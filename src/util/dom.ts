@@ -6,4 +6,4 @@ export const getMatrix = (to: SVGGraphicsElement, from: SVGGraphicsElement) =>
 
 /** get css variable */
 export const getCssVariable = (name: string) =>
-  getComputedStyle(document.body).getPropertyValue("--" + name);
+  getComputedStyle(document.body).getPropertyValue(name);

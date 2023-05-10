@@ -27,9 +27,9 @@ export default Viz;
   }));
 
   /** get css variable colors */
-  const primary = getCssVariable("primary");
-  const secondary = getCssVariable("secondary");
-  const gray = getCssVariable("gray");
+  const primary = getCssVariable("--primary");
+  const secondary = getCssVariable("--secondary");
+  const lightGray = getCssVariable("--light-gray");
 
   /** size and center canvas */
   const resize = () => {
@@ -119,7 +119,7 @@ export default Viz;
       y: randU() * canvas.height,
     },
     destination: point,
-    color: gray,
+    color: lightGray,
     alpha: 0,
     spin: Math.random() * 360,
   }));
@@ -138,13 +138,13 @@ export default Viz;
     });
     gsap.to(particle, {
       alpha: 1,
-      duration,
+      duration: 0.25,
       delay,
       ease,
     });
     gsap
-      .timeline({ repeat: -1, yoyo: true, delay: delay * 3 })
-      .to(particle, { color: gray, duration: duration })
+      .timeline({ repeat: -1, yoyo: true, delay: delay * 4 })
+      .to(particle, { color: lightGray, duration: duration })
       .to(particle, { color: secondary, duration: duration })
       .to(particle, { color: primary, duration: duration });
   }

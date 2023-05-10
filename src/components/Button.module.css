@@ -6,13 +6,13 @@
   gap: 10px;
   padding: 0.75em 1em;
   border-radius: 5px;
-  color: var(--light);
+  color: var(--off-white);
   text-decoration: none;
   cursor: pointer;
 }
 
 .button:hover {
-  color: var(--light);
+  color: var(--off-white);
 }
 
 .button:before,

@@ -1,9 +1,10 @@
 :root {
   /* https://tailwindcolor.com/ */
   /* https://www.materialpalette.com/colors */
-  --dark: #111827;
+  --off-black: #111827;
   --gray: #475569;
-  --light: #e2e8f0;
+  --light-gray: #64748B;
+  --off-white: #e2e8f0;
   --primary: #d239ed;
   --secondary: #4962f3;
   --fast: 0.25s ease;
@@ -19,7 +20,7 @@
 body {
   min-height: 100vh;
   margin: 0;
-  background: var(--dark);
+  background: var(--off-black);
   color: white;
   font-size: 14pt;
   font-family: "Mona Sans";
