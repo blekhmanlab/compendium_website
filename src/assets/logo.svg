@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100" id="logo">
   <path
     fill="none"
     stroke="currentColor"
@@ -371,7 +371,6 @@
   />
 
   <path
-    id="half"
     fill="currentColor"
     transform="scale(0.5)"
     d="
@@ -380,10 +379,15 @@
       C -12 50 -12 50 -14 15
       L -25 9
       C -21 -18 -21 -18 -8 -22
-      A 18 18 0 0 0 0 -20
+      A 18 18 0 0 0 8 -22
+      C 21 -18 21 -18 25 9
+      L 14 15
+      C 12 50 12 50 5 50
+      z
       M 0 -27
       A 11.5 11.5 0 0 1 0 -50
+      A 11.5 11.5 0 0 1 0 -27
+      z
     "
   />
-  <use href="#half" transform="scale(-1, 1) translate(0.5, 0)" />
 </svg>

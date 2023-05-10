@@ -4,7 +4,6 @@
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin: 10px;
   padding: 0.75em 1em;
   border-radius: 5px;
   color: var(--light);
@@ -23,8 +22,7 @@
   inset: 0;
   background: linear-gradient(45deg, var(--secondary), var(--primary));
   border-radius: 5px;
-  transition-property: opacity;
-  transition: var(--fast);
+  transition: opacity var(--fast);
   z-index: -1;
 }
 
@@ -49,8 +47,7 @@
   top: -0.05em;
   height: 1em;
   flex-shrink: 0;
-  transition-property: transform;
-  transition: var(--fast);
+  transition: transform var(--fast);
 }
 
 .button:hover .icon {
