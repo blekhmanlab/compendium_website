@@ -1,7 +1,7 @@
 import Button from "../components/Button.tsx";
-import { ReactComponent as HumanIcon } from "../assets/logo.svg";
-import { ReactComponent as BookIcon } from "../assets/book.svg";
-import { ReactComponent as DataIcon } from "../assets/data.svg";
+import { ReactComponent as HumanIcon } from "@/assets/logo.svg";
+import { ReactComponent as BookIcon } from "@/assets/book.svg";
+import { ReactComponent as DataIcon } from "@/assets/data.svg";
 import classes from "./Header.module.css";
 
 const Header = () => (
