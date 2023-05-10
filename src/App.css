@@ -1,0 +1,81 @@
+:root {
+  /* https://tailwindcolor.com/ */
+  /* https://www.materialpalette.com/colors */
+  --dark: #111827;
+  --gray: #64748b;
+  --light: #e2e8f0;
+  --primary: #d239ed;
+  --secondary: #2f48d5;
+
+  --fast: 0.25s ease;
+}
+
+@font-face {
+  font-family: "Mona Sans";
+  src: url("MonaSans.woff2") format("woff2");
+  /* ranges */
+  font-weight: 200 900;
+  font-stretch: 75% 125%;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--dark);
+  color: white;
+  font-size: 14pt;
+  font-family: "Mona Sans";
+  line-height: 1em;
+}
+
+header,
+section,
+footer {
+  padding: 40px max(calc((100% - var(--col)) / 2), 40px);
+}
+
+header,
+footer {
+  --col: 500px;
+}
+
+section {
+  --col: 1000px;
+}
+
+p {
+  text-align: justify;
+  line-height: 1.75em;
+}
+
+button {
+  all: unset;
+  cursor: pointer;
+  transition-property: background, color;
+  transition: var(--fast);
+}
+
+a {
+  cursor: pointer;
+  transition-property: background, color;
+  transition: var(--fast);
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1em;
+}
+
+h1 {
+  margin: 0;
+  letter-spacing: 1px;
+  font-weight: 600;
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.4rem;
+  font-weight: 200;
+  text-align: center;
+}

@@ -1,5 +1,14 @@
 import "./App.css";
+import Header from "./sections/Header.tsx";
+import Hero from "./sections/Hero.tsx";
 
-const App = () => <>Hello World</>;
+const App = () => (
+  <>
+    <Header />
+    <main>
+      <Hero />
+    </main>
+  </>
+);
 
 export default App;
