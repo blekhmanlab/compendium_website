@@ -7,6 +7,3 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <App />
   </React.StrictMode>
 );
-
-const instance = new ComlinkWorker(new URL("./data.ts", import.meta.url));
-console.log(await instance.getData("/class_complete.csv"));

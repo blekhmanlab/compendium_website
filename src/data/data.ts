@@ -8,3 +8,7 @@ export const getData = async (url: string) => {
   const { data } = await parse(text);
   return data;
 };
+
+// usage:
+// const instance = new ComlinkWorker(new URL("./data/data.ts", import.meta.url));
+// await instance.getData("./class.csv");
