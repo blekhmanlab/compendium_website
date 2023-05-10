@@ -25,3 +25,4 @@ jobs:
           keep_files: false
           publish_branch: gh-pages
           publish_dir: dist
+          github_token: ${{ secrets.GITHUB_TOKEN }}
