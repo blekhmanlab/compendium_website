@@ -1,0 +1,22 @@
+.svg {
+  width: 50%;
+}
+
+.xAxis {
+}
+
+.yAxis {
+}
+
+.bars {
+}
+
+.bar {
+  fill: var(--primary);
+}
+
+@media (max-width: 800px) {
+  .svg {
+    width: 100%;
+  }
+}

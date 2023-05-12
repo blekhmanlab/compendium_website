@@ -99,7 +99,6 @@ export default Viz;
     }));
 
   /** hard limit number of points */
-  console.info(points.length + " points");
   while (points.length > 500)
     points.splice(Math.floor(Math.random() * points.length), 1);
 

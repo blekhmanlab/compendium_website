@@ -3,10 +3,11 @@
   /* https://www.materialpalette.com/colors */
   --off-black: #111827;
   --gray: #475569;
-  --light-gray: #64748B;
+  --light-gray: #64748b;
   --off-white: #e2e8f0;
   --primary: #d239ed;
   --secondary: #4962f3;
+  --rounded: 5px;
   --fast: 0.25s ease;
 }
 
@@ -76,4 +77,8 @@ h2 {
   font-size: 1.4rem;
   font-weight: 200;
   text-align: center;
+}
+
+text {
+  fill: currentColor;
 }
