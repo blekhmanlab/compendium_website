@@ -1,4 +1,7 @@
-# Human Microbiome Compendium website.
+# Human Microbiome Compendium website
+
+[**⭐️ On Netlify**](https://human-microbiome-compendium.netlify.app/)  
+[**⭐️ On GitHub Pages**](https://blekhmanlab.github.io/compendium_website/)
 
 This project was scaffolded using Vite with the following options:
 
