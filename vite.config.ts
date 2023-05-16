@@ -6,7 +6,7 @@ import { comlink } from "vite-plugin-comlink";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/compendium_website/",
+  base: process.env.GITHUB_ACTIONS ? "/compendium_website/" : "/",
   plugins: [comlink(), react(), svgr()],
   worker: {
     plugins: [comlink()],
