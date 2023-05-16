@@ -52,8 +52,8 @@ export const loadData = async () => {
   };
 
   /** load and parse data files in parallel web workers */
-  makeWorker((worker) => worker.parseTable("classes.csv.gz"), "classes");
-  makeWorker((worker) => worker.parseTable("phyla.csv.gz"), "phyla");
-  makeWorker((worker) => worker.parseData("regions.csv.gz"), "regions");
-  makeWorker((worker) => worker.parseData("countries.csv.gz"), "countries");
+  makeWorker((worker) => worker.parseTable("classes.csv"), "classes");
+  makeWorker((worker) => worker.parseTable("phyla.csv"), "phyla");
+  makeWorker((worker) => worker.parseData("regions.csv"), "regions");
+  makeWorker((worker) => worker.parseData("countries.csv"), "countries");
 };
