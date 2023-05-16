@@ -13,7 +13,10 @@ import { CSV, Table } from "./";
 export const parseData = async (url: string): Promise<CSV> => {
   updateProgress("Fetching");
 
-  const response = await fetch(import.meta.env.BASE_URL + url);
+  const headers = new Headers();
+  headers.set("Accept-Encoding", "gzip");
+
+  const response = await fetch(import.meta.env.BASE_URL + url, { headers });
   if (!response.ok) throw Error("Response not OK");
 
   updateProgress("Parsing as text");
