@@ -19,10 +19,10 @@ export const parseData = async (url: string): Promise<CSV> => {
   const response = await fetch(import.meta.env.BASE_URL + url, { headers });
   if (!response.ok) throw Error("Response not OK");
 
-  progress?.("Parsing as text");
+  progress?.("Parsing text");
   const text = await response.text();
 
-  progress?.("Parsing as csv");
+  progress?.("Parsing csv");
   const parsed = await parse(text.trim());
   const data = parsed.data as CSV;
 
@@ -33,7 +33,7 @@ export const parseData = async (url: string): Promise<CSV> => {
 export const parseTable = async (url: string): Promise<Table> => {
   const data = await parseData(url);
 
-  progress?.("Parsing as table");
+  progress?.("Parsing table");
 
   const table: Table = [];
 
