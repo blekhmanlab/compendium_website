@@ -28,3 +28,5 @@ Notable technologies/packages/etc. used:
 | `yarn preview` | Serve built version of app (must run build first) |
 | `yarn lint`    | Fix linting and formatting                        |
 | `yarn imports` | Sort imports consistently                         |
+
+**Note**: `yarn dev` won't work Firefox due to [ESM import syntax in Web Workers not being supported](https://vitejs.dev/guide/features.html#import-with-query-suffixes) (the production build will work fine).
