@@ -11,7 +11,7 @@ import { CSV, Table } from "./";
 
 /** fetch file and parse as csv */
 export const parseData = async (url: string): Promise<CSV> => {
-  updateProgress("Fetching");
+  progress?.("Fetching");
 
   const headers = new Headers();
   headers.set("Accept-Encoding", "gzip, deflate, br");
@@ -19,10 +19,10 @@ export const parseData = async (url: string): Promise<CSV> => {
   const response = await fetch(import.meta.env.BASE_URL + url, { headers });
   if (!response.ok) throw Error("Response not OK");
 
-  updateProgress("Parsing as text");
+  progress?.("Parsing as text");
   const text = await response.text();
 
-  updateProgress("Parsing as csv");
+  progress?.("Parsing as csv");
   const parsed = await parse(text.trim());
   const data = parsed.data as CSV;
 
@@ -33,7 +33,7 @@ export const parseData = async (url: string): Promise<CSV> => {
 export const parseTable = async (url: string): Promise<Table> => {
   const data = await parseData(url);
 
-  updateProgress("Parsing as table");
+  progress?.("Parsing as table");
 
   const table: Table = [];
 
@@ -60,10 +60,12 @@ export const parseTable = async (url: string): Promise<Table> => {
   return table.slice(0, 15);
 };
 
-type OnProgress = (message: string) => void;
-let progressCallback: OnProgress | undefined;
-const updateProgress = (message: string) => progressCallback?.(message);
-export const onProgress = (callback: OnProgress) =>
-  (progressCallback = callback);
+type OnProgress = (status: string) => void;
+
+/** currently set progress callback */
+let progress: OnProgress | undefined;
+
+/** expose method to set progress callback */
+export const onProgress = (callback: OnProgress) => (progress = callback);
 
 expose({ parseData, parseTable, onProgress });

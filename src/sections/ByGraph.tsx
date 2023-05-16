@@ -49,6 +49,7 @@ const ByGraph = ({ id, title, table }: Props) => {
     fit();
   }, [table, id, fit]);
 
+  /** show status */
   if (!Array.isArray(table))
     return (
       <Placeholder className={classes.svg}>
@@ -60,7 +61,7 @@ const ByGraph = ({ id, title, table }: Props) => {
 
   return (
     <svg ref={svg} id={id} className={classes.svg}>
-      <text className={classes.title} x={width / 2} y="-20" textAnchor="middle">
+      <text className={classes.title} x={width / 2} y={-20} textAnchor="middle">
         {title}
       </text>
       <g className={classes.bars}></g>
@@ -79,40 +80,49 @@ export default ByGraph;
 const chart = (id: string, data: Table) => {
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
 
+  /** get x extent */
   const [xMin = 0, xMax = 100] = d3.extent(data, (d) => d.samples);
 
+  /** create x scale computer */
   const xScale = d3
     .scaleLog()
     .domain([Math.max(xMin * 0.9, 0.1), xMax])
     .range([0, width]);
 
+  /** create y scale computer */
   const yScale = d3
     .scaleBand()
     .domain(data.map((d) => d.fullName))
     .range([0, height(data.length)])
     .padding(0.2);
 
+  /** create x axis */
   const xAxis = d3
     .axisBottom(xScale)
     .ticks(3, (d: number) =>
       d.toLocaleString(undefined, { notation: "compact" })
     );
+
+  /** create y axis */
   const yAxis = d3.axisLeft(yScale).tickFormat((_, i) => data[i].name);
 
+  /** update x axis */
   svg
     .select<SVGGElement>("." + classes.xAxis)
     .attr("transform", `translate(0, ${height(data.length)})`)
     .call(xAxis);
 
+  /** update y axis */
   svg.select<SVGGElement>("." + classes.yAxis).call(yAxis);
 
+  /** update bars */
   svg
     .select("." + classes.bars)
     .selectAll("." + classes.bar)
     .data(data)
     .join("rect")
     .attr("class", classes.bar)
-    .attr("x", "0")
+    .attr("x", 0)
     .attr("y", (d) => yScale(d.fullName) || 0)
     .attr("width", (d) => xScale(d.samples))
     .attr("height", () => yScale.bandwidth())

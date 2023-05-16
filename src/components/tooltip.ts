@@ -11,8 +11,9 @@ const options: Partial<Props> = {
   appendTo: document.body,
   aria: { content: "describedby" },
   onShow: (instance: Instance) => {
-    const content = instance?.reference?.getAttribute("data-tooltip")?.trim();
-    if (!content) return false;
+    /** don't show if no content */
+    if (!instance?.reference?.getAttribute("data-tooltip")?.trim())
+      return false;
   },
   // onHide: () => false
 };
@@ -22,11 +23,12 @@ type _Element = Element & { _tippy: Instance };
 
 /** listen for changes to document */
 new MutationObserver(() => {
+  /** elements with tooltip attribute */
   const elements: NodeListOf<_Element> =
     document.querySelectorAll("[data-tooltip]");
 
   for (const element of elements) {
-    /** get tooltip content from attached attribute */
+    /** get tooltip content from attribute */
     const content = element.getAttribute("data-tooltip")?.trim() || "";
 
     /** if tippy instance doesn't exist for element yet, create one */
