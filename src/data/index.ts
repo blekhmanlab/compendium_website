@@ -2,7 +2,7 @@ import { proxy, Remote, wrap } from "comlink";
 import { create } from "zustand";
 import DataWorker from "./worker?worker";
 
-export type CSV = (string | number)[][];
+export type CSV = unknown[][];
 
 export type Table = {
   fullName: string;

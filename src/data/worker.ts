@@ -43,15 +43,15 @@ export const parseTable = async (url: string): Promise<Table> => {
     const [kingdom = "", phylum = "", _class = ""] = fullName.split(".");
     /** get name from most specific part */
     const name = _class || phylum || kingdom;
+    /** skip NA */
+    if (name === "NA") continue;
 
     /** count number of non-zero rows in col */
     let samples = 0;
     for (let row = 1; row < data.length; row++)
       if (data[row][col] !== "0") samples++;
 
-    /** number */
-    if (name !== "NA")
-      table.push({ fullName, name, kingdom, phylum, _class, samples });
+    table.push({ fullName, name, kingdom, phylum, _class, samples });
   }
 
   /** sort by sample count */
