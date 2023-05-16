@@ -1,15 +1,21 @@
 import { create } from "zustand";
 
-// type Header = [unknown, ...string[]];
-// type Row = [string, ...(number | string)[]];
-// export type CSV = [Header, ...Row[]];
 export type CSV = (string | number)[][];
+
+export type Table = {
+  fullName: string;
+  name: string;
+  kingdom: string;
+  phylum: string;
+  _class: string;
+  samples: number;
+}[];
 
 type Data = {
   /** class data */
-  classes?: CSV;
+  classes?: Table;
   /** phylum data */
-  phyla?: CSV;
+  phyla?: Table;
   /** region data */
   regions?: CSV;
   /** countries data */
@@ -25,25 +31,23 @@ export const useData = create<Data>(() => ({
 
 /** load data */
 export const loadData = async () => {
-  /** import functions as web workers */
-  const dataWorker = new ComlinkWorker<typeof import("./worker.ts")>(
-    new URL("./worker.ts", import.meta.url)
-  );
+  /** create web worker */
+  const worker = () =>
+    new ComlinkWorker<typeof import("./worker.ts")>(
+      new URL("./worker.ts", import.meta.url)
+    );
 
   /** load and parse data files in parallel web workers */
-  const [classes, phyla, regions, countries] = (
-    await Promise.allSettled(
-      [
-        { file: "classes.csv.gz", computeTotals: true },
-        { file: "phyla.csv.gz", computeTotals: true },
-        { file: "regions.csv.gz", computeTotals: false },
-        { file: "countries.csv.gz", computeTotals: false },
-      ].map(
-        async ({ file, computeTotals }) =>
-          await dataWorker.parseData(file, computeTotals)
-      )
-    )
-  ).map((result) => (result.status === "fulfilled" ? result.value : undefined));
-
-  useData.setState({ classes, phyla, regions, countries });
+  worker()
+    .parseTable("classes.csv.gz")
+    .then((classes) => useData.setState({ classes }));
+  worker()
+    .parseTable("phyla.csv.gz")
+    .then((phyla) => useData.setState({ phyla }));
+  worker()
+    .parseData("regions.csv.gz")
+    .then((regions) => useData.setState({ regions }));
+  worker()
+    .parseData("countries.csv.gz")
+    .then((countries) => useData.setState({ countries }));
 };

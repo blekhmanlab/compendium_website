@@ -2,7 +2,7 @@ import PoissonDiskSampling from "poisson-disk-sampling";
 import { gsap } from "gsap";
 import { waitFor } from "@/util/async";
 import { getCssVariable, getMatrix } from "@/util/dom";
-import { Point, cos, randU, sin } from "@/util/math";
+import { Point, cos, sin, normalize, scale } from "@/util/math";
 import classes from "./Viz.module.css";
 
 const Viz = () => <canvas className={classes.canvas}></canvas>;
@@ -108,19 +108,18 @@ export default Viz;
     alpha: number;
     color: string;
     spin: number;
+    animations: gsap.core.Timeline[];
   };
 
   /** create particle for each point */
   const particles: Particle[] = points.map((point) => ({
     /** starting values */
-    position: {
-      x: randU() * canvas.height,
-      y: randU() * canvas.height,
-    },
+    position: scale(normalize(point), canvasSize * 1.5),
     destination: point,
     color: lightGray,
     alpha: 0,
     spin: Math.random() * 360,
+    animations: [],
   }));
 
   /** animate each particle */
@@ -128,24 +127,24 @@ export default Viz;
     const duration = 2;
     const delay = Math.random() * duration;
     const ease = "power4.out";
-    gsap.to(particle.position, {
-      x: particle.destination.x,
-      y: particle.destination.y,
-      duration,
-      delay,
-      ease,
-    });
-    gsap.to(particle, {
-      alpha: 1,
-      duration: 0.25,
-      delay,
-      ease,
-    });
+    particle.animations = [
+      gsap.timeline().to(particle.position, {
+        x: particle.destination.x,
+        y: particle.destination.y,
+        duration,
+        delay,
+        ease,
+      }),
+      gsap
+        .timeline()
+        .to(particle, { alpha: 1, duration: 0.25, delay, ease })
+        .to(particle, { alpha: 0.5, duration, ease }),
+    ];
     gsap
-      .timeline({ repeat: -1, yoyo: true, delay: delay * 4 })
-      .to(particle, { color: lightGray, duration: duration })
-      .to(particle, { color: secondary, duration: duration })
-      .to(particle, { color: primary, duration: duration });
+      .timeline({ repeat: -1, yoyo: true, delay: -delay * 4 })
+      .to(particle, { color: lightGray, duration, ease })
+      .to(particle, { color: secondary, duration, ease })
+      .to(particle, { color: primary, duration, ease });
   }
 
   /** size of particle in canvas coordinates */
@@ -183,4 +182,11 @@ export default Viz;
     window.setTimeout(() => window.requestAnimationFrame(frame), 1);
   };
   frame();
+
+  /** restart animations on click */
+  canvas.addEventListener("click", () =>
+    particles.forEach((particle) =>
+      particle.animations.forEach((animation) => animation.restart())
+    )
+  );
 })();

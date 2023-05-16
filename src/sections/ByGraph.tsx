@@ -1,16 +1,44 @@
 import { useEffect } from "react";
 import * as d3 from "d3";
-import type { CSV } from "@/data";
+import { Table } from "@/data";
 import { useViewBox } from "@/util/hooks";
 import classes from "./ByGraph.module.css";
+import Placeholder from "@/components/Placeholder";
 
 type Props = {
   id: string;
   title: string;
-  table?: CSV;
+  table?: Table;
 };
 
+/** map colors to phyla */
+const colors = [
+  "#f44336",
+  "#e91e63",
+  "#9c27b0",
+  "#673ab7",
+  "#3f51b5",
+  "#2196f3",
+  "#03a9f4",
+  "#00bcd4",
+  "#009688",
+  "#4caf50",
+  "#8bc34a",
+  "#cddc39",
+  "#ffeb3b",
+  "#ffc107",
+  "#ff9800",
+  "#ff5722",
+];
+const colorMap: { [phylum: string]: string } = {};
+let colorIndex = 0;
+const getColor = (phylum: string) =>
+  (colorMap[phylum] ??= colors[colorIndex++ % colors.length]);
+
+/** svg key dimensions */
 const width = 380;
+const bandHeight = width / 15;
+const height = (rows: number) => bandHeight * (rows || 10);
 
 const ByGraph = ({ id, title, table }: Props) => {
   const [svg, fit] = useViewBox(20);
@@ -21,16 +49,22 @@ const ByGraph = ({ id, title, table }: Props) => {
     fit();
   }, [table, id, fit]);
 
-  if (!table) return <></>;
+  if (!table)
+    return (
+      <Placeholder className={classes.svg}>Loading "{title}" table</Placeholder>
+    );
 
   return (
     <svg ref={svg} id={id} className={classes.svg}>
-      <text x={width / 2} y="-10" textAnchor="middle">
+      <text className={classes.title} x={width / 2} y="-20" textAnchor="middle">
         {title}
       </text>
       <g className={classes.bars}></g>
       <g className={classes.xAxis}></g>
       <g className={classes.yAxis}></g>
+      <text x={width / 2} y={height(table.length) + 60} textAnchor="middle">
+        # of samples
+      </text>
     </svg>
   );
 };
@@ -38,24 +72,10 @@ const ByGraph = ({ id, title, table }: Props) => {
 export default ByGraph;
 
 /** d3 code */
-const chart = (id: string, table: CSV) => {
+const chart = (id: string, data: Table) => {
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
 
-  const data = table[0]
-    .map((name, index) => ({
-      name: name as string,
-      total: table[1][index] as number,
-    }))
-    .slice(1)
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 20)
-    .filter((d) => d.total)
-    .map((d) => ({ ...d, name: d.name.split(".").at(-1) as string }));
-
-  const bandHeight = width / 30;
-  const height = bandHeight * data.length;
-
-  const [xMin = 0, xMax = 100] = d3.extent(data, (d) => d.total);
+  const [xMin = 0, xMax = 100] = d3.extent(data, (d) => d.samples);
 
   const xScale = d3
     .scaleLog()
@@ -64,16 +84,20 @@ const chart = (id: string, table: CSV) => {
 
   const yScale = d3
     .scaleBand()
-    .domain(data.map((d) => d.name))
-    .range([0, height])
+    .domain(data.map((d) => d.fullName))
+    .range([0, height(data.length)])
     .padding(0.2);
 
-  const xAxis = d3.axisBottom(xScale);
-  const yAxis = d3.axisLeft(yScale);
+  const xAxis = d3
+    .axisBottom(xScale)
+    .ticks(3, (d: number) =>
+      d.toLocaleString(undefined, { notation: "compact" })
+    );
+  const yAxis = d3.axisLeft(yScale).tickFormat((_, i) => data[i].name);
 
   svg
     .select<SVGGElement>("." + classes.xAxis)
-    .attr("transform", `translate(0, ${height})`)
+    .attr("transform", `translate(0, ${height(data.length)})`)
     .call(xAxis);
 
   svg.select<SVGGElement>("." + classes.yAxis).call(yAxis);
@@ -85,7 +109,24 @@ const chart = (id: string, table: CSV) => {
     .join("rect")
     .attr("class", classes.bar)
     .attr("x", "0")
-    .attr("y", (d) => yScale(d.name) || 0)
-    .attr("width", (d) => xScale(d.total))
-    .attr("height", () => yScale.bandwidth());
+    .attr("y", (d) => yScale(d.fullName) || 0)
+    .attr("width", (d) => xScale(d.samples))
+    .attr("height", () => yScale.bandwidth())
+    .attr("fill", (d) => getColor(d.phylum))
+    .attr(
+      "data-tooltip",
+      ({ kingdom, phylum, _class, samples }) =>
+        `
+        <div class="tooltip-table">
+          <span>Kingdom</span>
+          <span>${kingdom}</span>
+          <span>Phylum</span>
+          <span>${phylum}</span>
+          <span>Class</span>
+          <span>${_class}</span>
+          <span># of Samples</span>
+          <span>${samples.toLocaleString()}</span>
+        </div>
+      `
+    );
 };

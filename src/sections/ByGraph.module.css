@@ -1,5 +1,13 @@
 .svg {
-  width: 50%;
+}
+
+.svg text {
+  fill: currentColor;
+  font-size: 1.2rem;
+}
+
+.title {
+  font-size: 1.5rem !important;
 }
 
 .xAxis {
@@ -12,11 +20,4 @@
 }
 
 .bar {
-  fill: var(--primary);
-}
-
-@media (max-width: 800px) {
-  .svg {
-    width: 100%;
-  }
 }
