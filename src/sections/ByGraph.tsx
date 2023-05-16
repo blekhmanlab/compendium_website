@@ -133,7 +133,9 @@ const chart = (id: string, data: Table) => {
         kingdom ? `<span>Kingdom</span><span>${kingdom}</span>` : "",
         phylum ? `<span>Phylum</span><span>${phylum}</span>` : "",
         _class ? `<span>Class</span><span>${_class}</span>` : "",
-        samples ? `<span>Samples</span><span>${samples}</span>` : "",
+        samples
+          ? `<span>Samples</span><span>${samples.toLocaleString()}</span>`
+          : "",
         `</div>`,
       ]
         .filter(Boolean)
