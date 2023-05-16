@@ -5,7 +5,7 @@ import svgr from "vite-plugin-svgr";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/compendium_website/",
+  base: process.env.GITHUB_ACTIONS ? "/compendium_website/" : "/",
   plugins: [react(), svgr()],
   resolve: {
     alias: {
