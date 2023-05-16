@@ -29,4 +29,4 @@ Notable technologies/packages/etc. used:
 | `yarn lint`    | Fix linting and formatting                        |
 | `yarn imports` | Sort imports consistently                         |
 
-**Note**: `yarn dev` won't work Firefox due to [ESM import syntax in Web Workers not being supported](https://vitejs.dev/guide/features.html#import-with-query-suffixes) (the production build will work fine).
+**Note**: `yarn dev` [won't work Firefox](https://caniuse.com/?search=module%20worker) (`yarn build` [will work fine](https://vitejs.dev/guide/features.html#import-with-query-suffixes)).
