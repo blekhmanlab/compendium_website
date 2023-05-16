@@ -14,7 +14,7 @@ export const parseData = async (url: string): Promise<CSV> => {
   updateProgress("Fetching");
 
   const headers = new Headers();
-  headers.set("Accept-Encoding", "gzip");
+  headers.set("Accept-Encoding", "gzip, deflate, br");
 
   const response = await fetch(import.meta.env.BASE_URL + url, { headers });
   if (!response.ok) throw Error("Response not OK");
