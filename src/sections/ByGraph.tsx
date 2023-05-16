@@ -117,20 +117,16 @@ const chart = (id: string, data: Table) => {
     .attr("width", (d) => xScale(d.samples))
     .attr("height", () => yScale.bandwidth())
     .attr("fill", (d) => getColor(d.phylum))
-    .attr(
-      "data-tooltip",
-      ({ kingdom, phylum, _class, samples }) =>
-        `
-        <div class="tooltip-table">
-          <span>Kingdom</span>
-          <span>${kingdom}</span>
-          <span>Phylum</span>
-          <span>${phylum}</span>
-          <span>Class</span>
-          <span>${_class}</span>
-          <span># of Samples</span>
-          <span>${samples.toLocaleString()}</span>
-        </div>
-      `
+    .attr("data-tooltip", ({ kingdom, phylum, _class, samples }) =>
+      [
+        `<div class="tooltip-table">`,
+        kingdom ? `<span>Kingdom</span><span>${kingdom}</span>` : "",
+        phylum ? `<span>Phylum</span><span>${phylum}</span>` : "",
+        _class ? `<span>Class</span><span>${_class}</span>` : "",
+        samples ? `<span>Samples</span><span>${samples}</span>` : "",
+        `</div>`,
+      ]
+        .filter(Boolean)
+        .join("")
     );
 };
