@@ -1,4 +1,7 @@
-/** get transform matrix that converts point from one element coordinate system to another */
+/**
+ * get transform matrix that converts point from one element coordinate system
+ * to another
+ */
 export const getMatrix = (to: SVGGraphicsElement, from: SVGGraphicsElement) =>
   (to.getScreenCTM() || new SVGMatrix())
     .inverse()

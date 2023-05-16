@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "lint": "eslint src --ext ts,tsx",
     "preview": "vite preview",
+    "lint": "eslint . --ext .tsx,.ts --fix && prettier --write \"**/*.{tsx,ts,css,json,yaml,svg,md}\" --no-error-on-unmatched-pattern",
     "imports": "npx format-imports --config ./format-imports.json --log ./src"
   },
   "dependencies": {
