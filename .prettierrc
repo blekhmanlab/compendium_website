@@ -1,0 +1,12 @@
+{
+  "plugins": ["prettier-plugin-jsdoc"],
+  "jsdocCapitalizeDescription": false,
+  "overrides": [
+    {
+      "files": "*.svg",
+      "options": {
+        "parser": "html"
+      }
+    }
+  ]
+}

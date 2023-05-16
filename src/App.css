@@ -2,11 +2,13 @@
   /* https://tailwindcolor.com/ */
   /* https://www.materialpalette.com/colors */
   --off-black: #111827;
+  --dark-gray: #334155;
   --gray: #475569;
-  --light-gray: #64748B;
+  --light-gray: #64748b;
   --off-white: #e2e8f0;
   --primary: #d239ed;
   --secondary: #4962f3;
+  --rounded: 5px;
   --fast: 0.25s ease;
 }
 
@@ -15,6 +17,10 @@
   src: url("@/assets/MonaSans.woff2") format("woff2");
   font-weight: 200 900;
   font-stretch: 75% 125%;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
@@ -76,4 +82,36 @@ h2 {
   font-size: 1.4rem;
   font-weight: 200;
   text-align: center;
+}
+
+.tippy-box {
+  padding: 10px 15px;
+  border-radius: var(--rounded);
+  background: var(--gray);
+  font-size: 1rem;
+  box-shadow: 0 0 10px var(--off-black);
+}
+
+.tippy-content {
+  padding: 0;
+}
+
+.tippy-arrow {
+  color: var(--gray);
+  z-index: 99;
+}
+
+.tooltip-table {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 5px 15px;
+  margin: 5px;
+}
+
+.tooltip-table > *:nth-child(odd) {
+  font-weight: 500;
+}
+
+[data-tooltip] {
+  cursor: help;
 }
