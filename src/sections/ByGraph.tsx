@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import * as d3 from "d3";
+import Placeholder from "@/components/Placeholder";
 import { Data, Table } from "@/data";
 import { useViewBox } from "@/util/hooks";
 import classes from "./ByGraph.module.css";
-import Placeholder from "@/components/Placeholder";
 
 type Props = {
   id: string;

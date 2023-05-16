@@ -1,10 +1,10 @@
+import Cols from "@/components/Cols";
+import { loadData, useData } from "@/data";
+import ByGraph from "@/sections/ByGraph";
 import Header from "@/sections/Header";
 import Hero from "@/sections/Hero";
-import ByGraph from "@/sections/ByGraph";
-import { loadData, useData } from "@/data";
 import "@/components/tooltip";
 import "./App.css";
-import Cols from "@/components/Cols";
 
 loadData();
 

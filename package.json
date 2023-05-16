@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "imports": "npx format-imports --config ./format-imports.json --log ./src"
   },
   "dependencies": {
     "comlink": "^4.4.1",

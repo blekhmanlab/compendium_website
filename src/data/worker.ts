@@ -1,5 +1,5 @@
-import { parse } from "papaparse";
 import { expose } from "comlink";
+import { parse } from "papaparse";
 import { CSV, Table } from "./";
 
 /**

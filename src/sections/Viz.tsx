@@ -1,8 +1,8 @@
-import PoissonDiskSampling from "poisson-disk-sampling";
 import { gsap } from "gsap";
+import PoissonDiskSampling from "poisson-disk-sampling";
 import { waitFor } from "@/util/async";
 import { getCssVariable, getMatrix } from "@/util/dom";
-import { Point, cos, sin, normalize, scale } from "@/util/math";
+import { cos, normalize, Point, scale, sin } from "@/util/math";
 import classes from "./Viz.module.css";
 
 const Viz = () => <canvas className={classes.canvas}></canvas>;

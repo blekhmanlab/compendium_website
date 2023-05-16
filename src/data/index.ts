@@ -1,5 +1,5 @@
+import { proxy, Remote, wrap } from "comlink";
 import { create } from "zustand";
-import { wrap, proxy, Remote } from "comlink";
 import DataWorker from "./worker?worker";
 
 export type CSV = (string | number)[][];
