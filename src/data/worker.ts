@@ -1,4 +1,5 @@
 import { parse } from "papaparse";
+import { expose } from "comlink";
 import { CSV, Table } from "./";
 
 /**
@@ -10,15 +11,15 @@ import { CSV, Table } from "./";
 
 /** fetch file and parse as csv */
 export const parseData = async (url: string): Promise<CSV> => {
-  console.info(url, "Fetching");
+  updateProgress("Fetching");
 
   const response = await fetch(import.meta.env.BASE_URL + url);
   if (!response.ok) throw Error("Response not OK");
 
-  console.info(url, "Parsing as text");
+  updateProgress("Parsing as text");
   const text = await response.text();
 
-  console.info(url, "Parsing as csv ");
+  updateProgress("Parsing as csv");
   const parsed = await parse(text.trim());
   const data = parsed.data as CSV;
 
@@ -28,6 +29,8 @@ export const parseData = async (url: string): Promise<CSV> => {
 /** parse csv with "by table" format */
 export const parseTable = async (url: string): Promise<Table> => {
   const data = await parseData(url);
+
+  updateProgress("Parsing as table");
 
   const table: Table = [];
 
@@ -53,3 +56,11 @@ export const parseTable = async (url: string): Promise<Table> => {
 
   return table.slice(0, 15);
 };
+
+type OnProgress = (message: string) => void;
+let progressCallback: OnProgress | undefined;
+const updateProgress = (message: string) => progressCallback?.(message);
+export const onProgress = (callback: OnProgress) =>
+  (progressCallback = callback);
+
+expose({ parseData, parseTable, onProgress });

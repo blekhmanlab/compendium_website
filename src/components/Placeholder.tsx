@@ -7,7 +7,9 @@ type Props = {
 };
 
 const Placeholder = ({ className = "", children }: Props) => (
-  <div className={[classes.placeholder, className].join(" ")}>{children}</div>
+  <div className={[classes.placeholder, className].join(" ")}>
+    <p>{children}</p>
+  </div>
 );
 
 export default Placeholder;

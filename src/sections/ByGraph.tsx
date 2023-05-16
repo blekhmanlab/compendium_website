@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import * as d3 from "d3";
-import { Table } from "@/data";
+import { Data, Table } from "@/data";
 import { useViewBox } from "@/util/hooks";
 import classes from "./ByGraph.module.css";
 import Placeholder from "@/components/Placeholder";
@@ -8,7 +8,7 @@ import Placeholder from "@/components/Placeholder";
 type Props = {
   id: string;
   title: string;
-  table?: Table;
+  table?: Data["phyla"] | Data["classes"];
 };
 
 /** map colors to phyla */
@@ -45,13 +45,17 @@ const ByGraph = ({ id, title, table }: Props) => {
 
   /** rerun d3 code when props change */
   useEffect(() => {
-    if (table) chart(id, table);
+    if (table && typeof table !== "string") chart(id, table);
     fit();
   }, [table, id, fit]);
 
-  if (!table)
+  if (!Array.isArray(table))
     return (
-      <Placeholder className={classes.svg}>Loading "{title}" table</Placeholder>
+      <Placeholder className={classes.svg}>
+        "{title}" table
+        <br />
+        {table}
+      </Placeholder>
     );
 
   return (

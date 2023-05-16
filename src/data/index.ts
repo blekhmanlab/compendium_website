@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { wrap, proxy, Remote } from "comlink";
+import DataWorker from "./worker?worker";
 
 export type CSV = (string | number)[][];
 
@@ -11,43 +13,47 @@ export type Table = {
   samples: number;
 }[];
 
-type Data = {
+type Status = string;
+
+export type Data = {
   /** class data */
-  classes?: Table;
+  classes: Table | Status;
   /** phylum data */
-  phyla?: Table;
+  phyla: Table | Status;
   /** region data */
-  regions?: CSV;
+  regions: CSV | Status;
   /** countries data */
-  countries?: CSV;
+  countries: CSV | Status;
 };
 
 export const useData = create<Data>(() => ({
-  classes: undefined,
-  phyla: undefined,
-  regions: undefined,
-  countries: undefined,
+  classes: "no data",
+  phyla: "no data",
+  regions: "no data",
+  countries: "no data",
 }));
 
 /** load data */
 export const loadData = async () => {
-  /** create web worker */
-  const worker = () =>
-    new ComlinkWorker<typeof import("./worker.ts")>(
-      new URL("./worker.ts", import.meta.url)
-    );
+  /** get exports from worker to define types for methods/objects/etc. */
+  type API = typeof import("./worker.ts");
+
+  /** wrapper func for creating worker */
+  const makeWorker = <Key extends keyof Data>(
+    method: (worker: Remote<API>) => Promise<Data[Key]>,
+    key: Key
+  ) => {
+    /** create worker instance */
+    const worker = wrap<API>(new DataWorker());
+    /** execute specified method, and set state on final result */
+    method(worker).then((result) => useData.setState({ [key]: result }));
+    /** on progress update, set state to status */
+    worker.onProgress(proxy((status) => useData.setState({ [key]: status })));
+  };
 
   /** load and parse data files in parallel web workers */
-  worker()
-    .parseTable("classes.csv.gz")
-    .then((classes) => useData.setState({ classes }));
-  worker()
-    .parseTable("phyla.csv.gz")
-    .then((phyla) => useData.setState({ phyla }));
-  worker()
-    .parseData("regions.csv.gz")
-    .then((regions) => useData.setState({ regions }));
-  worker()
-    .parseData("countries.csv.gz")
-    .then((countries) => useData.setState({ countries }));
+  makeWorker((worker) => worker.parseTable("classes.csv.gz"), "classes");
+  makeWorker((worker) => worker.parseTable("phyla.csv.gz"), "phyla");
+  makeWorker((worker) => worker.parseData("regions.csv.gz"), "regions");
+  makeWorker((worker) => worker.parseData("countries.csv.gz"), "countries");
 };
