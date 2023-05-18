@@ -100,7 +100,7 @@ const chart = (id: string, world: Props["world"], data: Props["data"]) => {
   const scale = d3
     .scaleLog<string>()
     .domain([min, max])
-    .range(["#334155", "#d239ed"])
+    .range(["#475569", "#d239ed"])
     .interpolate(d3.interpolateLab);
 
   /** map sample count from countries data to world data features */

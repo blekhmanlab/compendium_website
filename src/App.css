@@ -101,7 +101,7 @@ svg .graticule {
 
 svg .country {
   /* fill: var(--gray); */
-  stroke: var(--light-gray);
+  stroke: var(--dark-gray);
   stroke-width: 0.5;
 }
 
