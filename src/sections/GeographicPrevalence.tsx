@@ -138,8 +138,17 @@ const chart = (id: string, world: Props["world"], data: Props["data"]) => {
       ].join("")
     );
 
-  /** redraw paths based on projection */
-  const redraw = () => {
+  const update = () => {
+    /** get current projection components */
+    let [x, y] = projection.center();
+    const scale = projection.scale();
+
+    /** limit projection */
+    const angleLimit = 90 - 90 * (baseScale / scale);
+    y = clamp(y, -angleLimit, angleLimit);
+    projection.center([x, y]);
+
+    /** update paths based on projection */
     svg.selectAll<Element, Feature>(".graticule").attr("d", path);
     svg.selectAll<Element, Feature>(".country").attr("d", path);
   };
@@ -153,15 +162,14 @@ const chart = (id: string, world: Props["world"], data: Props["data"]) => {
       let [lambda, phi] = projection.rotate();
 
       /** update components based on drag */
-      lambda += ((baseScale / 2) * event.dx) / scale;
-      y += ((baseScale / 2) * event.dy) / scale;
-      y = clamp(y, -90, 90);
+      lambda += (baseScale / 2) * (event.dx / scale);
+      y += (baseScale / 2) * (event.dy / scale);
 
       /** update projection */
       projection.rotate([lambda, phi]);
       projection.center([x, y]);
 
-      redraw();
+      update();
     })
   );
 
@@ -169,7 +177,7 @@ const chart = (id: string, world: Props["world"], data: Props["data"]) => {
   svg.on("dblclick", () => {
     /** reset projection */
     reset();
-    redraw();
+    update();
   });
 
   /** on mouse wheel */
@@ -182,6 +190,6 @@ const chart = (id: string, world: Props["world"], data: Props["data"]) => {
     if (event.deltaY > 0) scale /= 1.2;
     if (event.deltaY < 0) scale *= 1.2;
     projection.scale(clamp(scale, baseScale, baseScale * 10));
-    redraw();
+    update();
   });
 };
