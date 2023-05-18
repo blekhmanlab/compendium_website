@@ -93,6 +93,23 @@ svg .title {
   font-size: 1.5rem !important;
 }
 
+svg .graticule {
+  fill: none;
+  stroke: var(--dark-gray);
+  stroke-width: 0.5;
+}
+
+svg .country {
+  /* fill: var(--gray); */
+  stroke: var(--light-gray);
+  stroke-width: 0.5;
+}
+
+svg [data-tooltip]:hover {
+  /* opacity: 0.5; */
+  fill: white;
+}
+
 .tippy-box {
   padding: 10px 15px;
   border-radius: var(--rounded);

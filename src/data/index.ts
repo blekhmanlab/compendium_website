@@ -1,10 +1,11 @@
-import { proxy, Remote, wrap } from "comlink";
-import { create } from "zustand";
 import DataWorker from "./worker?worker";
+import { proxy, Remote, wrap } from "comlink";
+import { FeatureCollection } from "geojson";
+import { create } from "zustand";
 
-export type CSV = unknown[][];
+export type CSV = string[][];
 
-export type Table = {
+export type TaxonomicPrevalence = {
   fullName: string;
   name: string;
   kingdom: string;
@@ -13,17 +14,25 @@ export type Table = {
   samples: number;
 }[];
 
+export type CountryPrevalence = {
+  code: string;
+  name: string;
+  samples: number;
+}[];
+
 type Status = string;
 
 export type Data = {
   /** class data */
-  classes: Table | Status;
+  classes: TaxonomicPrevalence | Status;
   /** phylum data */
-  phyla: Table | Status;
+  phyla: TaxonomicPrevalence | Status;
   /** region data */
   regions: CSV | Status;
   /** countries data */
-  countries: CSV | Status;
+  countries: CountryPrevalence | Status;
+  /** world map data */
+  world: FeatureCollection | Status;
 };
 
 export const useData = create<Data>(() => ({
@@ -31,6 +40,7 @@ export const useData = create<Data>(() => ({
   phyla: "no data",
   regions: "no data",
   countries: "no data",
+  world: "no data",
 }));
 
 /** load data */
@@ -46,14 +56,20 @@ export const loadData = async () => {
     /** create worker instance */
     const worker = wrap<API>(new DataWorker());
     /** execute specified method, and set state on final result */
-    method(worker).then((result) => useData.setState({ [key]: result }));
+    method(worker)
+      .then((result) => useData.setState({ [key]: result }))
+      .catch((error: Error) => {
+        console.error(error);
+        useData.setState({ [key]: "Error" });
+      });
     /** on progress update, set state to status */
     worker.onProgress(proxy((status) => useData.setState({ [key]: status })));
   };
 
   /** load and parse data files in parallel web workers */
-  makeWorker((worker) => worker.parseTable("classes.csv"), "classes");
-  makeWorker((worker) => worker.parseTable("phyla.csv"), "phyla");
-  makeWorker((worker) => worker.parseData("regions.csv"), "regions");
-  makeWorker((worker) => worker.parseData("countries.csv"), "countries");
+  makeWorker((worker) => worker.getTable("classes.csv"), "classes");
+  makeWorker((worker) => worker.getTable("phyla.csv"), "phyla");
+  makeWorker((worker) => worker.parseCsv("regions.csv"), "regions");
+  makeWorker((worker) => worker.getCountries("countries.csv"), "countries");
+  makeWorker((worker) => worker.getWorld(), "world");
 };

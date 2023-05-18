@@ -1,6 +1,7 @@
+import { CountryPrevalence, CSV, TaxonomicPrevalence } from "./";
 import { expose } from "comlink";
+import { FeatureCollection } from "geojson";
 import { parse } from "papaparse";
-import { CSV, Table } from "./";
 
 /**
  * every time you communicate with a web worker, the message content must be
@@ -10,7 +11,7 @@ import { CSV, Table } from "./";
  */
 
 /** fetch file and parse as csv */
-export const parseData = async (url: string): Promise<CSV> => {
+export const parseCsv = async (url: string): Promise<CSV> => {
   progress?.("Fetching");
 
   const headers = new Headers();
@@ -30,15 +31,15 @@ export const parseData = async (url: string): Promise<CSV> => {
 };
 
 /** parse csv with "by table" format */
-export const parseTable = async (url: string): Promise<Table> => {
-  const data = await parseData(url);
+export const getTable = async (url: string): Promise<TaxonomicPrevalence> => {
+  const csv = await parseCsv(url);
 
   progress?.("Parsing table");
 
-  const table: Table = [];
+  const data: TaxonomicPrevalence = [];
 
-  for (let col = 1; col < data[0].length; col++) {
-    const fullName = String(data[0][col] || "");
+  for (let col = 1; col < csv[0].length; col++) {
+    const fullName = String(csv[0][col] || "");
     /** get parts from full name */
     const [kingdom = "", phylum = "", _class = ""] = fullName.split(".");
     /** get name from most specific part */
@@ -48,18 +49,75 @@ export const parseTable = async (url: string): Promise<Table> => {
 
     /** count number of non-zero rows in col */
     let samples = 0;
-    for (let row = 1; row < data.length; row++)
-      if (data[row][col] !== "0") samples++;
+    for (let row = 1; row < csv.length; row++)
+      if (csv[row][col] !== "0") samples++;
 
-    table.push({ fullName, name, kingdom, phylum, _class, samples });
+    data.push({ fullName, name, kingdom, phylum, _class, samples });
   }
 
   /** sort by sample count */
-  table.sort((a, b) => b.samples - a.samples);
+  data.sort((a, b) => b.samples - a.samples);
 
-  return table.slice(0, 15);
+  return data.slice(0, 15);
 };
 
+/** fetch world geojson data */
+/** https://www.naturalearthdata.com/downloads/110m-cultural-vectors/ */
+/** https://github.com/nvkelso/natural-earth-vector/blob/master/geojson */
+const map =
+  "https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson";
+export const getWorld = async (): Promise<FeatureCollection> => {
+  progress?.("Fetching");
+
+  const response = await fetch(map);
+  if (!response.ok) throw Error("Response not OK");
+
+  progress?.("Parsing json");
+  const json = await response.json();
+
+  return json;
+};
+
+/** parse countries data format */
+export const getCountries = async (url: string): Promise<CountryPrevalence> => {
+  const csv = await parseCsv(url);
+
+  progress?.("Parsing table");
+
+  const data: { [key: string]: number } = {};
+
+  /** count samples in each country */
+  for (let row = 1; row < csv.length; row++) {
+    const code = csv[row][1] || "";
+    const name = csv[row][2].split(":")[0] || "";
+    const key = code + ":" + name;
+    data[key] ??= 0;
+    data[key]++;
+  }
+
+  /** split back out country code and full name */
+  const exclude = [
+    "labcontrol test",
+    "missing",
+    "n/a",
+    "na",
+    "not applicable",
+    "not available",
+    "not collected",
+    "unknown",
+    "unspecified",
+  ];
+  return Object.entries(data)
+    .map(([key, samples]) => {
+      const [code, name] = key.split(":");
+      return { code: code.toUpperCase(), name: name.toLowerCase(), samples };
+    })
+    .filter(
+      ({ name, code }) => !(exclude.includes(name) || exclude.includes(code))
+    );
+};
+
+/** progress callback */
 type OnProgress = (status: string) => void;
 
 /** currently set progress callback */
@@ -68,4 +126,4 @@ let progress: OnProgress | undefined;
 /** expose method to set progress callback */
 export const onProgress = (callback: OnProgress) => (progress = callback);
 
-expose({ parseData, parseTable, onProgress });
+expose({ parseCsv, getTable, getWorld, getCountries, onProgress });

@@ -1,13 +1,13 @@
-import { gsap } from "gsap";
-import PoissonDiskSampling from "poisson-disk-sampling";
+import classes from "./HeaderBg.module.css";
 import { waitFor } from "@/util/async";
 import { getCssVariable, getMatrix } from "@/util/dom";
 import { cos, normalize, Point, scale, sin } from "@/util/math";
-import classes from "./Viz.module.css";
+import { gsap } from "gsap";
+import PoissonDiskSampling from "poisson-disk-sampling";
 
-const Viz = () => <canvas className={classes.canvas}></canvas>;
+const HeaderBg = () => <canvas className={classes.canvas}></canvas>;
 
-export default Viz;
+export default HeaderBg;
 
 /** run once on app load */
 (async () => {
