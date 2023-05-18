@@ -99,9 +99,9 @@ const chart = (id: string, world: Props["world"], data: Props["data"]) => {
   /** color scale */
   const scale = d3
     .scaleLog<string>()
-    .domain([min, (min + max) / 2, max])
-    .range(["#334155", "#4962f3", "#d239ed"])
-    .interpolate(d3.interpolateHcl);
+    .domain([min, max])
+    .range(["#334155", "#d239ed"])
+    .interpolate(d3.interpolateLab);
 
   /** map sample count from countries data to world data features */
   const features = world.features.map((feature) => {
