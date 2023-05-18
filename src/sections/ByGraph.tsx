@@ -3,7 +3,6 @@ import * as d3 from "d3";
 import Placeholder from "@/components/Placeholder";
 import { Data, Table } from "@/data";
 import { useViewBox } from "@/util/hooks";
-import classes from "./ByGraph.module.css";
 
 type Props = {
   id: string;
@@ -35,8 +34,8 @@ let colorIndex = 0;
 const getColor = (phylum: string) =>
   (colorMap[phylum] ??= colors[colorIndex++ % colors.length]);
 
-/** svg key dimensions */
-const width = 380;
+/** svg dimensions */
+const width = 400;
 const bandHeight = width / 15;
 const height = (rows: number) => bandHeight * (rows || 10);
 
@@ -52,7 +51,7 @@ const ByGraph = ({ id, title, table }: Props) => {
   /** show status */
   if (!Array.isArray(table))
     return (
-      <Placeholder className={classes.svg}>
+      <Placeholder>
         "{title}" table
         <br />
         {table}
@@ -60,13 +59,13 @@ const ByGraph = ({ id, title, table }: Props) => {
     );
 
   return (
-    <svg ref={svg} id={id} className={classes.svg}>
-      <text className={classes.title} x={width / 2} y={-20} textAnchor="middle">
+    <svg ref={svg} id={id}>
+      <text className="title" x={width / 2} y={-20} textAnchor="middle">
         {title}
       </text>
-      <g className={classes.bars}></g>
-      <g className={classes.xAxis}></g>
-      <g className={classes.yAxis}></g>
+      <g className="bars"></g>
+      <g className="x-axis"></g>
+      <g className="y-axis"></g>
       <text x={width / 2} y={height(table.length) + 60} textAnchor="middle">
         # of samples
       </text>
@@ -108,20 +107,20 @@ const chart = (id: string, data: Table) => {
 
   /** update x axis */
   svg
-    .select<SVGGElement>("." + classes.xAxis)
+    .select<SVGGElement>(".x-axis")
     .attr("transform", `translate(0, ${height(data.length)})`)
     .call(xAxis);
 
   /** update y axis */
-  svg.select<SVGGElement>("." + classes.yAxis).call(yAxis);
+  svg.select<SVGGElement>(".y-axis").call(yAxis);
 
   /** update bars */
   svg
-    .select("." + classes.bars)
-    .selectAll("." + classes.bar)
+    .select(".bars")
+    .selectAll(".bar")
     .data(data)
     .join("rect")
-    .attr("class", classes.bar)
+    .attr("class", "bar")
     .attr("x", 0)
     .attr("y", (d) => yScale(d.fullName) || 0)
     .attr("width", (d) => xScale(d.samples))
