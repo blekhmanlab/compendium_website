@@ -29,6 +29,7 @@ const GeographicPrevalence = ({ id, title, world, data }: Props) => {
         "{title}" table
         <br />
         {typeof world === "string" && world}
+        <br />
         {typeof data === "string" && data}
       </Placeholder>
     );
@@ -94,30 +95,30 @@ const chart = (id: string, world: Props["world"], data: Props["data"]) => {
     .attr("d", path);
 
   /** get range of sample counts */
-  const [min = 0, max = 1000] = d3.extent(data, (d) => d.samples);
+  const [, max = 1000] = d3.extent(data, (d) => d.samples);
 
   /** color scale */
   const scale = d3
     .scaleLog<string>()
-    .domain([min, max])
+    .domain([1, max])
     .range(["#475569", "#d239ed"])
     .interpolate(d3.interpolateLab);
 
   /** map sample count from countries data to world data features */
   const features = world.features.map((feature) => {
     const properties = feature.properties as { [key: string]: string };
-    /** find matching data country */
-    const {
-      code = "??",
-      name = "???",
-      samples = 0,
-    } = data.find(
-      ({ code, name }) =>
-        code === properties.ISO_A2.toUpperCase() ||
-        name === properties.NAME.toLowerCase()
-    ) || {};
 
-    return { ...feature, properties, code, name, samples };
+    /** find matching data country */
+    const match = data.find((d) => d.code === properties.code);
+
+    return {
+      ...feature,
+      properties,
+      code: match?.code || properties.code || "",
+      name: match?.name || properties.name || "",
+      samples: match?.samples || 0,
+      region: match?.region || "",
+    };
   });
 
   /** draw features (countries) */
@@ -128,11 +129,12 @@ const chart = (id: string, world: Props["world"], data: Props["data"]) => {
     .join("path")
     .attr("class", "country")
     .attr("d", path)
-    .attr("fill", (d) => scale(d.samples || min))
-    .attr("data-tooltip", ({ properties, samples }) =>
+    .attr("fill", (d) => scale(d.samples || 1))
+    .attr("data-tooltip", ({ code, name, samples, region }) =>
       [
         `<div class="tooltip-table">`,
-        `<span>Country</span><span>${properties.NAME} (${properties.ISO_A2})</span>`,
+        `<span>Region</span><span>${region || "???"}</span>`,
+        `<span>Country</span><span>${name || "???"} (${code || "??"})</span>`,
         `<span>Samples</span><span>${samples.toLocaleString()}</span>`,
         `</div>`,
       ].join("")
@@ -173,23 +175,14 @@ const chart = (id: string, world: Props["world"], data: Props["data"]) => {
     })
   );
 
-  /** on mouse double click */
-  svg.on("dblclick", () => {
-    /** reset projection */
-    reset();
-    update();
-  });
-
-  /** on mouse wheel */
-  svg.on("wheel", (event: WheelEvent) => {
-    /** prevent page scroll */
-    event.preventDefault();
-
-    /** zoom in/out */
-    let scale = projection.scale();
-    if (event.deltaY > 0) scale /= 1.2;
-    if (event.deltaY < 0) scale *= 1.2;
-    projection.scale(clamp(scale, baseScale, baseScale * 10));
-    update();
-  });
+  /** zoom handler */
+  svg.call(
+    d3
+      .zoom<SVGSVGElement, unknown>()
+      .scaleExtent([baseScale, baseScale * 10])
+      .on("zoom", (event) => {
+        projection.scale(event.transform.k);
+        update();
+      })
+  );
 };

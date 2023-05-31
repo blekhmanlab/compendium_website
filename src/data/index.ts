@@ -14,10 +14,11 @@ export type TaxonomicPrevalence = {
   samples: number;
 }[];
 
-export type CountryPrevalence = {
+export type GeographicPrevalence = {
   code: string;
   name: string;
   samples: number;
+  region: string;
 }[];
 
 type Status = string;
@@ -30,7 +31,7 @@ export type Data = {
   /** region data */
   regions: CSV | Status;
   /** countries data */
-  countries: CountryPrevalence | Status;
+  countries: GeographicPrevalence | Status;
   /** world map data */
   world: FeatureCollection | Status;
 };
@@ -49,27 +50,39 @@ export const loadData = async () => {
   type API = typeof import("./worker.ts");
 
   /** wrapper func for creating worker */
-  const makeWorker = <Key extends keyof Data>(
+  const thread = <Key extends keyof Data>(
     method: (worker: Remote<API>) => Promise<Data[Key]>,
     key: Key
-  ) => {
-    /** create worker instance */
-    const worker = wrap<API>(new DataWorker());
-    /** execute specified method, and set state on final result */
-    method(worker)
-      .then((result) => useData.setState({ [key]: result }))
-      .catch((error: Error) => {
-        console.error(error);
-        useData.setState({ [key]: "Error" });
-      });
-    /** on progress update, set state to status */
-    worker.onProgress(proxy((status) => useData.setState({ [key]: status })));
-  };
+  ): Promise<void> =>
+    new Promise((resolve) => {
+      let resolved = false;
+      /** create worker instance */
+      const worker = wrap<API>(new DataWorker());
+      /** on progress update */
+      worker.onProgress(
+        proxy((status) => {
+          /** make sure on progress message hasn't arrived after final result */
+          if (!resolved)
+            /** set state to status */
+            useData.setState({ [key]: status });
+        })
+      );
+      /** execute specified method, and set state on final result */
+      method(worker)
+        .then((result) => useData.setState({ [key]: result }))
+        .catch((error: Error) => {
+          console.error(error);
+          useData.setState({ [key]: "Error" });
+        })
+        .finally(() => {
+          resolved = true;
+          resolve();
+        });
+    });
 
   /** load and parse data files in parallel web workers */
-  makeWorker((worker) => worker.getTable("classes.csv"), "classes");
-  makeWorker((worker) => worker.getTable("phyla.csv"), "phyla");
-  makeWorker((worker) => worker.parseCsv("regions.csv"), "regions");
-  makeWorker((worker) => worker.getCountries("countries.csv"), "countries");
-  makeWorker((worker) => worker.getWorld(), "world");
+  thread((worker) => worker.getTaxonomic("classes.csv"), "classes");
+  thread((worker) => worker.getTaxonomic("phyla.csv"), "phyla");
+  thread((worker) => worker.getGeographic(), "countries");
+  thread((worker) => worker.getWorld(), "world");
 };

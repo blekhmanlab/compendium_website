@@ -37,7 +37,7 @@ const App = () => {
         <section>
           <GeographicPrevalence
             id="map"
-            title="By Country"
+            title="By Geography"
             world={world}
             data={countries}
           />

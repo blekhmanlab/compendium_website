@@ -104,13 +104,11 @@ svg .graticule {
 }
 
 svg .country {
-  /* fill: var(--gray); */
   stroke: var(--dark-gray);
   stroke-width: 0.5;
 }
 
 svg [data-tooltip]:hover {
-  /* opacity: 0.5; */
   fill: white;
 }
 
