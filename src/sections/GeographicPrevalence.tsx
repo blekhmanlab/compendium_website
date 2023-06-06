@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import * as d3 from "d3";
-import { Feature, MultiPolygon } from "geojson";
+import { Feature } from "geojson";
 import dissolve from "geojson-dissolve";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
@@ -174,6 +174,8 @@ const chart = (
     /** map back to array */
     features = [...regions.values()];
   }
+
+  console.log(features);
 
   /** draw features (countries) */
   svg
