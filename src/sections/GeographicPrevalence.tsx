@@ -175,8 +175,6 @@ const chart = (
     features = [...regions.values()];
   }
 
-  console.log(features);
-
   /** draw features (countries) */
   svg
     .select(".countries")
