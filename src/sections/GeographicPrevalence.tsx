@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import * as d3 from "d3";
+import { Feature, MultiPolygon } from "geojson";
+import dissolve from "geojson-dissolve";
 import Placeholder from "@/components/Placeholder";
+import Select from "@/components/Select";
 import { Data } from "@/data";
 import { clamp } from "@/util/math";
-import * as d3 from "d3";
-import { Feature } from "geojson";
 
 type Props = {
   id: string;
@@ -16,11 +18,16 @@ type Props = {
 const width = 800;
 const height = 400;
 
+const byOptions = ["Country", "Region"];
+type By = (typeof byOptions)[number];
+
 const GeographicPrevalence = ({ id, title, world, data }: Props) => {
+  const [by, setBy] = useState<By>(byOptions[0]);
+
   /** rerun d3 code when props change */
   useEffect(() => {
-    chart(id, world, data);
-  }, [id, world, data]);
+    chart(id, world, data, by);
+  }, [id, world, data, by]);
 
   /** show status */
   if (typeof world === "string" || typeof data === "string")
@@ -35,24 +42,32 @@ const GeographicPrevalence = ({ id, title, world, data }: Props) => {
     );
 
   return (
-    <svg viewBox={[0, -60, width, height + 60].join(" ")} id={id}>
-      <text
-        className="title"
-        x={width / 2}
-        y={-50}
-        textAnchor="middle"
-        dominantBaseline="hanging"
-      >
-        {title}
-      </text>
-      <g className="map-container" clipPath="url(#map-clip)">
-        <g className="graticules"></g>
-        <g className="countries"></g>
-      </g>
-      <clipPath id="map-clip">
-        <rect x="0" y="0" width={width} height={height} />
-      </clipPath>
-    </svg>
+    <>
+      <svg viewBox={[0, -60, width, height + 60].join(" ")} id={id}>
+        <text
+          className="title"
+          x={width / 2}
+          y={-50}
+          textAnchor="middle"
+          dominantBaseline="hanging"
+        >
+          {title}
+        </text>
+        <g className="map-container" clipPath="url(#map-clip)">
+          <g className="graticules"></g>
+          <g className="countries"></g>
+        </g>
+        <clipPath id="map-clip">
+          <rect x="0" y="0" width={width} height={height} />
+        </clipPath>
+      </svg>
+      <Select
+        label="Group by:"
+        value={by}
+        onChange={setBy}
+        options={byOptions}
+      />
+    </>
   );
 };
 
@@ -62,7 +77,12 @@ export default GeographicPrevalence;
 
 const graticules = d3.geoGraticule().step([20, 20])();
 
-const chart = (id: string, world: Props["world"], data: Props["data"]) => {
+const chart = (
+  id: string,
+  world: Props["world"],
+  data: Props["data"],
+  by: By
+) => {
   if (typeof data === "string") return;
   if (typeof world === "string") return;
 
@@ -105,7 +125,7 @@ const chart = (id: string, world: Props["world"], data: Props["data"]) => {
     .interpolate(d3.interpolateLab);
 
   /** map sample count from countries data to world data features */
-  const features = world.features.map((feature) => {
+  let features = world.features.map((feature) => {
     const properties = feature.properties as { [key: string]: string };
 
     /** find matching data country */
@@ -121,6 +141,40 @@ const chart = (id: string, world: Props["world"], data: Props["data"]) => {
     };
   });
 
+  /** merge features by region */
+  if (by === "Region") {
+    /** map of region to feature */
+    const regions = new Map<string, (typeof features)[number]>();
+
+    for (const feature of features) {
+      /** catch countries without regions */
+      if (!feature.region) {
+        regions.set(feature.code || feature.name, feature);
+        continue;
+      }
+
+      /** if existing entry */
+      let existing = regions.get(feature.region);
+      if (existing) {
+        /** merge entry */
+        existing.geometry = dissolve([existing, feature]);
+        existing.samples += feature.samples;
+      } else
+      /** set new entry */
+        existing = feature;
+
+      /** unset country-specific details */
+      existing.code = "";
+      existing.name = "";
+
+      /** set entry */
+      regions.set(feature.region, existing);
+    }
+
+    /** map back to array */
+    features = [...regions.values()];
+  }
+
   /** draw features (countries) */
   svg
     .select(".countries")
@@ -133,11 +187,14 @@ const chart = (id: string, world: Props["world"], data: Props["data"]) => {
     .attr("data-tooltip", ({ code, name, samples, region }) =>
       [
         `<div class="tooltip-table">`,
-        `<span>Region</span><span>${region || "???"}</span>`,
-        `<span>Country</span><span>${name || "???"} (${code || "??"})</span>`,
+        region && `<span>Region</span><span>${region || "???"}</span>`,
+        (name || code) &&
+          `<span>Country</span><span>${name || "???"} (${code || "??"})</span>`,
         `<span>Samples</span><span>${samples.toLocaleString()}</span>`,
         `</div>`,
-      ].join("")
+      ]
+        .filter(Boolean)
+        .join("")
     );
 
   const update = () => {

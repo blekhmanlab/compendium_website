@@ -1,9 +1,9 @@
 import { useEffect } from "react";
+import * as d3 from "d3";
 import Placeholder from "@/components/Placeholder";
 import { Data } from "@/data";
 import { getColor } from "@/util/colors";
 import { useViewBox } from "@/util/hooks";
-import * as d3 from "d3";
 
 /** show prevalence of samples at certain taxonomic level as bar graph */
 

@@ -65,6 +65,10 @@ a {
   transition: background var(--fast), color var(--fast);
 }
 
+select {
+  cursor: pointer;
+}
+
 h1,
 h2,
 h3 {

@@ -1,0 +1,17 @@
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px;
+}
+
+.select {
+  width: 200px;
+  height: 40px;
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--rounded);
+  background: var(--gray);
+  color: var(--white);
+  font: inherit;
+}

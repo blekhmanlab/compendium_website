@@ -1,9 +1,9 @@
-import classes from "./HeaderBg.module.css";
+import { gsap } from "gsap";
+import PoissonDiskSampling from "poisson-disk-sampling";
 import { waitFor } from "@/util/async";
 import { getCssVariable, getMatrix } from "@/util/dom";
 import { cos, normalize, Point, scale, sin } from "@/util/math";
-import { gsap } from "gsap";
-import PoissonDiskSampling from "poisson-disk-sampling";
+import classes from "./HeaderBg.module.css";
 
 const HeaderBg = () => <canvas className={classes.canvas}></canvas>;
 

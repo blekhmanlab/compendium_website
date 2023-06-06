@@ -1,8 +1,8 @@
-import { CSV, GeographicPrevalence, TaxonomicPrevalence } from "./";
 import { expose } from "comlink";
 import { FeatureCollection } from "geojson";
 import { startCase } from "lodash";
 import { parse as parseCsv } from "papaparse";
+import { CSV, GeographicPrevalence, TaxonomicPrevalence } from "./";
 
 /**
  * every time you communicate with a web worker, the message content must be

@@ -8,7 +8,6 @@
   border-radius: var(--rounded);
   color: var(--off-white);
   text-decoration: none;
-  cursor: pointer;
 }
 
 .button:hover {

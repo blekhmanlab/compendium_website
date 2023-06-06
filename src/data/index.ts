@@ -1,7 +1,7 @@
-import DataWorker from "./worker?worker";
 import { proxy, Remote, wrap } from "comlink";
 import { FeatureCollection } from "geojson";
 import { create } from "zustand";
+import DataWorker from "./worker?worker";
 
 export type CSV = string[][];
 

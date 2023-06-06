@@ -1,9 +1,9 @@
-import classes from "./Header.module.css";
 import { ReactComponent as BookIcon } from "@/assets/book.svg";
 import { ReactComponent as DataIcon } from "@/assets/data.svg";
 import { ReactComponent as Logo } from "@/assets/logo.svg";
 import Button from "@/components/Button.tsx";
 import HeaderBg from "@/sections/HeaderBg.tsx";
+import classes from "./Header.module.css";
 
 const Header = () => (
   <header className={classes.header}>

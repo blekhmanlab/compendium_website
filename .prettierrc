@@ -1,6 +1,6 @@
 {
   "plugins": ["prettier-plugin-jsdoc", "@ianvs/prettier-plugin-sort-imports"],
-  "importOrder": ["react", "<THIRD_PARTY_MODULES>"],
+  "importOrder": ["react", "^[a-zA-Z]", "^@[a-zA-Z]", "^@/", "^./"],
   "jsdocCapitalizeDescription": false,
   "overrides": [
     {
