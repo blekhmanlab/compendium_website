@@ -1,4 +1,4 @@
-import tippy, { Instance, Props } from "tippy.js";
+import tippy, { followCursor, Instance, Props } from "tippy.js";
 import "tippy.js/dist/tippy.css";
 
 /** tippy options */
@@ -7,6 +7,8 @@ const options: Partial<Props> = {
   delay: [50, 0],
   duration: [100, 100],
   allowHTML: true,
+  followCursor: "initial",
+  plugins: [followCursor],
   // interactive: true,
   appendTo: document.body,
   aria: { content: "describedby" },
