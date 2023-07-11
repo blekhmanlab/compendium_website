@@ -43,16 +43,7 @@ const GeographicPrevalence = ({ id, title, world, data }: Props) => {
 
   return (
     <>
-      <svg viewBox={[0, -60, width, height + 60].join(" ")} id={id}>
-        <text
-          className="title"
-          x={width / 2}
-          y={-50}
-          textAnchor="middle"
-          dominantBaseline="hanging"
-        >
-          {title}
-        </text>
+      <svg viewBox={[0, 0, width, height + 60].join(" ")} id={id}>
         <g className="map-container" clipPath="url(#map-clip)">
           <g className="graticules"></g>
           <g className="countries"></g>

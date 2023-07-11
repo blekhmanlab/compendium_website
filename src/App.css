@@ -49,26 +49,6 @@ section {
   --col: 1000px;
 }
 
-p {
-  text-align: justify;
-  line-height: 1.75em;
-}
-
-button {
-  all: unset;
-  cursor: pointer;
-  transition: background var(--fast), color var(--fast);
-}
-
-a {
-  cursor: pointer;
-  transition: background var(--fast), color var(--fast);
-}
-
-select {
-  cursor: pointer;
-}
-
 h1,
 h2,
 h3 {
@@ -83,9 +63,65 @@ h1 {
 }
 
 h2 {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 200;
   text-align: center;
+}
+
+p {
+  text-align: justify;
+}
+
+p,
+code,
+details {
+  line-height: 1.75em;
+}
+
+a {
+  cursor: pointer;
+  transition: background var(--fast), color var(--fast);
+}
+
+select {
+  cursor: pointer;
+}
+
+code {
+  padding: 2px 5px;
+  background: var(--gray);
+  font-family: "IBM Plex Mono", monospace;
+  border-radius: var(--rounded);
+}
+
+li {
+  padding-left: 0.5em;
+}
+
+details {
+  width: 100%;
+  margin: 20px 0;
+}
+
+summary {
+  display: block;
+  cursor: pointer;
+}
+
+details > :not(summary) {
+  margin-left: 1.5em;
+}
+
+summary:before {
+  content: "▶";
+  display: inline-block;
+  width: 2em;
+  font-size: 0.8rem;
+  vertical-align: middle;
+}
+
+details[open] summary:before {
+  content: "▼";
 }
 
 :focus:not(:focus-visible) {
