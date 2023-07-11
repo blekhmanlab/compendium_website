@@ -1,7 +1,5 @@
-import { proxy, Remote, wrap } from "comlink";
-import { FeatureCollection } from "geojson";
+import { FeatureCollection, Geometry } from "geojson";
 import { create } from "zustand";
-import DataWorker from "./worker?worker";
 
 export type CSV = string[][];
 
@@ -21,68 +19,41 @@ export type GeographicPrevalence = {
   region: string;
 }[];
 
-type Status = string;
+export type MapPrevalence = FeatureCollection<
+  Geometry,
+  GeographicPrevalence[0]
+>;
 
 export type Data = {
-  /** class data */
-  classes: TaxonomicPrevalence | Status;
-  /** phylum data */
-  phyla: TaxonomicPrevalence | Status;
-  /** region data */
-  regions: CSV | Status;
-  /** countries data */
-  countries: GeographicPrevalence | Status;
-  /** world map data */
-  world: FeatureCollection | Status;
+  byClass?: TaxonomicPrevalence;
+  byPhyla?: TaxonomicPrevalence;
+  byCountry?: MapPrevalence;
+  byRegion?: MapPrevalence;
 };
 
 export const useData = create<Data>(() => ({
-  classes: "no data",
-  phyla: "no data",
-  regions: "no data",
-  countries: "no data",
-  world: "no data",
+  byClass: undefined,
+  byPhyla: undefined,
+  byCountry: undefined,
+  byRegion: undefined,
 }));
 
 /** load data */
 export const loadData = async () => {
-  /** get exports from worker to define types for methods/objects/etc. */
-  type API = typeof import("./worker.ts");
+  const [byClass, byPhyla, byCountry, byRegion] = await Promise.all([
+    request<TaxonomicPrevalence>("by-class.json"),
+    request<TaxonomicPrevalence>("by-phyla.json"),
+    request<MapPrevalence>("by-country.json"),
+    request<MapPrevalence>("by-region.json"),
+  ]);
 
-  /** wrapper func for creating worker */
-  const thread = <Key extends keyof Data>(
-    method: (worker: Remote<API>) => Promise<Data[Key]>,
-    key: Key
-  ): Promise<void> =>
-    new Promise((resolve) => {
-      let resolved = false;
-      /** create worker instance */
-      const worker = wrap<API>(new DataWorker());
-      /** on progress update */
-      worker.onProgress(
-        proxy((status) => {
-          /** make sure on progress message hasn't arrived after final result */
-          if (!resolved)
-            /** set state to status */
-            useData.setState({ [key]: status });
-        })
-      );
-      /** execute specified method, and set state on final result */
-      method(worker)
-        .then((result) => useData.setState({ [key]: result }))
-        .catch((error: Error) => {
-          console.error(error);
-          useData.setState({ [key]: "Error" });
-        })
-        .finally(() => {
-          resolved = true;
-          resolve();
-        });
-    });
+  useData.setState({ byClass, byPhyla, byCountry, byRegion });
+};
 
-  /** load and parse data files in parallel web workers */
-  thread((worker) => worker.getTaxonomic("classes.csv"), "classes");
-  thread((worker) => worker.getTaxonomic("phyla.csv"), "phyla");
-  thread((worker) => worker.getGeographic(), "countries");
-  thread((worker) => worker.getWorld(), "world");
+/** fetch json */
+const request = async <Type>(url: string): Promise<Type> => {
+  const response = await fetch(url);
+  if (!response.ok) throw Error("Response not OK");
+  const data = await response.json();
+  return data as Type;
 };
