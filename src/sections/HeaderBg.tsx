@@ -29,7 +29,7 @@ export default HeaderBg;
   /** get css variable colors */
   const primary = getCssVariable("--primary");
   const secondary = getCssVariable("--secondary");
-  const lightGray = getCssVariable("--light-gray");
+  const gray = getCssVariable("--gray");
 
   /** size and center canvas */
   const resize = () => {
@@ -116,7 +116,7 @@ export default HeaderBg;
     /** starting values */
     position: scale(normalize(point), canvasSize * 1.5),
     destination: point,
-    color: lightGray,
+    color: gray,
     alpha: 0,
     spin: Math.random() * 360,
     animations: [],
@@ -142,7 +142,7 @@ export default HeaderBg;
     ];
     gsap
       .timeline({ repeat: -1, yoyo: true, delay: -delay * 4 })
-      .to(particle, { color: lightGray, duration, ease })
+      .to(particle, { color: gray, duration, ease })
       .to(particle, { color: secondary, duration, ease })
       .to(particle, { color: primary, duration, ease });
   }
@@ -169,8 +169,8 @@ export default HeaderBg;
       ctx.fillStyle = color;
       ctx.beginPath();
       ctx.arc(
-        position.x + sin(t / 3 + spin) * (size / 2),
-        position.y + cos(t / 3 + spin) * (size / 2),
+        position.x + sin(t / 3 + spin) * size,
+        position.y + cos(t / 3 + spin) * size,
         size,
         0,
         Math.PI * 2

@@ -11,7 +11,7 @@ export const expensiveFunction = async () => {
   progress?.("Starting");
 
   let total = 0;
-  const big = 1000000000000;
+  const big = 500000000;
   for (let a = 0; a < big; a++) {
     if (a % (big / 100) === 0) progress?.(`${(100 * a) / big}% done`);
     total += Math.sqrt(Math.random()) ** 2;
