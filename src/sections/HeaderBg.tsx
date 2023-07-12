@@ -143,8 +143,8 @@ export default HeaderBg;
     gsap
       .timeline({ repeat: -1, yoyo: true, delay: -delay * 4 })
       .to(particle, { color: gray, duration, ease })
-      .to(particle, { color: secondary, duration, ease })
-      .to(particle, { color: primary, duration, ease });
+      .to(particle, { color: primary, duration, ease })
+      .to(particle, { color: secondary, duration, ease });
   }
 
   /** size of particle in canvas coordinates */

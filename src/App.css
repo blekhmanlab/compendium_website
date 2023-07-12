@@ -13,8 +13,9 @@
   /** 200 */
   --white: #e4e8ee;
 
-  --primary: #d239ed;
-  --secondary: #4962f3;
+  --primary: #e23fff;
+  --secondary: #4d67ff;
+  --tertiary: #52d7ff;
   --rounded: 5px;
   --fast: 0.25s ease;
 }
@@ -96,8 +97,12 @@ details {
 }
 
 a {
-  cursor: pointer;
-  transition: background var(--fast), color var(--fast);
+  color: var(--tertiary);
+  transition: color var(--fast);
+}
+
+a:hover {
+  color: var(--primary);
 }
 
 select {

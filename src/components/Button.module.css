@@ -8,6 +8,8 @@
   border-radius: var(--rounded);
   color: var(--off-white);
   text-decoration: none;
+  cursor: pointer;
+  transition: background var(--fast), color var(--fast);
 }
 
 .button:hover {
@@ -19,7 +21,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(45deg, var(--secondary), var(--primary));
+  background: linear-gradient(45deg, var(--primary), var(--secondary));
   border-radius: var(--rounded);
   transition: opacity var(--fast);
   z-index: -1;
