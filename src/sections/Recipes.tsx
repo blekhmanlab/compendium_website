@@ -5,8 +5,9 @@ const Recipes = () => (
         See samples filtered by <code>xxx</code>
       </summary>
       <p>
-        Lorem ipsum <code>dolor sit amet</code>, consectetur adipiscing elit,
-        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Lorem ipsum <code>dolor sit amet</code>, consectetur{" "}
+        <a href="link">adipiscing</a> elit, sed do eiusmod tempor incididunt ut
+        labore et dolore magna aliqua.
       </p>
       <ol>
         <li>Sed elementum tempus egestas sed sed risus pretium quam.</li>
@@ -26,8 +27,9 @@ const Recipes = () => (
         See samples filtered by <code>xxx</code>
       </summary>
       <p>
-        Lorem ipsum <code>dolor sit amet</code>, consectetur adipiscing elit,
-        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Lorem ipsum <code>dolor sit amet</code>, consectetur{" "}
+        <a href="link">adipiscing</a> elit, sed do eiusmod tempor incididunt ut
+        labore et dolore magna aliqua.
       </p>
       <ol>
         <li>Sed elementum tempus egestas sed sed risus pretium quam.</li>
@@ -47,8 +49,9 @@ const Recipes = () => (
         See samples filtered by <code>xxx</code>
       </summary>
       <p>
-        Lorem ipsum <code>dolor sit amet</code>, consectetur adipiscing elit,
-        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Lorem ipsum <code>dolor sit amet</code>, consectetur{" "}
+        <a href="link">adipiscing</a> elit, sed do eiusmod tempor incididunt ut
+        labore et dolore magna aliqua.
       </p>
       <ol>
         <li>Sed elementum tempus egestas sed sed risus pretium quam.</li>

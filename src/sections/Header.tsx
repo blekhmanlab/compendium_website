@@ -17,10 +17,14 @@ const Header = () => (
     <p className={classes.subtitle}>{import.meta.env.VITE_DESCRIPTION}</p>
 
     <div className={classes.buttons}>
-      <Button icon={BookIcon} href="some-link">
+      <Button icon={BookIcon} href="">
         Read the paper
       </Button>
-      <Button icon={DataIcon} href="some-link">
+      <Button
+        icon={DataIcon}
+        // temp link
+        href="https://drive.google.com/drive/folders/19GpvcX3rtLM0DSzt20lSjLA72DG7AdSM?usp=sharing"
+      >
         Download full data
       </Button>
     </div>

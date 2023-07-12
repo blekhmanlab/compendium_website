@@ -6,11 +6,6 @@
   flex-direction: column;
   gap: 40px;
   padding-top: 100px;
-  background: radial-gradient(
-    ellipse 75% 100% at top center,
-    var(--gray),
-    transparent
-  );
   overflow: hidden;
   z-index: 0;
 }
@@ -24,14 +19,14 @@
 }
 
 .logo {
-  color: white;
+  color: var(--white);
   height: 100%;
 }
 
 .divider {
   width: 2px;
   height: 100%;
-  background: white;
+  background: var(--white);
 }
 
 .h1 {
