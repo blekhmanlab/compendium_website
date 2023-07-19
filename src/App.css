@@ -1,13 +1,21 @@
 :root {
   /* https://tailwindcolor.com/ */
   /* https://www.materialpalette.com/colors */
-  --off-black: #111827;
-  --dark-gray: #334155;
-  --gray: #475569;
-  --light-gray: #64748b;
-  --off-white: #e2e8f0;
-  --primary: #d239ed;
-  --secondary: #4962f3;
+
+  /* 900 */
+  --black: #101829;
+  /* 700 */
+  --dark-gray: #354153;
+  /** 500 */
+  --gray: #687386;
+  /** 400 */
+  --light-gray: #94a3b8;
+  /** 200 */
+  --white: #e4e8ee;
+
+  --primary: #e23fff;
+  --secondary: #4d67ff;
+  --tertiary: #52d7ff;
   --rounded: 5px;
   --fast: 0.25s ease;
 }
@@ -26,8 +34,8 @@
 body {
   min-height: 100vh;
   margin: 0;
-  background: var(--off-black);
-  color: white;
+  background: var(--black);
+  color: var(--white);
   font-size: 14pt;
   font-family: "Mona Sans";
   font-weight: 300;
@@ -37,7 +45,11 @@ body {
 header,
 section,
 footer {
-  padding: 40px max(calc((100% - var(--col)) / 2), 40px);
+  padding: 60px max(calc((100% - var(--col)) / 2), 40px);
+}
+
+section:nth-child(odd) {
+  background: #8080ff10;
 }
 
 header,
@@ -63,9 +75,15 @@ h1 {
 }
 
 h2 {
+  margin: 40px 0;
   font-size: 1.5rem;
-  font-weight: 200;
+  font-weight: 400;
   text-align: center;
+}
+
+b,
+strong {
+  font-weight: 600;
 }
 
 p {
@@ -79,8 +97,12 @@ details {
 }
 
 a {
-  cursor: pointer;
-  transition: background var(--fast), color var(--fast);
+  color: var(--tertiary);
+  transition: color var(--fast);
+}
+
+a:hover {
+  color: var(--primary);
 }
 
 select {
@@ -89,7 +111,7 @@ select {
 
 code {
   padding: 2px 5px;
-  background: var(--gray);
+  background: var(--dark-gray);
   font-family: "IBM Plex Mono", monospace;
   border-radius: var(--rounded);
 }
@@ -144,20 +166,20 @@ svg .graticule {
 }
 
 svg .country {
-  stroke: var(--dark-gray);
+  stroke: var(--black);
   stroke-width: 0.5;
 }
 
 svg [data-tooltip]:hover {
-  fill: white;
+  fill: var(--white);
 }
 
 .tippy-box {
   padding: 10px 15px;
   border-radius: var(--rounded);
-  background: var(--gray);
+  background: var(--dark-gray);
   font-size: 1rem;
-  box-shadow: 0 0 10px var(--off-black);
+  box-shadow: 0 0 10px var(--black);
 }
 
 .tippy-content {
@@ -165,7 +187,7 @@ svg [data-tooltip]:hover {
 }
 
 .tippy-arrow {
-  color: var(--gray);
+  color: var(--dark-gray);
   z-index: 99;
 }
 

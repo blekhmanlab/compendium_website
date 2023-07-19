@@ -10,7 +10,7 @@ import { useViewBox } from "@/util/hooks";
 type Props = {
   id: string;
   title: string;
-  data: Data["phyla"] | Data["classes"];
+  data: Data["byClass"] | Data["byPhyla"];
 };
 
 /** svg dimensions */
@@ -27,15 +27,7 @@ const TaxonomicPrevalence = ({ id, title, data }: Props) => {
     fit();
   }, [data, id, fit]);
 
-  /** show status */
-  if (typeof data === "string")
-    return (
-      <Placeholder>
-        "{title}" table
-        <br />
-        {data}
-      </Placeholder>
-    );
+  if (!data) return <Placeholder>Loading "{title}" table</Placeholder>;
 
   return (
     <svg ref={svg} id={id}>
@@ -56,7 +48,7 @@ export default TaxonomicPrevalence;
 
 /** d3 code */
 const chart = (id: string, data: Props["data"]) => {
-  if (typeof data === "string") return;
+  if (!data) return;
 
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
 

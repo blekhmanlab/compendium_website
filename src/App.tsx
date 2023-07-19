@@ -11,10 +11,10 @@ import Recipes from "@/sections/Recipes";
 loadData();
 
 const App = () => {
-  const classes = useData((state) => state.classes);
-  const phyla = useData((state) => state.phyla);
-  const world = useData((state) => state.world);
-  const countries = useData((state) => state.countries);
+  const byClass = useData((state) => state.byClass);
+  const byPhyla = useData((state) => state.byPhyla);
+  const byCountry = useData((state) => state.byCountry);
+  const byRegion = useData((state) => state.byRegion);
 
   return (
     <>
@@ -27,12 +27,12 @@ const App = () => {
             <TaxonomicPrevalence
               id="by-phylum"
               title="By Phylum"
-              data={phyla}
+              data={byPhyla?.slice(0, 20)}
             />
             <TaxonomicPrevalence
               id="by-class"
               title="By Class"
-              data={classes}
+              data={byClass?.slice(0, 20)}
             />
           </Cols>
         </section>
@@ -41,8 +41,8 @@ const App = () => {
           <GeographicPrevalence
             id="map"
             title="By Geography"
-            world={world}
-            data={countries}
+            byCountry={byCountry}
+            byRegion={byRegion}
           />
         </section>
         <section>
