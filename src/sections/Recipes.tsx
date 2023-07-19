@@ -1,5 +1,7 @@
+import classes from "./Recipes.module.css";
+
 const Recipes = () => (
-  <>
+  <div className={classes.recipes}>
     <details>
       <summary>All samples from a single world region</summary>
       <p>
@@ -81,7 +83,7 @@ const Recipes = () => (
         morbi tristique senectus et.
       </p>
     </details>
-  </>
+  </div>
 );
 
 export default Recipes;

@@ -35,6 +35,13 @@ const GeographicPrevalence = ({ id, title, byCountry, byRegion }: Props) => {
 
   return (
     <>
+      <Select
+        label="Group by:"
+        value={by}
+        onChange={setBy}
+        options={byOptions}
+      />
+
       <svg viewBox={[0, -10, width, height + 20].join(" ")} id={id}>
         <g className="map-container" clipPath="url(#map-clip)">
           <g className="graticules"></g>
@@ -44,12 +51,6 @@ const GeographicPrevalence = ({ id, title, byCountry, byRegion }: Props) => {
           <rect x="0" y="0" width={width} height={height} />
         </clipPath>
       </svg>
-      <Select
-        label="Group by:"
-        value={by}
-        onChange={setBy}
-        options={byOptions}
-      />
     </>
   );
 };

@@ -10,7 +10,7 @@ import { useViewBox } from "@/util/hooks";
 type Props = {
   id: string;
   title: string;
-  data: Data["byClass"] | Data["byPhyla"];
+  data: Data["byClass"] | Data["byPhylum"];
 };
 
 /** svg dimensions */

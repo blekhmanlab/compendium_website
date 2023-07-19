@@ -1,4 +1,5 @@
 import { expose } from "comlink";
+import trigramSimilarity from "trigram-similarity";
 
 /**
  * note: every time you communicate with a web worker, the message content must
@@ -7,7 +8,7 @@ import { expose } from "comlink";
  */
 
 /** example of function that takes long time to compute */
-export const expensiveFunction = async () => {
+export const expensiveFunction = () => {
   progress?.("Starting");
 
   let total = 0;
@@ -20,6 +21,21 @@ export const expensiveFunction = async () => {
   return total;
 };
 
+/** fuzzy (trigram) search on large list of items */
+export const fuzzySearch = <Entry extends { [key: string]: unknown }>(
+  /** array of objects */
+  list: Entry[],
+  /** key object to search */
+  key: keyof Entry,
+  /** string to search */
+  search: string,
+  /** similarity threshold */
+  threshold = 0.25
+): Entry[] =>
+  list.filter(
+    (entry) => trigramSimilarity(String(entry[key]), search) > threshold
+  );
+
 /** progress callback type */
 type OnProgress = (status: string) => void;
 
@@ -29,4 +45,4 @@ let progress: OnProgress | undefined;
 /** expose method to set progress callback */
 export const onProgress = (callback: OnProgress) => (progress = callback);
 
-expose({ expensiveFunction, onProgress });
+expose({ expensiveFunction, fuzzySearch, onProgress });

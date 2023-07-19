@@ -1,53 +1,53 @@
 import { FeatureCollection, Geometry } from "geojson";
 import { create } from "zustand";
 
-export type CSV = string[][];
+/** metadata about overall project */
+export type Metadata = typeof import("../../public/metadata.json");
 
-export type TaxonomicPrevalence = {
-  fullName: string;
-  name: string;
-  kingdom: string;
-  phylum: string;
-  _class: string;
-  samples: number;
-}[];
+/** by class or phylum or other taxonomic level */
+export type ByTaxLevel = typeof import("../../public/by-class.json");
 
-export type GeographicPrevalence = {
-  code: string;
-  name: string;
-  samples: number;
-  region: string;
-}[];
+/** by country or by region */
+export type ByGeo =
+  typeof import("../../public/by-country.json")["features"][number]["properties"][];
 
-export type MapPrevalence = FeatureCollection<
-  Geometry,
-  GeographicPrevalence[0]
->;
+/** by country or by region, combined with natural earth geojson feature data */
+export type ByMap = FeatureCollection<Geometry, ByGeo[number]>;
+
+/** project and sample name details */
+export type ByProject = typeof import("../../public/by-project.json");
 
 export type Data = {
-  byClass?: TaxonomicPrevalence;
-  byPhyla?: TaxonomicPrevalence;
-  byCountry?: MapPrevalence;
-  byRegion?: MapPrevalence;
+  metadata?: Metadata;
+  byClass?: ByTaxLevel;
+  byPhylum?: ByTaxLevel;
+  byCountry?: ByMap;
+  byRegion?: ByMap;
+  byProject?: ByProject;
 };
 
-export const useData = create<Data>(() => ({
-  byClass: undefined,
-  byPhyla: undefined,
-  byCountry: undefined,
-  byRegion: undefined,
-}));
+export const useData = create<Data>(() => ({}));
 
 /** load data */
 export const loadData = async () => {
-  const [byClass, byPhyla, byCountry, byRegion] = await Promise.all([
-    request<TaxonomicPrevalence>("by-class.json"),
-    request<TaxonomicPrevalence>("by-phyla.json"),
-    request<MapPrevalence>("by-country.json"),
-    request<MapPrevalence>("by-region.json"),
-  ]);
+  const [metadata, byClass, byPhylum, byCountry, byRegion, byProject] =
+    await Promise.all([
+      request<Metadata>("metadata.json"),
+      request<ByTaxLevel>("by-class.json"),
+      request<ByTaxLevel>("by-phylum.json"),
+      request<ByMap>("by-country.json"),
+      request<ByMap>("by-region.json"),
+      request<ByProject>("by-project.json"),
+    ]);
 
-  useData.setState({ byClass, byPhyla, byCountry, byRegion });
+  useData.setState({
+    metadata,
+    byClass,
+    byPhylum,
+    byCountry,
+    byRegion,
+    byProject,
+  });
 };
 
 /** fetch json */

@@ -14,17 +14,17 @@
   --white: #e4e8ee;
 
   --primary: #e23fff;
-  --secondary: #4d67ff;
+  --secondary: #6e84ff;
   --tertiary: #52d7ff;
   --rounded: 5px;
   --fast: 0.25s ease;
 }
 
 @font-face {
-  font-family: "Mona Sans";
-  src: url("@/assets/MonaSans.woff2") format("woff2");
   font-weight: 200 900;
+  src: url("@/assets/MonaSans.woff2") format("woff2");
   font-stretch: 75% 125%;
+  font-family: "Mona Sans";
 }
 
 * {
@@ -36,20 +36,24 @@ body {
   margin: 0;
   background: var(--black);
   color: var(--white);
-  font-size: 14pt;
-  font-family: "Mona Sans";
   font-weight: 300;
+  font-size: 14pt;
   line-height: 1em;
+  font-family: "Mona Sans";
 }
 
 header,
 section,
 footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 60px max(calc((100% - var(--col)) / 2), 40px);
+  gap: 40px;
 }
 
-section:nth-child(odd) {
-  background: #8080ff10;
+:where(header, section, footer) > * {
+  margin: 0 !important;
 }
 
 header,
@@ -61,23 +65,26 @@ section {
   --col: 1000px;
 }
 
+section:nth-child(odd) {
+  background: #8080ff10;
+}
+
 h1,
 h2,
 h3 {
+  margin: 0;
   line-height: 1.2em;
 }
 
 h1 {
-  margin: 0;
-  letter-spacing: 1px;
   font-weight: 600;
   font-size: 2.2rem;
+  letter-spacing: 1px;
 }
 
 h2 {
-  margin: 40px 0;
-  font-size: 1.5rem;
   font-weight: 400;
+  font-size: 1.5rem;
   text-align: center;
 }
 
@@ -87,6 +94,7 @@ strong {
 }
 
 p {
+  margin: 0;
   text-align: justify;
 }
 
@@ -105,24 +113,47 @@ a:hover {
   color: var(--primary);
 }
 
-select {
-  cursor: pointer;
-}
-
 code {
   padding: 2px 5px;
+  border-radius: var(--rounded);
   background: var(--dark-gray);
   font-family: "IBM Plex Mono", monospace;
-  border-radius: var(--rounded);
 }
 
 li {
-  padding-left: 0.5em;
+  padding-left: 20px;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead tr:last-child {
+  border-bottom: solid 1px var(--gray);
+}
+
+th {
+  font-weight: 400;
+}
+
+tbody tr:not(:first-child):hover {
+  background: var(--dark-gray);
+}
+
+th,
+td {
+  padding: 5px 10px;
+  text-align: left;
 }
 
 details {
   width: 100%;
-  margin: 20px 0;
 }
 
 summary {
@@ -130,14 +161,18 @@ summary {
   cursor: pointer;
 }
 
+details[open] > summary {
+  margin-bottom: 20px;
+}
+
 details > :not(summary) {
-  margin-left: 1.5em;
+  margin-left: 30px;
 }
 
 summary:before {
-  content: "▶";
   display: inline-block;
-  width: 2em;
+  width: 30px;
+  content: "▶";
   font-size: 0.8rem;
   vertical-align: middle;
 }
@@ -178,8 +213,8 @@ svg [data-tooltip]:hover {
   padding: 10px 15px;
   border-radius: var(--rounded);
   background: var(--dark-gray);
-  font-size: 1rem;
   box-shadow: 0 0 10px var(--black);
+  font-size: 1rem;
 }
 
 .tippy-content {
@@ -187,15 +222,15 @@ svg [data-tooltip]:hover {
 }
 
 .tippy-arrow {
-  color: var(--dark-gray);
   z-index: 99;
+  color: var(--dark-gray);
 }
 
 .tooltip-table {
   display: grid;
   grid-template-columns: auto auto;
-  gap: 5px 15px;
   margin: 5px;
+  gap: 5px 15px;
 }
 
 .tooltip-table > *:nth-child(odd) {

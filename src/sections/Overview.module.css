@@ -1,0 +1,21 @@
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 40px 0;
+  gap: 40px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tile svg {
+  height: 1.5em;
+}
+
+.tile p {
+  text-align: center;
+}

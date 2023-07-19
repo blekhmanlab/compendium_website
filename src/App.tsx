@@ -2,17 +2,18 @@ import Cols from "@/components/Cols";
 import { loadData, useData } from "@/data";
 import GeographicPrevalence from "@/sections/GeographicPrevalence";
 import Header from "@/sections/Header";
-import Hero from "@/sections/Hero";
+import Overview from "@/sections/Overview";
 import TaxonomicPrevalence from "@/sections/TaxonomicPrevalence";
 import "@/components/tooltip";
 import "./App.css";
 import Recipes from "@/sections/Recipes";
+import Search from "@/sections/Search";
 
 loadData();
 
 const App = () => {
   const byClass = useData((state) => state.byClass);
-  const byPhyla = useData((state) => state.byPhyla);
+  const byPhylum = useData((state) => state.byPhylum);
   const byCountry = useData((state) => state.byCountry);
   const byRegion = useData((state) => state.byRegion);
 
@@ -20,14 +21,23 @@ const App = () => {
     <>
       <Header />
       <main>
-        <Hero />
+        <section>
+          <h2>Overview</h2>
+          <Overview />
+        </section>
+
+        <section>
+          <h2>Search</h2>
+          <Search />
+        </section>
+
         <section>
           <h2>By Taxonomic Level</h2>
           <Cols>
             <TaxonomicPrevalence
               id="by-phylum"
               title="By Phylum"
-              data={byPhyla?.slice(0, 20)}
+              data={byPhylum?.slice(0, 20)}
             />
             <TaxonomicPrevalence
               id="by-class"
@@ -36,6 +46,7 @@ const App = () => {
             />
           </Cols>
         </section>
+
         <section>
           <h2>By Geography</h2>
           <GeographicPrevalence
@@ -45,6 +56,7 @@ const App = () => {
             byRegion={byRegion}
           />
         </section>
+
         <section>
           <h2>Recipes</h2>
           <Recipes />

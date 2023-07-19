@@ -1,5 +1,5 @@
-import { ReactComponent as BookIcon } from "@/assets/book.svg";
-import { ReactComponent as DataIcon } from "@/assets/data.svg";
+import { ReactComponent as PaperIcon } from "@/assets/book.svg";
+import { ReactComponent as DataIcon } from "@/assets/database.svg";
 import { ReactComponent as Logo } from "@/assets/logo.svg";
 import Button from "@/components/Button.tsx";
 import HeaderBg from "@/sections/HeaderBg.tsx";
@@ -8,6 +8,7 @@ import classes from "./Header.module.css";
 const Header = () => (
   <header className={classes.header}>
     <HeaderBg />
+
     <div className={classes.title}>
       <Logo className={classes.logo}></Logo>
       <div className={classes.divider}></div>
@@ -17,11 +18,12 @@ const Header = () => (
     <p className={classes.subtitle}>{import.meta.env.VITE_DESCRIPTION}</p>
 
     <div className={classes.buttons}>
-      <Button icon={BookIcon} href="">
+      <Button icon={PaperIcon} design="big" href="">
         Read the paper
       </Button>
       <Button
         icon={DataIcon}
+        design="big"
         // temp link
         href="https://drive.google.com/drive/folders/19GpvcX3rtLM0DSzt20lSjLA72DG7AdSM?usp=sharing"
       >
