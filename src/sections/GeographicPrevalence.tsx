@@ -43,7 +43,7 @@ const GeographicPrevalence = ({ id, title, byCountry, byRegion }: Props) => {
         options={byOptions}
       />
 
-      <svg viewBox={[0, -10, width, height + 20].join(" ")} id={id}>
+      <svg viewBox={[0, 0, width, height].join(" ")} id={id}>
         <g className="map-container" clipPath="url(#map-clip)">
           <g className="graticules"></g>
           <g className="features"></g>
@@ -70,15 +70,26 @@ const chart = (id: string, data: Props["byCountry"] | Props["byRegion"]) => {
   /** create projection */
   const projection = d3.geoNaturalEarth1();
 
-  /** fit projection */
-  const fit = () => {
-    projection.center([0, 0]);
-    projection.fitSize([width, height], data);
-    projection.rotate([0, 0]);
-  };
-  fit();
+  /** fit projection to bbox of earth */
+  const fitProjection = () =>
+    projection.fitSize([width, height], {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [-180, -90],
+            [180, -90],
+            [180, 90],
+            [-180, 90],
+          ],
+        ],
+      },
+    });
+  fitProjection();
 
-  /** get scale when projection fit to contents */
+  /** get scale when projection fit to earth bbox */
   const baseScale = projection.scale();
 
   /** path calculator for projection */
@@ -129,14 +140,45 @@ const chart = (id: string, data: Props["byCountry"] | Props["byRegion"]) => {
         .join("")
     );
 
-  const update = () => {
+  /** reset map view */
+  const resetView = () => {
+    projection.center([0, 0]);
+    projection.rotate([0, 0]);
+    fitProjection();
+  };
+
+  type DragEvent = d3.D3DragEvent<Element, Data, unknown>;
+  type ZoomEvent = d3.D3ZoomEvent<SVGSVGElement, Data>;
+
+  /** move map view pan and zoom */
+  const moveView = (event?: DragEvent | ZoomEvent) => {
     /** get current projection components */
     let [x, y] = projection.center();
-    const scale = projection.scale();
+    let scale = projection.scale();
+    let [lambda, phi] = projection.rotate();
+
+    /** update components based on transform */
+    if (event) {
+      /** zoom event */
+      if ("transform" in event) {
+        /** get mouse position in geo coordinates */
+        // projection.invert?.(d3.pointer(event)) || [];
+        scale = event.transform.k;
+      } else {
+        /** drag event */
+        lambda += (baseScale / 2) * (event.dx / scale);
+        y += (baseScale / 2) * (event.dy / scale);
+      }
+    }
 
     /** limit projection */
     const angleLimit = 90 - 90 * (baseScale / scale);
     y = clamp(y, -angleLimit, angleLimit);
+    projection.center([x, y]);
+
+    /** update projection */
+    projection.scale(scale);
+    projection.rotate([lambda, phi]);
     projection.center([x, y]);
 
     /** update paths based on projection */
@@ -144,41 +186,29 @@ const chart = (id: string, data: Props["byCountry"] | Props["byRegion"]) => {
     svg.selectAll<Element, Feature>(".feature").attr("d", path);
   };
 
-  /** mouse drag handler */
-  const drag = d3
-    .drag<SVGSVGElement, unknown, unknown>()
-    .on("drag", (event) => {
-      /** get current projection components */
-      let [x, y] = projection.center();
-      const scale = projection.scale();
-      let [lambda, phi] = projection.rotate();
+  /** drag handler */
+  const drag = d3.drag<SVGSVGElement, unknown, unknown>().on("drag", moveView);
 
-      /** update components based on drag */
-      lambda += (baseScale / 2) * (event.dx / scale);
-      y += (baseScale / 2) * (event.dy / scale);
-
-      /** update projection */
-      projection.rotate([lambda, phi]);
-      projection.center([x, y]);
-
-      update();
-    });
+  /** connect drag handler to svg */
   svg.call(drag);
 
   /** zoom handler */
   const zoom = d3
     .zoom<SVGSVGElement, unknown>()
     .scaleExtent([baseScale, baseScale * 10])
-    .on("zoom", (event) => {
-      projection.scale(event.transform.k);
-      update();
-    });
-  svg.call(zoom).on("wheel", (event) => event.preventDefault());
+    .on("zoom", moveView);
+
+  /** connect zoom handler to svg */
+  svg
+    .call(zoom)
+    /** always prevent scroll on wheel, not just when at scale limit */
+    .on("wheel", (event) => event.preventDefault());
 
   /** double click handler */
   svg.on("dblclick.zoom", () => {
+    /** reset zoom handler */
     zoom.transform(svg, d3.zoomIdentity);
-    fit();
-    update();
+    resetView();
+    moveView();
   });
 };
