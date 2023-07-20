@@ -113,7 +113,7 @@ const Search = () => {
     <>
       <p>
         Does this dataset have what you're looking for? Search for a project,
-        sample, country, phylum, class, etc.
+        sample, phylum, class, country, or region.
       </p>
 
       <Textbox value={search} onChange={setSearch} placeholder="Search" />

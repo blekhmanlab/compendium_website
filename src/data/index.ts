@@ -30,23 +30,23 @@ export const useData = create<Data>(() => ({}));
 
 /** load data */
 export const loadData = async () => {
-  const [metadata, byClass, byPhylum, byCountry, byRegion, byProject] =
+  const [metadata, byProject, byPhylum, byClass, byCountry, byRegion] =
     await Promise.all([
       request<Metadata>("metadata.json"),
-      request<ByTaxLevel>("by-class.json"),
+      request<ByProject>("by-project.json"),
       request<ByTaxLevel>("by-phylum.json"),
+      request<ByTaxLevel>("by-class.json"),
       request<ByMap>("by-country.json"),
       request<ByMap>("by-region.json"),
-      request<ByProject>("by-project.json"),
     ]);
 
   useData.setState({
     metadata,
-    byClass,
+    byProject,
     byPhylum,
+    byClass,
     byCountry,
     byRegion,
-    byProject,
   });
 };
 

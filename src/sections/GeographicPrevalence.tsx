@@ -6,6 +6,7 @@ import Select from "@/components/Select";
 import { Data } from "@/data";
 import { getCssVariable } from "@/util/dom";
 import { clamp } from "@/util/math";
+import "./GeographicPrevalence.css";
 
 type Props = {
   id: string;
@@ -45,7 +46,7 @@ const GeographicPrevalence = ({ id, title, byCountry, byRegion }: Props) => {
       <svg viewBox={[0, -10, width, height + 20].join(" ")} id={id}>
         <g className="map-container" clipPath="url(#map-clip)">
           <g className="graticules"></g>
-          <g className="countries"></g>
+          <g className="features"></g>
         </g>
         <clipPath id="map-clip">
           <rect x="0" y="0" width={width} height={height} />
@@ -106,13 +107,13 @@ const chart = (id: string, data: Props["byCountry"] | Props["byRegion"]) => {
     .range([gray, primary])
     .interpolate(d3.interpolateLab);
 
-  /** draw features (countries) */
+  /** draw features */
   svg
-    .select(".countries")
-    .selectAll(".country")
+    .select(".features")
+    .selectAll(".feature")
     .data(data.features)
     .join("path")
-    .attr("class", "country")
+    .attr("class", "feature")
     .attr("d", path)
     .attr("fill", (d) => scale(d.properties.samples || 1))
     .attr("data-tooltip", ({ properties: { code, name, samples, region } }) =>
@@ -140,7 +141,7 @@ const chart = (id: string, data: Props["byCountry"] | Props["byRegion"]) => {
 
     /** update paths based on projection */
     svg.selectAll<Element, Feature>(".graticule").attr("d", path);
-    svg.selectAll<Element, Feature>(".country").attr("d", path);
+    svg.selectAll<Element, Feature>(".feature").attr("d", path);
   };
 
   /** mouse drag handler */

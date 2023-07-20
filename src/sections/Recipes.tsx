@@ -1,9 +1,9 @@
+import Accordion from "@/components/Accordion";
 import classes from "./Recipes.module.css";
 
 const Recipes = () => (
   <div className={classes.recipes}>
-    <details>
-      <summary>All samples from a single world region</summary>
+    <Accordion title="All samples from a single world region">
       <p>
         Lorem ipsum <code>dolor sit amet</code>, consectetur{" "}
         <a href="link">adipiscing</a> elit, sed do eiusmod tempor incididunt ut
@@ -20,10 +20,9 @@ const Recipes = () => (
         aliquam purus sit amet luctus venenatis. Pulvinar pellentesque habitant
         morbi tristique senectus et.
       </p>
-    </details>
+    </Accordion>
 
-    <details>
-      <summary>All samples from a set of 4 BioProjects</summary>
+    <Accordion title="All samples from a set of 4 BioProjects">
       <p>
         Lorem ipsum <code>dolor sit amet</code>, consectetur{" "}
         <a href="link">adipiscing</a> elit, sed do eiusmod tempor incididunt ut
@@ -40,12 +39,9 @@ const Recipes = () => (
         aliquam purus sit amet luctus venenatis. Pulvinar pellentesque habitant
         morbi tristique senectus et.
       </p>
-    </details>
+    </Accordion>
 
-    <details>
-      <summary>
-        All samples with read counts consolidated at the order level
-      </summary>
+    <Accordion title="All samples with read counts consolidated at the order level">
       <p>
         Lorem ipsum <code>dolor sit amet</code>, consectetur{" "}
         <a href="link">adipiscing</a> elit, sed do eiusmod tempor incididunt ut
@@ -62,10 +58,9 @@ const Recipes = () => (
         aliquam purus sit amet luctus venenatis. Pulvinar pellentesque habitant
         morbi tristique senectus et.
       </p>
-    </details>
+    </Accordion>
 
-    <details>
-      <summary>All samples with less than 10 percent Firmicutes</summary>
+    <Accordion title="All samples with less than 10 percent Firmicutes">
       <p>
         Lorem ipsum <code>dolor sit amet</code>, consectetur{" "}
         <a href="link">adipiscing</a> elit, sed do eiusmod tempor incididunt ut
@@ -82,7 +77,7 @@ const Recipes = () => (
         aliquam purus sit amet luctus venenatis. Pulvinar pellentesque habitant
         morbi tristique senectus et.
       </p>
-    </details>
+    </Accordion>
   </div>
 );
 

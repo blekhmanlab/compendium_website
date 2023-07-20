@@ -18,6 +18,9 @@
   --tertiary: #52d7ff;
   --rounded: 5px;
   --fast: 0.25s ease;
+
+  --spacing: 1.75em;
+  --compact: 1.35em;
 }
 
 @font-face {
@@ -38,7 +41,7 @@ body {
   color: var(--white);
   font-weight: 300;
   font-size: 14pt;
-  line-height: 1em;
+  line-height: var(--spacing);
   font-family: "Mona Sans";
 }
 
@@ -50,10 +53,6 @@ footer {
   align-items: center;
   padding: 60px max(calc((100% - var(--col)) / 2), 40px);
   gap: 40px;
-}
-
-:where(header, section, footer) > * {
-  margin: 0 !important;
 }
 
 header,
@@ -73,7 +72,7 @@ h1,
 h2,
 h3 {
   margin: 0;
-  line-height: 1.2em;
+  line-height: var(--compact);
 }
 
 h1 {
@@ -94,14 +93,14 @@ strong {
 }
 
 p {
-  margin: 0;
   text-align: justify;
 }
 
 p,
-code,
-details {
-  line-height: 1.75em;
+ul,
+ol,
+code {
+  margin: 0;
 }
 
 a {
@@ -152,61 +151,29 @@ td {
   text-align: left;
 }
 
-details {
-  width: 100%;
-}
-
-summary {
-  display: block;
-  cursor: pointer;
-}
-
-details[open] > summary {
-  margin-bottom: 20px;
-}
-
-details > :not(summary) {
-  margin-left: 30px;
-}
-
-summary:before {
-  display: inline-block;
-  width: 30px;
-  content: "▶";
-  font-size: 0.8rem;
-  vertical-align: middle;
-}
-
-details[open] summary:before {
-  content: "▼";
-}
-
-:focus:not(:focus-visible) {
-  outline: none;
-}
-
 svg text {
   fill: currentColor;
   font-size: 1.2rem;
 }
 
 svg .title {
-  font-size: 1.5rem !important;
+  font-size: 1.5rem;
 }
 
-svg .graticule {
-  fill: none;
-  stroke: var(--dark-gray);
-  stroke-width: 0.5;
-}
-
-svg .country {
-  stroke: var(--black);
-  stroke-width: 0.5;
+svg .axis-title {
+  font-size: 1.35rem;
 }
 
 svg [data-tooltip]:hover {
   fill: var(--white);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+[data-tooltip] {
+  cursor: help;
 }
 
 .tippy-box {
@@ -235,8 +202,4 @@ svg [data-tooltip]:hover {
 
 .tooltip-table > *:nth-child(odd) {
   font-weight: 500;
-}
-
-[data-tooltip] {
-  cursor: help;
 }

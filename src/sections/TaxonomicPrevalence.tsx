@@ -37,7 +37,12 @@ const TaxonomicPrevalence = ({ id, title, data }: Props) => {
       <g className="bars"></g>
       <g className="x-axis"></g>
       <g className="y-axis"></g>
-      <text x={width / 2} y={height(data.length) + 60} textAnchor="middle">
+      <text
+        className="axis-title"
+        x={width / 2}
+        y={height(data.length) + 60}
+        textAnchor="middle"
+      >
         # of samples
       </text>
     </svg>

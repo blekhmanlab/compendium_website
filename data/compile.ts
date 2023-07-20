@@ -229,27 +229,27 @@ const deriveMetadata = (
   byRegion: ByMap,
   byProject: ByProject
 ): Metadata => {
-  const classes = byClass.filter((tax) => tax.samples).length;
+  const projects = byProject.length;
+  const samples = byProject.reduce(
+    (total, { samples }) => total + samples.length,
+    0
+  );
   const phyla = byPhylum.filter((tax) => tax.samples).length;
+  const classes = byClass.filter((tax) => tax.samples).length;
   const countries = byCountry.features.filter(
     (feature) => feature.properties.samples
   ).length;
   const regions = byRegion.features.filter(
     (feature) => feature.properties.samples
   ).length;
-  const samples = byProject.reduce(
-    (total, { samples }) => total + samples.length,
-    0
-  );
-  const projects = byProject.length;
 
   return {
-    classes,
+    projects,
+    samples,
     phyla,
+    classes,
     countries,
     regions,
-    samples,
-    projects,
     size: "1.1 GB",
   };
 };
@@ -288,8 +288,8 @@ const deriveMetadata = (
 
   console.info("Deriving metadata");
   const metadata = deriveMetadata(
-    byClass,
     byPhylum,
+    byClass,
     byCountry,
     byRegion,
     byProject
