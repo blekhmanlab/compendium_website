@@ -28,8 +28,8 @@
 
 .summary:before {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
+  width: 25px;
+  height: 25px;
   background: currentColor;
   content: "-";
   -webkit-mask: url("@/assets/angle.svg") center no-repeat;
@@ -42,8 +42,5 @@
 }
 
 .content {
-  display: flex;
-  flex-direction: column;
-  margin: 20px 0 20px calc(5px + 22px + 10px);
-  gap: 20px;
+  padding: 20px 0 20px calc(5px + 25px + 10px);
 }

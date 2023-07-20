@@ -20,7 +20,7 @@
   --fast: 0.25s ease;
 
   --spacing: 1.75em;
-  --compact: 1.35em;
+  --compact: 1.5em;
 }
 
 @font-face {
@@ -100,6 +100,7 @@ p,
 ul,
 ol,
 code {
+  width: 100%;
   margin: 0;
 }
 
@@ -121,6 +122,13 @@ code {
 
 li {
   padding-left: 20px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 20px;
 }
 
 .table-wrapper {
