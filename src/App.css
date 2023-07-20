@@ -141,8 +141,8 @@ th {
   font-weight: 400;
 }
 
-tbody tr:not(:first-child):hover {
-  background: var(--dark-gray);
+tbody tr:nth-child(even) {
+  background: #ffffff08;
 }
 
 th,

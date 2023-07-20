@@ -22,7 +22,7 @@
 
 .button[data-design="big"] {
   position: relative;
-  padding: 15px 25px;
+  padding: 10px 20px;
   background: none;
   color: var(--off-white);
 }
