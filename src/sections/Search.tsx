@@ -112,7 +112,7 @@ const Search = () => {
   return (
     <>
       <p>
-        Does this dataset have what you're looking for? Search for a project,
+        Does this dataset have what you're looking for? Search for a BioProject accession number,
         sample, phylum, class, country, or region.
       </p>
 
