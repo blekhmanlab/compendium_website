@@ -53,7 +53,7 @@ export const loadData = async () => {
     byPhylum,
     byClass,
     byCountry,
-    byRegion
+    byRegion,
   );
 
   useData.setState({
@@ -82,7 +82,7 @@ const compileSearchList = (
   byClass: ByTaxLevel,
   byPhylum: ByTaxLevel,
   byCountry: ByMap,
-  byRegion: ByMap
+  byRegion: ByMap,
 ) => {
   /** collect complete list */
   const list: SearchList = [];

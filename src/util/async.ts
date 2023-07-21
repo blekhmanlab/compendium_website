@@ -6,7 +6,7 @@ export const sleep = async (ms = 0): Promise<void> =>
 export const waitFor = async <T>(
   func: () => T,
   timeout = 1000,
-  interval = 50
+  interval = 50,
 ): Promise<NonNullable<T>> => {
   for (let check = 0; check < timeout / interval; check++) {
     const result = func();

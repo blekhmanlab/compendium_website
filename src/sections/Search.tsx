@@ -12,7 +12,7 @@ const Search = () => {
 
   /** get exact matches */
   const exact = (searchList || []).filter((entry) =>
-    entry.name.toLowerCase().includes(search.toLowerCase())
+    entry.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   /** get fuzzy (trigram) matches (in worker to not freeze ui) */
@@ -28,7 +28,7 @@ const Search = () => {
         (fuzzy) => {
           /** if not latest run of use effect (superseded), ignore result */
           if (latest) setFuzzy(fuzzy as SearchList);
-        }
+        },
       );
     else setFuzzy([]);
 
@@ -42,7 +42,7 @@ const Search = () => {
     /** de-duplicate items already in exact */
     fuzzy
       .filter((fuzzy) => !exact.find((result) => result.name === fuzzy.name))
-      .map((fuzzy) => ({ ...fuzzy, fuzzy: true }))
+      .map((fuzzy) => ({ ...fuzzy, fuzzy: true })),
   );
 
   /** reset limit when search changes */

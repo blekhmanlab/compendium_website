@@ -77,7 +77,7 @@ const chart = (id: string, data: Props["data"]) => {
   const xAxis = d3
     .axisBottom(xScale)
     .ticks(3, (d: number) =>
-      d.toLocaleString(undefined, { notation: "compact" })
+      d.toLocaleString(undefined, { notation: "compact" }),
     );
 
   /** create y axis */
@@ -116,6 +116,6 @@ const chart = (id: string, data: Props["data"]) => {
         `</div>`,
       ]
         .filter(Boolean)
-        .join("")
+        .join(""),
     );
 };

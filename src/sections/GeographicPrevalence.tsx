@@ -137,7 +137,7 @@ const chart = (id: string, data: Props["byCountry"] | Props["byRegion"]) => {
         `</div>`,
       ]
         .filter(Boolean)
-        .join("")
+        .join(""),
     );
 
   /** reset map view */

@@ -30,10 +30,10 @@ export const fuzzySearch = <Entry extends { [key: string]: unknown }>(
   /** string to search */
   search: string,
   /** similarity threshold */
-  threshold = 0.25
+  threshold = 0.25,
 ): Entry[] =>
   list.filter(
-    (entry) => trigramSimilarity(String(entry[key]), search) > threshold
+    (entry) => trigramSimilarity(String(entry[key]), search) > threshold,
   );
 
 /** progress callback type */

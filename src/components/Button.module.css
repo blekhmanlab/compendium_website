@@ -13,7 +13,9 @@
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: background var(--fast), color var(--fast);
+  transition:
+    background var(--fast),
+    color var(--fast);
 }
 
 .button:hover {
@@ -51,7 +53,8 @@
 
 .button[data-design="big"]:before {
   padding: 2px;
-  -webkit-mask: linear-gradient(white 0 0) content-box,
+  -webkit-mask:
+    linear-gradient(white 0 0) content-box,
     linear-gradient(white 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;

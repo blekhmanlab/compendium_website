@@ -146,7 +146,7 @@ const transformCountries = (countries: CSV, regions: CSV): ByGeo => {
   ];
 
   const data = Object.values(map).filter(
-    ({ name, code }) => !(exclude.includes(name) || exclude.includes(code))
+    ({ name, code }) => !(exclude.includes(name) || exclude.includes(code)),
   );
 
   return data;
@@ -156,7 +156,7 @@ const transformCountries = (countries: CSV, regions: CSV): ByGeo => {
 const transformByGeographic = (
   worldMap: FeatureCollection,
   countries: ByGeo,
-  byRegion = false
+  byRegion = false,
 ): ByMap => {
   const data = {
     ...worldMap,
@@ -185,7 +185,7 @@ const transformByGeographic = (
       if (!feature.properties?.region) {
         regions.set(
           feature.properties?.code || feature.properties?.name,
-          feature
+          feature,
         );
         continue;
       }
@@ -227,20 +227,20 @@ const deriveMetadata = (
   byPhylum: ByTaxLevel,
   byCountry: ByMap,
   byRegion: ByMap,
-  byProject: ByProject
+  byProject: ByProject,
 ): Metadata => {
   const projects = byProject.length;
   const samples = byProject.reduce(
     (total, { samples }) => total + samples.length,
-    0
+    0,
   );
   const phyla = byPhylum.filter((tax) => tax.samples).length;
   const classes = byClass.filter((tax) => tax.samples).length;
   const countries = byCountry.features.filter(
-    (feature) => feature.properties.samples
+    (feature) => feature.properties.samples,
   ).length;
   const regions = byRegion.features.filter(
-    (feature) => feature.properties.samples
+    (feature) => feature.properties.samples,
   ).length;
 
   return {
@@ -272,7 +272,7 @@ const deriveMetadata = (
 
   console.info("Getting and cleaning world map data");
   const worldMap = transformWorldMap(
-    await request<FeatureCollection>(naturalEarth)
+    await request<FeatureCollection>(naturalEarth),
   );
 
   console.info("Computing country and region data");
@@ -292,7 +292,7 @@ const deriveMetadata = (
     byClass,
     byCountry,
     byRegion,
-    byProject
+    byProject,
   );
   write("../public/metadata.json", metadata);
 })();
