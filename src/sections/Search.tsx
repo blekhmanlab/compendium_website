@@ -54,20 +54,20 @@ const Search = () => {
     <>
       <p>
         Does this dataset have what you're looking for? Search for a{" "}
-        <span data-tooltip="Collection of multiple samples, by <a href=''>BioProject</a> accession">
+        <span data-tooltip="Collection of multiple samples, by <a href='https://www.ncbi.nlm.nih.gov/bioproject/'>BioProject</a> accession">
           project
         </span>
         ,{" "}
-        <span data-tooltip="Individual sample, by <a href=''>SRA</a> run accession">
+        <span data-tooltip="Individual sample, by <a href='https://www.ncbi.nlm.nih.gov/sra'>SRA</a> run accession">
           sample
         </span>
-        , <span data-tooltip="Taxonomic level of samples">phylum</span>,{" "}
-        <span data-tooltip="Taxonomic level of samples">class</span>,{" "}
+        , <span data-tooltip="Taxon observed in sample">phylum</span>,{" "}
+        <span data-tooltip="Taxon observed of sample">class</span>,{" "}
         <span data-tooltip="Geographic origin of samples, based on <a href='https://www.naturalearthdata.com/'>Natural Earth</a> data">
           country
         </span>
         , or{" "}
-        <span data-tooltip="Geographic origin of samples, split into <a href='https://unstats.un.org/sdgs/indicators/regional-groups/'>SDG Regions</a>">
+        <span data-tooltip="Geographic origin of samples, grouped by <a href='https://unstats.un.org/sdgs/indicators/regional-groups/'>SDG Regions</a>">
           region
         </span>{" "}
         to find it in the dataset and see how many samples are present in it.
