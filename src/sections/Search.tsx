@@ -62,7 +62,7 @@ const Search = () => {
           sample
         </span>
         , <span data-tooltip="Taxon observed in sample">phylum</span>,{" "}
-        <span data-tooltip="Taxon observed of sample">class</span>,{" "}
+        <span data-tooltip="Taxon observed in sample">class</span>,{" "}
         <span data-tooltip="Geographic origin of samples, based on <a href='https://www.naturalearthdata.com/'>Natural Earth</a> data">
           country
         </span>
