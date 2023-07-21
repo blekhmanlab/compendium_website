@@ -13,6 +13,10 @@ const Textbox = ({ value, onChange, ...props }: Props) => (
     {...props}
     value={value}
     onChange={(event) => onChange(event.target.value)}
+    autoComplete="off"
+    autoCorrect="off"
+    autoCapitalize="off"
+    spellCheck="false"
   />
 );
 
