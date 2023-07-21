@@ -26,7 +26,7 @@
   display: none;
 }
 
-.summary:before {
+.summary::before {
   flex-shrink: 0;
   width: 25px;
   height: 25px;
@@ -37,7 +37,7 @@
   transition: transform var(--fast);
 }
 
-.details[open] > .summary:before {
+.details[open] > .summary::before {
   transform: rotate(90deg);
 }
 
