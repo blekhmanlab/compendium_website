@@ -26,6 +26,7 @@ Notable technologies/packages/etc. used:
 | Command        | Description                                       |
 | -------------- | ------------------------------------------------- |
 | `yarn install` | Install packages                                  |
+| `yarn compile` | Compile/transform raw data into needed format     |
 | `yarn dev`     | Start local dev server with hot-reloading         |
 | `yarn build`   | Build production version of app                   |
 | `yarn preview` | Serve built version of app (must run build first) |

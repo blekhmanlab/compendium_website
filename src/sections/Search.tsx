@@ -1,77 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import Textbox from "@/components/Textbox";
-import { useData } from "@/data";
+import { SearchList, useData } from "@/data";
 import { thread } from "@/workers";
-
-/** list of search entries or exact */
-type List = { name: string; type: string; samples: number; fuzzy?: boolean }[];
 
 const Search = () => {
   const [search, setSearch] = useState("");
-  const [fuzzy, setFuzzy] = useState<List>([]);
+  const [fuzzy, setFuzzy] = useState<SearchList>([]);
   const [limit, setLimit] = useState(10);
-  const byClass = useData((state) => state.byClass);
-  const byPhylum = useData((state) => state.byPhylum);
-  const byCountry = useData((state) => state.byCountry);
-  const byRegion = useData((state) => state.byRegion);
-  const byProject = useData((state) => state.byProject);
-
-  /** collate all data into single list of entries to search. can't do this as
-   * compile pre-process because file ends up being very large. */
-  const list: List = useMemo(() => {
-    if (!byClass || !byPhylum || !byCountry || !byRegion || !byProject)
-      return [];
-
-    /** collect complete list */
-    const list: List = [];
-
-    /** include classes */
-    for (const { name, samples } of byClass)
-      list.push({ type: "Class", name, samples });
-
-    /** include phyla */
-    for (const { name, samples } of byPhylum)
-      list.push({ type: "Phylum", name, samples });
-
-    /** include countries */
-    for (const {
-      properties: { name, samples },
-    } of byCountry.features)
-      list.push({ type: "Country", name, samples });
-
-    /** include regions */
-    for (const {
-      properties: { region, samples },
-    } of byRegion.features)
-      list.push({ type: "Region", name: region, samples });
-
-    /** include projects */
-    for (const { project, samples } of byProject)
-      list.push({
-        type: "Project",
-        name: project,
-        samples: samples.length,
-      });
-
-    /** include samples */
-    for (const { samples } of byProject)
-      for (const sample of samples)
-        list.push({ type: "Sample", name: sample, samples: 1 });
-
-    /** sort by number of samples */
-    list.sort((a, b) => b.samples - a.samples);
-
-    return list;
-  }, [byClass, byPhylum, byCountry, byRegion, byProject]);
+  const searchList = useData((state) => state.searchList);
 
   /** get exact matches */
-  const exact = useMemo(
-    () =>
-      list.filter((entry) =>
-        entry.name.toLowerCase().includes(search.toLowerCase())
-      ),
-    [list, search]
+  const exact = (searchList || []).filter((entry) =>
+    entry.name.toLowerCase().includes(search.toLowerCase())
   );
 
   /** get fuzzy (trigram) matches (in worker to not freeze ui) */
@@ -81,12 +22,12 @@ const Search = () => {
     /** reset fuzzy */
     setFuzzy([]);
 
-    if (search.trim())
+    if (searchList && search.trim())
       /** fuzzy search then set recommendations */
-      thread((worker) => worker.fuzzySearch(list, "name", search)).then(
+      thread((worker) => worker.fuzzySearch(searchList, "name", search)).then(
         (fuzzy) => {
           /** if not latest run of use effect (superseded), ignore result */
-          if (latest) setFuzzy(fuzzy as List);
+          if (latest) setFuzzy(fuzzy as SearchList);
         }
       );
     else setFuzzy([]);
@@ -94,7 +35,7 @@ const Search = () => {
     return () => {
       latest = false;
     };
-  }, [list, search, exact]);
+  }, [searchList, search]);
 
   /** full list of matches */
   const matches = exact.concat(
@@ -112,8 +53,10 @@ const Search = () => {
   return (
     <>
       <p>
-        Does this dataset have what you're looking for? Search for sample counts grouped by project (BioProject accession),
-        sample (SRA run accession), presence of specific taxa (phylum or class name), or geographic origin (country or region name).
+        Does this dataset have what you're looking for? Search for sample counts
+        grouped by project (BioProject accession), sample (SRA run accession),
+        presence of specific taxa (phylum or class name), or geographic origin
+        (country or region name).
       </p>
 
       <Textbox value={search} onChange={setSearch} placeholder="Search" />
