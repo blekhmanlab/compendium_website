@@ -112,8 +112,8 @@ const Search = () => {
   return (
     <>
       <p>
-        Does this dataset have what you're looking for? Search for a BioProject accession number,
-        sample, phylum, class, country, or region.
+        Does this dataset have what you're looking for? Search for sample counts grouped by project (BioProject accession),
+        sample (SRA run accession), presence of specific taxa (phylum or class name), or geographic origin (country or region name).
       </p>
 
       <Textbox value={search} onChange={setSearch} placeholder="Search" />
