@@ -1,0 +1,46 @@
+.details {
+  display: flex;
+  width: 100%;
+}
+
+.summary {
+  display: flex;
+  padding: 5px;
+  gap: 10px;
+  border-radius: var(--rounded);
+  line-height: var(--compact);
+  list-style: none;
+  cursor: pointer;
+  transition: background var(--fast);
+}
+
+.summary:hover {
+  background: var(--dark-gray);
+}
+
+.details[open] > .summary {
+  background: var(--dark-gray);
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary::before {
+  flex-shrink: 0;
+  width: 25px;
+  height: 25px;
+  background: currentColor;
+  content: "-";
+  -webkit-mask: url("@/assets/angle.svg") center no-repeat;
+  mask: url("@/assets/angle.svg") center no-repeat;
+  transition: transform var(--fast);
+}
+
+.details[open] > .summary::before {
+  transform: rotate(90deg);
+}
+
+.content {
+  padding: 20px 0 20px calc(5px + 25px + 10px);
+}

@@ -1,0 +1,10 @@
+.graticule {
+  fill: none;
+  stroke: var(--dark-gray);
+  stroke-width: 0.5;
+}
+
+.feature {
+  stroke: var(--black);
+  stroke-width: 0.5;
+}

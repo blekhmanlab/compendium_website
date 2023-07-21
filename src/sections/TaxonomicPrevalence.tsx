@@ -10,7 +10,7 @@ import { useViewBox } from "@/util/hooks";
 type Props = {
   id: string;
   title: string;
-  data: Data["byClass"] | Data["byPhyla"];
+  data: Data["byClass"] | Data["byPhylum"];
 };
 
 /** svg dimensions */
@@ -37,7 +37,12 @@ const TaxonomicPrevalence = ({ id, title, data }: Props) => {
       <g className="bars"></g>
       <g className="x-axis"></g>
       <g className="y-axis"></g>
-      <text x={width / 2} y={height(data.length) + 60} textAnchor="middle">
+      <text
+        className="axis-title"
+        x={width / 2}
+        y={height(data.length) + 60}
+        textAnchor="middle"
+      >
         # of samples
       </text>
     </svg>
@@ -72,7 +77,7 @@ const chart = (id: string, data: Props["data"]) => {
   const xAxis = d3
     .axisBottom(xScale)
     .ticks(3, (d: number) =>
-      d.toLocaleString(undefined, { notation: "compact" })
+      d.toLocaleString(undefined, { notation: "compact" }),
     );
 
   /** create y axis */
@@ -111,6 +116,6 @@ const chart = (id: string, data: Props["data"]) => {
         `</div>`,
       ]
         .filter(Boolean)
-        .join("")
+        .join(""),
     );
 };

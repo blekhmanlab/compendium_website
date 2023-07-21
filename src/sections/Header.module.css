@@ -1,25 +1,25 @@
 .header {
-  position: relative;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  gap: 40px;
-  padding-top: 100px;
-  overflow: hidden;
   z-index: 0;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 100px;
+  padding-bottom: 100px;
+  overflow: hidden;
+  gap: 40px;
 }
 
 .title {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 20px;
+  justify-content: center;
   height: 120px;
+  gap: 20px;
 }
 
 .logo {
-  color: var(--white);
   height: 100%;
 }
 
@@ -34,18 +34,17 @@
 }
 
 .subtitle {
-  font-size: 1.4rem;
-  font-weight: 200;
-  text-align: center;
   color: var(--off-white);
-  text-wrap: balance;
+  font-weight: 200;
+  font-size: 1.4rem;
+  text-align: center;
 }
 
 .buttons {
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: 20px;
   font-size: 1.2rem;
 }

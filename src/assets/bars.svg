@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100">
+  <path
+    fill="none"
+    stroke="currentColor"
+    stroke-width="10"
+    stroke-linecap="round"
+    d="
+      M -45 -40 L 45 -40
+      M -20 -20 L 45 -20
+      M 0 0 L 45 0
+      M 15 20 L 45 20
+      M 20 40 L 45 40
+    "
+  />
+</svg>

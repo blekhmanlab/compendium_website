@@ -14,7 +14,7 @@ export default HeaderBg;
   /** wait for necessary elements to load */
   const canvas = await waitFor(() => document.querySelector("canvas"));
   const svg = await waitFor(() =>
-    document.querySelector<SVGSVGElement>("#logo")
+    document.querySelector<SVGSVGElement>("#logo"),
   );
   const ctx = await waitFor(() => canvas.getContext("2d"));
 
@@ -85,7 +85,7 @@ export default HeaderBg;
           (fill && path.isPointInFill(point)) ||
           (stroke && path.isPointInStroke(point))
         );
-      })
+      }),
     )
     /** map svg viewbox range to -0.5 -> 0.5 */
     .map(({ x, y }) => ({
@@ -160,7 +160,7 @@ export default HeaderBg;
       -canvas.width / 2,
       -canvas.height / 2,
       canvas.width,
-      canvas.height
+      canvas.height,
     );
 
     /** draw particles */
@@ -173,7 +173,7 @@ export default HeaderBg;
         position.y + cos(t / 3 + spin) * size,
         size,
         0,
-        Math.PI * 2
+        Math.PI * 2,
       );
       ctx.fill();
     }
@@ -186,7 +186,7 @@ export default HeaderBg;
   /** restart animations on click */
   canvas.addEventListener("click", () =>
     particles.forEach((particle) =>
-      particle.animations.forEach((animation) => animation.restart())
-    )
+      particle.animations.forEach((animation) => animation.restart()),
+    ),
   );
 })();

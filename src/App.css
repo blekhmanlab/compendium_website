@@ -14,17 +14,20 @@
   --white: #e4e8ee;
 
   --primary: #e23fff;
-  --secondary: #4d67ff;
+  --secondary: #6e84ff;
   --tertiary: #52d7ff;
   --rounded: 5px;
   --fast: 0.25s ease;
+
+  --spacing: 1.75em;
+  --compact: 1.5em;
 }
 
 @font-face {
-  font-family: "Mona Sans";
-  src: url("@/assets/MonaSans.woff2") format("woff2");
   font-weight: 200 900;
+  src: url("@/assets/MonaSans.woff2") format("woff2");
   font-stretch: 75% 125%;
+  font-family: "Mona Sans";
 }
 
 * {
@@ -36,20 +39,20 @@ body {
   margin: 0;
   background: var(--black);
   color: var(--white);
-  font-size: 14pt;
-  font-family: "Mona Sans";
   font-weight: 300;
-  line-height: 1em;
+  font-size: 14pt;
+  line-height: var(--spacing);
+  font-family: "Mona Sans";
 }
 
 header,
 section,
 footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 60px max(calc((100% - var(--col)) / 2), 40px);
-}
-
-section:nth-child(odd) {
-  background: #8080ff10;
+  gap: 40px;
 }
 
 header,
@@ -61,23 +64,27 @@ section {
   --col: 1000px;
 }
 
+section:nth-child(odd) {
+  background: #8080ff10;
+}
+
 h1,
 h2,
 h3 {
-  line-height: 1.2em;
+  margin: 0;
+  line-height: var(--compact);
 }
 
 h1 {
-  margin: 0;
-  letter-spacing: 1px;
   font-weight: 600;
   font-size: 2.2rem;
+  line-height: 1.25em;
+  letter-spacing: 1px;
 }
 
 h2 {
-  margin: 40px 0;
-  font-size: 1.5rem;
   font-weight: 400;
+  font-size: 1.5rem;
   text-align: center;
 }
 
@@ -91,9 +98,11 @@ p {
 }
 
 p,
-code,
-details {
-  line-height: 1.75em;
+ul,
+ol,
+code {
+  width: 100%;
+  margin: 0;
 }
 
 a {
@@ -102,52 +111,53 @@ a {
 }
 
 a:hover {
-  color: var(--primary);
-}
-
-select {
-  cursor: pointer;
+  color: currentColor;
 }
 
 code {
   padding: 2px 5px;
+  border-radius: var(--rounded);
   background: var(--dark-gray);
   font-family: "IBM Plex Mono", monospace;
-  border-radius: var(--rounded);
 }
 
 li {
-  padding-left: 0.5em;
+  padding-left: 20px;
 }
 
-details {
+.content {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  margin: 20px 0;
+  gap: 20px;
 }
 
-summary {
-  display: block;
-  cursor: pointer;
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
 }
 
-details > :not(summary) {
-  margin-left: 1.5em;
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-summary:before {
-  content: "▶";
-  display: inline-block;
-  width: 2em;
-  font-size: 0.8rem;
-  vertical-align: middle;
+thead tr:last-child {
+  border-bottom: solid 1px var(--gray);
 }
 
-details[open] summary:before {
-  content: "▼";
+th {
+  font-weight: 400;
 }
 
-:focus:not(:focus-visible) {
-  outline: none;
+tbody tr:nth-child(even) {
+  background: #ffffff08;
+}
+
+th,
+td {
+  padding: 5px 10px;
+  text-align: left;
 }
 
 svg text {
@@ -156,52 +166,64 @@ svg text {
 }
 
 svg .title {
-  font-size: 1.5rem !important;
+  font-size: 1.5rem;
 }
 
-svg .graticule {
-  fill: none;
-  stroke: var(--dark-gray);
-  stroke-width: 0.5;
-}
-
-svg .country {
-  stroke: var(--black);
-  stroke-width: 0.5;
+svg .axis-title {
+  font-size: 1.35rem;
 }
 
 svg [data-tooltip]:hover {
   fill: var(--white);
 }
 
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+[data-tooltip] {
+  cursor: help;
+}
+
+span[data-tooltip] {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 4px;
+}
+
 .tippy-box {
   padding: 10px 15px;
   border-radius: var(--rounded);
-  background: var(--dark-gray);
+  background: var(--white);
+  color: var(--black);
   font-size: 1rem;
-  box-shadow: 0 0 10px var(--black);
+  line-height: var(--compact);
 }
 
 .tippy-content {
   padding: 0;
 }
 
+.tippy-content a {
+  color: var(--secondary);
+}
+
+.tippy-content a:hover {
+  color: currentColor;
+}
+
 .tippy-arrow {
-  color: var(--dark-gray);
   z-index: 99;
+  color: var(--white);
 }
 
 .tooltip-table {
   display: grid;
   grid-template-columns: auto auto;
-  gap: 5px 15px;
   margin: 5px;
+  gap: 5px 15px;
 }
 
 .tooltip-table > *:nth-child(odd) {
   font-weight: 500;
-}
-
-[data-tooltip] {
-  cursor: help;
 }

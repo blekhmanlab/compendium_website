@@ -9,7 +9,7 @@ export const thread = <Type>(
   /** method to run from worker */
   method: (worker: Remote<API>) => Promise<Type>,
   /** method to run on progress update */
-  onProgress?: (status: string) => void
+  onProgress?: (status: string) => void,
 ): Promise<Type> =>
   new Promise((resolve, reject) => {
     /** flag for if final result has happened */
@@ -23,7 +23,7 @@ export const thread = <Type>(
         if (!resolved)
           /** update progress */
           onProgress?.(status);
-      })
+      }),
     );
     /** execute specified method */
     method(worker)
@@ -43,18 +43,18 @@ export const example = async () => {
   /** in sequence */
   const a = await thread(
     (worker) => worker.expensiveFunction(),
-    (status) => console.info(status)
+    (status) => console.info(status),
   );
 
   /** in parallel */
   const [b, c] = await Promise.all([
     thread(
       (worker) => worker.expensiveFunction(),
-      (status) => console.info(status)
+      (status) => console.info(status),
     ),
     thread(
       (worker) => worker.expensiveFunction(),
-      (status) => console.info(status)
+      (status) => console.info(status),
     ),
   ]);
 

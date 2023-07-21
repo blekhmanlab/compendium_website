@@ -1,1 +1,1714 @@
-[{"fullName":"Bacteria.Firmicutes.Bacilli","name":"Bacilli","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Bacilli","samples":163251},{"fullName":"Bacteria.Firmicutes.Clostridia","name":"Clostridia","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Clostridia","samples":158909},{"fullName":"Bacteria.Proteobacteria.Gammaproteobacteria","name":"Gammaproteobacteria","kingdom":"Bacteria","phylum":"Proteobacteria","_class":"Gammaproteobacteria","samples":155811},{"fullName":"Bacteria.Bacteroidota.Bacteroidia","name":"Bacteroidia","kingdom":"Bacteria","phylum":"Bacteroidota","_class":"Bacteroidia","samples":149669},{"fullName":"Bacteria.Firmicutes.Negativicutes","name":"Negativicutes","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Negativicutes","samples":144751},{"fullName":"Bacteria.Actinobacteriota.Actinobacteria","name":"Actinobacteria","kingdom":"Bacteria","phylum":"Actinobacteriota","_class":"Actinobacteria","samples":142518},{"fullName":"Bacteria.Actinobacteriota.Coriobacteriia","name":"Coriobacteriia","kingdom":"Bacteria","phylum":"Actinobacteriota","_class":"Coriobacteriia","samples":119915},{"fullName":"Bacteria.Desulfobacterota.Desulfovibrionia","name":"Desulfovibrionia","kingdom":"Bacteria","phylum":"Desulfobacterota","_class":"Desulfovibrionia","samples":73182},{"fullName":"Bacteria.Verrucomicrobiota.Verrucomicrobiae","name":"Verrucomicrobiae","kingdom":"Bacteria","phylum":"Verrucomicrobiota","_class":"Verrucomicrobiae","samples":68777},{"fullName":"Bacteria.Proteobacteria.Alphaproteobacteria","name":"Alphaproteobacteria","kingdom":"Bacteria","phylum":"Proteobacteria","_class":"Alphaproteobacteria","samples":58778},{"fullName":"Bacteria.Fusobacteriota.Fusobacteriia","name":"Fusobacteriia","kingdom":"Bacteria","phylum":"Fusobacteriota","_class":"Fusobacteriia","samples":38080},{"fullName":"Bacteria.Campilobacterota.Campylobacteria","name":"Campylobacteria","kingdom":"Bacteria","phylum":"Campilobacterota","_class":"Campylobacteria","samples":26988},{"fullName":"Bacteria.Cyanobacteria.Cyanobacteriia","name":"Cyanobacteriia","kingdom":"Bacteria","phylum":"Cyanobacteria","_class":"Cyanobacteriia","samples":23876},{"fullName":"Archaea.Euryarchaeota.Methanobacteria","name":"Methanobacteria","kingdom":"Archaea","phylum":"Euryarchaeota","_class":"Methanobacteria","samples":22935},{"fullName":"Bacteria.Cyanobacteria.Vampirivibrionia","name":"Vampirivibrionia","kingdom":"Bacteria","phylum":"Cyanobacteria","_class":"Vampirivibrionia","samples":21799},{"fullName":"Bacteria.Patescibacteria.Saccharimonadia","name":"Saccharimonadia","kingdom":"Bacteria","phylum":"Patescibacteria","_class":"Saccharimonadia","samples":16325},{"fullName":"Bacteria.Synergistota.Synergistia","name":"Synergistia","kingdom":"Bacteria","phylum":"Synergistota","_class":"Synergistia","samples":14320},{"fullName":"Bacteria.Verrucomicrobiota.Lentisphaeria","name":"Lentisphaeria","kingdom":"Bacteria","phylum":"Verrucomicrobiota","_class":"Lentisphaeria","samples":13939},{"fullName":"Bacteria.Spirochaetota.Spirochaetia","name":"Spirochaetia","kingdom":"Bacteria","phylum":"Spirochaetota","_class":"Spirochaetia","samples":5436},{"fullName":"Bacteria.Deinococcota.Deinococci","name":"Deinococci","kingdom":"Bacteria","phylum":"Deinococcota","_class":"Deinococci","samples":4055},{"fullName":"Bacteria.Firmicutes.Incertae","name":"Incertae","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Incertae","samples":3744},{"fullName":"Bacteria.Elusimicrobiota.Elusimicrobia","name":"Elusimicrobia","kingdom":"Bacteria","phylum":"Elusimicrobiota","_class":"Elusimicrobia","samples":2756},{"fullName":"Archaea.Thermoplasmatota.Thermoplasmata","name":"Thermoplasmata","kingdom":"Archaea","phylum":"Thermoplasmatota","_class":"Thermoplasmata","samples":2281},{"fullName":"Bacteria.Acidobacteriota.Acidobacteriae","name":"Acidobacteriae","kingdom":"Bacteria","phylum":"Acidobacteriota","_class":"Acidobacteriae","samples":2096},{"fullName":"Bacteria.Planctomycetota.Planctomycetes","name":"Planctomycetes","kingdom":"Bacteria","phylum":"Planctomycetota","_class":"Planctomycetes","samples":1962},{"fullName":"Bacteria.Chloroflexi.Anaerolineae","name":"Anaerolineae","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"Anaerolineae","samples":1937},{"fullName":"Bacteria.Actinobacteriota.Thermoleophilia","name":"Thermoleophilia","kingdom":"Bacteria","phylum":"Actinobacteriota","_class":"Thermoleophilia","samples":1868},{"fullName":"Bacteria.Myxococcota.Polyangia","name":"Polyangia","kingdom":"Bacteria","phylum":"Myxococcota","_class":"Polyangia","samples":1772},{"fullName":"Bacteria.Actinobacteriota.Acidimicrobiia","name":"Acidimicrobiia","kingdom":"Bacteria","phylum":"Actinobacteriota","_class":"Acidimicrobiia","samples":1740},{"fullName":"Bacteria.Bdellovibrionota.Oligoflexia","name":"Oligoflexia","kingdom":"Bacteria","phylum":"Bdellovibrionota","_class":"Oligoflexia","samples":1735},{"fullName":"Bacteria.Acidobacteriota.Vicinamibacteria","name":"Vicinamibacteria","kingdom":"Bacteria","phylum":"Acidobacteriota","_class":"Vicinamibacteria","samples":1633},{"fullName":"Bacteria.Bdellovibrionota.Bdellovibrionia","name":"Bdellovibrionia","kingdom":"Bacteria","phylum":"Bdellovibrionota","_class":"Bdellovibrionia","samples":1608},{"fullName":"Bacteria.Patescibacteria.Gracilibacteria","name":"Gracilibacteria","kingdom":"Bacteria","phylum":"Patescibacteria","_class":"Gracilibacteria","samples":1535},{"fullName":"Bacteria.Acidobacteriota.Subgroup","name":"Subgroup","kingdom":"Bacteria","phylum":"Acidobacteriota","_class":"Subgroup","samples":1533},{"fullName":"Bacteria.Chloroflexi.Chloroflexia","name":"Chloroflexia","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"Chloroflexia","samples":1525},{"fullName":"Bacteria.Verrucomicrobiota.Kiritimatiellae","name":"Kiritimatiellae","kingdom":"Bacteria","phylum":"Verrucomicrobiota","_class":"Kiritimatiellae","samples":1452},{"fullName":"Bacteria.Acidobacteriota.Blastocatellia","name":"Blastocatellia","kingdom":"Bacteria","phylum":"Acidobacteriota","_class":"Blastocatellia","samples":1441},{"fullName":"Bacteria.Gemmatimonadota.Gemmatimonadetes","name":"Gemmatimonadetes","kingdom":"Bacteria","phylum":"Gemmatimonadota","_class":"Gemmatimonadetes","samples":1283},{"fullName":"Bacteria.Desulfobacterota.Desulfuromonadia","name":"Desulfuromonadia","kingdom":"Bacteria","phylum":"Desulfobacterota","_class":"Desulfuromonadia","samples":1212},{"fullName":"Bacteria.Spirochaetota.Brachyspirae","name":"Brachyspirae","kingdom":"Bacteria","phylum":"Spirochaetota","_class":"Brachyspirae","samples":1094},{"fullName":"Bacteria.Planctomycetota.Phycisphaerae","name":"Phycisphaerae","kingdom":"Bacteria","phylum":"Planctomycetota","_class":"Phycisphaerae","samples":1065},{"fullName":"Bacteria.Nitrospirota.Nitrospiria","name":"Nitrospiria","kingdom":"Bacteria","phylum":"Nitrospirota","_class":"Nitrospiria","samples":1030},{"fullName":"Bacteria.Verrucomicrobiota.Chlamydiae","name":"Chlamydiae","kingdom":"Bacteria","phylum":"Verrucomicrobiota","_class":"Chlamydiae","samples":1014},{"fullName":"Bacteria.Patescibacteria.Parcubacteria","name":"Parcubacteria","kingdom":"Bacteria","phylum":"Patescibacteria","_class":"Parcubacteria","samples":979},{"fullName":"Bacteria.Deferribacterota.Deferribacteres","name":"Deferribacteres","kingdom":"Bacteria","phylum":"Deferribacterota","_class":"Deferribacteres","samples":970},{"fullName":"Bacteria.Chloroflexi.KD4","name":"KD4","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"KD4","samples":928},{"fullName":"Bacteria.Myxococcota.Myxococcia","name":"Myxococcia","kingdom":"Bacteria","phylum":"Myxococcota","_class":"Myxococcia","samples":828},{"fullName":"Bacteria.Firmicutes.Syntrophomonadia","name":"Syntrophomonadia","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Syntrophomonadia","samples":767},{"fullName":"Bacteria.Acidobacteriota.Holophagae","name":"Holophagae","kingdom":"Bacteria","phylum":"Acidobacteriota","_class":"Holophagae","samples":729},{"fullName":"Bacteria.Chloroflexi.Ktedonobacteria","name":"Ktedonobacteria","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"Ktedonobacteria","samples":724},{"fullName":"Archaea.Crenarchaeota.Nitrososphaeria","name":"Nitrososphaeria","kingdom":"Archaea","phylum":"Crenarchaeota","_class":"Nitrososphaeria","samples":716},{"fullName":"Bacteria.WPS.2","name":"2","kingdom":"Bacteria","phylum":"WPS","_class":"2","samples":716},{"fullName":"Bacteria.Methylomirabilota.Methylomirabilia","name":"Methylomirabilia","kingdom":"Bacteria","phylum":"Methylomirabilota","_class":"Methylomirabilia","samples":707},{"fullName":"Bacteria.Desulfobacterota.Desulfobulbia","name":"Desulfobulbia","kingdom":"Bacteria","phylum":"Desulfobacterota","_class":"Desulfobulbia","samples":707},{"fullName":"Bacteria.Fibrobacterota.Fibrobacteria","name":"Fibrobacteria","kingdom":"Bacteria","phylum":"Fibrobacterota","_class":"Fibrobacteria","samples":697},{"fullName":"Bacteria.Actinobacteriota.Rubrobacteria","name":"Rubrobacteria","kingdom":"Bacteria","phylum":"Actinobacteriota","_class":"Rubrobacteria","samples":653},{"fullName":"Bacteria.Dependentiae.Babeliae","name":"Babeliae","kingdom":"Bacteria","phylum":"Dependentiae","_class":"Babeliae","samples":630},{"fullName":"Bacteria.Desulfobacterota.Desulfobacteria","name":"Desulfobacteria","kingdom":"Bacteria","phylum":"Desulfobacterota","_class":"Desulfobacteria","samples":576},{"fullName":"Bacteria.Planctomycetota.OM190","name":"OM190","kingdom":"Bacteria","phylum":"Planctomycetota","_class":"OM190","samples":572},{"fullName":"Bacteria.Armatimonadota.Fimbriimonadia","name":"Fimbriimonadia","kingdom":"Bacteria","phylum":"Armatimonadota","_class":"Fimbriimonadia","samples":560},{"fullName":"Bacteria.Acidobacteriota.Thermoanaerobaculia","name":"Thermoanaerobaculia","kingdom":"Bacteria","phylum":"Acidobacteriota","_class":"Thermoanaerobaculia","samples":542},{"fullName":"Bacteria.Gemmatimonadota.Longimicrobia","name":"Longimicrobia","kingdom":"Bacteria","phylum":"Gemmatimonadota","_class":"Longimicrobia","samples":523},{"fullName":"Bacteria.NB1.j","name":"j","kingdom":"Bacteria","phylum":"NB1","_class":"j","samples":509},{"fullName":"Bacteria.Chloroflexi.TK10","name":"TK10","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"TK10","samples":490},{"fullName":"Bacteria.Actinobacteriota.MB","name":"MB","kingdom":"Bacteria","phylum":"Actinobacteriota","_class":"MB","samples":476},{"fullName":"Bacteria.Bacteroidota.Ignavibacteria","name":"Ignavibacteria","kingdom":"Bacteria","phylum":"Bacteroidota","_class":"Ignavibacteria","samples":469},{"fullName":"Bacteria.Bacteroidota.Kapabacteria","name":"Kapabacteria","kingdom":"Bacteria","phylum":"Bacteroidota","_class":"Kapabacteria","samples":466},{"fullName":"Bacteria.Cyanobacteria.Sericytochromatia","name":"Sericytochromatia","kingdom":"Bacteria","phylum":"Cyanobacteria","_class":"Sericytochromatia","samples":464},{"fullName":"Bacteria.Chloroflexi.Dehalococcoidia","name":"Dehalococcoidia","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"Dehalococcoidia","samples":450},{"fullName":"Bacteria.Bacteroidota.Rhodothermia","name":"Rhodothermia","kingdom":"Bacteria","phylum":"Bacteroidota","_class":"Rhodothermia","samples":431},{"fullName":"Bacteria.Myxococcota.bacteriap25","name":"bacteriap25","kingdom":"Bacteria","phylum":"Myxococcota","_class":"bacteriap25","samples":431},{"fullName":"Bacteria.SAR324.clade","name":"clade","kingdom":"Bacteria","phylum":"SAR324","_class":"clade","samples":385},{"fullName":"Bacteria.Firmicutes.Limnochordia","name":"Limnochordia","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Limnochordia","samples":374},{"fullName":"Bacteria.RCP2.54","name":"54","kingdom":"Bacteria","phylum":"RCP2","_class":"54","samples":363},{"fullName":"Bacteria.Verrucomicrobiota.Omnitrophia","name":"Omnitrophia","kingdom":"Bacteria","phylum":"Verrucomicrobiota","_class":"Omnitrophia","samples":352},{"fullName":"Archaea.Halobacterota.Halobacteria","name":"Halobacteria","kingdom":"Archaea","phylum":"Halobacterota","_class":"Halobacteria","samples":343},{"fullName":"Bacteria.Elusimicrobiota.Lineage","name":"Lineage","kingdom":"Bacteria","phylum":"Elusimicrobiota","_class":"Lineage","samples":339},{"fullName":"Bacteria.Chloroflexi.OLB14","name":"OLB14","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"OLB14","samples":335},{"fullName":"Bacteria.Gemmatimonadota.S0134","name":"S0134","kingdom":"Bacteria","phylum":"Gemmatimonadota","_class":"S0134","samples":327},{"fullName":"Bacteria.Spirochaetota.Leptospirae","name":"Leptospirae","kingdom":"Bacteria","phylum":"Spirochaetota","_class":"Leptospirae","samples":325},{"fullName":"Bacteria.Chloroflexi.JG30","name":"JG30","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"JG30","samples":317},{"fullName":"Bacteria.Bacteroidota.SJA","name":"SJA","kingdom":"Bacteria","phylum":"Bacteroidota","_class":"SJA","samples":302},{"fullName":"Bacteria.Chloroflexi.AD3","name":"AD3","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"AD3","samples":295},{"fullName":"Bacteria.Chloroflexi.Gitt","name":"Gitt","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"Gitt","samples":292},{"fullName":"Bacteria.Nitrospirota.Thermodesulfovibrionia","name":"Thermodesulfovibrionia","kingdom":"Bacteria","phylum":"Nitrospirota","_class":"Thermodesulfovibrionia","samples":281},{"fullName":"Bacteria.Latescibacterota.Latescibacteria","name":"Latescibacteria","kingdom":"Bacteria","phylum":"Latescibacterota","_class":"Latescibacteria","samples":277},{"fullName":"Archaea.Halobacterota.Methanosarcinia","name":"Methanosarcinia","kingdom":"Archaea","phylum":"Halobacterota","_class":"Methanosarcinia","samples":271},{"fullName":"Bacteria.Firmicutes.Desulfitobacteriia","name":"Desulfitobacteriia","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Desulfitobacteriia","samples":270},{"fullName":"Bacteria.Planctomycetota.BD7","name":"BD7","kingdom":"Bacteria","phylum":"Planctomycetota","_class":"BD7","samples":256},{"fullName":"Bacteria.Planctomycetota.Brocadiae","name":"Brocadiae","kingdom":"Bacteria","phylum":"Planctomycetota","_class":"Brocadiae","samples":241},{"fullName":"Archaea.Nanoarchaeota.Nanoarchaeia","name":"Nanoarchaeia","kingdom":"Archaea","phylum":"Nanoarchaeota","_class":"Nanoarchaeia","samples":240},{"fullName":"Bacteria.Desulfobacterota.Syntrophobacteria","name":"Syntrophobacteria","kingdom":"Bacteria","phylum":"Desulfobacterota","_class":"Syntrophobacteria","samples":239},{"fullName":"Bacteria.Desulfobacterota.Syntrophia","name":"Syntrophia","kingdom":"Bacteria","phylum":"Desulfobacterota","_class":"Syntrophia","samples":236},{"fullName":"Bacteria.Thermotogota.Thermotogae","name":"Thermotogae","kingdom":"Bacteria","phylum":"Thermotogota","_class":"Thermotogae","samples":234},{"fullName":"Bacteria.Gemmatimonadota.BD2","name":"BD2","kingdom":"Bacteria","phylum":"Gemmatimonadota","_class":"BD2","samples":233},{"fullName":"Bacteria.Acidobacteriota.Aminicenantia","name":"Aminicenantia","kingdom":"Bacteria","phylum":"Acidobacteriota","_class":"Aminicenantia","samples":228},{"fullName":"Bacteria.Firmicutes.Thermoanaerobacteria","name":"Thermoanaerobacteria","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Thermoanaerobacteria","samples":225},{"fullName":"Bacteria.Firmicutes.Desulfotomaculia","name":"Desulfotomaculia","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Desulfotomaculia","samples":224},{"fullName":"Bacteria.Cloacimonadota.Cloacimonadia","name":"Cloacimonadia","kingdom":"Bacteria","phylum":"Cloacimonadota","_class":"Cloacimonadia","samples":218},{"fullName":"Bacteria.Planctomycetota.Pla4","name":"Pla4","kingdom":"Bacteria","phylum":"Planctomycetota","_class":"Pla4","samples":218},{"fullName":"Bacteria.Patescibacteria.ABY1","name":"ABY1","kingdom":"Bacteria","phylum":"Patescibacteria","_class":"ABY1","samples":216},{"fullName":"Bacteria.Patescibacteria.Microgenomatia","name":"Microgenomatia","kingdom":"Bacteria","phylum":"Patescibacteria","_class":"Microgenomatia","samples":204},{"fullName":"Bacteria.Bacteroidota.Kryptonia","name":"Kryptonia","kingdom":"Bacteria","phylum":"Bacteroidota","_class":"Kryptonia","samples":191},{"fullName":"Bacteria.Entotheonellaeota.Entotheonellia","name":"Entotheonellia","kingdom":"Bacteria","phylum":"Entotheonellaeota","_class":"Entotheonellia","samples":187},{"fullName":"Bacteria.Sumerlaeota.Sumerlaeia","name":"Sumerlaeia","kingdom":"Bacteria","phylum":"Sumerlaeota","_class":"Sumerlaeia","samples":183},{"fullName":"Bacteria.Armatimonadota.Armatimonadia","name":"Armatimonadia","kingdom":"Bacteria","phylum":"Armatimonadota","_class":"Armatimonadia","samples":183},{"fullName":"Bacteria.Armatimonadota.Chthonomonadetes","name":"Chthonomonadetes","kingdom":"Bacteria","phylum":"Armatimonadota","_class":"Chthonomonadetes","samples":178},{"fullName":"Archaea.Halobacterota.Methanomicrobia","name":"Methanomicrobia","kingdom":"Archaea","phylum":"Halobacterota","_class":"Methanomicrobia","samples":169},{"fullName":"Bacteria.Hydrogenedentes.Hydrogenedentia","name":"Hydrogenedentia","kingdom":"Bacteria","phylum":"Hydrogenedentes","_class":"Hydrogenedentia","samples":157},{"fullName":"Bacteria.Firmicutes.Symbiobacteriia","name":"Symbiobacteriia","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Symbiobacteriia","samples":147},{"fullName":"Bacteria.Halanaerobiaeota.Halanaerobiia","name":"Halanaerobiia","kingdom":"Bacteria","phylum":"Halanaerobiaeota","_class":"Halanaerobiia","samples":143},{"fullName":"Archaea.Crenarchaeota.Bathyarchaeia","name":"Bathyarchaeia","kingdom":"Archaea","phylum":"Crenarchaeota","_class":"Bathyarchaeia","samples":143},{"fullName":"Bacteria.Firmicutes.Moorellia","name":"Moorellia","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Moorellia","samples":138},{"fullName":"Bacteria.Abditibacteriota.Abditibacteria","name":"Abditibacteria","kingdom":"Bacteria","phylum":"Abditibacteriota","_class":"Abditibacteria","samples":135},{"fullName":"Bacteria.Planctomycetota.vadinHA49","name":"vadinHA49","kingdom":"Bacteria","phylum":"Planctomycetota","_class":"vadinHA49","samples":129},{"fullName":"Bacteria.Fibrobacterota.Chitinivibrionia","name":"Chitinivibrionia","kingdom":"Bacteria","phylum":"Fibrobacterota","_class":"Chitinivibrionia","samples":122},{"fullName":"Bacteria.Nitrospirota.4","name":"4","kingdom":"Bacteria","phylum":"Nitrospirota","_class":"4","samples":119},{"fullName":"Bacteria.Calditrichota.Calditrichia","name":"Calditrichia","kingdom":"Bacteria","phylum":"Calditrichota","_class":"Calditrichia","samples":117},{"fullName":"Bacteria.Gemmatimonadota.AKAU4049","name":"AKAU4049","kingdom":"Bacteria","phylum":"Gemmatimonadota","_class":"AKAU4049","samples":117},{"fullName":"Bacteria.Patescibacteria.Dojkabacteria","name":"Dojkabacteria","kingdom":"Bacteria","phylum":"Patescibacteria","_class":"Dojkabacteria","samples":113},{"fullName":"Bacteria.Dadabacteria.Dadabacteriia","name":"Dadabacteriia","kingdom":"Bacteria","phylum":"Dadabacteria","_class":"Dadabacteriia","samples":108},{"fullName":"Bacteria.Marinimicrobia..SAR406.clade..NA.NA.NA.NA","name":"Marinimicrobia","kingdom":"Bacteria","phylum":"Marinimicrobia","_class":"","samples":107},{"fullName":"Bacteria.Nitrospirota.Leptospirillia","name":"Leptospirillia","kingdom":"Bacteria","phylum":"Nitrospirota","_class":"Leptospirillia","samples":105},{"fullName":"Bacteria.Firmicutes.Dethiobacteria","name":"Dethiobacteria","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Dethiobacteria","samples":97},{"fullName":"Bacteria.Coprothermobacterota.Coprothermobacteria","name":"Coprothermobacteria","kingdom":"Bacteria","phylum":"Coprothermobacterota","_class":"Coprothermobacteria","samples":93},{"fullName":"Bacteria.Desulfobacterota.Syntrophorhabdia","name":"Syntrophorhabdia","kingdom":"Bacteria","phylum":"Desulfobacterota","_class":"Syntrophorhabdia","samples":91},{"fullName":"Bacteria.Firmicutes.D8A","name":"D8A","kingdom":"Bacteria","phylum":"Firmicutes","_class":"D8A","samples":83},{"fullName":"Bacteria.Gemmatimonadota.PAUC43f","name":"PAUC43f","kingdom":"Bacteria","phylum":"Gemmatimonadota","_class":"PAUC43f","samples":79},{"fullName":"Bacteria.Chloroflexi.P2","name":"P2","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"P2","samples":79},{"fullName":"Bacteria.Spirochaetota.V2072","name":"V2072","kingdom":"Bacteria","phylum":"Spirochaetota","_class":"V2072","samples":78},{"fullName":"Bacteria.Desulfobacterota.Desulfobaccia","name":"Desulfobaccia","kingdom":"Bacteria","phylum":"Desulfobacterota","_class":"Desulfobaccia","samples":66},{"fullName":"Bacteria.Caldatribacteriota.JS1","name":"JS1","kingdom":"Bacteria","phylum":"Caldatribacteriota","_class":"JS1","samples":66},{"fullName":"Bacteria.Caldisericota.Caldisericia","name":"Caldisericia","kingdom":"Bacteria","phylum":"Caldisericota","_class":"Caldisericia","samples":65},{"fullName":"Bacteria.Acidobacteriota.c5LKS83","name":"c5LKS83","kingdom":"Bacteria","phylum":"Acidobacteriota","_class":"c5LKS83","samples":64},{"fullName":"Bacteria.Aquificota.Aquificae","name":"Aquificae","kingdom":"Bacteria","phylum":"Aquificota","_class":"Aquificae","samples":63},{"fullName":"Bacteria.Patescibacteria.Berkelbacteria","name":"Berkelbacteria","kingdom":"Bacteria","phylum":"Patescibacteria","_class":"Berkelbacteria","samples":63},{"fullName":"Bacteria.Deferrisomatota.Defferrisomatia","name":"Defferrisomatia","kingdom":"Bacteria","phylum":"Deferrisomatota","_class":"Defferrisomatia","samples":59},{"fullName":"Bacteria.Firmicutes.Thermacetogenia","name":"Thermacetogenia","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Thermacetogenia","samples":58},{"fullName":"Bacteria.Firmicutes.Thermovenabulia","name":"Thermovenabulia","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Thermovenabulia","samples":57},{"fullName":"Bacteria.Firmicutes.BRH","name":"BRH","kingdom":"Bacteria","phylum":"Firmicutes","_class":"BRH","samples":55},{"fullName":"Bacteria.Spirochaetota.MVP","name":"MVP","kingdom":"Bacteria","phylum":"Spirochaetota","_class":"MVP","samples":48},{"fullName":"Bacteria.Planctomycetota.Pla3","name":"Pla3","kingdom":"Bacteria","phylum":"Planctomycetota","_class":"Pla3","samples":47},{"fullName":"Bacteria.Caldatribacteriota.Caldatribacteriia","name":"Caldatribacteriia","kingdom":"Bacteria","phylum":"Caldatribacteriota","_class":"Caldatribacteriia","samples":46},{"fullName":"Bacteria.Patescibacteria.WWE3","name":"WWE3","kingdom":"Bacteria","phylum":"Patescibacteria","_class":"WWE3","samples":45},{"fullName":"Archaea.Nanohaloarchaeota.Nanosalinia","name":"Nanosalinia","kingdom":"Archaea","phylum":"Nanohaloarchaeota","_class":"Nanosalinia","samples":44},{"fullName":"Bacteria.Chloroflexi.SHA","name":"SHA","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"SHA","samples":44},{"fullName":"Bacteria.Chloroflexi.SL56","name":"SL56","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"SL56","samples":42},{"fullName":"Bacteria.Nitrospinota.P9X2b3D02","name":"P9X2b3D02","kingdom":"Bacteria","phylum":"Nitrospinota","_class":"P9X2b3D02","samples":42},{"fullName":"Archaea.Crenarchaeota.Methanomethylicia","name":"Methanomethylicia","kingdom":"Archaea","phylum":"Crenarchaeota","_class":"Methanomethylicia","samples":37},{"fullName":"Archaea.Crenarchaeota.Thermoprotei","name":"Thermoprotei","kingdom":"Archaea","phylum":"Crenarchaeota","_class":"Thermoprotei","samples":35},{"fullName":"Bacteria.Desulfobacterota.Desulfomonilia","name":"Desulfomonilia","kingdom":"Bacteria","phylum":"Desulfobacterota","_class":"Desulfomonilia","samples":33},{"fullName":"Bacteria.Firmicutes.Sulfobacillia","name":"Sulfobacillia","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Sulfobacillia","samples":32},{"fullName":"Bacteria.Actinobacteriota.WCHB1","name":"WCHB1","kingdom":"Bacteria","phylum":"Actinobacteriota","_class":"WCHB1","samples":31},{"fullName":"Bacteria.Acetothermia.Acetothermiia","name":"Acetothermiia","kingdom":"Bacteria","phylum":"Acetothermia","_class":"Acetothermiia","samples":29},{"fullName":"Bacteria.Spirochaetota.Brevinematia","name":"Brevinematia","kingdom":"Bacteria","phylum":"Spirochaetota","_class":"Brevinematia","samples":27},{"fullName":"Bacteria.Elusimicrobiota.Endomicrobia","name":"Endomicrobia","kingdom":"Bacteria","phylum":"Elusimicrobiota","_class":"Endomicrobia","samples":26},{"fullName":"Bacteria.Acidobacteriota.AT","name":"AT","kingdom":"Bacteria","phylum":"Acidobacteriota","_class":"AT","samples":24},{"fullName":"Archaea.Micrarchaeota.Micrarchaeia","name":"Micrarchaeia","kingdom":"Archaea","phylum":"Micrarchaeota","_class":"Micrarchaeia","samples":23},{"fullName":"Archaea.Euryarchaeota.Thermococci","name":"Thermococci","kingdom":"Archaea","phylum":"Euryarchaeota","_class":"Thermococci","samples":23},{"fullName":"Archaea.Iainarchaeota.Iainarchaeia","name":"Iainarchaeia","kingdom":"Archaea","phylum":"Iainarchaeota","_class":"Iainarchaeia","samples":23},{"fullName":"Bacteria.Aquificota.Desulfurobacteriia","name":"Desulfurobacteriia","kingdom":"Bacteria","phylum":"Aquificota","_class":"Desulfurobacteriia","samples":21},{"fullName":"Bacteria.Firmicutes.Thermaerobacteria","name":"Thermaerobacteria","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Thermaerobacteria","samples":20},{"fullName":"Archaea.Aenigmarchaeota.Aenigmarchaeia","name":"Aenigmarchaeia","kingdom":"Archaea","phylum":"Aenigmarchaeota","_class":"Aenigmarchaeia","samples":19},{"fullName":"Bacteria.LCP.89","name":"89","kingdom":"Bacteria","phylum":"LCP","_class":"89","samples":19},{"fullName":"Bacteria.Patescibacteria.CPR2","name":"CPR2","kingdom":"Bacteria","phylum":"Patescibacteria","_class":"CPR2","samples":17},{"fullName":"Bacteria.Actinobacteriota.RBG","name":"RBG","kingdom":"Bacteria","phylum":"Actinobacteriota","_class":"RBG","samples":15},{"fullName":"Bacteria.Desulfobacterota.Thermodesulfobacteria","name":"Thermodesulfobacteria","kingdom":"Bacteria","phylum":"Desulfobacterota","_class":"Thermodesulfobacteria","samples":15},{"fullName":"Bacteria.Bacteroidota.Chlorobia","name":"Chlorobia","kingdom":"Bacteria","phylum":"Bacteroidota","_class":"Chlorobia","samples":14},{"fullName":"Bacteria.Nitrospinota.Nitrospinia","name":"Nitrospinia","kingdom":"Bacteria","phylum":"Nitrospinota","_class":"Nitrospinia","samples":13},{"fullName":"Bacteria.Bacteroidota.OC31","name":"OC31","kingdom":"Bacteria","phylum":"Bacteroidota","_class":"OC31","samples":12},{"fullName":"Archaea.Aenigmarchaeota.Deep","name":"Deep","kingdom":"Archaea","phylum":"Aenigmarchaeota","_class":"Deep","samples":12},{"fullName":"Bacteria.Armatimonadota.DG","name":"DG","kingdom":"Bacteria","phylum":"Armatimonadota","_class":"DG","samples":12},{"fullName":"Bacteria.Planctomycetota.028H05","name":"028H05","kingdom":"Bacteria","phylum":"Planctomycetota","_class":"028H05","samples":11},{"fullName":"Bacteria.Firmicutes.Thermincolia","name":"Thermincolia","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Thermincolia","samples":11},{"fullName":"Archaea.Halobacterota.Methanocellia","name":"Methanocellia","kingdom":"Archaea","phylum":"Halobacterota","_class":"Methanocellia","samples":10},{"fullName":"Archaea.Euryarchaeota.Methanococci","name":"Methanococci","kingdom":"Archaea","phylum":"Euryarchaeota","_class":"Methanococci","samples":10},{"fullName":"Bacteria.Rs.K70","name":"K70","kingdom":"Bacteria","phylum":"Rs","_class":"K70","samples":9},{"fullName":"Bacteria.TX1A.33","name":"33","kingdom":"Bacteria","phylum":"TX1A","_class":"33","samples":9},{"fullName":"Bacteria.Aerophobota.Aerophobia","name":"Aerophobia","kingdom":"Bacteria","phylum":"Aerophobota","_class":"Aerophobia","samples":8},{"fullName":"Bacteria.Firmicutes.TSAC18","name":"TSAC18","kingdom":"Bacteria","phylum":"Firmicutes","_class":"TSAC18","samples":8},{"fullName":"Bacteria.Desulfobacterota.Desulfarculia","name":"Desulfarculia","kingdom":"Bacteria","phylum":"Desulfobacterota","_class":"Desulfarculia","samples":8},{"fullName":"Bacteria.Fermentibacterota.Fermentibacteria","name":"Fermentibacteria","kingdom":"Bacteria","phylum":"Fermentibacterota","_class":"Fermentibacteria","samples":8},{"fullName":"Bacteria.Acidobacteriota.d142","name":"d142","kingdom":"Bacteria","phylum":"Acidobacteriota","_class":"d142","samples":8},{"fullName":"Bacteria.Modulibacteria.Moduliflexia","name":"Moduliflexia","kingdom":"Bacteria","phylum":"Modulibacteria","_class":"Moduliflexia","samples":7},{"fullName":"Bacteria.Proteobacteria.Zetaproteobacteria","name":"Zetaproteobacteria","kingdom":"Bacteria","phylum":"Proteobacteria","_class":"Zetaproteobacteria","samples":7},{"fullName":"Bacteria.WOR.1","name":"1","kingdom":"Bacteria","phylum":"WOR","_class":"1","samples":6},{"fullName":"Archaea.Asgardarchaeota.Lokiarchaeia","name":"Lokiarchaeia","kingdom":"Archaea","phylum":"Asgardarchaeota","_class":"Lokiarchaeia","samples":5},{"fullName":"Bacteria.Elusimicrobiota.4","name":"4","kingdom":"Bacteria","phylum":"Elusimicrobiota","_class":"4","samples":5},{"fullName":"Bacteria.Patescibacteria.Kazania","name":"Kazania","kingdom":"Bacteria","phylum":"Patescibacteria","_class":"Kazania","samples":4},{"fullName":"Bacteria.Gemmatimonadota.MD2902","name":"MD2902","kingdom":"Bacteria","phylum":"Gemmatimonadota","_class":"MD2902","samples":4},{"fullName":"Bacteria.Dictyoglomota.Dictyoglomia","name":"Dictyoglomia","kingdom":"Bacteria","phylum":"Dictyoglomota","_class":"Dictyoglomia","samples":3},{"fullName":"Bacteria.BHI80.139","name":"139","kingdom":"Bacteria","phylum":"BHI80","_class":"139","samples":3},{"fullName":"Bacteria.Chloroflexi.N9D0","name":"N9D0","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"N9D0","samples":2},{"fullName":"Bacteria.Nitrospirota.BMS9AB35","name":"BMS9AB35","kingdom":"Bacteria","phylum":"Nitrospirota","_class":"BMS9AB35","samples":2},{"fullName":"Bacteria.Firmicutes.TTA","name":"TTA","kingdom":"Bacteria","phylum":"Firmicutes","_class":"TTA","samples":2},{"fullName":"Bacteria.Chloroflexi.TK30","name":"TK30","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"TK30","samples":2},{"fullName":"Bacteria.Nitrospirota.HDB","name":"HDB","kingdom":"Bacteria","phylum":"Nitrospirota","_class":"HDB","samples":2},{"fullName":"Bacteria.10bav.F6","name":"F6","kingdom":"Bacteria","phylum":"10bav","_class":"F6","samples":2},{"fullName":"Archaea.Halobacterota.Methanonatronarchaeia","name":"Methanonatronarchaeia","kingdom":"Archaea","phylum":"Halobacterota","_class":"Methanonatronarchaeia","samples":2},{"fullName":"Bacteria.Elusimicrobiota.Rs","name":"Rs","kingdom":"Bacteria","phylum":"Elusimicrobiota","_class":"Rs","samples":2},{"fullName":"Bacteria.Chloroflexi.NLS2","name":"NLS2","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"NLS2","samples":2},{"fullName":"Archaea.Altiarchaeota.Altiarchaeia","name":"Altiarchaeia","kingdom":"Archaea","phylum":"Altiarchaeota","_class":"Altiarchaeia","samples":2},{"fullName":"Bacteria.Acidobacteriota.ODP1230B23","name":"ODP1230B23","kingdom":"Bacteria","phylum":"Acidobacteriota","_class":"ODP1230B23","samples":1},{"fullName":"Bacteria.Firmicutes.Natranaerobiia","name":"Natranaerobiia","kingdom":"Bacteria","phylum":"Firmicutes","_class":"Natranaerobiia","samples":1},{"fullName":"Bacteria.Acidobacteriota.FFCH5909","name":"FFCH5909","kingdom":"Bacteria","phylum":"Acidobacteriota","_class":"FFCH5909","samples":1},{"fullName":"Archaea.Halobacterota.Archaeoglobi","name":"Archaeoglobi","kingdom":"Archaea","phylum":"Halobacterota","_class":"Archaeoglobi","samples":1},{"fullName":"Archaea.Hydrothermarchaeota.Hydrothermarchaeia","name":"Hydrothermarchaeia","kingdom":"Archaea","phylum":"Hydrothermarchaeota","_class":"Hydrothermarchaeia","samples":1},{"fullName":"Bacteria.Proteobacteria.Magnetococcia","name":"Magnetococcia","kingdom":"Bacteria","phylum":"Proteobacteria","_class":"Magnetococcia","samples":1},{"fullName":"Archaea.Halobacterota.ANME","name":"ANME","kingdom":"Archaea","phylum":"Halobacterota","_class":"ANME","samples":1},{"fullName":"Bacteria.CK.2C2","name":"2C2","kingdom":"Bacteria","phylum":"CK","_class":"2C2","samples":1},{"fullName":"Bacteria.Desulfobacterota.Dissulfuribacteria","name":"Dissulfuribacteria","kingdom":"Bacteria","phylum":"Desulfobacterota","_class":"Dissulfuribacteria","samples":1},{"fullName":"Bacteria.Chloroflexi.TK17","name":"TK17","kingdom":"Bacteria","phylum":"Chloroflexi","_class":"TK17","samples":1},{"fullName":"Bacteria.Campilobacterota.Desulfurellia","name":"Desulfurellia","kingdom":"Bacteria","phylum":"Campilobacterota","_class":"Desulfurellia","samples":1},{"fullName":"Bacteria.Thermodesulfobiota.Thermodesulfobiia","name":"Thermodesulfobiia","kingdom":"Bacteria","phylum":"Thermodesulfobiota","_class":"Thermodesulfobiia","samples":1}]
+[
+  {
+    "fullName": "Bacteria.Firmicutes.Bacilli",
+    "name": "Bacilli",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Bacilli",
+    "samples": 163251
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Clostridia",
+    "name": "Clostridia",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Clostridia",
+    "samples": 158909
+  },
+  {
+    "fullName": "Bacteria.Proteobacteria.Gammaproteobacteria",
+    "name": "Gammaproteobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Proteobacteria",
+    "_class": "Gammaproteobacteria",
+    "samples": 155811
+  },
+  {
+    "fullName": "Bacteria.Bacteroidota.Bacteroidia",
+    "name": "Bacteroidia",
+    "kingdom": "Bacteria",
+    "phylum": "Bacteroidota",
+    "_class": "Bacteroidia",
+    "samples": 149669
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Negativicutes",
+    "name": "Negativicutes",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Negativicutes",
+    "samples": 144751
+  },
+  {
+    "fullName": "Bacteria.Actinobacteriota.Actinobacteria",
+    "name": "Actinobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Actinobacteriota",
+    "_class": "Actinobacteria",
+    "samples": 142518
+  },
+  {
+    "fullName": "Bacteria.Actinobacteriota.Coriobacteriia",
+    "name": "Coriobacteriia",
+    "kingdom": "Bacteria",
+    "phylum": "Actinobacteriota",
+    "_class": "Coriobacteriia",
+    "samples": 119915
+  },
+  {
+    "fullName": "Bacteria.Desulfobacterota.Desulfovibrionia",
+    "name": "Desulfovibrionia",
+    "kingdom": "Bacteria",
+    "phylum": "Desulfobacterota",
+    "_class": "Desulfovibrionia",
+    "samples": 73182
+  },
+  {
+    "fullName": "Bacteria.Verrucomicrobiota.Verrucomicrobiae",
+    "name": "Verrucomicrobiae",
+    "kingdom": "Bacteria",
+    "phylum": "Verrucomicrobiota",
+    "_class": "Verrucomicrobiae",
+    "samples": 68777
+  },
+  {
+    "fullName": "Bacteria.Proteobacteria.Alphaproteobacteria",
+    "name": "Alphaproteobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Proteobacteria",
+    "_class": "Alphaproteobacteria",
+    "samples": 58778
+  },
+  {
+    "fullName": "Bacteria.Fusobacteriota.Fusobacteriia",
+    "name": "Fusobacteriia",
+    "kingdom": "Bacteria",
+    "phylum": "Fusobacteriota",
+    "_class": "Fusobacteriia",
+    "samples": 38080
+  },
+  {
+    "fullName": "Bacteria.Campilobacterota.Campylobacteria",
+    "name": "Campylobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Campilobacterota",
+    "_class": "Campylobacteria",
+    "samples": 26988
+  },
+  {
+    "fullName": "Bacteria.Cyanobacteria.Cyanobacteriia",
+    "name": "Cyanobacteriia",
+    "kingdom": "Bacteria",
+    "phylum": "Cyanobacteria",
+    "_class": "Cyanobacteriia",
+    "samples": 23876
+  },
+  {
+    "fullName": "Archaea.Euryarchaeota.Methanobacteria",
+    "name": "Methanobacteria",
+    "kingdom": "Archaea",
+    "phylum": "Euryarchaeota",
+    "_class": "Methanobacteria",
+    "samples": 22935
+  },
+  {
+    "fullName": "Bacteria.Cyanobacteria.Vampirivibrionia",
+    "name": "Vampirivibrionia",
+    "kingdom": "Bacteria",
+    "phylum": "Cyanobacteria",
+    "_class": "Vampirivibrionia",
+    "samples": 21799
+  },
+  {
+    "fullName": "Bacteria.Patescibacteria.Saccharimonadia",
+    "name": "Saccharimonadia",
+    "kingdom": "Bacteria",
+    "phylum": "Patescibacteria",
+    "_class": "Saccharimonadia",
+    "samples": 16325
+  },
+  {
+    "fullName": "Bacteria.Synergistota.Synergistia",
+    "name": "Synergistia",
+    "kingdom": "Bacteria",
+    "phylum": "Synergistota",
+    "_class": "Synergistia",
+    "samples": 14320
+  },
+  {
+    "fullName": "Bacteria.Verrucomicrobiota.Lentisphaeria",
+    "name": "Lentisphaeria",
+    "kingdom": "Bacteria",
+    "phylum": "Verrucomicrobiota",
+    "_class": "Lentisphaeria",
+    "samples": 13939
+  },
+  {
+    "fullName": "Bacteria.Spirochaetota.Spirochaetia",
+    "name": "Spirochaetia",
+    "kingdom": "Bacteria",
+    "phylum": "Spirochaetota",
+    "_class": "Spirochaetia",
+    "samples": 5436
+  },
+  {
+    "fullName": "Bacteria.Deinococcota.Deinococci",
+    "name": "Deinococci",
+    "kingdom": "Bacteria",
+    "phylum": "Deinococcota",
+    "_class": "Deinococci",
+    "samples": 4055
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Incertae",
+    "name": "Incertae",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Incertae",
+    "samples": 3744
+  },
+  {
+    "fullName": "Bacteria.Elusimicrobiota.Elusimicrobia",
+    "name": "Elusimicrobia",
+    "kingdom": "Bacteria",
+    "phylum": "Elusimicrobiota",
+    "_class": "Elusimicrobia",
+    "samples": 2756
+  },
+  {
+    "fullName": "Archaea.Thermoplasmatota.Thermoplasmata",
+    "name": "Thermoplasmata",
+    "kingdom": "Archaea",
+    "phylum": "Thermoplasmatota",
+    "_class": "Thermoplasmata",
+    "samples": 2281
+  },
+  {
+    "fullName": "Bacteria.Acidobacteriota.Acidobacteriae",
+    "name": "Acidobacteriae",
+    "kingdom": "Bacteria",
+    "phylum": "Acidobacteriota",
+    "_class": "Acidobacteriae",
+    "samples": 2096
+  },
+  {
+    "fullName": "Bacteria.Planctomycetota.Planctomycetes",
+    "name": "Planctomycetes",
+    "kingdom": "Bacteria",
+    "phylum": "Planctomycetota",
+    "_class": "Planctomycetes",
+    "samples": 1962
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.Anaerolineae",
+    "name": "Anaerolineae",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "Anaerolineae",
+    "samples": 1937
+  },
+  {
+    "fullName": "Bacteria.Actinobacteriota.Thermoleophilia",
+    "name": "Thermoleophilia",
+    "kingdom": "Bacteria",
+    "phylum": "Actinobacteriota",
+    "_class": "Thermoleophilia",
+    "samples": 1868
+  },
+  {
+    "fullName": "Bacteria.Myxococcota.Polyangia",
+    "name": "Polyangia",
+    "kingdom": "Bacteria",
+    "phylum": "Myxococcota",
+    "_class": "Polyangia",
+    "samples": 1772
+  },
+  {
+    "fullName": "Bacteria.Actinobacteriota.Acidimicrobiia",
+    "name": "Acidimicrobiia",
+    "kingdom": "Bacteria",
+    "phylum": "Actinobacteriota",
+    "_class": "Acidimicrobiia",
+    "samples": 1740
+  },
+  {
+    "fullName": "Bacteria.Bdellovibrionota.Oligoflexia",
+    "name": "Oligoflexia",
+    "kingdom": "Bacteria",
+    "phylum": "Bdellovibrionota",
+    "_class": "Oligoflexia",
+    "samples": 1735
+  },
+  {
+    "fullName": "Bacteria.Acidobacteriota.Vicinamibacteria",
+    "name": "Vicinamibacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Acidobacteriota",
+    "_class": "Vicinamibacteria",
+    "samples": 1633
+  },
+  {
+    "fullName": "Bacteria.Bdellovibrionota.Bdellovibrionia",
+    "name": "Bdellovibrionia",
+    "kingdom": "Bacteria",
+    "phylum": "Bdellovibrionota",
+    "_class": "Bdellovibrionia",
+    "samples": 1608
+  },
+  {
+    "fullName": "Bacteria.Patescibacteria.Gracilibacteria",
+    "name": "Gracilibacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Patescibacteria",
+    "_class": "Gracilibacteria",
+    "samples": 1535
+  },
+  {
+    "fullName": "Bacteria.Acidobacteriota.Subgroup",
+    "name": "Subgroup",
+    "kingdom": "Bacteria",
+    "phylum": "Acidobacteriota",
+    "_class": "Subgroup",
+    "samples": 1533
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.Chloroflexia",
+    "name": "Chloroflexia",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "Chloroflexia",
+    "samples": 1525
+  },
+  {
+    "fullName": "Bacteria.Verrucomicrobiota.Kiritimatiellae",
+    "name": "Kiritimatiellae",
+    "kingdom": "Bacteria",
+    "phylum": "Verrucomicrobiota",
+    "_class": "Kiritimatiellae",
+    "samples": 1452
+  },
+  {
+    "fullName": "Bacteria.Acidobacteriota.Blastocatellia",
+    "name": "Blastocatellia",
+    "kingdom": "Bacteria",
+    "phylum": "Acidobacteriota",
+    "_class": "Blastocatellia",
+    "samples": 1441
+  },
+  {
+    "fullName": "Bacteria.Gemmatimonadota.Gemmatimonadetes",
+    "name": "Gemmatimonadetes",
+    "kingdom": "Bacteria",
+    "phylum": "Gemmatimonadota",
+    "_class": "Gemmatimonadetes",
+    "samples": 1283
+  },
+  {
+    "fullName": "Bacteria.Desulfobacterota.Desulfuromonadia",
+    "name": "Desulfuromonadia",
+    "kingdom": "Bacteria",
+    "phylum": "Desulfobacterota",
+    "_class": "Desulfuromonadia",
+    "samples": 1212
+  },
+  {
+    "fullName": "Bacteria.Spirochaetota.Brachyspirae",
+    "name": "Brachyspirae",
+    "kingdom": "Bacteria",
+    "phylum": "Spirochaetota",
+    "_class": "Brachyspirae",
+    "samples": 1094
+  },
+  {
+    "fullName": "Bacteria.Planctomycetota.Phycisphaerae",
+    "name": "Phycisphaerae",
+    "kingdom": "Bacteria",
+    "phylum": "Planctomycetota",
+    "_class": "Phycisphaerae",
+    "samples": 1065
+  },
+  {
+    "fullName": "Bacteria.Nitrospirota.Nitrospiria",
+    "name": "Nitrospiria",
+    "kingdom": "Bacteria",
+    "phylum": "Nitrospirota",
+    "_class": "Nitrospiria",
+    "samples": 1030
+  },
+  {
+    "fullName": "Bacteria.Verrucomicrobiota.Chlamydiae",
+    "name": "Chlamydiae",
+    "kingdom": "Bacteria",
+    "phylum": "Verrucomicrobiota",
+    "_class": "Chlamydiae",
+    "samples": 1014
+  },
+  {
+    "fullName": "Bacteria.Patescibacteria.Parcubacteria",
+    "name": "Parcubacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Patescibacteria",
+    "_class": "Parcubacteria",
+    "samples": 979
+  },
+  {
+    "fullName": "Bacteria.Deferribacterota.Deferribacteres",
+    "name": "Deferribacteres",
+    "kingdom": "Bacteria",
+    "phylum": "Deferribacterota",
+    "_class": "Deferribacteres",
+    "samples": 970
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.KD4",
+    "name": "KD4",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "KD4",
+    "samples": 928
+  },
+  {
+    "fullName": "Bacteria.Myxococcota.Myxococcia",
+    "name": "Myxococcia",
+    "kingdom": "Bacteria",
+    "phylum": "Myxococcota",
+    "_class": "Myxococcia",
+    "samples": 828
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Syntrophomonadia",
+    "name": "Syntrophomonadia",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Syntrophomonadia",
+    "samples": 767
+  },
+  {
+    "fullName": "Bacteria.Acidobacteriota.Holophagae",
+    "name": "Holophagae",
+    "kingdom": "Bacteria",
+    "phylum": "Acidobacteriota",
+    "_class": "Holophagae",
+    "samples": 729
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.Ktedonobacteria",
+    "name": "Ktedonobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "Ktedonobacteria",
+    "samples": 724
+  },
+  {
+    "fullName": "Archaea.Crenarchaeota.Nitrososphaeria",
+    "name": "Nitrososphaeria",
+    "kingdom": "Archaea",
+    "phylum": "Crenarchaeota",
+    "_class": "Nitrososphaeria",
+    "samples": 716
+  },
+  {
+    "fullName": "Bacteria.WPS.2",
+    "name": "2",
+    "kingdom": "Bacteria",
+    "phylum": "WPS",
+    "_class": "2",
+    "samples": 716
+  },
+  {
+    "fullName": "Bacteria.Methylomirabilota.Methylomirabilia",
+    "name": "Methylomirabilia",
+    "kingdom": "Bacteria",
+    "phylum": "Methylomirabilota",
+    "_class": "Methylomirabilia",
+    "samples": 707
+  },
+  {
+    "fullName": "Bacteria.Desulfobacterota.Desulfobulbia",
+    "name": "Desulfobulbia",
+    "kingdom": "Bacteria",
+    "phylum": "Desulfobacterota",
+    "_class": "Desulfobulbia",
+    "samples": 707
+  },
+  {
+    "fullName": "Bacteria.Fibrobacterota.Fibrobacteria",
+    "name": "Fibrobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Fibrobacterota",
+    "_class": "Fibrobacteria",
+    "samples": 697
+  },
+  {
+    "fullName": "Bacteria.Actinobacteriota.Rubrobacteria",
+    "name": "Rubrobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Actinobacteriota",
+    "_class": "Rubrobacteria",
+    "samples": 653
+  },
+  {
+    "fullName": "Bacteria.Dependentiae.Babeliae",
+    "name": "Babeliae",
+    "kingdom": "Bacteria",
+    "phylum": "Dependentiae",
+    "_class": "Babeliae",
+    "samples": 630
+  },
+  {
+    "fullName": "Bacteria.Desulfobacterota.Desulfobacteria",
+    "name": "Desulfobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Desulfobacterota",
+    "_class": "Desulfobacteria",
+    "samples": 576
+  },
+  {
+    "fullName": "Bacteria.Planctomycetota.OM190",
+    "name": "OM190",
+    "kingdom": "Bacteria",
+    "phylum": "Planctomycetota",
+    "_class": "OM190",
+    "samples": 572
+  },
+  {
+    "fullName": "Bacteria.Armatimonadota.Fimbriimonadia",
+    "name": "Fimbriimonadia",
+    "kingdom": "Bacteria",
+    "phylum": "Armatimonadota",
+    "_class": "Fimbriimonadia",
+    "samples": 560
+  },
+  {
+    "fullName": "Bacteria.Acidobacteriota.Thermoanaerobaculia",
+    "name": "Thermoanaerobaculia",
+    "kingdom": "Bacteria",
+    "phylum": "Acidobacteriota",
+    "_class": "Thermoanaerobaculia",
+    "samples": 542
+  },
+  {
+    "fullName": "Bacteria.Gemmatimonadota.Longimicrobia",
+    "name": "Longimicrobia",
+    "kingdom": "Bacteria",
+    "phylum": "Gemmatimonadota",
+    "_class": "Longimicrobia",
+    "samples": 523
+  },
+  {
+    "fullName": "Bacteria.NB1.j",
+    "name": "j",
+    "kingdom": "Bacteria",
+    "phylum": "NB1",
+    "_class": "j",
+    "samples": 509
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.TK10",
+    "name": "TK10",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "TK10",
+    "samples": 490
+  },
+  {
+    "fullName": "Bacteria.Actinobacteriota.MB",
+    "name": "MB",
+    "kingdom": "Bacteria",
+    "phylum": "Actinobacteriota",
+    "_class": "MB",
+    "samples": 476
+  },
+  {
+    "fullName": "Bacteria.Bacteroidota.Ignavibacteria",
+    "name": "Ignavibacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Bacteroidota",
+    "_class": "Ignavibacteria",
+    "samples": 469
+  },
+  {
+    "fullName": "Bacteria.Bacteroidota.Kapabacteria",
+    "name": "Kapabacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Bacteroidota",
+    "_class": "Kapabacteria",
+    "samples": 466
+  },
+  {
+    "fullName": "Bacteria.Cyanobacteria.Sericytochromatia",
+    "name": "Sericytochromatia",
+    "kingdom": "Bacteria",
+    "phylum": "Cyanobacteria",
+    "_class": "Sericytochromatia",
+    "samples": 464
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.Dehalococcoidia",
+    "name": "Dehalococcoidia",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "Dehalococcoidia",
+    "samples": 450
+  },
+  {
+    "fullName": "Bacteria.Bacteroidota.Rhodothermia",
+    "name": "Rhodothermia",
+    "kingdom": "Bacteria",
+    "phylum": "Bacteroidota",
+    "_class": "Rhodothermia",
+    "samples": 431
+  },
+  {
+    "fullName": "Bacteria.Myxococcota.bacteriap25",
+    "name": "bacteriap25",
+    "kingdom": "Bacteria",
+    "phylum": "Myxococcota",
+    "_class": "bacteriap25",
+    "samples": 431
+  },
+  {
+    "fullName": "Bacteria.SAR324.clade",
+    "name": "clade",
+    "kingdom": "Bacteria",
+    "phylum": "SAR324",
+    "_class": "clade",
+    "samples": 385
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Limnochordia",
+    "name": "Limnochordia",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Limnochordia",
+    "samples": 374
+  },
+  {
+    "fullName": "Bacteria.RCP2.54",
+    "name": "54",
+    "kingdom": "Bacteria",
+    "phylum": "RCP2",
+    "_class": "54",
+    "samples": 363
+  },
+  {
+    "fullName": "Bacteria.Verrucomicrobiota.Omnitrophia",
+    "name": "Omnitrophia",
+    "kingdom": "Bacteria",
+    "phylum": "Verrucomicrobiota",
+    "_class": "Omnitrophia",
+    "samples": 352
+  },
+  {
+    "fullName": "Archaea.Halobacterota.Halobacteria",
+    "name": "Halobacteria",
+    "kingdom": "Archaea",
+    "phylum": "Halobacterota",
+    "_class": "Halobacteria",
+    "samples": 343
+  },
+  {
+    "fullName": "Bacteria.Elusimicrobiota.Lineage",
+    "name": "Lineage",
+    "kingdom": "Bacteria",
+    "phylum": "Elusimicrobiota",
+    "_class": "Lineage",
+    "samples": 339
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.OLB14",
+    "name": "OLB14",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "OLB14",
+    "samples": 335
+  },
+  {
+    "fullName": "Bacteria.Gemmatimonadota.S0134",
+    "name": "S0134",
+    "kingdom": "Bacteria",
+    "phylum": "Gemmatimonadota",
+    "_class": "S0134",
+    "samples": 327
+  },
+  {
+    "fullName": "Bacteria.Spirochaetota.Leptospirae",
+    "name": "Leptospirae",
+    "kingdom": "Bacteria",
+    "phylum": "Spirochaetota",
+    "_class": "Leptospirae",
+    "samples": 325
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.JG30",
+    "name": "JG30",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "JG30",
+    "samples": 317
+  },
+  {
+    "fullName": "Bacteria.Bacteroidota.SJA",
+    "name": "SJA",
+    "kingdom": "Bacteria",
+    "phylum": "Bacteroidota",
+    "_class": "SJA",
+    "samples": 302
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.AD3",
+    "name": "AD3",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "AD3",
+    "samples": 295
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.Gitt",
+    "name": "Gitt",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "Gitt",
+    "samples": 292
+  },
+  {
+    "fullName": "Bacteria.Nitrospirota.Thermodesulfovibrionia",
+    "name": "Thermodesulfovibrionia",
+    "kingdom": "Bacteria",
+    "phylum": "Nitrospirota",
+    "_class": "Thermodesulfovibrionia",
+    "samples": 281
+  },
+  {
+    "fullName": "Bacteria.Latescibacterota.Latescibacteria",
+    "name": "Latescibacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Latescibacterota",
+    "_class": "Latescibacteria",
+    "samples": 277
+  },
+  {
+    "fullName": "Archaea.Halobacterota.Methanosarcinia",
+    "name": "Methanosarcinia",
+    "kingdom": "Archaea",
+    "phylum": "Halobacterota",
+    "_class": "Methanosarcinia",
+    "samples": 271
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Desulfitobacteriia",
+    "name": "Desulfitobacteriia",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Desulfitobacteriia",
+    "samples": 270
+  },
+  {
+    "fullName": "Bacteria.Planctomycetota.BD7",
+    "name": "BD7",
+    "kingdom": "Bacteria",
+    "phylum": "Planctomycetota",
+    "_class": "BD7",
+    "samples": 256
+  },
+  {
+    "fullName": "Bacteria.Planctomycetota.Brocadiae",
+    "name": "Brocadiae",
+    "kingdom": "Bacteria",
+    "phylum": "Planctomycetota",
+    "_class": "Brocadiae",
+    "samples": 241
+  },
+  {
+    "fullName": "Archaea.Nanoarchaeota.Nanoarchaeia",
+    "name": "Nanoarchaeia",
+    "kingdom": "Archaea",
+    "phylum": "Nanoarchaeota",
+    "_class": "Nanoarchaeia",
+    "samples": 240
+  },
+  {
+    "fullName": "Bacteria.Desulfobacterota.Syntrophobacteria",
+    "name": "Syntrophobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Desulfobacterota",
+    "_class": "Syntrophobacteria",
+    "samples": 239
+  },
+  {
+    "fullName": "Bacteria.Desulfobacterota.Syntrophia",
+    "name": "Syntrophia",
+    "kingdom": "Bacteria",
+    "phylum": "Desulfobacterota",
+    "_class": "Syntrophia",
+    "samples": 236
+  },
+  {
+    "fullName": "Bacteria.Thermotogota.Thermotogae",
+    "name": "Thermotogae",
+    "kingdom": "Bacteria",
+    "phylum": "Thermotogota",
+    "_class": "Thermotogae",
+    "samples": 234
+  },
+  {
+    "fullName": "Bacteria.Gemmatimonadota.BD2",
+    "name": "BD2",
+    "kingdom": "Bacteria",
+    "phylum": "Gemmatimonadota",
+    "_class": "BD2",
+    "samples": 233
+  },
+  {
+    "fullName": "Bacteria.Acidobacteriota.Aminicenantia",
+    "name": "Aminicenantia",
+    "kingdom": "Bacteria",
+    "phylum": "Acidobacteriota",
+    "_class": "Aminicenantia",
+    "samples": 228
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Thermoanaerobacteria",
+    "name": "Thermoanaerobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Thermoanaerobacteria",
+    "samples": 225
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Desulfotomaculia",
+    "name": "Desulfotomaculia",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Desulfotomaculia",
+    "samples": 224
+  },
+  {
+    "fullName": "Bacteria.Cloacimonadota.Cloacimonadia",
+    "name": "Cloacimonadia",
+    "kingdom": "Bacteria",
+    "phylum": "Cloacimonadota",
+    "_class": "Cloacimonadia",
+    "samples": 218
+  },
+  {
+    "fullName": "Bacteria.Planctomycetota.Pla4",
+    "name": "Pla4",
+    "kingdom": "Bacteria",
+    "phylum": "Planctomycetota",
+    "_class": "Pla4",
+    "samples": 218
+  },
+  {
+    "fullName": "Bacteria.Patescibacteria.ABY1",
+    "name": "ABY1",
+    "kingdom": "Bacteria",
+    "phylum": "Patescibacteria",
+    "_class": "ABY1",
+    "samples": 216
+  },
+  {
+    "fullName": "Bacteria.Patescibacteria.Microgenomatia",
+    "name": "Microgenomatia",
+    "kingdom": "Bacteria",
+    "phylum": "Patescibacteria",
+    "_class": "Microgenomatia",
+    "samples": 204
+  },
+  {
+    "fullName": "Bacteria.Bacteroidota.Kryptonia",
+    "name": "Kryptonia",
+    "kingdom": "Bacteria",
+    "phylum": "Bacteroidota",
+    "_class": "Kryptonia",
+    "samples": 191
+  },
+  {
+    "fullName": "Bacteria.Entotheonellaeota.Entotheonellia",
+    "name": "Entotheonellia",
+    "kingdom": "Bacteria",
+    "phylum": "Entotheonellaeota",
+    "_class": "Entotheonellia",
+    "samples": 187
+  },
+  {
+    "fullName": "Bacteria.Sumerlaeota.Sumerlaeia",
+    "name": "Sumerlaeia",
+    "kingdom": "Bacteria",
+    "phylum": "Sumerlaeota",
+    "_class": "Sumerlaeia",
+    "samples": 183
+  },
+  {
+    "fullName": "Bacteria.Armatimonadota.Armatimonadia",
+    "name": "Armatimonadia",
+    "kingdom": "Bacteria",
+    "phylum": "Armatimonadota",
+    "_class": "Armatimonadia",
+    "samples": 183
+  },
+  {
+    "fullName": "Bacteria.Armatimonadota.Chthonomonadetes",
+    "name": "Chthonomonadetes",
+    "kingdom": "Bacteria",
+    "phylum": "Armatimonadota",
+    "_class": "Chthonomonadetes",
+    "samples": 178
+  },
+  {
+    "fullName": "Archaea.Halobacterota.Methanomicrobia",
+    "name": "Methanomicrobia",
+    "kingdom": "Archaea",
+    "phylum": "Halobacterota",
+    "_class": "Methanomicrobia",
+    "samples": 169
+  },
+  {
+    "fullName": "Bacteria.Hydrogenedentes.Hydrogenedentia",
+    "name": "Hydrogenedentia",
+    "kingdom": "Bacteria",
+    "phylum": "Hydrogenedentes",
+    "_class": "Hydrogenedentia",
+    "samples": 157
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Symbiobacteriia",
+    "name": "Symbiobacteriia",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Symbiobacteriia",
+    "samples": 147
+  },
+  {
+    "fullName": "Bacteria.Halanaerobiaeota.Halanaerobiia",
+    "name": "Halanaerobiia",
+    "kingdom": "Bacteria",
+    "phylum": "Halanaerobiaeota",
+    "_class": "Halanaerobiia",
+    "samples": 143
+  },
+  {
+    "fullName": "Archaea.Crenarchaeota.Bathyarchaeia",
+    "name": "Bathyarchaeia",
+    "kingdom": "Archaea",
+    "phylum": "Crenarchaeota",
+    "_class": "Bathyarchaeia",
+    "samples": 143
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Moorellia",
+    "name": "Moorellia",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Moorellia",
+    "samples": 138
+  },
+  {
+    "fullName": "Bacteria.Abditibacteriota.Abditibacteria",
+    "name": "Abditibacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Abditibacteriota",
+    "_class": "Abditibacteria",
+    "samples": 135
+  },
+  {
+    "fullName": "Bacteria.Planctomycetota.vadinHA49",
+    "name": "vadinHA49",
+    "kingdom": "Bacteria",
+    "phylum": "Planctomycetota",
+    "_class": "vadinHA49",
+    "samples": 129
+  },
+  {
+    "fullName": "Bacteria.Fibrobacterota.Chitinivibrionia",
+    "name": "Chitinivibrionia",
+    "kingdom": "Bacteria",
+    "phylum": "Fibrobacterota",
+    "_class": "Chitinivibrionia",
+    "samples": 122
+  },
+  {
+    "fullName": "Bacteria.Nitrospirota.4",
+    "name": "4",
+    "kingdom": "Bacteria",
+    "phylum": "Nitrospirota",
+    "_class": "4",
+    "samples": 119
+  },
+  {
+    "fullName": "Bacteria.Calditrichota.Calditrichia",
+    "name": "Calditrichia",
+    "kingdom": "Bacteria",
+    "phylum": "Calditrichota",
+    "_class": "Calditrichia",
+    "samples": 117
+  },
+  {
+    "fullName": "Bacteria.Gemmatimonadota.AKAU4049",
+    "name": "AKAU4049",
+    "kingdom": "Bacteria",
+    "phylum": "Gemmatimonadota",
+    "_class": "AKAU4049",
+    "samples": 117
+  },
+  {
+    "fullName": "Bacteria.Patescibacteria.Dojkabacteria",
+    "name": "Dojkabacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Patescibacteria",
+    "_class": "Dojkabacteria",
+    "samples": 113
+  },
+  {
+    "fullName": "Bacteria.Dadabacteria.Dadabacteriia",
+    "name": "Dadabacteriia",
+    "kingdom": "Bacteria",
+    "phylum": "Dadabacteria",
+    "_class": "Dadabacteriia",
+    "samples": 108
+  },
+  {
+    "fullName": "Bacteria.Marinimicrobia..SAR406.clade..NA.NA.NA.NA",
+    "name": "Marinimicrobia",
+    "kingdom": "Bacteria",
+    "phylum": "Marinimicrobia",
+    "_class": "",
+    "samples": 107
+  },
+  {
+    "fullName": "Bacteria.Nitrospirota.Leptospirillia",
+    "name": "Leptospirillia",
+    "kingdom": "Bacteria",
+    "phylum": "Nitrospirota",
+    "_class": "Leptospirillia",
+    "samples": 105
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Dethiobacteria",
+    "name": "Dethiobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Dethiobacteria",
+    "samples": 97
+  },
+  {
+    "fullName": "Bacteria.Coprothermobacterota.Coprothermobacteria",
+    "name": "Coprothermobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Coprothermobacterota",
+    "_class": "Coprothermobacteria",
+    "samples": 93
+  },
+  {
+    "fullName": "Bacteria.Desulfobacterota.Syntrophorhabdia",
+    "name": "Syntrophorhabdia",
+    "kingdom": "Bacteria",
+    "phylum": "Desulfobacterota",
+    "_class": "Syntrophorhabdia",
+    "samples": 91
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.D8A",
+    "name": "D8A",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "D8A",
+    "samples": 83
+  },
+  {
+    "fullName": "Bacteria.Gemmatimonadota.PAUC43f",
+    "name": "PAUC43f",
+    "kingdom": "Bacteria",
+    "phylum": "Gemmatimonadota",
+    "_class": "PAUC43f",
+    "samples": 79
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.P2",
+    "name": "P2",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "P2",
+    "samples": 79
+  },
+  {
+    "fullName": "Bacteria.Spirochaetota.V2072",
+    "name": "V2072",
+    "kingdom": "Bacteria",
+    "phylum": "Spirochaetota",
+    "_class": "V2072",
+    "samples": 78
+  },
+  {
+    "fullName": "Bacteria.Desulfobacterota.Desulfobaccia",
+    "name": "Desulfobaccia",
+    "kingdom": "Bacteria",
+    "phylum": "Desulfobacterota",
+    "_class": "Desulfobaccia",
+    "samples": 66
+  },
+  {
+    "fullName": "Bacteria.Caldatribacteriota.JS1",
+    "name": "JS1",
+    "kingdom": "Bacteria",
+    "phylum": "Caldatribacteriota",
+    "_class": "JS1",
+    "samples": 66
+  },
+  {
+    "fullName": "Bacteria.Caldisericota.Caldisericia",
+    "name": "Caldisericia",
+    "kingdom": "Bacteria",
+    "phylum": "Caldisericota",
+    "_class": "Caldisericia",
+    "samples": 65
+  },
+  {
+    "fullName": "Bacteria.Acidobacteriota.c5LKS83",
+    "name": "c5LKS83",
+    "kingdom": "Bacteria",
+    "phylum": "Acidobacteriota",
+    "_class": "c5LKS83",
+    "samples": 64
+  },
+  {
+    "fullName": "Bacteria.Aquificota.Aquificae",
+    "name": "Aquificae",
+    "kingdom": "Bacteria",
+    "phylum": "Aquificota",
+    "_class": "Aquificae",
+    "samples": 63
+  },
+  {
+    "fullName": "Bacteria.Patescibacteria.Berkelbacteria",
+    "name": "Berkelbacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Patescibacteria",
+    "_class": "Berkelbacteria",
+    "samples": 63
+  },
+  {
+    "fullName": "Bacteria.Deferrisomatota.Defferrisomatia",
+    "name": "Defferrisomatia",
+    "kingdom": "Bacteria",
+    "phylum": "Deferrisomatota",
+    "_class": "Defferrisomatia",
+    "samples": 59
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Thermacetogenia",
+    "name": "Thermacetogenia",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Thermacetogenia",
+    "samples": 58
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Thermovenabulia",
+    "name": "Thermovenabulia",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Thermovenabulia",
+    "samples": 57
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.BRH",
+    "name": "BRH",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "BRH",
+    "samples": 55
+  },
+  {
+    "fullName": "Bacteria.Spirochaetota.MVP",
+    "name": "MVP",
+    "kingdom": "Bacteria",
+    "phylum": "Spirochaetota",
+    "_class": "MVP",
+    "samples": 48
+  },
+  {
+    "fullName": "Bacteria.Planctomycetota.Pla3",
+    "name": "Pla3",
+    "kingdom": "Bacteria",
+    "phylum": "Planctomycetota",
+    "_class": "Pla3",
+    "samples": 47
+  },
+  {
+    "fullName": "Bacteria.Caldatribacteriota.Caldatribacteriia",
+    "name": "Caldatribacteriia",
+    "kingdom": "Bacteria",
+    "phylum": "Caldatribacteriota",
+    "_class": "Caldatribacteriia",
+    "samples": 46
+  },
+  {
+    "fullName": "Bacteria.Patescibacteria.WWE3",
+    "name": "WWE3",
+    "kingdom": "Bacteria",
+    "phylum": "Patescibacteria",
+    "_class": "WWE3",
+    "samples": 45
+  },
+  {
+    "fullName": "Archaea.Nanohaloarchaeota.Nanosalinia",
+    "name": "Nanosalinia",
+    "kingdom": "Archaea",
+    "phylum": "Nanohaloarchaeota",
+    "_class": "Nanosalinia",
+    "samples": 44
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.SHA",
+    "name": "SHA",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "SHA",
+    "samples": 44
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.SL56",
+    "name": "SL56",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "SL56",
+    "samples": 42
+  },
+  {
+    "fullName": "Bacteria.Nitrospinota.P9X2b3D02",
+    "name": "P9X2b3D02",
+    "kingdom": "Bacteria",
+    "phylum": "Nitrospinota",
+    "_class": "P9X2b3D02",
+    "samples": 42
+  },
+  {
+    "fullName": "Archaea.Crenarchaeota.Methanomethylicia",
+    "name": "Methanomethylicia",
+    "kingdom": "Archaea",
+    "phylum": "Crenarchaeota",
+    "_class": "Methanomethylicia",
+    "samples": 37
+  },
+  {
+    "fullName": "Archaea.Crenarchaeota.Thermoprotei",
+    "name": "Thermoprotei",
+    "kingdom": "Archaea",
+    "phylum": "Crenarchaeota",
+    "_class": "Thermoprotei",
+    "samples": 35
+  },
+  {
+    "fullName": "Bacteria.Desulfobacterota.Desulfomonilia",
+    "name": "Desulfomonilia",
+    "kingdom": "Bacteria",
+    "phylum": "Desulfobacterota",
+    "_class": "Desulfomonilia",
+    "samples": 33
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Sulfobacillia",
+    "name": "Sulfobacillia",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Sulfobacillia",
+    "samples": 32
+  },
+  {
+    "fullName": "Bacteria.Actinobacteriota.WCHB1",
+    "name": "WCHB1",
+    "kingdom": "Bacteria",
+    "phylum": "Actinobacteriota",
+    "_class": "WCHB1",
+    "samples": 31
+  },
+  {
+    "fullName": "Bacteria.Acetothermia.Acetothermiia",
+    "name": "Acetothermiia",
+    "kingdom": "Bacteria",
+    "phylum": "Acetothermia",
+    "_class": "Acetothermiia",
+    "samples": 29
+  },
+  {
+    "fullName": "Bacteria.Spirochaetota.Brevinematia",
+    "name": "Brevinematia",
+    "kingdom": "Bacteria",
+    "phylum": "Spirochaetota",
+    "_class": "Brevinematia",
+    "samples": 27
+  },
+  {
+    "fullName": "Bacteria.Elusimicrobiota.Endomicrobia",
+    "name": "Endomicrobia",
+    "kingdom": "Bacteria",
+    "phylum": "Elusimicrobiota",
+    "_class": "Endomicrobia",
+    "samples": 26
+  },
+  {
+    "fullName": "Bacteria.Acidobacteriota.AT",
+    "name": "AT",
+    "kingdom": "Bacteria",
+    "phylum": "Acidobacteriota",
+    "_class": "AT",
+    "samples": 24
+  },
+  {
+    "fullName": "Archaea.Micrarchaeota.Micrarchaeia",
+    "name": "Micrarchaeia",
+    "kingdom": "Archaea",
+    "phylum": "Micrarchaeota",
+    "_class": "Micrarchaeia",
+    "samples": 23
+  },
+  {
+    "fullName": "Archaea.Euryarchaeota.Thermococci",
+    "name": "Thermococci",
+    "kingdom": "Archaea",
+    "phylum": "Euryarchaeota",
+    "_class": "Thermococci",
+    "samples": 23
+  },
+  {
+    "fullName": "Archaea.Iainarchaeota.Iainarchaeia",
+    "name": "Iainarchaeia",
+    "kingdom": "Archaea",
+    "phylum": "Iainarchaeota",
+    "_class": "Iainarchaeia",
+    "samples": 23
+  },
+  {
+    "fullName": "Bacteria.Aquificota.Desulfurobacteriia",
+    "name": "Desulfurobacteriia",
+    "kingdom": "Bacteria",
+    "phylum": "Aquificota",
+    "_class": "Desulfurobacteriia",
+    "samples": 21
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Thermaerobacteria",
+    "name": "Thermaerobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Thermaerobacteria",
+    "samples": 20
+  },
+  {
+    "fullName": "Archaea.Aenigmarchaeota.Aenigmarchaeia",
+    "name": "Aenigmarchaeia",
+    "kingdom": "Archaea",
+    "phylum": "Aenigmarchaeota",
+    "_class": "Aenigmarchaeia",
+    "samples": 19
+  },
+  {
+    "fullName": "Bacteria.LCP.89",
+    "name": "89",
+    "kingdom": "Bacteria",
+    "phylum": "LCP",
+    "_class": "89",
+    "samples": 19
+  },
+  {
+    "fullName": "Bacteria.Patescibacteria.CPR2",
+    "name": "CPR2",
+    "kingdom": "Bacteria",
+    "phylum": "Patescibacteria",
+    "_class": "CPR2",
+    "samples": 17
+  },
+  {
+    "fullName": "Bacteria.Actinobacteriota.RBG",
+    "name": "RBG",
+    "kingdom": "Bacteria",
+    "phylum": "Actinobacteriota",
+    "_class": "RBG",
+    "samples": 15
+  },
+  {
+    "fullName": "Bacteria.Desulfobacterota.Thermodesulfobacteria",
+    "name": "Thermodesulfobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Desulfobacterota",
+    "_class": "Thermodesulfobacteria",
+    "samples": 15
+  },
+  {
+    "fullName": "Bacteria.Bacteroidota.Chlorobia",
+    "name": "Chlorobia",
+    "kingdom": "Bacteria",
+    "phylum": "Bacteroidota",
+    "_class": "Chlorobia",
+    "samples": 14
+  },
+  {
+    "fullName": "Bacteria.Nitrospinota.Nitrospinia",
+    "name": "Nitrospinia",
+    "kingdom": "Bacteria",
+    "phylum": "Nitrospinota",
+    "_class": "Nitrospinia",
+    "samples": 13
+  },
+  {
+    "fullName": "Bacteria.Bacteroidota.OC31",
+    "name": "OC31",
+    "kingdom": "Bacteria",
+    "phylum": "Bacteroidota",
+    "_class": "OC31",
+    "samples": 12
+  },
+  {
+    "fullName": "Archaea.Aenigmarchaeota.Deep",
+    "name": "Deep",
+    "kingdom": "Archaea",
+    "phylum": "Aenigmarchaeota",
+    "_class": "Deep",
+    "samples": 12
+  },
+  {
+    "fullName": "Bacteria.Armatimonadota.DG",
+    "name": "DG",
+    "kingdom": "Bacteria",
+    "phylum": "Armatimonadota",
+    "_class": "DG",
+    "samples": 12
+  },
+  {
+    "fullName": "Bacteria.Planctomycetota.028H05",
+    "name": "028H05",
+    "kingdom": "Bacteria",
+    "phylum": "Planctomycetota",
+    "_class": "028H05",
+    "samples": 11
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Thermincolia",
+    "name": "Thermincolia",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Thermincolia",
+    "samples": 11
+  },
+  {
+    "fullName": "Archaea.Halobacterota.Methanocellia",
+    "name": "Methanocellia",
+    "kingdom": "Archaea",
+    "phylum": "Halobacterota",
+    "_class": "Methanocellia",
+    "samples": 10
+  },
+  {
+    "fullName": "Archaea.Euryarchaeota.Methanococci",
+    "name": "Methanococci",
+    "kingdom": "Archaea",
+    "phylum": "Euryarchaeota",
+    "_class": "Methanococci",
+    "samples": 10
+  },
+  {
+    "fullName": "Bacteria.Rs.K70",
+    "name": "K70",
+    "kingdom": "Bacteria",
+    "phylum": "Rs",
+    "_class": "K70",
+    "samples": 9
+  },
+  {
+    "fullName": "Bacteria.TX1A.33",
+    "name": "33",
+    "kingdom": "Bacteria",
+    "phylum": "TX1A",
+    "_class": "33",
+    "samples": 9
+  },
+  {
+    "fullName": "Bacteria.Aerophobota.Aerophobia",
+    "name": "Aerophobia",
+    "kingdom": "Bacteria",
+    "phylum": "Aerophobota",
+    "_class": "Aerophobia",
+    "samples": 8
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.TSAC18",
+    "name": "TSAC18",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "TSAC18",
+    "samples": 8
+  },
+  {
+    "fullName": "Bacteria.Desulfobacterota.Desulfarculia",
+    "name": "Desulfarculia",
+    "kingdom": "Bacteria",
+    "phylum": "Desulfobacterota",
+    "_class": "Desulfarculia",
+    "samples": 8
+  },
+  {
+    "fullName": "Bacteria.Fermentibacterota.Fermentibacteria",
+    "name": "Fermentibacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Fermentibacterota",
+    "_class": "Fermentibacteria",
+    "samples": 8
+  },
+  {
+    "fullName": "Bacteria.Acidobacteriota.d142",
+    "name": "d142",
+    "kingdom": "Bacteria",
+    "phylum": "Acidobacteriota",
+    "_class": "d142",
+    "samples": 8
+  },
+  {
+    "fullName": "Bacteria.Modulibacteria.Moduliflexia",
+    "name": "Moduliflexia",
+    "kingdom": "Bacteria",
+    "phylum": "Modulibacteria",
+    "_class": "Moduliflexia",
+    "samples": 7
+  },
+  {
+    "fullName": "Bacteria.Proteobacteria.Zetaproteobacteria",
+    "name": "Zetaproteobacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Proteobacteria",
+    "_class": "Zetaproteobacteria",
+    "samples": 7
+  },
+  {
+    "fullName": "Bacteria.WOR.1",
+    "name": "1",
+    "kingdom": "Bacteria",
+    "phylum": "WOR",
+    "_class": "1",
+    "samples": 6
+  },
+  {
+    "fullName": "Archaea.Asgardarchaeota.Lokiarchaeia",
+    "name": "Lokiarchaeia",
+    "kingdom": "Archaea",
+    "phylum": "Asgardarchaeota",
+    "_class": "Lokiarchaeia",
+    "samples": 5
+  },
+  {
+    "fullName": "Bacteria.Elusimicrobiota.4",
+    "name": "4",
+    "kingdom": "Bacteria",
+    "phylum": "Elusimicrobiota",
+    "_class": "4",
+    "samples": 5
+  },
+  {
+    "fullName": "Bacteria.Patescibacteria.Kazania",
+    "name": "Kazania",
+    "kingdom": "Bacteria",
+    "phylum": "Patescibacteria",
+    "_class": "Kazania",
+    "samples": 4
+  },
+  {
+    "fullName": "Bacteria.Gemmatimonadota.MD2902",
+    "name": "MD2902",
+    "kingdom": "Bacteria",
+    "phylum": "Gemmatimonadota",
+    "_class": "MD2902",
+    "samples": 4
+  },
+  {
+    "fullName": "Bacteria.Dictyoglomota.Dictyoglomia",
+    "name": "Dictyoglomia",
+    "kingdom": "Bacteria",
+    "phylum": "Dictyoglomota",
+    "_class": "Dictyoglomia",
+    "samples": 3
+  },
+  {
+    "fullName": "Bacteria.BHI80.139",
+    "name": "139",
+    "kingdom": "Bacteria",
+    "phylum": "BHI80",
+    "_class": "139",
+    "samples": 3
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.N9D0",
+    "name": "N9D0",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "N9D0",
+    "samples": 2
+  },
+  {
+    "fullName": "Bacteria.Nitrospirota.BMS9AB35",
+    "name": "BMS9AB35",
+    "kingdom": "Bacteria",
+    "phylum": "Nitrospirota",
+    "_class": "BMS9AB35",
+    "samples": 2
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.TTA",
+    "name": "TTA",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "TTA",
+    "samples": 2
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.TK30",
+    "name": "TK30",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "TK30",
+    "samples": 2
+  },
+  {
+    "fullName": "Bacteria.Nitrospirota.HDB",
+    "name": "HDB",
+    "kingdom": "Bacteria",
+    "phylum": "Nitrospirota",
+    "_class": "HDB",
+    "samples": 2
+  },
+  {
+    "fullName": "Bacteria.10bav.F6",
+    "name": "F6",
+    "kingdom": "Bacteria",
+    "phylum": "10bav",
+    "_class": "F6",
+    "samples": 2
+  },
+  {
+    "fullName": "Archaea.Halobacterota.Methanonatronarchaeia",
+    "name": "Methanonatronarchaeia",
+    "kingdom": "Archaea",
+    "phylum": "Halobacterota",
+    "_class": "Methanonatronarchaeia",
+    "samples": 2
+  },
+  {
+    "fullName": "Bacteria.Elusimicrobiota.Rs",
+    "name": "Rs",
+    "kingdom": "Bacteria",
+    "phylum": "Elusimicrobiota",
+    "_class": "Rs",
+    "samples": 2
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.NLS2",
+    "name": "NLS2",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "NLS2",
+    "samples": 2
+  },
+  {
+    "fullName": "Archaea.Altiarchaeota.Altiarchaeia",
+    "name": "Altiarchaeia",
+    "kingdom": "Archaea",
+    "phylum": "Altiarchaeota",
+    "_class": "Altiarchaeia",
+    "samples": 2
+  },
+  {
+    "fullName": "Bacteria.Acidobacteriota.ODP1230B23",
+    "name": "ODP1230B23",
+    "kingdom": "Bacteria",
+    "phylum": "Acidobacteriota",
+    "_class": "ODP1230B23",
+    "samples": 1
+  },
+  {
+    "fullName": "Bacteria.Firmicutes.Natranaerobiia",
+    "name": "Natranaerobiia",
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "_class": "Natranaerobiia",
+    "samples": 1
+  },
+  {
+    "fullName": "Bacteria.Acidobacteriota.FFCH5909",
+    "name": "FFCH5909",
+    "kingdom": "Bacteria",
+    "phylum": "Acidobacteriota",
+    "_class": "FFCH5909",
+    "samples": 1
+  },
+  {
+    "fullName": "Archaea.Halobacterota.Archaeoglobi",
+    "name": "Archaeoglobi",
+    "kingdom": "Archaea",
+    "phylum": "Halobacterota",
+    "_class": "Archaeoglobi",
+    "samples": 1
+  },
+  {
+    "fullName": "Archaea.Hydrothermarchaeota.Hydrothermarchaeia",
+    "name": "Hydrothermarchaeia",
+    "kingdom": "Archaea",
+    "phylum": "Hydrothermarchaeota",
+    "_class": "Hydrothermarchaeia",
+    "samples": 1
+  },
+  {
+    "fullName": "Bacteria.Proteobacteria.Magnetococcia",
+    "name": "Magnetococcia",
+    "kingdom": "Bacteria",
+    "phylum": "Proteobacteria",
+    "_class": "Magnetococcia",
+    "samples": 1
+  },
+  {
+    "fullName": "Archaea.Halobacterota.ANME",
+    "name": "ANME",
+    "kingdom": "Archaea",
+    "phylum": "Halobacterota",
+    "_class": "ANME",
+    "samples": 1
+  },
+  {
+    "fullName": "Bacteria.CK.2C2",
+    "name": "2C2",
+    "kingdom": "Bacteria",
+    "phylum": "CK",
+    "_class": "2C2",
+    "samples": 1
+  },
+  {
+    "fullName": "Bacteria.Desulfobacterota.Dissulfuribacteria",
+    "name": "Dissulfuribacteria",
+    "kingdom": "Bacteria",
+    "phylum": "Desulfobacterota",
+    "_class": "Dissulfuribacteria",
+    "samples": 1
+  },
+  {
+    "fullName": "Bacteria.Chloroflexi.TK17",
+    "name": "TK17",
+    "kingdom": "Bacteria",
+    "phylum": "Chloroflexi",
+    "_class": "TK17",
+    "samples": 1
+  },
+  {
+    "fullName": "Bacteria.Campilobacterota.Desulfurellia",
+    "name": "Desulfurellia",
+    "kingdom": "Bacteria",
+    "phylum": "Campilobacterota",
+    "_class": "Desulfurellia",
+    "samples": 1
+  },
+  {
+    "fullName": "Bacteria.Thermodesulfobiota.Thermodesulfobiia",
+    "name": "Thermodesulfobiia",
+    "kingdom": "Bacteria",
+    "phylum": "Thermodesulfobiota",
+    "_class": "Thermodesulfobiia",
+    "samples": 1
+  }
+]

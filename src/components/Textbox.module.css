@@ -1,21 +1,22 @@
-.label {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.select {
+.input {
+  display: block;
+  width: 300px;
+  max-width: 100%;
   height: 40px;
+  margin: auto;
   padding: 0 10px;
   border: none;
   border-radius: var(--rounded);
   background: var(--dark-gray);
   color: inherit;
   font: inherit;
-  cursor: pointer;
   transition: background var(--fast);
 }
 
-.select:hover {
+.input:hover {
   background: var(--gray);
+}
+
+.input::placeholder {
+  color: var(--light-gray);
 }

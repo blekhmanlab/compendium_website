@@ -6,15 +6,18 @@ import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
 import type {
-  CSV,
-  GeographicPrevalence,
-  MapPrevalence,
-  TaxonomicPrevalence,
+  ByGeo,
+  ByMap,
+  ByProject,
+  ByTaxLevel,
+  Metadata,
 } from "../src/data";
 import { FeatureCollection } from "geojson";
 import dissolve from "geojson-dissolve";
 import _ from "lodash";
 import papaparse from "papaparse";
+
+type CSV = string[][];
 
 /** set working directory to directory of this script */
 chdir(dirname(fileURLToPath(import.meta.url)));
@@ -36,8 +39,8 @@ const write = (filename: string, data: unknown) =>
   writeFileSync("../public/" + filename, JSON.stringify(data), "utf8");
 
 /** transform "by taxonomic level" data */
-const transformByTaxonomic = (csv: CSV): TaxonomicPrevalence => {
-  const data: TaxonomicPrevalence = [];
+const transformByTaxonomic = (csv: CSV): ByTaxLevel => {
+  const data: ByTaxLevel = [];
 
   for (let col = 1; col < csv[0].length; col++) {
     const fullName = csv[0][col];
@@ -60,6 +63,25 @@ const transformByTaxonomic = (csv: CSV): TaxonomicPrevalence => {
   data.sort((a, b) => b.samples - a.samples);
 
   return data;
+};
+
+/** extract projects and samples from classes data */
+const getProjects = (csv: CSV): ByProject => {
+  /** make map of unique projects */
+  const projects: { [key: string]: string[] } = {};
+
+  /** go through rows and split out project and sample */
+  for (let row = 1; row < csv.length; row++) {
+    const [project = "", sample = ""] = csv[row][0].split("_");
+    if (!projects[project]) projects[project] = [];
+    projects[project].push(sample);
+  }
+
+  /** transform into desired data structure */
+  return Object.entries(projects).map(([project, samples]) => ({
+    project,
+    samples,
+  }));
 };
 
 /** transform world map data */
@@ -88,12 +110,9 @@ const transformWorldMap = (data: FeatureCollection): FeatureCollection => {
 };
 
 /** transform country and region data */
-const transformCountries = (
-  countries: CSV,
-  regions: CSV
-): GeographicPrevalence => {
+const transformCountries = (countries: CSV, regions: CSV): ByGeo => {
   /** map of country code to full country details */
-  const map: { [key: string]: GeographicPrevalence[0] } = {};
+  const map: { [key: string]: ByGeo[number] } = {};
 
   /** add countries from regions.csv */
   for (let row = 1; row < regions.length; row++) {
@@ -127,7 +146,7 @@ const transformCountries = (
   ];
 
   const data = Object.values(map).filter(
-    ({ name, code }) => !(exclude.includes(name) || exclude.includes(code))
+    ({ name, code }) => !(exclude.includes(name) || exclude.includes(code)),
   );
 
   return data;
@@ -136,10 +155,10 @@ const transformCountries = (
 /** transform "by geography" data */
 const transformByGeographic = (
   worldMap: FeatureCollection,
-  countries: GeographicPrevalence,
-  byRegion = false
-): MapPrevalence => {
-  const data: MapPrevalence = {
+  countries: ByGeo,
+  byRegion = false,
+): ByMap => {
+  const data = {
     ...worldMap,
     features: worldMap.features.map((feature) => {
       /** find matching country in geographic data */
@@ -159,14 +178,14 @@ const transformByGeographic = (
   /** merge features by region geographic data */
   if (byRegion) {
     /** (key/value) map of region to feature */
-    const regions = new Map<string, MapPrevalence["features"][0]>();
+    const regions = new Map<string, ByMap["features"][number]>();
 
     for (const feature of data.features) {
       /** catch countries without regions */
       if (!feature.properties?.region) {
         regions.set(
           feature.properties?.code || feature.properties?.name,
-          feature
+          feature,
         );
         continue;
       }
@@ -202,6 +221,39 @@ const transformByGeographic = (
 const naturalEarth =
   "https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson";
 
+/** derive metadata about data */
+const deriveMetadata = (
+  byClass: ByTaxLevel,
+  byPhylum: ByTaxLevel,
+  byCountry: ByMap,
+  byRegion: ByMap,
+  byProject: ByProject,
+): Metadata => {
+  const projects = byProject.length;
+  const samples = byProject.reduce(
+    (total, { samples }) => total + samples.length,
+    0,
+  );
+  const phyla = byPhylum.filter((tax) => tax.samples).length;
+  const classes = byClass.filter((tax) => tax.samples).length;
+  const countries = byCountry.features.filter(
+    (feature) => feature.properties.samples,
+  ).length;
+  const regions = byRegion.features.filter(
+    (feature) => feature.properties.samples,
+  ).length;
+
+  return {
+    projects,
+    samples,
+    phyla,
+    classes,
+    countries,
+    regions,
+    size: "1.1 GB",
+  };
+};
+
 /** main workflow */
 (async () => {
   console.info("Computing 'by class' taxonomic level data");
@@ -209,14 +261,18 @@ const naturalEarth =
   const byClass = transformByTaxonomic(classesCsv);
   write("../public/by-class.json", byClass);
 
-  console.info("Computing 'by phyla' taxonomic level data");
+  console.info("Computing 'by phylum' taxonomic level data");
   const phylaCsv = await load<CSV>("phyla.csv");
-  const byPhlya = transformByTaxonomic(phylaCsv);
-  write("../public/by-phyla.json", byPhlya);
+  const byPhylum = transformByTaxonomic(phylaCsv);
+  write("../public/by-phylum.json", byPhylum);
+
+  console.info("Getting projects and samples");
+  const byProject = getProjects(classesCsv);
+  write("../public/by-project.json", byProject);
 
   console.info("Getting and cleaning world map data");
   const worldMap = transformWorldMap(
-    await request<FeatureCollection>(naturalEarth)
+    await request<FeatureCollection>(naturalEarth),
   );
 
   console.info("Computing country and region data");
@@ -229,4 +285,14 @@ const naturalEarth =
   const byRegion = transformByGeographic(worldMap, countries, true);
   write("../public/by-country.json", byCountry);
   write("../public/by-region.json", byRegion);
+
+  console.info("Deriving metadata");
+  const metadata = deriveMetadata(
+    byPhylum,
+    byClass,
+    byCountry,
+    byRegion,
+    byProject,
+  );
+  write("../public/metadata.json", metadata);
 })();
