@@ -111,7 +111,7 @@ a {
 }
 
 a:hover {
-  color: var(--primary);
+  color: currentColor;
 }
 
 code {
@@ -185,21 +185,36 @@ svg [data-tooltip]:hover {
   cursor: help;
 }
 
+span[data-tooltip] {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 4px;
+}
+
 .tippy-box {
   padding: 10px 15px;
   border-radius: var(--rounded);
-  background: var(--dark-gray);
-  box-shadow: 0 0 10px var(--black);
+  background: var(--white);
+  color: var(--black);
   font-size: 1rem;
+  line-height: var(--compact);
 }
 
 .tippy-content {
   padding: 0;
 }
 
+.tippy-content a {
+  color: var(--secondary);
+}
+
+.tippy-content a:hover {
+  color: currentColor;
+}
+
 .tippy-arrow {
   z-index: 99;
-  color: var(--dark-gray);
+  color: var(--white);
 }
 
 .tooltip-table {

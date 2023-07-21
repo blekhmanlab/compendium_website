@@ -53,10 +53,24 @@ const Search = () => {
   return (
     <>
       <p>
-        Does this dataset have what you're looking for? Search for sample counts
-        grouped by project (BioProject accession), sample (SRA run accession),
-        presence of specific taxa (phylum or class name), or geographic origin
-        (country or region name).
+        Does this dataset have what you're looking for? Search for a{" "}
+        <span data-tooltip="Collection of multiple samples, by <a href=''>BioProject</a> accession">
+          project
+        </span>
+        ,{" "}
+        <span data-tooltip="Individual sample, by <a href=''>SRA</a> run accession">
+          sample
+        </span>
+        , <span data-tooltip="Taxonomic level of samples">phylum</span>,{" "}
+        <span data-tooltip="Taxonomic level of samples">class</span>,{" "}
+        <span data-tooltip="Geographic origin of samples, based on <a href='https://www.naturalearthdata.com/'>Natural Earth</a> data">
+          country
+        </span>
+        , or{" "}
+        <span data-tooltip="Geographic origin of samples, split into <a href='https://unstats.un.org/sdgs/indicators/regional-groups/'>SDG Regions</a>">
+          region
+        </span>{" "}
+        to find it in the dataset and see how many samples are present in it.
       </p>
 
       <Textbox value={search} onChange={setSearch} placeholder="Search" />
