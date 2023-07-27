@@ -181,10 +181,6 @@ svg [data-tooltip]:hover {
   outline: none;
 }
 
-[data-tooltip] {
-  cursor: help;
-}
-
 span[data-tooltip] {
   text-decoration: underline;
   text-decoration-style: dotted;

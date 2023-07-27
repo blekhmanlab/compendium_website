@@ -1,10 +1,16 @@
-.input {
-  display: block;
+.wrapper {
+  display: flex;
+  position: relative;
   width: 300px;
   max-width: 100%;
   height: 40px;
   margin: auto;
-  padding: 0 10px;
+}
+
+.input {
+  display: block;
+  flex-grow: 1;
+  padding: 0 40px 0 10px;
   border: none;
   border-radius: var(--rounded);
   background: var(--dark-gray);
@@ -19,4 +25,29 @@
 
 .input::placeholder {
   color: var(--light-gray);
+}
+
+.button {
+  display: flex;
+  position: absolute;
+  right: 0;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.button svg {
+  width: 33%;
+  color: var(--light-gray);
+  transition: color var(--fast);
+}
+
+.button:hover svg {
+  color: var(--white);
 }

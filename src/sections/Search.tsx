@@ -1,14 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Button from "@/components/Button";
+import Select from "@/components/Select";
 import Textbox from "@/components/Textbox";
 import { SearchList, useData } from "@/data";
 import { thread } from "@/workers";
+import classes from "./Search.module.css";
+
+const filters = [
+  "All",
+  "Project",
+  "Sample",
+  "Phylum",
+  "Class",
+  "Country",
+  "Region",
+];
 
 const Search = () => {
   const [search, setSearch] = useState("");
   const [fuzzy, setFuzzy] = useState<SearchList>([]);
+  const [filter, setFilter] = useState<(typeof filters)[number]>(filters[0]);
   const [limit, setLimit] = useState(10);
-  const searchList = useData((state) => state.searchList);
+
+  const fullSearchList = useData((state) => state.searchList);
+
+  /** filter full search list before any other steps */
+  const searchList = useMemo(
+    () =>
+      fullSearchList?.filter(
+        (entry) => filter === "All" || entry.type === filter,
+      ),
+    [filter, fullSearchList],
+  );
 
   /** get exact matches */
   const exact = (searchList || []).filter((entry) =>
@@ -73,7 +96,15 @@ const Search = () => {
         to find it in the dataset and see how many samples are present in it.
       </p>
 
-      <Textbox value={search} onChange={setSearch} placeholder="Search" />
+      <div className={classes.search}>
+        <Textbox value={search} onChange={setSearch} placeholder="Search" />
+        <Select
+          label="Filter by type:"
+          options={filters}
+          value={filter}
+          onChange={setFilter}
+        />
+      </div>
 
       <div className="table-wrapper">
         <table>

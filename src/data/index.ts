@@ -48,6 +48,8 @@ export const loadData = async () => {
       request<ByMap>("by-region.json"),
     ]);
 
+  console.log(byRegion);
+
   const searchList = compileSearchList(
     byProject,
     byPhylum,
@@ -75,8 +77,10 @@ const request = async <Type>(url: string): Promise<Type> => {
   return data as Type;
 };
 
-/** collate all data into single list of entries to search. can't do this as
- * compile pre-process because file ends up being very large. */
+/**
+ * collate all data into single list of entries to search. can't do this as
+ * compile pre-process because file ends up being very large.
+ */
 const compileSearchList = (
   byProject: ByProject,
   byClass: ByTaxLevel,
@@ -85,7 +89,7 @@ const compileSearchList = (
   byRegion: ByMap,
 ) => {
   /** collect complete list */
-  const list: SearchList = [];
+  let list: SearchList = [];
 
   /** include classes */
   for (const { name, samples } of byClass)
@@ -122,6 +126,9 @@ const compileSearchList = (
 
   /** sort by number of samples */
   list.sort((a, b) => b.samples - a.samples);
+
+  /** remove entries with no name (regions) */
+  list = list.filter(({ name }) => name.trim());
 
   return list;
 };
