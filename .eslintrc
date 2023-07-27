@@ -13,6 +13,6 @@
   "rules": {
     "prettier/prettier": "warn",
     "react-refresh/only-export-components": "warn",
-    "prefer-const": ["error", { "destructuring": "all" }]
+    "prefer-const": ["error", { "destructuring": "all" }],
   }
 }
