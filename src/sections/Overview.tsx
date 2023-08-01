@@ -38,7 +38,13 @@ const Overview = () => {
     },
     {
       icon: SizeIcon,
-      text: `${metadata?.size || 0} data size`,
+      text: (
+        <>
+          v{metadata?.version}
+          <br />
+          {metadata?.date}
+        </>
+      ),
     },
   ];
 
