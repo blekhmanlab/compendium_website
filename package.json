@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite",
     "compile": "npx ts-node --esm --files ./compile/index.ts",
-    "build": "yarn compile && tsc && vite build",
+    "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .tsx,.ts --fix && prettier --write \"**/*.{tsx,ts,css,json,yaml,svg,md}\" --no-error-on-unmatched-pattern"
   },
