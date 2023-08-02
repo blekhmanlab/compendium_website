@@ -2,17 +2,12 @@
 /// <reference path="./dissolve.d.ts" />
 
 import { execSync } from "child_process";
-import { readFileSync, writeFileSync } from "fs";
+import { createReadStream, writeFileSync } from "fs";
+import { memoryUsage } from "node:process";
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
-import type {
-  ByGeo,
-  ByMap,
-  ByProject,
-  ByTaxLevel,
-  Metadata,
-} from "../src/data";
+import type { ByMap } from "../src/data";
 import progress from "cli-progress";
 import { FeatureCollection } from "geojson";
 import dissolve from "geojson-dissolve";
@@ -21,6 +16,55 @@ import { parse } from "node-html-parser";
 import Downloader from "nodejs-file-downloader";
 import papaparse from "papaparse";
 import { LD } from "./ld";
+
+/**
+ * pre-compile step that takes the "raw" distributed data (csv/tsv), and
+ * transforms and pares it down to just what the website needs (json).
+ */
+
+/**
+ * keep these types separate from those in state data. state data types are
+ * inferred directly from the JSON files, so they exactly match what will be
+ * accessed by the built app. the types here should be spelled out explicitly to
+ * define what the script's functions should spit out, and because during
+ * dev/testing/changes, the JSON files may be missing/incorrect.
+ */
+
+type Metadata = {
+  projects: number;
+  samples: number;
+  phyla: number;
+  classes: number;
+  countries: number;
+  regions: number;
+  date: string;
+  url: string;
+  version: string;
+};
+
+type ByTaxLevel = {
+  name: string;
+  kingdom: string;
+  phylum: string;
+  _class: string;
+  // order: string;
+  // family: string;
+  // genus: string;
+  // species: string;
+  samples: number;
+}[];
+
+type ByGeo = {
+  code: string;
+  name: string;
+  samples: number;
+  region: string;
+}[];
+
+type ByProject = {
+  project: string;
+  samples: string[];
+}[];
 
 /** JSON-LD with latest downloads and other metadata */
 const ld = "https://doi.org/10.5281/zenodo.8186993";
@@ -36,15 +80,12 @@ type CSV = string[][];
 chdir(dirname(fileURLToPath(import.meta.url)));
 
 /** fetch json */
-const request = async <Type>(
-  url: string,
-  type: "json" | "text" = "json",
-): Promise<Type> => {
+const request = async <Type>(url: string, type: "json" | "text" = "json") => {
   const options: RequestInit = { redirect: "follow" };
   const response = await fetch(url, options);
   if (!response.ok) throw Error("Response not OK");
   if (type === "text") return (await response.text()) as Type;
-  else return await response.json();
+  else return (await response.json()) as Type;
 };
 
 /** download file */
@@ -74,12 +115,20 @@ const download = async (url: string) => {
     },
   }).download();
   bar.stop();
-  if (filename?.endsWith(".gz")) execSync("gzip -d " + filename);
+  if (filename?.endsWith(".gz")) execSync("gzip -d -f " + filename);
 };
 
 /** load local csv file */
 const load = async <Type>(url: string): Promise<Type> =>
-  (await papaparse.parse(readFileSync(url, "utf8").trim())).data as Type;
+  new Promise((resolve) => {
+    const results: unknown[] = [];
+    const stream = createReadStream(url);
+    papaparse.parse(stream, {
+      delimiter: ",",
+      step: (row) => results.push(row.data),
+      complete: () => resolve(results as Type),
+    });
+  });
 
 /** write local json file */
 const write = (filename: string, data: unknown, pretty = false) =>
@@ -99,30 +148,61 @@ const getLd = async (): Promise<LD> => {
 };
 
 /** transform "by taxonomic level" data */
-const transformByTaxonomic = (csv: CSV): ByTaxLevel => {
+const transformByTaxonomic = (csv: CSV): { [key: string]: ByTaxLevel } => {
   const data: ByTaxLevel = [];
 
-  for (let col = 1; col < csv[0].length; col++) {
-    const fullName = csv[0][col];
-    /** get parts from full name */
-    const [kingdom = "", phylum = "", _class = ""] = fullName.split(".");
-    /** get name from most specific part */
-    const name = _class || phylum || kingdom;
-    /** skip NA */
-    if (name === "NA") continue;
+  for (let col = 2; col < csv[0].length; col++) {
+    const [
+      kingdom = "",
+      phylum = "",
+      _class = "",
+      // order = "",
+      // family = "",
+      // genus = "",
+      // species = "",
+    ] = csv[0][col].split(".");
 
     /** count number of non-zero rows in col */
     let samples = 0;
     for (let row = 1; row < csv.length; row++)
       if (csv[row][col] !== "0") samples++;
 
-    data.push({ fullName, name, kingdom, phylum, _class, samples });
+    data.push({
+      name: "",
+      kingdom,
+      phylum,
+      _class,
+      samples,
+    });
   }
 
   /** sort by sample count */
   data.sort((a, b) => b.samples - a.samples);
 
-  return data;
+  /** types for grouping */
+  type Entry = ByTaxLevel[number];
+
+  /** group by phylum */
+  const byPhylum: { [key: Entry["phylum"]]: Entry } = {};
+  const byClass: { [key: Entry["_class"]]: Entry } = {};
+
+  for (const datum of data) {
+    /** group by class */
+    if (byClass[datum._class]) byClass[datum._class].samples += datum.samples;
+    else byClass[datum._class] = { ...datum, name: datum._class, samples: 1 };
+
+    /** group by phylum */
+    if (byPhylum[datum.phylum]) byPhylum[datum.phylum].samples++;
+    else
+      byPhylum[datum.phylum] = {
+        ...datum,
+        _class: "",
+        name: datum.phylum,
+        samples: 1,
+      };
+  }
+
+  return { byPhylum: Object.values(byPhylum), byClass: Object.values(byClass) };
 };
 
 /** extract projects and samples from classes data */
@@ -314,50 +394,46 @@ const deriveMetadata = (
 
 /** main workflow */
 (async () => {
-  console.info("Getting JSON-LD");
-  const ld = await getLd();
+  // console.info("Getting JSON-LD");
+  // const ld = await getLd();
 
-  console.info("Downloading raw data");
-  for (const { contentUrl } of ld.distribution) await download(contentUrl);
+  // console.info("Downloading raw data");
+  // for (const { contentUrl } of ld.distribution) await download(contentUrl);
 
-  console.info("Computing 'by class' taxonomic level data");
-  const classesCsv = await load<CSV>("classes.csv");
-  const byClass = transformByTaxonomic(classesCsv);
+  console.info("Computing taxonomic level data");
+  const taxaCsv = await load<CSV>("taxonomic_table.csv");
+  const { byPhylum, byClass } = transformByTaxonomic(taxaCsv);
+  write("../public/by-phylum.json", byPhylum);
   write("../public/by-class.json", byClass);
 
-  console.info("Computing 'by phylum' taxonomic level data");
-  const phylaCsv = await load<CSV>("phyla.csv");
-  const byPhylum = transformByTaxonomic(phylaCsv);
-  write("../public/by-phylum.json", byPhylum);
+  // console.info("Getting projects and samples");
+  // const byProject = getProjects(classesCsv);
+  // write("../public/by-project.json", byProject);
 
-  console.info("Getting projects and samples");
-  const byProject = getProjects(classesCsv);
-  write("../public/by-project.json", byProject);
+  // console.info("Getting and cleaning world map data");
+  // const worldMap = transformWorldMap(
+  //   await request<FeatureCollection>(naturalEarth),
+  // );
 
-  console.info("Getting and cleaning world map data");
-  const worldMap = transformWorldMap(
-    await request<FeatureCollection>(naturalEarth),
-  );
+  // console.info("Computing country and region data");
+  // const countriesCsv = await load<CSV>("countries.csv");
+  // const regionsCsv = await load<CSV>("regions.csv");
+  // const countries = transformCountries(countriesCsv, regionsCsv);
 
-  console.info("Computing country and region data");
-  const countriesCsv = await load<CSV>("countries.csv");
-  const regionsCsv = await load<CSV>("regions.csv");
-  const countries = transformCountries(countriesCsv, regionsCsv);
+  // console.info("Merging country data with world map data");
+  // const byCountry = transformByGeographic(worldMap, countries);
+  // const byRegion = transformByGeographic(worldMap, countries, true);
+  // write("../public/by-country.json", byCountry);
+  // write("../public/by-region.json", byRegion);
 
-  console.info("Merging country data with world map data");
-  const byCountry = transformByGeographic(worldMap, countries);
-  const byRegion = transformByGeographic(worldMap, countries, true);
-  write("../public/by-country.json", byCountry);
-  write("../public/by-region.json", byRegion);
-
-  console.info("Deriving metadata");
-  const metadata = deriveMetadata(
-    byPhylum,
-    byClass,
-    byCountry,
-    byRegion,
-    byProject,
-    ld,
-  );
-  write("../public/metadata.json", metadata, true);
+  // console.info("Deriving metadata");
+  // const metadata = deriveMetadata(
+  //   byPhylum,
+  //   byClass,
+  //   byCountry,
+  //   byRegion,
+  //   byProject,
+  //   ld,
+  // );
+  // write("../public/metadata.json", metadata, true);
 })();

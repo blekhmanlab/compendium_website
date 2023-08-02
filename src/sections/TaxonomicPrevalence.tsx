@@ -69,7 +69,7 @@ const chart = (id: string, data: Props["data"]) => {
   /** create y scale computer */
   const yScale = d3
     .scaleBand()
-    .domain(data.map((d) => d.fullName))
+    .domain(data.map((d) => d.kingdom + d.phylum + d._class))
     .range([0, height(data.length)])
     .padding(0.2);
 
@@ -100,7 +100,7 @@ const chart = (id: string, data: Props["data"]) => {
     .join("rect")
     .attr("class", "bar")
     .attr("x", 0)
-    .attr("y", (d) => yScale(d.fullName) || 0)
+    .attr("y", (d) => yScale(d.kingdom + d.phylum + d._class) || 0)
     .attr("width", (d) => xScale(d.samples))
     .attr("height", () => yScale.bandwidth())
     .attr("fill", (d) => getColor(d.phylum))
