@@ -3,7 +3,8 @@
 
 import { execSync } from "child_process";
 import { createReadStream, writeFileSync } from "fs";
-import { memoryUsage } from "node:process";
+import { EventEmitter, once } from "node:events";
+// import { memoryUsage } from "node:process";
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
@@ -118,17 +119,19 @@ const download = async (url: string) => {
   if (filename?.endsWith(".gz")) execSync("gzip -d -f " + filename);
 };
 
-/** load local csv file */
-const load = async <Type>(url: string): Promise<Type> =>
-  new Promise((resolve) => {
-    const results: unknown[] = [];
-    const stream = createReadStream(url);
-    papaparse.parse(stream, {
-      delimiter: ",",
-      step: (row) => results.push(row.data),
-      complete: () => resolve(results as Type),
-    });
-  });
+/** load local csv file by stream */
+async function* stream<Type>(url: string): AsyncGenerator<[Type, number]> {
+  const emitter = new EventEmitter();
+  const step = (row) => emitter.emit("row", row.data);
+  const complete = () => emitter.emit("row", null);
+  papaparse.parse(createReadStream(url), { step, complete });
+  let rowIndex = 0;
+  while (true) {
+    const row: Type | null = (await once(emitter, "row"))[0];
+    if (row) yield [row, rowIndex++];
+    else return;
+  }
+}
 
 /** write local json file */
 const write = (filename: string, data: unknown, pretty = false) =>
@@ -148,32 +151,35 @@ const getLd = async (): Promise<LD> => {
 };
 
 /** transform "by taxonomic level" data */
-const transformByTaxonomic = (csv: CSV): { [key: string]: ByTaxLevel } => {
+const transformByTaxonomic = async (
+  filename: string,
+): Promise<{ [key: string]: ByTaxLevel }> => {
   const data: ByTaxLevel = [];
 
-  for (let col = 2; col < csv[0].length; col++) {
-    const [
-      kingdom = "",
-      phylum = "",
-      _class = "",
-      // order = "",
-      // family = "",
-      // genus = "",
-      // species = "",
-    ] = csv[0][col].split(".");
-
-    /** count number of non-zero rows in col */
-    let samples = 0;
-    for (let row = 1; row < csv.length; row++)
-      if (csv[row][col] !== "0") samples++;
-
-    data.push({
-      name: "",
-      kingdom,
-      phylum,
-      _class,
-      samples,
-    });
+  for await (const [row, rowIndex] of stream<string[]>(filename)) {
+    for (const [colIndex, cell] of Object.entries(row)) {
+      if (Number(colIndex) === 0) continue;
+      if (rowIndex === 0) {
+        const [
+          kingdom = "",
+          phylum = "",
+          _class = "",
+          // order = "",
+          // family = "",
+          // genus = "",
+          // species = "",
+        ] = cell.split(".");
+        data.push({
+          name: "",
+          kingdom,
+          phylum,
+          _class,
+          samples: 0,
+        });
+      } else {
+        if (cell !== "0") data[Number(colIndex)].samples++;
+      }
+    }
   }
 
   /** sort by sample count */
@@ -401,8 +407,9 @@ const deriveMetadata = (
   // for (const { contentUrl } of ld.distribution) await download(contentUrl);
 
   console.info("Computing taxonomic level data");
-  const taxaCsv = await load<CSV>("taxonomic_table.csv");
-  const { byPhylum, byClass } = transformByTaxonomic(taxaCsv);
+  const { byPhylum, byClass } = await transformByTaxonomic(
+    "taxonomic_table.csv",
+  );
   write("../public/by-phylum.json", byPhylum);
   write("../public/by-class.json", byClass);
 
@@ -416,8 +423,8 @@ const deriveMetadata = (
   // );
 
   // console.info("Computing country and region data");
-  // const countriesCsv = await load<CSV>("countries.csv");
-  // const regionsCsv = await load<CSV>("regions.csv");
+  // const countriesCsv = await stream<CSV>("countries.csv");
+  // const regionsCsv = await stream<CSV>("regions.csv");
   // const countries = transformCountries(countriesCsv, regionsCsv);
 
   // console.info("Merging country data with world map data");
