@@ -3,25 +3,37 @@
 
 import { execSync } from "child_process";
 import { createReadStream, writeFileSync } from "fs";
-import { EventEmitter, once } from "node:events";
-// import { memoryUsage } from "node:process";
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
-import type { ByMap } from "../src/data";
-import progress from "cli-progress";
-import { FeatureCollection } from "geojson";
+import { FeatureCollection, Geometry } from "geojson";
 import dissolve from "geojson-dissolve";
 import _ from "lodash";
-import { parse } from "node-html-parser";
+import { parse as parseHTML } from "node-html-parser";
 import Downloader from "nodejs-file-downloader";
 import papaparse from "papaparse";
+import countryToRegion from "./country-to-region.json" assert { type: "json" };
 import { LD } from "./ld";
 
 /**
  * pre-compile step that takes the "raw" distributed data (csv/tsv), and
- * transforms and pares it down to just what the website needs (json).
+ * processs and pares it down to just what the website needs (json).
  */
+
+/** url with JSON-LD containing latest downloads and other metadata */
+const metaUrl = "https://doi.org/10.5281/zenodo.8186993";
+
+/** raw taxonomic data */
+const taxonomicData = "taxonomic_table.csv";
+
+/** raw sample metadata */
+const sampleData = "sample_metadata.tsv";
+
+/** raw natural earth data */
+const naturalEarthData =
+  "https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson";
+/** https://www.naturalearthdata.com/downloads/110m-cultural-vectors/ */
+/** https://github.com/nvkelso/natural-earth-vector/blob/master/geojson */
 
 /**
  * keep these types separate from those in state data. state data types are
@@ -44,7 +56,6 @@ type Metadata = {
 };
 
 type ByTaxLevel = {
-  name: string;
   kingdom: string;
   phylum: string;
   _class: string;
@@ -56,29 +67,32 @@ type ByTaxLevel = {
 }[];
 
 type ByGeo = {
-  code: string;
-  name: string;
-  samples: number;
   region: string;
+  country: string;
+  code: string;
+  samples: number;
 }[];
+
+type Features = FeatureCollection<Geometry, { [key: string]: string | number }>;
+
+type ByMap = FeatureCollection<Geometry, ByGeo[number]>;
 
 type ByProject = {
   project: string;
   samples: string[];
 }[];
 
-/** JSON-LD with latest downloads and other metadata */
-const ld = "https://doi.org/10.5281/zenodo.8186993";
-
-/** https://www.naturalearthdata.com/downloads/110m-cultural-vectors/ */
-/** https://github.com/nvkelso/natural-earth-vector/blob/master/geojson */
-const naturalEarth =
-  "https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson";
-
-type CSV = string[][];
-
 /** set working directory to directory of this script */
 chdir(dirname(fileURLToPath(import.meta.url)));
+
+const lastCall: { [key: string]: number } = {};
+/** return true only if enough time has passed since last call */
+const throttle = (key: string, interval = 1000) => {
+  if (!lastCall[key] || performance.now() > lastCall[key] + interval) {
+    lastCall[key] = performance.now();
+    return true;
+  } else return false;
+};
 
 /** fetch json */
 const request = async <Type>(url: string, type: "json" | "text" = "json") => {
@@ -91,47 +105,32 @@ const request = async <Type>(url: string, type: "json" | "text" = "json") => {
 
 /** download file */
 const download = async (url: string) => {
-  const filename = url.split("/").pop();
-  const bar = new progress.SingleBar({
-    format: [
-      "{filename}",
-      "{bar}",
-      "{percentage}%",
-      "{remaining}MB",
-      "{eta_formatted}",
-    ].join(" | "),
-  });
-  bar.start(100, 0, { filename, remaining: "???" });
+  const filename = url.split("/").pop() || "";
+  console.info(`Downloading ${filename}`);
   await new Downloader({
     url,
     fileName: filename,
     cloneFiles: false,
     maxAttempts: 3,
     onProgress: (percentage, _, remainingSize) => {
-      const percent = Number(percentage);
-      bar.update(percent, {
-        filename,
-        remaining: (remainingSize / 1024 / 1024).toFixed(2),
-      });
+      if (!throttle("download")) return;
+      const percent = Number(percentage).toFixed(1);
+      const remaining = (remainingSize / 1024 / 1024).toFixed(1);
+      console.info(`${percent}% done, ${remaining}MB left`);
     },
   }).download();
-  bar.stop();
+  console.info(`100% done, 0MB left`);
   if (filename?.endsWith(".gz")) execSync("gzip -d -f " + filename);
 };
 
 /** load local csv file by stream */
-async function* stream<Type>(url: string): AsyncGenerator<[Type, number]> {
-  const emitter = new EventEmitter();
-  const step = (row) => emitter.emit("row", row.data);
-  const complete = () => emitter.emit("row", null);
-  papaparse.parse(createReadStream(url), { step, complete });
-  let rowIndex = 0;
-  while (true) {
-    const row: Type | null = (await once(emitter, "row"))[0];
-    if (row) yield [row, rowIndex++];
-    else return;
-  }
-}
+/** https://stackoverflow.com/questions/63749853/possible-to-make-an-event-handler-wait-until-async-promise-based-code-is-done */
+const stream = <Type = string>(url: string) => {
+  const dataStream = createReadStream(url);
+  const parseStream = papaparse.parse(papaparse.NODE_STREAM_INPUT);
+  dataStream.pipe(parseStream);
+  return parseStream as unknown as AsyncGenerator<Type[]>;
+};
 
 /** write local json file */
 const write = (filename: string, data: unknown, pretty = false) =>
@@ -141,24 +140,24 @@ const write = (filename: string, data: unknown, pretty = false) =>
     "utf8",
   );
 
-/** scrape JSON-LD from zenodo site */
-const getLd = async (): Promise<LD> => {
-  const response = await request<string>(ld, "text");
+/** scrape JSON-LD from url */
+const getMeta = async (): Promise<LD> => {
+  const response = await request<string>(metaUrl, "text");
   const json =
-    parse(response).querySelector("script[type='application/ld+json']")
+    parseHTML(response).querySelector("script[type='application/ld+json']")
       ?.innerText || "-";
   return JSON.parse(json);
 };
 
-/** transform "by taxonomic level" data */
-const transformByTaxonomic = async (
-  filename: string,
-): Promise<{ [key: string]: ByTaxLevel }> => {
-  const data: ByTaxLevel = [];
+/** process taxonomic table data */
+const processTaxonomic = async (): Promise<{ [key: string]: ByTaxLevel }> => {
+  let data: ByTaxLevel = [];
 
-  for await (const [row, rowIndex] of stream<string[]>(filename)) {
-    for (const [colIndex, cell] of Object.entries(row)) {
-      if (Number(colIndex) === 0) continue;
+  /** parse csv one row at a time */
+  let rowIndex = 0;
+  for await (const row of stream(taxonomicData)) {
+    if (throttle("taxonomic")) console.info(`Row ${rowIndex}`);
+    for (let colIndex = 2; colIndex < row.length; colIndex++) {
       if (rowIndex === 0) {
         const [
           kingdom = "",
@@ -168,195 +167,179 @@ const transformByTaxonomic = async (
           // family = "",
           // genus = "",
           // species = "",
-        ] = cell.split(".");
+        ] = row[colIndex].split(".");
         data.push({
-          name: "",
           kingdom,
           phylum,
           _class,
           samples: 0,
         });
-      } else {
-        if (cell !== "0") data[Number(colIndex)].samples++;
-      }
+      } else if (row[colIndex] !== "0")
+        /** count samples */
+        data[colIndex - 2].samples++;
     }
+    rowIndex++;
   }
 
-  /** sort by sample count */
-  data.sort((a, b) => b.samples - a.samples);
+  /** map of unique phyla */
+  const byPhylum: { [key: ByTaxLevel[number]["phylum"]]: ByTaxLevel[number] } =
+    {};
+  /** map of unique classes */
+  const byClass: { [key: ByTaxLevel[number]["_class"]]: ByTaxLevel[number] } =
+    {};
 
-  /** types for grouping */
-  type Entry = ByTaxLevel[number];
-
-  /** group by phylum */
-  const byPhylum: { [key: Entry["phylum"]]: Entry } = {};
-  const byClass: { [key: Entry["_class"]]: Entry } = {};
+  /** filter out nulls */
+  data = data.filter((datum) => datum._class !== "NA" && datum.phylum !== "NA");
 
   for (const datum of data) {
     /** group by class */
-    if (byClass[datum._class]) byClass[datum._class].samples += datum.samples;
-    else byClass[datum._class] = { ...datum, name: datum._class, samples: 1 };
+    if (!byClass[datum._class])
+      byClass[datum._class] = { ...datum, samples: 0 };
+    byClass[datum._class].samples += datum.samples;
 
     /** group by phylum */
-    if (byPhylum[datum.phylum]) byPhylum[datum.phylum].samples++;
-    else
-      byPhylum[datum.phylum] = {
-        ...datum,
-        _class: "",
-        name: datum.phylum,
-        samples: 1,
-      };
+    if (!byPhylum[datum.phylum])
+      byPhylum[datum.phylum] = { ...datum, _class: "", samples: 0 };
+    byPhylum[datum.phylum].samples += datum.samples;
   }
 
-  return { byPhylum: Object.values(byPhylum), byClass: Object.values(byClass) };
+  return {
+    byPhylum: Object.values(byPhylum).sort((a, b) => b.samples - a.samples),
+    byClass: Object.values(byClass).sort((a, b) => b.samples - a.samples),
+  };
 };
 
-/** extract projects and samples from classes data */
-const getProjects = (csv: CSV): ByProject => {
-  /** make map of unique projects */
-  const projects: { [key: string]: string[] } = {};
+/** process sample metadata */
+const processSample = async (): Promise<{
+  byProject: ByProject;
+  countries: ByGeo;
+}> => {
+  /** map of unique projects */
+  const byProject: { [key: ByProject[number]["project"]]: ByProject[number] } =
+    {};
+  /** map of unique countries */
+  const countries: { [key: ByGeo[number]["country"]]: ByGeo[number] } = {};
 
-  /** go through rows and split out project and sample */
-  for (let row = 1; row < csv.length; row++) {
-    const [project = "", sample = ""] = csv[row][0].split("_");
-    if (!projects[project]) projects[project] = [];
-    projects[project].push(sample);
+  let rowIndex = 0;
+  for await (const row of stream(sampleData)) {
+    if (rowIndex++ === 0) continue;
+
+    /** project and sample info */
+    const [sample, project] = row;
+    if (!byProject[project]) byProject[project] = { project, samples: [] };
+    byProject[project].samples.push(sample);
+
+    /** geography info */
+    const code = row.at(-3) || "";
+    const country = row.at(-2) || "";
+    const region = row.at(-1) || "";
+    if (!countries[country])
+      countries[country] = { region, country, code, samples: 0 };
+    countries[country].samples++;
   }
 
-  /** transform into desired data structure */
-  return Object.entries(projects).map(([project, samples]) => ({
-    project,
-    samples,
-  }));
+  return {
+    byProject: Object.values(byProject),
+    countries: Object.values(countries),
+  };
 };
 
-/** transform world map data */
-const transformWorldMap = (data: FeatureCollection): FeatureCollection => {
-  /** filter out missing/nullish */
+/** process world map data */
+const processWorldMap = async (): Promise<ByMap> => {
+  /** fetch natural earth data */
+  const data = await request<Features>(naturalEarthData);
+
+  /** filter out null property */
   const clean = (value: unknown) => {
     if (typeof value !== "string") return "";
     if (["-99"].includes(value)) return "";
     return value;
   };
 
-  /** only keep needed properties (opt-in) */
-  for (const feature of data.features || [])
-    feature.properties = {
-      code: (
+  const newData: ByMap = {
+    ...data,
+    features: data.features.map((feature) => {
+      /** get needed properties */
+
+      const country = _.startCase(clean(feature.properties?.NAME));
+      const code = (
         clean(feature.properties?.ISO_A2) ||
         clean(feature.properties?.ISO_A2_EH) ||
         clean(feature.properties?.ADM0_ISO) ||
-        clean(feature.properties?.ADM0_A3) ||
-        ""
-      ).toUpperCase(),
-      name: _.startCase(clean(feature.properties?.NAME) || ""),
-    };
+        clean(feature.properties?.ADM0_A3)
+      ).toUpperCase();
+      const region =
+        countryToRegion.find(
+          (entry) => entry[0] === code || entry[1] === country,
+        )?.[2] || "";
 
-  return data;
+      return {
+        ...feature,
+        /** only keep needed properties (opt-in) */
+        properties: { region, country, code, samples: 0 },
+      };
+    }),
+  };
+
+  return newData;
 };
 
-/** transform country and region data */
-const transformCountries = (countries: CSV, regions: CSV): ByGeo => {
-  /** map of country code to full country details */
-  const map: { [key: string]: ByGeo[number] } = {};
-
-  /** add countries from regions.csv */
-  for (let row = 1; row < regions.length; row++) {
-    const [code, name, region] = regions[row];
-    map[code] = { code, name: _.startCase(name), samples: 0, region };
-  }
-
-  /** add countries from countries.csv */
-  for (let row = 1; row < countries.length; row++) {
-    const code = countries[row][1] || "";
-    const [name = ""] = countries[row][2].split(":") || [];
-    map[code] = {
-      code: map[code]?.code || code,
-      name: map[code]?.name || _.startCase(name),
-      samples: (map[code]?.samples || 0) + 1,
-      region: map[code]?.region || "",
-    };
-  }
-
-  /** filter out missing/nullish */
-  const exclude = [
-    "labcontrol test",
-    "missing",
-    "n/a",
-    "na",
-    "not applicable",
-    "not available",
-    "not collected",
-    "unknown",
-    "unspecified",
-  ];
-
-  const data = Object.values(map).filter(
-    ({ name, code }) => !(exclude.includes(name) || exclude.includes(code)),
-  );
-
-  return data;
-};
-
-/** transform "by geography" data */
-const transformByGeographic = (
-  worldMap: FeatureCollection,
+/** process "by geography" data */
+const processByGeographic = (
+  worldMap: ByMap,
   countries: ByGeo,
   byRegion = false,
 ): ByMap => {
+  /** loose two-way string compare */
+  const compare = (a: string, b: string) => {
+    if (!a || !b) return false;
+    a = a.toLowerCase();
+    b = b.toLowerCase();
+    return a.includes(b) || b.includes(a);
+  };
+
   const data = {
     ...worldMap,
     features: worldMap.features.map((feature) => {
       /** find matching country in geographic data */
-      const match = countries.find((d) => d.code === feature.properties?.code);
-      return {
-        ...feature,
-        properties: {
-          code: match?.code || feature.properties?.code || "",
-          name: match?.name || feature.properties?.name || "",
-          samples: match?.samples || 0,
-          region: match?.region || "",
-        },
-      };
+      const match = countries.find(
+        (country) => feature.properties.country === country.country,
+      );
+
+      if (match) feature.properties = match;
+      else feature.properties.samples = 0;
+
+      return feature;
     }),
   };
 
   /** merge features by region geographic data */
   if (byRegion) {
-    /** (key/value) map of region to feature */
-    const regions = new Map<string, ByMap["features"][number]>();
+    /** map of region to feature */
+    const regions: { [key: string]: ByMap["features"][number] } = {};
 
     for (const feature of data.features) {
-      /** catch countries without regions */
-      if (!feature.properties?.region) {
-        regions.set(
-          feature.properties?.code || feature.properties?.name,
-          feature,
-        );
-        continue;
-      }
-
       /** get existing entry */
-      let existing = regions.get(feature.properties?.region);
+      let existing = regions[feature.properties.region];
 
       if (existing) {
         /** merge entry */
         existing.geometry = dissolve([existing, feature]);
-        existing.properties.samples += feature.properties?.samples;
+        existing.properties.samples += feature.properties.samples;
       } else
       /** set new entry */
         existing = feature;
 
       /** unset country-specific details */
+      existing.properties.country = "";
       existing.properties.code = "";
-      existing.properties.name = "";
 
       /** set entry */
-      regions.set(feature.properties?.region, existing);
+      regions[feature.properties.region] = existing;
     }
 
     /** map back to array */
-    data.features = [...regions.values()];
+    data.features = Object.values(regions);
   }
 
   return data;
@@ -400,47 +383,38 @@ const deriveMetadata = (
 
 /** main workflow */
 (async () => {
-  // console.info("Getting JSON-LD");
-  // const ld = await getLd();
+  console.info("Getting data download links and meta");
+  const ld = await getMeta();
 
   // console.info("Downloading raw data");
   // for (const { contentUrl } of ld.distribution) await download(contentUrl);
 
-  console.info("Computing taxonomic level data");
-  const { byPhylum, byClass } = await transformByTaxonomic(
-    "taxonomic_table.csv",
-  );
+  console.info("Transforming taxonomic table data");
+  const { byPhylum, byClass } = await processTaxonomic();
   write("../public/by-phylum.json", byPhylum);
   write("../public/by-class.json", byClass);
 
-  // console.info("Getting projects and samples");
-  // const byProject = getProjects(classesCsv);
-  // write("../public/by-project.json", byProject);
+  console.info("Transform sample metadata");
+  const { byProject, countries } = await processSample();
+  write("../public/by-project.json", byProject);
 
-  // console.info("Getting and cleaning world map data");
-  // const worldMap = transformWorldMap(
-  //   await request<FeatureCollection>(naturalEarth),
-  // );
+  console.info("Getting and cleaning world map data");
+  const worldMap = await processWorldMap();
 
-  // console.info("Computing country and region data");
-  // const countriesCsv = await stream<CSV>("countries.csv");
-  // const regionsCsv = await stream<CSV>("regions.csv");
-  // const countries = transformCountries(countriesCsv, regionsCsv);
+  console.info("Merging country and region data with world map data");
+  const byCountry = processByGeographic(worldMap, countries);
+  const byRegion = processByGeographic(worldMap, countries, true);
+  write("../public/by-country.json", byCountry);
+  write("../public/by-region.json", byRegion);
 
-  // console.info("Merging country data with world map data");
-  // const byCountry = transformByGeographic(worldMap, countries);
-  // const byRegion = transformByGeographic(worldMap, countries, true);
-  // write("../public/by-country.json", byCountry);
-  // write("../public/by-region.json", byRegion);
-
-  // console.info("Deriving metadata");
-  // const metadata = deriveMetadata(
-  //   byPhylum,
-  //   byClass,
-  //   byCountry,
-  //   byRegion,
-  //   byProject,
-  //   ld,
-  // );
-  // write("../public/metadata.json", metadata, true);
+  console.info("Deriving metadata");
+  const metadata = deriveMetadata(
+    byPhylum,
+    byClass,
+    byCountry,
+    byRegion,
+    byProject,
+    ld,
+  );
+  write("../public/metadata.json", metadata, true);
 })();

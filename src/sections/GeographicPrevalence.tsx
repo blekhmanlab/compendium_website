@@ -65,6 +65,8 @@ const graticules = d3.geoGraticule().step([20, 20])();
 const chart = (id: string, data: Props["byCountry"] | Props["byRegion"]) => {
   if (!data) return;
 
+  console.log(data);
+
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
 
   /** create projection */
@@ -127,17 +129,21 @@ const chart = (id: string, data: Props["byCountry"] | Props["byRegion"]) => {
     .attr("class", "feature")
     .attr("d", path)
     .attr("fill", (d) => scale(d.properties.samples || 1))
-    .attr("data-tooltip", ({ properties: { code, name, samples, region } }) =>
-      [
-        `<div class="tooltip-table">`,
-        region && `<span>Region</span><span>${region || "???"}</span>`,
-        (name || code) &&
-          `<span>Country</span><span>${name || "???"} (${code || "??"})</span>`,
-        `<span>Samples</span><span>${samples.toLocaleString()}</span>`,
-        `</div>`,
-      ]
-        .filter(Boolean)
-        .join(""),
+    .attr(
+      "data-tooltip",
+      ({ properties: { region, country, code, samples } }) =>
+        [
+          `<div class="tooltip-table">`,
+          region && `<span>Region</span><span>${region || "???"}</span>`,
+          (country || code) &&
+            `<span>Country</span><span>${country || "???"} (${
+              code || "??"
+            })</span>`,
+          `<span>Samples</span><span>${samples.toLocaleString()}</span>`,
+          `</div>`,
+        ]
+          .filter(Boolean)
+          .join(""),
     );
 
   /** reset map view */

@@ -4,6 +4,7 @@
     "./node_modules/prettier-plugin-jsdoc/dist/index.js",
     "prettier-plugin-css-order"
   ],
+  "importOrderParserPlugins": ["importAssertions", "typescript"],
   "importOrder": ["^react", "^[a-zA-Z]", "^@[a-zA-Z]", "^@/", "^./"],
   "order": "smacss",
   "jsdocCapitalizeDescription": false,

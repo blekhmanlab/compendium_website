@@ -11,6 +11,9 @@ type Props = {
   id: string;
   title: string;
   data: Data["byClass"] | Data["byPhylum"];
+  name:
+    | keyof NonNullable<Data["byClass"]>[number]
+    | keyof NonNullable<Data["byPhylum"]>[number];
 };
 
 /** svg dimensions */
@@ -18,14 +21,14 @@ const width = 400;
 const bandHeight = width / 15;
 const height = (rows: number) => bandHeight * (rows || 10);
 
-const TaxonomicPrevalence = ({ id, title, data }: Props) => {
+const TaxonomicPrevalence = ({ id, title, data, name }: Props) => {
   const [svg, fit] = useViewBox(20);
 
   /** rerun d3 code when props change */
   useEffect(() => {
-    chart(id, data);
+    chart(id, data, name);
     fit();
-  }, [data, id, fit]);
+  }, [data, id, fit, name]);
 
   if (!data) return <Placeholder>Loading "{title}" table</Placeholder>;
 
@@ -52,7 +55,7 @@ const TaxonomicPrevalence = ({ id, title, data }: Props) => {
 export default TaxonomicPrevalence;
 
 /** d3 code */
-const chart = (id: string, data: Props["data"]) => {
+const chart = (id: string, data: Props["data"], name: Props["name"]) => {
   if (!data) return;
 
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
@@ -81,7 +84,7 @@ const chart = (id: string, data: Props["data"]) => {
     );
 
   /** create y axis */
-  const yAxis = d3.axisLeft(yScale).tickFormat((_, i) => data[i].name);
+  const yAxis = d3.axisLeft(yScale).tickFormat((_, i) => String(data[i][name]));
 
   /** update x axis */
   svg

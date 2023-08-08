@@ -38,11 +38,13 @@ const App = () => {
               id="by-phylum"
               title="By Phylum"
               data={byPhylum?.slice(0, 20)}
+              name="phylum"
             />
             <TaxonomicPrevalence
               id="by-class"
               title="By Class"
               data={byClass?.slice(0, 20)}
+              name="_class"
             />
           </Cols>
         </section>

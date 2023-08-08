@@ -92,18 +92,18 @@ const compileSearchList = (
   let list: SearchList = [];
 
   /** include classes */
-  for (const { name, samples } of byClass)
-    list.push({ type: "Class", name, samples });
+  for (const { _class, samples } of byClass)
+    list.push({ type: "Class", name: _class, samples });
 
   /** include phyla */
-  for (const { name, samples } of byPhylum)
-    list.push({ type: "Phylum", name, samples });
+  for (const { phylum, samples } of byPhylum)
+    list.push({ type: "Phylum", name: phylum, samples });
 
   /** include countries */
   for (const {
-    properties: { name, samples },
+    properties: { country, samples },
   } of byCountry.features)
-    list.push({ type: "Country", name, samples });
+    list.push({ type: "Country", name: country, samples });
 
   /** include regions */
   for (const {
