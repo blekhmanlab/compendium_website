@@ -1,4 +1,5 @@
 import { SelectHTMLAttributes } from "react";
+import { startCase } from "lodash";
 import classes from "./Select.module.css";
 
 type Props<Options extends string[]> = {
@@ -25,7 +26,7 @@ const Select = <Options extends string[]>({
     >
       {options.map((option, index) => (
         <option key={index} value={option}>
-          {option}
+          {startCase(option)}
         </option>
       ))}
     </select>

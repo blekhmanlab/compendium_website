@@ -2,24 +2,21 @@ import { useEffect, useMemo, useState } from "react";
 import Button from "@/components/Button";
 import Select from "@/components/Select";
 import Textbox from "@/components/Textbox";
-import { SearchList, useData } from "@/data";
+import { Data, SearchList, useData } from "@/data";
 import { thread } from "@/workers";
 import classes from "./Search.module.css";
 
-const filters = [
-  "All",
-  "Project",
-  "Sample",
-  "Phylum",
-  "Class",
-  "Country",
-  "Region",
-];
+type Filters = NonNullable<Data["searchList"]>[number]["type"][];
+type FiltersAll = ("All" | Props["filters"][number])[];
 
-const Search = () => {
+type Props = {
+  filters: Filters;
+};
+
+const Search = ({ filters }: Props) => {
   const [search, setSearch] = useState("");
   const [fuzzy, setFuzzy] = useState<SearchList>([]);
-  const [filter, setFilter] = useState<(typeof filters)[number]>(filters[0]);
+  const [filter, setFilter] = useState<FiltersAll[number]>("All");
   const [limit, setLimit] = useState(10);
 
   const fullSearchList = useData((state) => state.searchList);
@@ -27,10 +24,12 @@ const Search = () => {
   /** filter full search list before any other steps */
   const searchList = useMemo(
     () =>
-      fullSearchList?.filter(
-        (entry) => filter === "All" || entry.type === filter,
+      fullSearchList?.filter((entry) =>
+        entry.type === filter || filter === "All"
+          ? filters.includes(entry.type)
+          : false,
       ),
-    [filter, fullSearchList],
+    [filters, filter, fullSearchList],
   );
 
   /** get exact matches */
@@ -75,44 +74,23 @@ const Search = () => {
 
   return (
     <>
-      <p>
-        Does this dataset have what you're looking for? Search for a{" "}
-        <span data-tooltip="Collection of multiple samples, by <a href='https://www.ncbi.nlm.nih.gov/bioproject/'>BioProject</a> accession">
-          project
-        </span>
-        ,{" "}
-        <span data-tooltip="Individual sample, by <a href='https://www.ncbi.nlm.nih.gov/sra'>SRA</a> run accession">
-          sample
-        </span>
-        , <span data-tooltip="Taxon observed in sample">phylum</span>,{" "}
-        <span data-tooltip="Taxon observed in sample">class</span>,{" "}
-        <span data-tooltip="Geographic origin of samples, based on <a href='https://www.naturalearthdata.com/'>Natural Earth</a> data">
-          country
-        </span>
-        , or{" "}
-        <span data-tooltip="Geographic origin of samples, grouped by <a href='https://unstats.un.org/sdgs/indicators/regional-groups/'>SDG Regions</a>">
-          region
-        </span>{" "}
-        to find it in the dataset and see how many samples are present in it.
-      </p>
-
       <div className={classes.search}>
         <Textbox value={search} onChange={setSearch} placeholder="Search" />
         <Select
           label="Filter by type:"
-          options={filters}
+          options={["All", ...filters] as FiltersAll}
           value={filter}
           onChange={setFilter}
         />
       </div>
 
       <div className="table-wrapper">
-        <table>
+        <table className={classes.table}>
           <thead>
             <tr>
               <th>Name</th>
-              <th style={{ width: "100px" }}>Type</th>
-              <th style={{ width: "100px" }}>Samples</th>
+              <th>Type</th>
+              <th>Samples</th>
             </tr>
           </thead>
 

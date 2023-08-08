@@ -3,39 +3,40 @@ import * as d3 from "d3";
 import { Feature } from "geojson";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
-import { Data } from "@/data";
+import { Data, useData } from "@/data";
 import { getCssVariable } from "@/util/dom";
 import { clamp } from "@/util/math";
 import "./GeographicPrevalence.css";
-
-type Props = {
-  id: string;
-  title: string;
-  byCountry: Data["byCountry"];
-  byRegion: Data["byRegion"];
-};
 
 /** svg dimensions */
 const width = 800;
 const height = 400;
 
+const id = "map";
+const title = "By Geography";
+
 const byOptions = ["Country", "Region"];
 type By = (typeof byOptions)[number];
 
-const GeographicPrevalence = ({ id, title, byCountry, byRegion }: Props) => {
+const GeographicPrevalence = () => {
+  const byCountry = useData((state) => state.byCountry);
+  const byRegion = useData((state) => state.byRegion);
+
   const [by, setBy] = useState<By>(byOptions[0]);
 
   /** rerun d3 code when props change */
   useEffect(() => {
     chart(id, by === "Country" ? byCountry : byRegion);
-  }, [id, byCountry, byRegion, by]);
+  }, [byCountry, byRegion, by]);
 
   /** show status */
   if (!byCountry || !byRegion)
     return <Placeholder>Loading "{title}" table</Placeholder>;
 
   return (
-    <>
+    <section>
+      <h2>Geographic Prevalence</h2>
+
       <Select
         label="Group by:"
         value={by}
@@ -52,7 +53,7 @@ const GeographicPrevalence = ({ id, title, byCountry, byRegion }: Props) => {
           <rect x="0" y="0" width={width} height={height} />
         </clipPath>
       </svg>
-    </>
+    </section>
   );
 };
 
@@ -62,10 +63,8 @@ export default GeographicPrevalence;
 
 const graticules = d3.geoGraticule().step([20, 20])();
 
-const chart = (id: string, data: Props["byCountry"] | Props["byRegion"]) => {
+const chart = (id: string, data: Data["byCountry"] | Data["byRegion"]) => {
   if (!data) return;
-
-  console.log(data);
 
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
 

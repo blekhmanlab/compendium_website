@@ -2,7 +2,7 @@
 /// <reference path="./dissolve.d.ts" />
 
 import { execSync } from "child_process";
-import { createReadStream, writeFileSync } from "fs";
+import { createReadStream, readFileSync, writeFileSync } from "fs";
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
@@ -12,7 +12,6 @@ import _ from "lodash";
 import { parse as parseHTML } from "node-html-parser";
 import Downloader from "nodejs-file-downloader";
 import papaparse from "papaparse";
-import countryToRegion from "./country-to-region.json" assert { type: "json" };
 import { LD } from "./ld";
 
 /**
@@ -182,25 +181,28 @@ const processTaxonomic = async (): Promise<{ [key: string]: ByTaxLevel }> => {
   }
 
   /** map of unique phyla */
-  const byPhylum: { [key: ByTaxLevel[number]["phylum"]]: ByTaxLevel[number] } =
-    {};
+  const byPhylum: { [key: string]: ByTaxLevel[number] } = {};
   /** map of unique classes */
-  const byClass: { [key: ByTaxLevel[number]["_class"]]: ByTaxLevel[number] } =
-    {};
+  const byClass: { [key: string]: ByTaxLevel[number] } = {};
 
   /** filter out nulls */
   data = data.filter((datum) => datum._class !== "NA" && datum.phylum !== "NA");
 
-  for (const datum of data) {
-    /** group by class */
-    if (!byClass[datum._class])
-      byClass[datum._class] = { ...datum, samples: 0 };
-    byClass[datum._class].samples += datum.samples;
-
+  for (const { kingdom, phylum, _class, samples } of data) {
     /** group by phylum */
-    if (!byPhylum[datum.phylum])
-      byPhylum[datum.phylum] = { ...datum, _class: "", samples: 0 };
-    byPhylum[datum.phylum].samples += datum.samples;
+    {
+      const key = phylum;
+      if (!byPhylum[key])
+        byPhylum[key] = { kingdom, phylum, _class: "", samples: 0 };
+      byPhylum[key].samples += samples;
+    }
+
+    /** group by class */
+    {
+      const key = _class;
+      if (!byClass[key]) byClass[key] = { kingdom, phylum, _class, samples: 0 };
+      byClass[key].samples += samples;
+    }
   }
 
   return {
@@ -230,12 +232,12 @@ const processSample = async (): Promise<{
     byProject[project].samples.push(sample);
 
     /** geography info */
-    const code = row.at(-3) || "";
-    const country = row.at(-2) || "";
+    const country = _.startCase((row.at(-3) || "").split(":").pop());
+    const code = row.at(-2) || "";
     const region = row.at(-1) || "";
-    if (!countries[country])
-      countries[country] = { region, country, code, samples: 0 };
-    countries[country].samples++;
+    if (!countries[code])
+      countries[code] = { region, country, code, samples: 0 };
+    countries[code].samples++;
   }
 
   return {
@@ -256,32 +258,26 @@ const processWorldMap = async (): Promise<ByMap> => {
     return value;
   };
 
-  const newData: ByMap = {
-    ...data,
-    features: data.features.map((feature) => {
-      /** get needed properties */
+  /** map of all countries to their regions */
+  const countryToRegion = JSON.parse(
+    readFileSync("./country-to-region.json", "utf-8"),
+  );
 
-      const country = _.startCase(clean(feature.properties?.NAME));
-      const code = (
-        clean(feature.properties?.ISO_A2) ||
-        clean(feature.properties?.ISO_A2_EH) ||
-        clean(feature.properties?.ADM0_ISO) ||
-        clean(feature.properties?.ADM0_A3)
-      ).toUpperCase();
-      const region =
-        countryToRegion.find(
-          (entry) => entry[0] === code || entry[1] === country,
-        )?.[2] || "";
+  for (const feature of data.features) {
+    const country = _.startCase(clean(feature.properties.NAME));
+    const code = (
+      clean(feature.properties.ISO_A2_EH) ||
+      clean(feature.properties.ISO_A2) ||
+      clean(feature.properties.ADM0_ISO) ||
+      clean(feature.properties.ADM0_A3)
+    ).toUpperCase();
+    const region: string = countryToRegion[code] || "";
 
-      return {
-        ...feature,
-        /** only keep needed properties (opt-in) */
-        properties: { region, country, code, samples: 0 },
-      };
-    }),
-  };
+    /** only keep needed properties (opt-in) */
+    feature.properties = { region, country, code, samples: 0 };
+  }
 
-  return newData;
+  return data as ByMap;
 };
 
 /** process "by geography" data */
@@ -290,28 +286,13 @@ const processByGeographic = (
   countries: ByGeo,
   byRegion = false,
 ): ByMap => {
-  /** loose two-way string compare */
-  const compare = (a: string, b: string) => {
-    if (!a || !b) return false;
-    a = a.toLowerCase();
-    b = b.toLowerCase();
-    return a.includes(b) || b.includes(a);
-  };
+  const data = _.cloneDeep(worldMap);
 
-  const data = {
-    ...worldMap,
-    features: worldMap.features.map((feature) => {
-      /** find matching country in geographic data */
-      const match = countries.find(
-        (country) => feature.properties.country === country.country,
-      );
-
-      if (match) feature.properties = match;
-      else feature.properties.samples = 0;
-
-      return feature;
-    }),
-  };
+  /** lookup sample count from matching country, keep existing properties */
+  for (const { properties } of data.features)
+    properties.samples =
+      countries.find((country) => properties.code === country.code)?.samples ||
+      0;
 
   /** merge features by region geographic data */
   if (byRegion) {
@@ -319,6 +300,12 @@ const processByGeographic = (
     const regions: { [key: string]: ByMap["features"][number] } = {};
 
     for (const feature of data.features) {
+      /** catch countries without regions */
+      if (!feature.properties.region) {
+        regions[feature.properties.code] = feature;
+        continue;
+      }
+
       /** get existing entry */
       let existing = regions[feature.properties.region];
 
@@ -347,11 +334,11 @@ const processByGeographic = (
 
 /** derive metadata about data */
 const deriveMetadata = (
-  byClass: ByTaxLevel,
-  byPhylum: ByTaxLevel,
-  byCountry: ByMap,
-  byRegion: ByMap,
   byProject: ByProject,
+  byPhylum: ByTaxLevel,
+  byClass: ByTaxLevel,
+  byRegion: ByMap,
+  byCountry: ByMap,
   ld: LD,
 ): Metadata => {
   const projects = byProject.length;
@@ -361,10 +348,10 @@ const deriveMetadata = (
   );
   const phyla = byPhylum.filter((tax) => tax.samples).length;
   const classes = byClass.filter((tax) => tax.samples).length;
-  const countries = byCountry.features.filter(
+  const regions = byRegion.features.filter(
     (feature) => feature.properties.samples,
   ).length;
-  const regions = byRegion.features.filter(
+  const countries = byCountry.features.filter(
     (feature) => feature.properties.samples,
   ).length;
 
@@ -373,8 +360,8 @@ const deriveMetadata = (
     samples,
     phyla,
     classes,
-    countries,
     regions,
+    countries,
     date: ld.datePublished,
     url: ld["@id"],
     version: ld.version,
@@ -393,6 +380,7 @@ const deriveMetadata = (
   const { byPhylum, byClass } = await processTaxonomic();
   write("../public/by-phylum.json", byPhylum);
   write("../public/by-class.json", byClass);
+  console.log(byPhylum.length, byClass.length);
 
   console.info("Transform sample metadata");
   const { byProject, countries } = await processSample();
@@ -409,11 +397,11 @@ const deriveMetadata = (
 
   console.info("Deriving metadata");
   const metadata = deriveMetadata(
+    byProject,
     byPhylum,
     byClass,
-    byCountry,
     byRegion,
-    byProject,
+    byCountry,
     ld,
   );
   write("../public/metadata.json", metadata, true);

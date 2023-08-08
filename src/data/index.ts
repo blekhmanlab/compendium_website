@@ -4,6 +4,9 @@ import { create } from "zustand";
 /** metadata about overall project */
 export type Metadata = typeof import("../../public/metadata.json");
 
+/** project and sample name details */
+export type ByProject = typeof import("../../public/by-project.json");
+
 /** by class or phylum or other taxonomic level */
 export type ByTaxLevel = typeof import("../../public/by-class.json");
 
@@ -14,23 +17,20 @@ export type ByGeo =
 /** by country or by region, combined with natural earth geojson feature data */
 export type ByMap = FeatureCollection<Geometry, ByGeo[number]>;
 
-/** project and sample name details */
-export type ByProject = typeof import("../../public/by-project.json");
-
 export type SearchList = {
   name: string;
-  type: string;
+  type: "Project" | "Sample" | "Phylum" | "Class" | "Region" | "Country";
   samples: number;
   fuzzy?: boolean;
 }[];
 
 export type Data = {
   metadata?: Metadata;
-  byClass?: ByTaxLevel;
-  byPhylum?: ByTaxLevel;
-  byCountry?: ByMap;
-  byRegion?: ByMap;
   byProject?: ByProject;
+  byPhylum?: ByTaxLevel;
+  byClass?: ByTaxLevel;
+  byRegion?: ByMap;
+  byCountry?: ByMap;
   searchList?: ReturnType<typeof compileSearchList>;
 };
 
@@ -38,24 +38,22 @@ export const useData = create<Data>(() => ({}));
 
 /** one-time load app-wide data */
 export const loadData = async () => {
-  const [metadata, byProject, byPhylum, byClass, byCountry, byRegion] =
+  const [metadata, byProject, byPhylum, byClass, byRegion, byCountry] =
     await Promise.all([
       request<Metadata>("metadata.json"),
       request<ByProject>("by-project.json"),
       request<ByTaxLevel>("by-phylum.json"),
       request<ByTaxLevel>("by-class.json"),
-      request<ByMap>("by-country.json"),
       request<ByMap>("by-region.json"),
+      request<ByMap>("by-country.json"),
     ]);
-
-  console.log(byRegion);
 
   const searchList = compileSearchList(
     byProject,
     byPhylum,
     byClass,
-    byCountry,
     byRegion,
+    byCountry,
   );
 
   useData.setState({
@@ -63,8 +61,8 @@ export const loadData = async () => {
     byProject,
     byPhylum,
     byClass,
-    byCountry,
     byRegion,
+    byCountry,
     searchList,
   });
 };
@@ -83,33 +81,13 @@ const request = async <Type>(url: string): Promise<Type> => {
  */
 const compileSearchList = (
   byProject: ByProject,
-  byClass: ByTaxLevel,
   byPhylum: ByTaxLevel,
-  byCountry: ByMap,
+  byClass: ByTaxLevel,
   byRegion: ByMap,
+  byCountry: ByMap,
 ) => {
   /** collect complete list */
   let list: SearchList = [];
-
-  /** include classes */
-  for (const { _class, samples } of byClass)
-    list.push({ type: "Class", name: _class, samples });
-
-  /** include phyla */
-  for (const { phylum, samples } of byPhylum)
-    list.push({ type: "Phylum", name: phylum, samples });
-
-  /** include countries */
-  for (const {
-    properties: { country, samples },
-  } of byCountry.features)
-    list.push({ type: "Country", name: country, samples });
-
-  /** include regions */
-  for (const {
-    properties: { region, samples },
-  } of byRegion.features)
-    list.push({ type: "Region", name: region, samples });
 
   /** include projects */
   for (const { project, samples } of byProject)
@@ -123,6 +101,26 @@ const compileSearchList = (
   for (const { samples } of byProject)
     for (const sample of samples)
       list.push({ type: "Sample", name: sample, samples: 1 });
+
+  /** include phyla */
+  for (const { phylum, samples } of byPhylum)
+    list.push({ type: "Phylum", name: phylum, samples });
+
+  /** include classes */
+  for (const { _class, samples } of byClass)
+    list.push({ type: "Class", name: _class, samples });
+
+  /** include regions */
+  for (const {
+    properties: { region, samples },
+  } of byRegion.features)
+    list.push({ type: "Region", name: region, samples });
+
+  /** include countries */
+  for (const {
+    properties: { country, samples },
+  } of byCountry.features)
+    list.push({ type: "Country", name: country, samples });
 
   /** sort by number of samples */
   list.sort((a, b) => b.samples - a.samples);
