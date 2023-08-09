@@ -158,16 +158,18 @@ const processTaxonomic = async (): Promise<{ [key: string]: ByTaxLevel }> => {
   /** header row */
   const header: ByTaxLevel = [];
 
-  /** parse csv one row at a time */
   let rowIndex = 0;
+
+  /** parse csv one row at a time */
   for await (const row of stream(taxonomicData)) {
     /** show progress periodically */
     if (throttle("taxonomic")) console.info(`Row ${rowIndex}`);
 
-    /** whether row (sample) has already been counted toward group */
+    /** whether row (sample) has already been counted toward taxon */
     const phylumCounted: { [key: string]: boolean } = {};
     const classCounted: { [key: string]: boolean } = {};
 
+    /** loop through columns */
     for (let colIndex = 2; colIndex < row.length; colIndex++) {
       const cell = row[colIndex];
 
@@ -179,9 +181,9 @@ const processTaxonomic = async (): Promise<{ [key: string]: ByTaxLevel }> => {
         /** get props from header row */
         const { kingdom, phylum, _class } = header[colIndex - 2];
 
-        /** if sample exists */
+        /** if taxon present in sample */
         if (cell !== "0") {
-          /** group by phylum */
+          /** count sample toward phylum (if not already) */
           if (!phylumCounted[phylum]) {
             if (!byPhylum[phylum])
               byPhylum[phylum] = { kingdom, phylum, _class: "", samples: 0 };
@@ -189,7 +191,7 @@ const processTaxonomic = async (): Promise<{ [key: string]: ByTaxLevel }> => {
             phylumCounted[phylum] = true;
           }
 
-          /** group by class */
+          /** count sample toward class (if not already) */
           if (!classCounted[_class]) {
             if (!byClass[_class])
               byClass[_class] = { kingdom, phylum, _class, samples: 0 };
