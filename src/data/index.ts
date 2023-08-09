@@ -32,6 +32,7 @@ export type Data = {
   byRegion?: ByMap;
   byCountry?: ByMap;
   searchList?: ReturnType<typeof compileSearchList>;
+  selectedCountry?: { name: string; code: string };
 };
 
 export const useData = create<Data>(() => ({}));
@@ -130,3 +131,7 @@ const compileSearchList = (
 
   return list;
 };
+
+/** select country code */
+export const selectCountry = (country?: { name: string; code: string }) =>
+  useData.setState({ selectedCountry: country });

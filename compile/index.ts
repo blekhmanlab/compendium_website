@@ -58,11 +58,8 @@ type ByTaxLevel = {
   kingdom: string;
   phylum: string;
   _class: string;
-  // order: string;
-  // family: string;
-  // genus: string;
-  // species: string;
   samples: number;
+  codes: string[];
 }[];
 
 type ByGeo = {
@@ -81,6 +78,8 @@ type ByProject = {
   samples: string[];
 }[];
 
+type RunToCode = { [key: string]: string };
+
 /** set working directory to directory of this script */
 chdir(dirname(fileURLToPath(import.meta.url)));
 
@@ -93,7 +92,7 @@ const throttle = (key: string, interval = 1000) => {
   } else return false;
 };
 
-/** fetch json */
+/** fetch json or text */
 const request = async <Type>(url: string, type: "json" | "text" = "json") => {
   const options: RequestInit = { redirect: "follow" };
   const response = await fetch(url, options);
@@ -149,14 +148,16 @@ const getMeta = async (): Promise<LD> => {
 };
 
 /** process taxonomic table data */
-const processTaxonomic = async (): Promise<{ [key: string]: ByTaxLevel }> => {
+const processTaxonomic = async (
+  runToCode: RunToCode,
+): Promise<{ [key: string]: ByTaxLevel }> => {
   /** map of unique phyla */
   const byPhylum: { [key: string]: ByTaxLevel[number] } = {};
   /** map of unique classes */
   const byClass: { [key: string]: ByTaxLevel[number] } = {};
 
   /** header row */
-  const header: ByTaxLevel = [];
+  const header: { kingdom: string; phylum: string; _class: string }[] = [];
 
   let rowIndex = 0;
 
@@ -176,26 +177,45 @@ const processTaxonomic = async (): Promise<{ [key: string]: ByTaxLevel }> => {
       /** fill out header row */
       if (rowIndex === 0) {
         const [kingdom = "", phylum = "", _class = ""] = cell.split(".");
-        header.push({ kingdom, phylum, _class, samples: 0 });
+        header.push({ kingdom, phylum, _class });
       } else {
         /** get props from header row */
         const { kingdom, phylum, _class } = header[colIndex - 2];
+        const [, sample] = row[1].split("_");
 
         /** if taxon present in sample */
         if (cell !== "0") {
           /** count sample toward phylum (if not already) */
           if (!phylumCounted[phylum]) {
             if (!byPhylum[phylum])
-              byPhylum[phylum] = { kingdom, phylum, _class: "", samples: 0 };
+              byPhylum[phylum] = {
+                kingdom,
+                phylum,
+                _class: "",
+                samples: 0,
+                codes: [],
+              };
             byPhylum[phylum].samples++;
+            /** include country code from sample meta */
+            if (!byPhylum[phylum].codes.includes(runToCode[sample]))
+              byPhylum[phylum].codes.push(runToCode[sample]);
             phylumCounted[phylum] = true;
           }
 
           /** count sample toward class (if not already) */
           if (!classCounted[_class]) {
             if (!byClass[_class])
-              byClass[_class] = { kingdom, phylum, _class, samples: 0 };
+              byClass[_class] = {
+                kingdom,
+                phylum,
+                _class,
+                samples: 0,
+                codes: [],
+              };
             byClass[_class].samples++;
+            /** include country code from sample meta */
+            if (!byClass[_class].codes.includes(runToCode[sample]))
+              byClass[_class].codes.push(runToCode[sample]);
             classCounted[_class] = true;
           }
         }
@@ -215,7 +235,10 @@ const processTaxonomic = async (): Promise<{ [key: string]: ByTaxLevel }> => {
 const processSample = async (): Promise<{
   byProject: ByProject;
   countries: ByGeo;
+  runToCode: RunToCode;
 }> => {
+  /** map of sample run names to country code */
+  const runToCode: RunToCode = {};
   /** map of unique projects */
   const byProject: { [key: ByProject[number]["project"]]: ByProject[number] } =
     {};
@@ -227,7 +250,7 @@ const processSample = async (): Promise<{
     if (rowIndex++ === 0) continue;
 
     /** project and sample info */
-    const [sample, project] = row;
+    const [sample, project, run] = row;
     if (!byProject[project]) byProject[project] = { project, samples: [] };
     byProject[project].samples.push(sample);
 
@@ -238,11 +261,15 @@ const processSample = async (): Promise<{
     if (!countries[code])
       countries[code] = { region, country, code, samples: 0 };
     countries[code].samples++;
+
+    /** save code for sample run */
+    runToCode[run] = code;
   }
 
   return {
     byProject: Object.values(byProject),
     countries: Object.values(countries),
+    runToCode,
   };
 };
 
@@ -376,14 +403,14 @@ const deriveMetadata = (
   // console.info("Downloading raw data");
   // for (const { contentUrl } of ld.distribution) await download(contentUrl);
 
+  console.info("Transform sample metadata");
+  const { byProject, countries, runToCode } = await processSample();
+  write("../public/by-project.json", byProject);
+
   console.info("Transforming taxonomic table data");
-  const { byPhylum, byClass } = await processTaxonomic();
+  const { byPhylum, byClass } = await processTaxonomic(runToCode);
   write("../public/by-phylum.json", byPhylum);
   write("../public/by-class.json", byClass);
-
-  console.info("Transform sample metadata");
-  const { byProject, countries } = await processSample();
-  write("../public/by-project.json", byProject);
 
   console.info("Getting and cleaning world map data");
   const worldMap = await processWorldMap();

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import * as d3 from "d3";
 import Placeholder from "@/components/Placeholder";
-import { Data } from "@/data";
+import { Data, useData } from "@/data";
 import { getColor } from "@/util/colors";
 import { useViewBox } from "@/util/hooks";
 
@@ -22,15 +22,23 @@ const bandHeight = width / 15;
 const height = (rows: number) => bandHeight * (rows || 10);
 
 const TaxonomicChart = ({ id, title, data, name }: Props) => {
+  const selectedCountry = useData((state) => state.selectedCountry);
+
   const [svg, fit] = useViewBox(20);
+
+  const filteredData = (
+    data && selectedCountry
+      ? data.filter((d) => d.codes.includes(selectedCountry.code || ""))
+      : data
+  )?.slice(0, 20);
 
   /** rerun d3 code when props change */
   useEffect(() => {
-    chart(id, data, name);
+    chart(id, filteredData, name);
     fit();
-  }, [data, id, fit, name]);
+  }, [filteredData, selectedCountry, id, fit, name]);
 
-  if (!data) return <Placeholder>Loading "{title}" table</Placeholder>;
+  if (!filteredData) return <Placeholder>Loading "{title}" table</Placeholder>;
 
   return (
     <svg ref={svg} id={id}>
@@ -43,7 +51,7 @@ const TaxonomicChart = ({ id, title, data, name }: Props) => {
       <text
         className="axis-title"
         x={width / 2}
-        y={height(data.length) + 60}
+        y={height(filteredData?.length || 0) + 60}
         textAnchor="middle"
       >
         # of samples

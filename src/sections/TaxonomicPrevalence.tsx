@@ -15,13 +15,13 @@ const TaxonomicPrevalence = () => {
         <TaxonomicChart
           id="by-phylum"
           title="By Phylum"
-          data={byPhylum?.slice(0, 20)}
+          data={byPhylum}
           name="phylum"
         />
         <TaxonomicChart
           id="by-class"
           title="By Class"
-          data={byClass?.slice(0, 20)}
+          data={byClass}
           name="_class"
         />
       </Cols>

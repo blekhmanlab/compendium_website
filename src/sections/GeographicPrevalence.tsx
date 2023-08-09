@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import { Feature } from "geojson";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
-import { Data, useData } from "@/data";
+import { Data, selectCountry, useData } from "@/data";
 import { getCssVariable } from "@/util/dom";
 import { clamp } from "@/util/math";
 import "./GeographicPrevalence.css";
@@ -21,13 +21,14 @@ type By = (typeof byOptions)[number];
 const GeographicPrevalence = () => {
   const byCountry = useData((state) => state.byCountry);
   const byRegion = useData((state) => state.byRegion);
+  const selectedCountry = useData((state) => state.selectedCountry);
 
   const [by, setBy] = useState<By>(byOptions[0]);
 
   /** rerun d3 code when props change */
   useEffect(() => {
-    chart(id, by === "Country" ? byCountry : byRegion);
-  }, [byCountry, byRegion, by]);
+    chart(id, by === "Country" ? byCountry : byRegion, selectedCountry);
+  }, [byCountry, byRegion, by, selectedCountry]);
 
   /** show status */
   if (!byCountry || !byRegion)
@@ -63,7 +64,11 @@ export default GeographicPrevalence;
 
 const graticules = d3.geoGraticule().step([20, 20])();
 
-const chart = (id: string, data: Data["byCountry"] | Data["byRegion"]) => {
+const chart = (
+  id: string,
+  data: Data["byCountry"] | Data["byRegion"],
+  selectedCountry: Data["selectedCountry"],
+) => {
   if (!data) return;
 
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
@@ -110,7 +115,9 @@ const chart = (id: string, data: Data["byCountry"] | Data["byRegion"]) => {
 
   /** get css variable colors */
   const primary = getCssVariable("--primary");
+  const secondary = getCssVariable("--secondary");
   const gray = getCssVariable("--gray");
+  const darkGray = getCssVariable("--dark-gray");
 
   /** color scale */
   const scale = d3
@@ -127,7 +134,13 @@ const chart = (id: string, data: Data["byCountry"] | Data["byRegion"]) => {
     .join("path")
     .attr("class", "feature")
     .attr("d", path)
-    .attr("fill", (d) => scale(d.properties.samples || 1))
+    .attr("fill", (d) =>
+      !selectedCountry
+        ? scale(d.properties.samples || 1)
+        : selectedCountry.code === d.properties.code
+        ? secondary
+        : darkGray,
+    )
     .attr(
       "data-tooltip",
       ({ properties: { region, country, code, samples } }) =>
@@ -143,7 +156,11 @@ const chart = (id: string, data: Data["byCountry"] | Data["byRegion"]) => {
         ]
           .filter(Boolean)
           .join(""),
-    );
+    )
+    .on("click", (event, d) => {
+      event.stopPropagation();
+      selectCountry({ name: d.properties.country, code: d.properties.code });
+    });
 
   /** reset map view */
   const resetView = () => {
@@ -216,4 +233,6 @@ const chart = (id: string, data: Data["byCountry"] | Data["byRegion"]) => {
     resetView();
     moveView();
   });
+
+  d3.select(window).on("click", () => selectCountry());
 };
