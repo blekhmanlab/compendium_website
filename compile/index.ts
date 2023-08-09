@@ -124,11 +124,11 @@ const download = async (url: string) => {
 
 /** load local csv file by stream */
 /** https://stackoverflow.com/questions/63749853/possible-to-make-an-event-handler-wait-until-async-promise-based-code-is-done */
-const stream = <Type = string>(url: string) => {
+const stream = (url: string) => {
   const dataStream = createReadStream(url);
   const parseStream = papaparse.parse(papaparse.NODE_STREAM_INPUT);
   dataStream.pipe(parseStream);
-  return parseStream as unknown as AsyncGenerator<Type[]>;
+  return parseStream;
 };
 
 /** write local json file */
@@ -150,59 +150,57 @@ const getMeta = async (): Promise<LD> => {
 
 /** process taxonomic table data */
 const processTaxonomic = async (): Promise<{ [key: string]: ByTaxLevel }> => {
-  let data: ByTaxLevel = [];
-
-  /** parse csv one row at a time */
-  let rowIndex = 0;
-  for await (const row of stream(taxonomicData)) {
-    if (throttle("taxonomic")) console.info(`Row ${rowIndex}`);
-    for (let colIndex = 2; colIndex < row.length; colIndex++) {
-      if (rowIndex === 0) {
-        const [
-          kingdom = "",
-          phylum = "",
-          _class = "",
-          // order = "",
-          // family = "",
-          // genus = "",
-          // species = "",
-        ] = row[colIndex].split(".");
-        data.push({
-          kingdom,
-          phylum,
-          _class,
-          samples: 0,
-        });
-      } else if (row[colIndex] !== "0")
-        /** count samples */
-        data[colIndex - 2].samples++;
-    }
-    rowIndex++;
-  }
-
   /** map of unique phyla */
   const byPhylum: { [key: string]: ByTaxLevel[number] } = {};
   /** map of unique classes */
   const byClass: { [key: string]: ByTaxLevel[number] } = {};
 
-  /** filter out nulls */
-  data = data.filter((datum) => datum._class !== "NA" && datum.phylum !== "NA");
+  /** header row */
+  const header: ByTaxLevel = [];
 
-  for (const { kingdom, phylum, _class, samples } of data) {
-    /** group by phylum */
-    {
-      const key = phylum;
-      if (!byPhylum[key])
-        byPhylum[key] = { kingdom, phylum, _class: "", samples: 0 };
-      byPhylum[key].samples += samples;
+  /** parse csv one row at a time */
+  let rowIndex = 0;
+  for await (const row of stream(taxonomicData)) {
+    /** show progress periodically */
+    if (throttle("taxonomic")) console.info(`Row ${rowIndex}`);
+
+    /** whether row (sample) has already been counted toward group */
+    const phylumCounted: { [key: string]: boolean } = {};
+    const classCounted: { [key: string]: boolean } = {};
+
+    for (let colIndex = 2; colIndex < row.length; colIndex++) {
+      const cell = row[colIndex];
+
+      /** fill out header row */
+      if (rowIndex === 0) {
+        const [kingdom = "", phylum = "", _class = ""] = cell.split(".");
+        header.push({ kingdom, phylum, _class, samples: 0 });
+      } else {
+        /** get props from header row */
+        const { kingdom, phylum, _class } = header[colIndex - 2];
+
+        /** if sample exists */
+        if (cell !== "0") {
+          /** group by phylum */
+          if (!phylumCounted[phylum]) {
+            if (!byPhylum[phylum])
+              byPhylum[phylum] = { kingdom, phylum, _class: "", samples: 0 };
+            byPhylum[phylum].samples++;
+            phylumCounted[phylum] = true;
+          }
+
+          /** group by class */
+          if (!classCounted[_class]) {
+            if (!byClass[_class])
+              byClass[_class] = { kingdom, phylum, _class, samples: 0 };
+            byClass[_class].samples++;
+            classCounted[_class] = true;
+          }
+        }
+      }
     }
 
-    /** group by class */
-    {
-      const key = _class;
-      if (!byClass[key]) byClass[key] = { kingdom, phylum, _class, samples: 0 };
-      byClass[key].samples += samples;
-    }
+    rowIndex++;
   }
 
   return {
@@ -380,7 +378,6 @@ const deriveMetadata = (
   const { byPhylum, byClass } = await processTaxonomic();
   write("../public/by-phylum.json", byPhylum);
   write("../public/by-class.json", byClass);
-  console.log(byPhylum.length, byClass.length);
 
   console.info("Transform sample metadata");
   const { byProject, countries } = await processSample();
