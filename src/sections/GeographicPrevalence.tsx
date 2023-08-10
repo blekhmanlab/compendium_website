@@ -6,7 +6,7 @@ import Select from "@/components/Select";
 import { Data, selectCountry, useData } from "@/data";
 import { getCssVariable } from "@/util/dom";
 import { clamp } from "@/util/math";
-import "./GeographicPrevalence.css";
+import classes from "./GeographicPrevalence.module.css";
 
 /** svg dimensions */
 const width = 800;
@@ -45,6 +45,15 @@ const GeographicPrevalence = () => {
         options={byOptions}
       />
 
+      {by === "Region" && (
+        <span>
+          Countries grouped into regions according to{" "}
+          <a href="https://unstats.un.org/sdgs/indicators/regional-groups/">
+            the UN's Sustainable Development Goals
+          </a>
+        </span>
+      )}
+
       <svg viewBox={[0, 0, width, height].join(" ")} id={id}>
         <g className="map-container" clipPath="url(#map-clip)">
           <g className="graticules"></g>
@@ -54,6 +63,12 @@ const GeographicPrevalence = () => {
           <rect x="0" y="0" width={width} height={height} />
         </clipPath>
       </svg>
+
+      <div className={classes.legend}>
+        <span>Less Samples</span>
+        <span className={classes.gradient}></span>
+        <span>More Samples</span>
+      </div>
     </section>
   );
 };
@@ -104,10 +119,10 @@ const chart = (
   /** draw graticules */
   svg
     .select(".graticules")
-    .selectAll(".graticule")
+    .selectAll("." + classes.graticule)
     .data([graticules])
     .join("path")
-    .attr("class", "graticule")
+    .attr("class", classes.graticule)
     .attr("d", path);
 
   /** get range of sample counts */
@@ -115,8 +130,8 @@ const chart = (
 
   /** get css variable colors */
   const primary = getCssVariable("--primary");
-  const secondary = getCssVariable("--secondary");
   const gray = getCssVariable("--gray");
+  const secondary = getCssVariable("--secondary");
   const darkGray = getCssVariable("--dark-gray");
 
   /** color scale */
@@ -129,10 +144,10 @@ const chart = (
   /** draw features */
   svg
     .select(".features")
-    .selectAll(".feature")
+    .selectAll("." + classes.feature)
     .data(data.features)
     .join("path")
-    .attr("class", "feature")
+    .attr("class", classes.feature)
     .attr("d", path)
     .attr("fill", (d) =>
       !selectedCountry

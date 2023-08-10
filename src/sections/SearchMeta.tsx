@@ -14,11 +14,11 @@ const SearchMeta = () => (
         sample
       </span>
       ,{" "}
-      <span data-tooltip="Geographic origin of samples, based on <a href='https://www.naturalearthdata.com/'>Natural Earth</a> data">
+      <span data-tooltip="Geographic origin of samples, based on <a href='https://www.naturalearthdata.com/'>Natural Earth</a> country data">
         country
       </span>
       , or{" "}
-      <span data-tooltip="Geographic origin of samples, grouped by <a href='https://unstats.un.org/sdgs/indicators/regional-groups/'>SDG Regions</a>">
+      <span data-tooltip="Geographic origin of samples, grouped into regions according to <a href='https://unstats.un.org/sdgs/indicators/regional-groups/'>the UN's Sustainable Development Goals</a>">
         region
       </span>{" "}
       to find it in the dataset and see how many samples are present in it.
