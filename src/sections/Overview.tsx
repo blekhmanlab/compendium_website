@@ -68,12 +68,12 @@ const Overview = () => {
         {tiles.map(({ icon, text }, index) => {
           /** icon color */
           const percent = (index / (tiles.length - 1)) * 100;
-          const color = `color-mix(in hsl, var(--primary), ${percent}% var(--secondary))`;
+          const color = `color-mix(in hsl, var(--primary-light), ${percent}% var(--secondary-light))`;
 
           return (
             <div key={index} className={classes.tile}>
               {icon({ style: { color } })}
-              <p>{text}</p>
+              <span>{text}</span>
             </div>
           );
         })}

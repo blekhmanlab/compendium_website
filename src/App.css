@@ -14,12 +14,15 @@
   --white: #e4e8ee;
 
   --primary: #e23fff;
-  --secondary: #6e84ff;
-  --tertiary: #52d7ff;
+  --secondary: #556eff;
+  --primary-light: #f19fff;
+  --secondary-light: #aab7ff;
+
   --rounded: 5px;
   --fast: 0.25s ease;
+  --shadow: 0 0 10px #00000020;
 
-  --spacing: 1.75em;
+  --spacing: 2em;
   --compact: 1.5em;
 }
 
@@ -34,15 +37,18 @@
   box-sizing: border-box;
 }
 
-body {
-  min-height: 100vh;
-  margin: 0;
+html {
   background: var(--black);
   color: var(--white);
   font-weight: 300;
   font-size: 14pt;
   line-height: var(--spacing);
   font-family: "Mona Sans";
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
 }
 
 header,
@@ -61,7 +67,7 @@ footer {
 }
 
 section {
-  --col: 1000px;
+  --col: 1200px;
 }
 
 section:nth-child(odd) {
@@ -77,30 +83,26 @@ h3 {
 
 h1 {
   font-weight: 600;
-  font-size: 2.2rem;
+  font-size: 1.9rem;
   line-height: 1.25em;
   letter-spacing: 1px;
 }
 
 h2 {
   font-weight: 400;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   text-align: center;
 }
 
 h3 {
   font-weight: 400;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   text-align: center;
 }
 
 b,
 strong {
   font-weight: 600;
-}
-
-p {
-  text-align: justify;
 }
 
 p,
@@ -111,13 +113,18 @@ code {
   margin: 0;
 }
 
+p {
+  width: 66%;
+  text-align: justify;
+}
+
 a {
-  color: var(--tertiary);
+  color: var(--secondary-light);
   transition: color var(--fast);
 }
 
 a:hover {
-  color: currentColor;
+  color: var(--primary-light);
 }
 
 code {
@@ -134,6 +141,7 @@ li {
 .content {
   display: flex;
   flex-direction: column;
+  align-items: center;
   width: 100%;
   gap: 20px;
 }
@@ -183,6 +191,12 @@ svg [data-tooltip]:hover {
   fill: var(--white);
 }
 
+.inline-svg {
+  height: 1em;
+  margin-right: 0.35em;
+  margin-left: 0.15em;
+}
+
 :focus:not(:focus-visible) {
   outline: none;
 }
@@ -211,7 +225,7 @@ span[data-tooltip] {
 }
 
 .tippy-content a:hover {
-  color: currentColor;
+  color: var(--primary);
 }
 
 .tippy-arrow {

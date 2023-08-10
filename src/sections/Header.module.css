@@ -34,9 +34,11 @@
 }
 
 .subtitle {
+  text-wrap: balance;
+  width: 100%;
   color: var(--off-white);
   font-weight: 200;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   text-align: center;
 }
 

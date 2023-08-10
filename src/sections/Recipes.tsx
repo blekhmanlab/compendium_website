@@ -1,110 +1,46 @@
-import Accordion from "@/components/Accordion";
+import { ReactComponent as DownloadIcon } from "@/assets/download.svg";
+import { ReactComponent as RecipeIcon } from "@/assets/recipe.svg";
+import Button from "@/components/Button";
+import classes from "./Recipes.module.css";
 
 const Recipes = () => (
   <section>
     <h2>Recipes</h2>
 
-    <div className="content">
-      <p>
-        To do more advanced searching, filtering, analysis, etc., please
-        download the full dataset:
-      </p>
+    <p>
+      <a href={import.meta.env.VITE_R_PACKAGE}>
+        <DownloadIcon className="inline-svg" />
+        Download the R package
+      </a>{" "}
+      to do more advanced filtering and analyses on this data. Here are some of
+      the things you can do with it:
+    </p>
 
-      <ol>
-        <li>Install R</li>
-        <li>
-          Lorem ipsum <code>dolor sit amet</code>
-        </li>
-        <li>
-          Lorem ipsum <code>dolor sit amet</code>
-        </li>
-      </ol>
-
-      <p>Once you're set up, here are some things you can do with the data:</p>
-
-      <Accordion title="Get samples from a single world region">
-        <p>
-          Lorem ipsum <code>dolor sit amet</code>, consectetur{" "}
-          <a href="link">adipiscing</a> elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua.
-        </p>
-        <ol>
-          <li>Sed elementum tempus egestas sed sed risus pretium quam.</li>
-          <li>Viverra nibh cras pulvinar mattis nunc sed.</li>
-          <li>
-            Ultrices in iaculis nunc sed augue lacus viverra vitae congue.
-          </li>
-        </ol>
-        <p>
-          Tortor condimentum lacinia quis vel eros donec. Ullamcorper malesuada
-          proin libero nunc consequat interdum varius sit. Adipiscing elit ut
-          aliquam purus sit amet luctus venenatis. Pulvinar pellentesque
-          habitant morbi tristique senectus et.
-        </p>
-      </Accordion>
-
-      <Accordion title="Get samples from a set of 4 BioProjects">
-        <p>
-          Lorem ipsum <code>dolor sit amet</code>, consectetur{" "}
-          <a href="link">adipiscing</a> elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua.
-        </p>
-        <ol>
-          <li>Sed elementum tempus egestas sed sed risus pretium quam.</li>
-          <li>Viverra nibh cras pulvinar mattis nunc sed.</li>
-          <li>
-            Ultrices in iaculis nunc sed augue lacus viverra vitae congue.
-          </li>
-        </ol>
-        <p>
-          Tortor condimentum lacinia quis vel eros donec. Ullamcorper malesuada
-          proin libero nunc consequat interdum varius sit. Adipiscing elit ut
-          aliquam purus sit amet luctus venenatis. Pulvinar pellentesque
-          habitant morbi tristique senectus et.
-        </p>
-      </Accordion>
-
-      <Accordion title="Get samples with read counts consolidated at the order level">
-        <p>
-          Lorem ipsum <code>dolor sit amet</code>, consectetur{" "}
-          <a href="link">adipiscing</a> elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua.
-        </p>
-        <ol>
-          <li>Sed elementum tempus egestas sed sed risus pretium quam.</li>
-          <li>Viverra nibh cras pulvinar mattis nunc sed.</li>
-          <li>
-            Ultrices in iaculis nunc sed augue lacus viverra vitae congue.
-          </li>
-        </ol>
-        <p>
-          Tortor condimentum lacinia quis vel eros donec. Ullamcorper malesuada
-          proin libero nunc consequat interdum varius sit. Adipiscing elit ut
-          aliquam purus sit amet luctus venenatis. Pulvinar pellentesque
-          habitant morbi tristique senectus et.
-        </p>
-      </Accordion>
-
-      <Accordion title="Get samples with less than 10 percent Firmicutes">
-        <p>
-          Lorem ipsum <code>dolor sit amet</code>, consectetur{" "}
-          <a href="link">adipiscing</a> elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua.
-        </p>
-        <ol>
-          <li>Sed elementum tempus egestas sed sed risus pretium quam.</li>
-          <li>Viverra nibh cras pulvinar mattis nunc sed.</li>
-          <li>
-            Ultrices in iaculis nunc sed augue lacus viverra vitae congue.
-          </li>
-        </ol>
-        <p>
-          Tortor condimentum lacinia quis vel eros donec. Ullamcorper malesuada
-          proin libero nunc consequat interdum varius sit. Adipiscing elit ut
-          aliquam purus sit amet luctus venenatis. Pulvinar pellentesque
-          habitant morbi tristique senectus et.
-        </p>
-      </Accordion>
+    <div className={classes.buttons}>
+      <Button
+        icon={RecipeIcon}
+        href={import.meta.env.VITE_R_PACKAGE + "#recipe-1"}
+      >
+        Get samples from a single world region
+      </Button>
+      <Button
+        icon={RecipeIcon}
+        href={import.meta.env.VITE_R_PACKAGE + "#recipe-2"}
+      >
+        Get samples from a set of 4 BioProjects
+      </Button>
+      <Button
+        icon={RecipeIcon}
+        href={import.meta.env.VITE_R_PACKAGE + "#recipe-3"}
+      >
+        Get samples with read counts consolidated at the order level
+      </Button>
+      <Button
+        icon={RecipeIcon}
+        href={import.meta.env.VITE_R_PACKAGE + "#recipe-4"}
+      >
+        Get samples with less than 10% Firmicutes
+      </Button>
     </div>
   </section>
 );

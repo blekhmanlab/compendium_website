@@ -10,8 +10,8 @@
   color: inherit;
   font: inherit;
   line-height: var(--compact);
+  text-align: center;
   text-decoration: none;
-  white-space: nowrap;
   cursor: pointer;
   transition:
     background var(--fast),
@@ -20,6 +20,7 @@
 
 .button:hover {
   background: var(--gray);
+  color: inherit;
 }
 
 .button[data-design="big"] {
@@ -27,6 +28,7 @@
   padding: 10px 20px;
   background: none;
   color: var(--off-white);
+  white-space: nowrap;
 }
 
 .button[data-design="big"]:hover {
