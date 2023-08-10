@@ -22,13 +22,13 @@ const bandHeight = width / 15;
 const height = (rows: number) => bandHeight * (rows || 10);
 
 const TaxonomicChart = ({ id, title, data, name }: Props) => {
-  const selectedCountry = useData((state) => state.selectedCountry);
+  const selectedFeature = useData((state) => state.selectedFeature);
 
   const [svg, fit] = useViewBox(20);
 
   const filteredData = (
-    data && selectedCountry
-      ? data.filter((d) => d.codes.includes(selectedCountry.code || ""))
+    data && selectedFeature
+      ? data.filter((d) => d.codes.includes(selectedFeature.code || ""))
       : data
   )?.slice(0, 20);
 
@@ -36,7 +36,7 @@ const TaxonomicChart = ({ id, title, data, name }: Props) => {
   useEffect(() => {
     chart(id, filteredData, name);
     fit();
-  }, [filteredData, selectedCountry, id, fit, name]);
+  }, [filteredData, selectedFeature, id, fit, name]);
 
   if (!filteredData) return <Placeholder>Loading "{title}" table</Placeholder>;
 

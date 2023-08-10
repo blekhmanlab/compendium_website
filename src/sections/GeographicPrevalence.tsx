@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import { Feature } from "geojson";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
-import { Data, selectCountry, useData } from "@/data";
+import { Data, setSelectedFeature, useData } from "@/data";
 import { getCssVariable } from "@/util/dom";
 import { clamp } from "@/util/math";
 import classes from "./GeographicPrevalence.module.css";
@@ -21,14 +21,14 @@ type By = (typeof byOptions)[number];
 const GeographicPrevalence = () => {
   const byCountry = useData((state) => state.byCountry);
   const byRegion = useData((state) => state.byRegion);
-  const selectedCountry = useData((state) => state.selectedCountry);
+  const selectedFeature = useData((state) => state.selectedFeature);
 
   const [by, setBy] = useState<By>(byOptions[0]);
 
   /** rerun d3 code when props change */
   useEffect(() => {
-    chart(id, by === "Country" ? byCountry : byRegion, selectedCountry);
-  }, [byCountry, byRegion, by, selectedCountry]);
+    chart(id, by === "Country" ? byCountry : byRegion, selectedFeature);
+  }, [byCountry, byRegion, by, selectedFeature]);
 
   /** show status */
   if (!byCountry || !byRegion)
@@ -45,17 +45,7 @@ const GeographicPrevalence = () => {
         options={byOptions}
       />
 
-      {by === "Region" && (
-        <span>
-          Countries grouped into regions according to{" "}
-          <a
-            href="https://unstats.un.org/sdgs/indicators/regional-groups/"
-            target="_blank"
-          >
-            the UN's Sustainable Development Goals
-          </a>
-        </span>
-      )}
+      {selectedFeature && <>Selected: {selectedFeature.country}</>}
 
       <svg viewBox={[0, 0, width, height].join(" ")} id={id}>
         <g className="map-container" clipPath="url(#map-clip)">
@@ -72,6 +62,18 @@ const GeographicPrevalence = () => {
         <span className={classes.gradient}></span>
         <span>More Samples</span>
       </div>
+
+      {by === "Region" && (
+        <span>
+          Countries grouped into regions according to{" "}
+          <a
+            href="https://unstats.un.org/sdgs/indicators/regional-groups/"
+            target="_blank"
+          >
+            the UN's Sustainable Development Goals
+          </a>
+        </span>
+      )}
     </section>
   );
 };
@@ -80,44 +82,44 @@ export default GeographicPrevalence;
 
 /** d3 code */
 
+/** create projection */
+const projection = d3.geoNaturalEarth1();
+
+/** fit projection to bbox of earth */
+const fitProjection = () =>
+  projection.fitSize([width, height], {
+    type: "Feature",
+    properties: {},
+    geometry: {
+      type: "Polygon",
+      coordinates: [
+        [
+          [-180, -90],
+          [180, -90],
+          [180, 90],
+          [-180, 90],
+        ],
+      ],
+    },
+  });
+fitProjection();
+
+/** get scale when projection fit to earth bbox */
+const baseScale = projection.scale();
+
+/** path calculator for projection */
+const path = d3.geoPath().projection(projection);
+
 const graticules = d3.geoGraticule().step([20, 20])();
 
 const chart = (
   id: string,
   data: Data["byCountry"] | Data["byRegion"],
-  selectedCountry: Data["selectedCountry"],
+  selectedFeature: Data["selectedFeature"],
 ) => {
   if (!data) return;
 
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
-
-  /** create projection */
-  const projection = d3.geoNaturalEarth1();
-
-  /** fit projection to bbox of earth */
-  const fitProjection = () =>
-    projection.fitSize([width, height], {
-      type: "Feature",
-      properties: {},
-      geometry: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [-180, -90],
-            [180, -90],
-            [180, 90],
-            [-180, 90],
-          ],
-        ],
-      },
-    });
-  fitProjection();
-
-  /** get scale when projection fit to earth bbox */
-  const baseScale = projection.scale();
-
-  /** path calculator for projection */
-  const path = d3.geoPath().projection(projection);
 
   /** draw graticules */
   svg
@@ -144,6 +146,23 @@ const chart = (
     .range([gray, primary])
     .interpolate(d3.interpolateLab);
 
+  /** select country or region on mouse or key click */
+  const selectFeature = (
+    event: PointerEvent | KeyboardEvent,
+    d: (typeof data)["features"][number],
+  ) => {
+    const feature = d.properties;
+    /** key press */
+    if ("key" in event) {
+      if (event.key === "Enter") setSelectedFeature(feature);
+      if (event.key === "Escape") setSelectedFeature(undefined);
+    } else {
+      /** mouse click */
+      setSelectedFeature(feature);
+      event.stopPropagation();
+    }
+  };
+
   /** draw features */
   svg
     .select(".features")
@@ -153,9 +172,9 @@ const chart = (
     .attr("class", classes.feature)
     .attr("d", path)
     .attr("fill", (d) =>
-      !selectedCountry
+      !selectedFeature
         ? scale(d.properties.samples || 1)
-        : selectedCountry.code === d.properties.code
+        : selectedFeature.code === d.properties.code
         ? secondary
         : darkGray,
     )
@@ -175,10 +194,8 @@ const chart = (
           .filter(Boolean)
           .join(""),
     )
-    .on("click", (event, d) => {
-      event.stopPropagation();
-      selectCountry({ name: d.properties.country, code: d.properties.code });
-    });
+    .on("keydown", selectFeature)
+    .on("click", selectFeature);
 
   /** reset map view */
   const resetView = () => {
@@ -222,8 +239,8 @@ const chart = (
     projection.center([x, y]);
 
     /** update paths based on projection */
-    svg.selectAll<Element, Feature>(".graticule").attr("d", path);
-    svg.selectAll<Element, Feature>(".feature").attr("d", path);
+    svg.selectAll<Element, Feature>("." + classes.graticule).attr("d", path);
+    svg.selectAll<Element, Feature>("." + classes.feature).attr("d", path);
   };
 
   /** drag handler */
@@ -241,7 +258,7 @@ const chart = (
   /** connect zoom handler to svg */
   svg
     .call(zoom)
-    /** always prevent scroll on wheel, not just when at scale limit */
+    /** always prevent scroll on wheel, not just when under scale limit */
     .on("wheel", (event) => event.preventDefault());
 
   /** double click handler */
@@ -252,5 +269,6 @@ const chart = (
     moveView();
   });
 
-  d3.select(window).on("click", () => selectCountry());
+  /** unset selected feature when clicking off map */
+  d3.select(window).on("click", () => setSelectedFeature());
 };

@@ -7,6 +7,7 @@
 .feature {
   stroke: var(--black);
   stroke-width: 0.5;
+  cursor: pointer;
 }
 
 .legend {
