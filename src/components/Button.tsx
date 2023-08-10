@@ -22,7 +22,12 @@ const isButton = (props: AnchorOrButton): props is Button => "onClick" in props;
 const Button = ({ icon, design = "", children, ...props }: Props) => {
   if (isAnchor(props))
     return (
-      <a className={classes.button} data-design={design} {...props}>
+      <a
+        className={classes.button}
+        data-design={design}
+        target="_blank"
+        {...props}
+      >
         {icon?.({ className: classes.icon })}
         {children}
       </a>

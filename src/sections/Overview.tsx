@@ -34,7 +34,13 @@ const Overview = () => {
     },
     {
       icon: CountriesIcon,
-      text: `${(metadata?.countries || 0).toLocaleString()} countries`,
+      text: (
+        <>
+          {(metadata?.countries || 0).toLocaleString()} countries
+          <br />
+          {(metadata?.regions || 0).toLocaleString()} regions
+        </>
+      ),
     },
     {
       icon: SizeIcon,

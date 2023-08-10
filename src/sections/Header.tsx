@@ -1,6 +1,7 @@
 import { ReactComponent as PaperIcon } from "@/assets/book.svg";
-import { ReactComponent as DataIcon } from "@/assets/database.svg";
+import { ReactComponent as DownloadIcon } from "@/assets/download.svg";
 import { ReactComponent as Logo } from "@/assets/logo.svg";
+import { ReactComponent as PackageIcon } from "@/assets/package.svg";
 import Button from "@/components/Button.tsx";
 import HeaderBg from "@/sections/HeaderBg.tsx";
 import classes from "./Header.module.css";
@@ -18,16 +19,29 @@ const Header = () => (
     <p className={classes.subtitle}>{import.meta.env.VITE_DESCRIPTION}</p>
 
     <div className={classes.buttons}>
-      <Button icon={PaperIcon} design="big" href="">
-        Read the paper
+      <Button
+        icon={PaperIcon}
+        design="big"
+        href=""
+        data-tooltip="Learn about the methods behind and significance of this dataset."
+      >
+        Paper
       </Button>
       <Button
-        icon={DataIcon}
+        icon={PackageIcon}
         design="big"
-        // temp link
-        href="https://drive.google.com/drive/folders/19GpvcX3rtLM0DSzt20lSjLA72DG7AdSM?usp=sharing"
+        href="https://seandavi.github.io/MicroBioMap/"
+        data-tooltip="Use the R package to do more advanced filtering and analysis with the dataset."
       >
-        Download full data
+        R Package
+      </Button>
+      <Button
+        icon={DownloadIcon}
+        design="big"
+        href="https://doi.org/10.5281/zenodo.8186993"
+        data-tooltip="Download the data directly as CSV/TSV files."
+      >
+        CSV data
       </Button>
     </div>
   </header>
