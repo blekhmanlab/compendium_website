@@ -14,12 +14,14 @@ type Props = {
 };
 
 const Search = ({ filters }: Props) => {
+  /** get global state */
+  const fullSearchList = useData((state) => state.searchList);
+
+  /** local state */
   const [search, setSearch] = useState("");
   const [fuzzy, setFuzzy] = useState<SearchList>([]);
   const [filter, setFilter] = useState<FiltersAll[number]>("All");
   const [limit, setLimit] = useState(10);
-
-  const fullSearchList = useData((state) => state.searchList);
 
   /** filter full search list before any other steps */
   const searchList = useMemo(

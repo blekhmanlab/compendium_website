@@ -1,11 +1,10 @@
 import { loadData } from "@/data";
 import Footer from "@/sections/Footer";
-import GeographicPrevalence from "@/sections/GeographicPrevalence";
 import Header from "@/sections/Header";
 import Overview from "@/sections/Overview";
+import Prevalence from "@/sections/Prevalence";
 import Recipes from "@/sections/Recipes";
 import Search from "@/sections/Search";
-import TaxonomicPrevalence from "@/sections/TaxonomicPrevalence";
 import "@/components/tooltip";
 import "./App.css";
 
@@ -17,8 +16,7 @@ const App = () => (
     <main>
       <Overview />
       <Search />
-      <TaxonomicPrevalence />
-      <GeographicPrevalence />
+      <Prevalence />
       <Recipes />
       <Footer />
     </main>

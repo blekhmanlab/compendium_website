@@ -6,6 +6,7 @@ import { useData } from "@/data";
 import classes from "./Overview.module.css";
 
 const Overview = () => {
+  /** get global state */
   const metadata = useData((state) => state.metadata);
 
   /** round down to nearest large amount */

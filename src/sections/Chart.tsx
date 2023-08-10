@@ -1,17 +1,16 @@
 import { useEffect } from "react";
 import * as d3 from "d3";
+import { startCase } from "lodash";
 import Placeholder from "@/components/Placeholder";
 import { Data, useData } from "@/data";
 import { getColor } from "@/util/colors";
-import { useViewBox } from "@/util/hooks";
+import { useId, useViewBox } from "@/util/hooks";
 
-/** show prevalence of samples at certain taxonomic level as bar graph */
+/** show prevalence of samples at certain taxonomic level as bar chart */
 
 type Props = {
-  id: string;
-  title: string;
   data: Data["byClass"] | Data["byPhylum"];
-  name:
+  datumKey:
     | keyof NonNullable<Data["byClass"]>[number]
     | keyof NonNullable<Data["byPhylum"]>[number];
 };
@@ -21,24 +20,27 @@ const width = 400;
 const bandHeight = width / 15;
 const height = (rows: number) => bandHeight * (rows || 10);
 
-const TaxonomicChart = ({ id, title, data, name }: Props) => {
+const Chart = ({ data, datumKey }: Props) => {
+  /** get global state */
   const selectedFeature = useData((state) => state.selectedFeature);
+
+  /** unique id */
+  const id = useId();
+  /** infer title from key we're accessing on datum */
+  const title = startCase(datumKey);
+
+  /** filtered data */
+  const filtered = data?.slice(0, 20);
 
   const [svg, fit] = useViewBox(20);
 
-  const filteredData = (
-    data && selectedFeature
-      ? data.filter((d) => d.codes.includes(selectedFeature.code || ""))
-      : data
-  )?.slice(0, 20);
-
   /** rerun d3 code when props change */
   useEffect(() => {
-    chart(id, filteredData, name);
+    chart(id, filtered, datumKey);
     fit();
-  }, [filteredData, selectedFeature, id, fit, name]);
+  }, [filtered, selectedFeature, id, fit, datumKey]);
 
-  if (!filteredData) return <Placeholder>Loading "{title}" table</Placeholder>;
+  if (!filtered) return <Placeholder>Loading "{title}" table</Placeholder>;
 
   return (
     <svg ref={svg} id={id}>
@@ -51,7 +53,7 @@ const TaxonomicChart = ({ id, title, data, name }: Props) => {
       <text
         className="axis-title"
         x={width / 2}
-        y={height(filteredData?.length || 0) + 60}
+        y={height(filtered?.length || 0) + 60}
         textAnchor="middle"
       >
         # of samples
@@ -60,10 +62,14 @@ const TaxonomicChart = ({ id, title, data, name }: Props) => {
   );
 };
 
-export default TaxonomicChart;
+export default Chart;
 
 /** d3 code */
-const chart = (id: string, data: Props["data"], name: Props["name"]) => {
+const chart = (
+  id: string,
+  data: Props["data"],
+  datumKey: Props["datumKey"],
+) => {
   if (!data) return;
 
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
@@ -92,7 +98,9 @@ const chart = (id: string, data: Props["data"], name: Props["name"]) => {
     );
 
   /** create y axis */
-  const yAxis = d3.axisLeft(yScale).tickFormat((_, i) => String(data[i][name]));
+  const yAxis = d3
+    .axisLeft(yScale)
+    .tickFormat((_, i) => String(data[i][datumKey]));
 
   /** update x axis */
   svg

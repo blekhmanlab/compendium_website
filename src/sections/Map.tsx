@@ -5,47 +5,45 @@ import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import { Data, setSelectedFeature, useData } from "@/data";
 import { getCssVariable } from "@/util/dom";
+import { useId } from "@/util/hooks";
 import { clamp } from "@/util/math";
-import classes from "./GeographicPrevalence.module.css";
+import classes from "./Map.module.css";
 
 /** svg dimensions */
 const width = 800;
 const height = 400;
 
-const id = "map";
-const title = "By Geography";
-
 const byOptions = ["Country", "Region"];
 type By = (typeof byOptions)[number];
 
-const GeographicPrevalence = () => {
+const Map = () => {
+  /** get global state */
   const byCountry = useData((state) => state.byCountry);
   const byRegion = useData((state) => state.byRegion);
   const selectedFeature = useData((state) => state.selectedFeature);
 
+  /** unique id */
+  const id = useId();
+
+  /** local state */
   const [by, setBy] = useState<By>(byOptions[0]);
 
   /** rerun d3 code when props change */
   useEffect(() => {
     chart(id, by === "Country" ? byCountry : byRegion, selectedFeature);
-  }, [byCountry, byRegion, by, selectedFeature]);
+  }, [id, byCountry, byRegion, by, selectedFeature]);
 
   /** show status */
-  if (!byCountry || !byRegion)
-    return <Placeholder>Loading "{title}" table</Placeholder>;
+  if (!byCountry || !byRegion) return <Placeholder>Loading map</Placeholder>;
 
   return (
-    <section>
-      <h2>Geographic Prevalence</h2>
-
+    <div className="content">
       <Select
         label="Group by:"
         value={by}
         onChange={setBy}
         options={byOptions}
       />
-
-      {selectedFeature && <>Selected: {selectedFeature.country}</>}
 
       <svg viewBox={[0, 0, width, height].join(" ")} id={id}>
         <g className="map-container" clipPath="url(#map-clip)">
@@ -63,6 +61,10 @@ const GeographicPrevalence = () => {
         <span>More Samples</span>
       </div>
 
+      {selectedFeature && (
+        <>Selected: {selectedFeature.country || selectedFeature.region}</>
+      )}
+
       {by === "Region" && (
         <span>
           Countries grouped into regions according to{" "}
@@ -74,11 +76,11 @@ const GeographicPrevalence = () => {
           </a>
         </span>
       )}
-    </section>
+    </div>
   );
 };
 
-export default GeographicPrevalence;
+export default Map;
 
 /** d3 code */
 
@@ -174,7 +176,11 @@ const chart = (
     .attr("fill", (d) =>
       !selectedFeature
         ? scale(d.properties.samples || 1)
-        : selectedFeature.code === d.properties.code
+        : (
+            selectedFeature.country
+              ? selectedFeature.country === d.properties.country
+              : selectedFeature.region === d.properties.region
+          )
         ? secondary
         : darkGray,
     )

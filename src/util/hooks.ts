@@ -27,3 +27,9 @@ export const useViewBox = (padding = 0): [Ref<SVGSVGElement>, () => void] => {
 
   return [svg, setViewBox];
 };
+
+let id = 0;
+export const useId = () => {
+  id++;
+  return "a".repeat(id);
+};
