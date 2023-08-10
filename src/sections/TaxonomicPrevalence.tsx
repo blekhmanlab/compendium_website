@@ -1,6 +1,5 @@
 import Cols from "@/components/Cols";
 import { useData } from "@/data";
-import Search from "@/sections/Search";
 import TaxonomicChart from "@/sections/TaxonomicChart";
 
 const TaxonomicPrevalence = () => {
@@ -25,9 +24,6 @@ const TaxonomicPrevalence = () => {
           name="_class"
         />
       </Cols>
-
-      <h3>Search taxonomic levels</h3>
-      <Search filters={["Phylum", "Class"]} />
     </section>
   );
 };

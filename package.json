@@ -10,6 +10,7 @@
     "lint": "eslint . --ext .tsx,.ts --fix && prettier --write \"**/*.{tsx,ts,css,json,yaml,svg,md}\" --no-error-on-unmatched-pattern"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.16",
     "comlink": "^4.4.1",
     "d3": "^7.8.5",
     "gsap": "^3.12.2",

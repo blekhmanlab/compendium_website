@@ -18,6 +18,18 @@
     color var(--fast);
 }
 
+.button[aria-selected] {
+  border-radius: 999px;
+}
+
+.button[aria-selected="false"] {
+  background: none;
+}
+
+.button[aria-selected="true"] {
+  background: var(--gray);
+}
+
 .button:hover {
   background: var(--gray);
   color: inherit;

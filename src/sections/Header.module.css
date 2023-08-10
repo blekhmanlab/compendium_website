@@ -32,7 +32,6 @@
 
 .subtitle {
   text-wrap: balance;
-  width: 100%;
   color: var(--off-white);
   font-weight: 200;
   font-size: 1.2rem;

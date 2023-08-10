@@ -1,0 +1,15 @@
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.panels {
+  width: 100%;
+}
+
+.panels p {
+  text-wrap: balance;
+  text-align: center;
+}

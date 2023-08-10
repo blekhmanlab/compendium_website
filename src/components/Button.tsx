@@ -1,8 +1,10 @@
 import {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
+  forwardRef,
   FunctionComponent,
   ReactNode,
+  Ref,
 } from "react";
 import classes from "./Button.module.css";
 
@@ -16,30 +18,38 @@ type Props = {
   children: ReactNode;
 } & AnchorOrButton;
 
-const isAnchor = (props: AnchorOrButton): props is Anchor => "href" in props;
-const isButton = (props: AnchorOrButton): props is Button => "onClick" in props;
-
-const Button = ({ icon, design = "", children, ...props }: Props) => {
-  if (isAnchor(props))
-    return (
-      <a
-        className={classes.button}
-        data-design={design}
-        target="_blank"
-        {...props}
-      >
-        {icon?.({ className: classes.icon })}
-        {children}
-      </a>
-    );
-  if (isButton(props))
-    return (
-      <button className={classes.button} data-design={design} {...props}>
-        {icon?.({ className: classes.icon })}
-        {children}
-      </button>
-    );
-  return <></>;
-};
+const Button = forwardRef(
+  (
+    { icon, design = "", children, ...props }: Props,
+    ref: Ref<HTMLAnchorElement | HTMLButtonElement>,
+  ) => {
+    if ("href" in props)
+      return (
+        <a
+          ref={ref as Ref<HTMLAnchorElement>}
+          className={classes.button}
+          data-design={design}
+          target="_blank"
+          {...(props as Anchor)}
+        >
+          {icon?.({ className: classes.icon })}
+          {children}
+        </a>
+      );
+    if ("onClick" in props)
+      return (
+        <button
+          ref={ref as Ref<HTMLButtonElement>}
+          className={classes.button}
+          data-design={design}
+          {...(props as Button)}
+        >
+          {icon?.({ className: classes.icon })}
+          {children}
+        </button>
+      );
+    return <></>;
+  },
+);
 
 export default Button;

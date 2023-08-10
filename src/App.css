@@ -257,3 +257,16 @@ span[data-tooltip] {
 .tooltip-table > *:nth-child(odd) {
   font-weight: 500;
 }
+
+/* https://tailwindcss.com/docs/screen-readers */
+.sr-only {
+  clip: rect(0, 0, 0, 0);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border-width: 0;
+  white-space: nowrap;
+}
