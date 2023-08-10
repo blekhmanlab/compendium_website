@@ -71,6 +71,7 @@ section {
 
 footer {
   --col: 1200px;
+  background: #8080ff08;
 }
 
 section:nth-child(odd) {

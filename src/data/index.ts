@@ -105,23 +105,23 @@ const compileSearchList = (
 
   /** include phyla */
   for (const { phylum, samples } of byPhylum)
-    list.push({ type: "Phylum", name: phylum, samples });
+    list.push({ type: "Phylum", name: phylum, samples: samples.total });
 
   /** include classes */
   for (const { _class, samples } of byClass)
-    list.push({ type: "Class", name: _class, samples });
+    list.push({ type: "Class", name: _class, samples: samples.total });
 
   /** include regions */
   for (const {
     properties: { region, samples },
   } of byRegion.features)
-    list.push({ type: "Region", name: region, samples });
+    list.push({ type: "Region", name: region, samples: samples });
 
   /** include countries */
   for (const {
     properties: { country, samples },
   } of byCountry.features)
-    list.push({ type: "Country", name: country, samples });
+    list.push({ type: "Country", name: country, samples: samples });
 
   /** sort by number of samples */
   list.sort((a, b) => b.samples - a.samples);

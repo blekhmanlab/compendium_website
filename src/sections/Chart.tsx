@@ -36,9 +36,9 @@ const Chart = ({ data, datumKey }: Props) => {
 
   /** rerun d3 code when props change */
   useEffect(() => {
-    chart(id, filtered, datumKey);
+    chart(id, filtered, datumKey, selectedFeature);
     fit();
-  }, [filtered, selectedFeature, id, fit, datumKey]);
+  }, [id, filtered, datumKey, selectedFeature, fit]);
 
   if (!filtered) return <Placeholder>Loading "{title}" table</Placeholder>;
 
@@ -69,13 +69,20 @@ const chart = (
   id: string,
   data: Props["data"],
   datumKey: Props["datumKey"],
+  selectedFeature: Data["selectedFeature"],
 ) => {
   if (!data) return;
 
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
 
+  /** get appropriate sample count */
+  const getSamples = (d: (typeof data)[number]) =>
+    selectedFeature
+      ? d.samples[selectedFeature.code as "US"] || 0.00001
+      : d.samples.total;
+
   /** get range of sample counts */
-  const [xMin = 0, xMax = 100] = d3.extent(data, (d) => d.samples);
+  const [xMin = 0, xMax = 100] = d3.extent(data, getSamples);
 
   /** create x scale computer */
   const xScale = d3
@@ -120,18 +127,16 @@ const chart = (
     .attr("class", "bar")
     .attr("x", 0)
     .attr("y", (d) => yScale(d.kingdom + d.phylum + d._class) || 0)
-    .attr("width", (d) => xScale(d.samples))
+    .attr("width", (d) => xScale(getSamples(d)))
     .attr("height", () => yScale.bandwidth())
     .attr("fill", (d) => getColor(d.phylum))
-    .attr("data-tooltip", ({ kingdom, phylum, _class, samples }) =>
+    .attr("data-tooltip", (d) =>
       [
         `<div class="tooltip-table">`,
-        kingdom ? `<span>Kingdom</span><span>${kingdom}</span>` : "",
-        phylum ? `<span>Phylum</span><span>${phylum}</span>` : "",
-        _class ? `<span>Class</span><span>${_class}</span>` : "",
-        samples
-          ? `<span>Samples</span><span>${samples.toLocaleString()}</span>`
-          : "",
+        d.kingdom ? `<span>Kingdom</span><span>${d.kingdom}</span>` : "",
+        d.phylum ? `<span>Phylum</span><span>${d.phylum}</span>` : "",
+        d._class ? `<span>Class</span><span>${d._class}</span>` : "",
+        `<span>Samples</span><span>${getSamples(d).toLocaleString()}</span>`,
         `</div>`,
       ]
         .filter(Boolean)

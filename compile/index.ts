@@ -58,8 +58,7 @@ type ByTaxLevel = {
   kingdom: string;
   phylum: string;
   _class: string;
-  samples: number;
-  codes: string[];
+  samples: { [key: string]: number };
 }[];
 
 type ByGeo = {
@@ -148,9 +147,7 @@ const getMeta = async (): Promise<LD> => {
 };
 
 /** process taxonomic table data */
-const processTaxonomic = async (
-  runToCode: RunToCode,
-): Promise<{ [key: string]: ByTaxLevel }> => {
+const processTaxonomic = async (): Promise<{ [key: string]: ByTaxLevel }> => {
   /** map of unique phyla */
   const byPhylum: { [key: string]: ByTaxLevel[number] } = {};
   /** map of unique classes */
@@ -181,7 +178,6 @@ const processTaxonomic = async (
       } else {
         /** get props from header row */
         const { kingdom, phylum, _class } = header[colIndex - 2];
-        const [, sample] = row[1].split("_");
 
         /** if taxon present in sample */
         if (cell !== "0") {
@@ -192,13 +188,9 @@ const processTaxonomic = async (
                 kingdom,
                 phylum,
                 _class: "",
-                samples: 0,
-                codes: [],
+                samples: { total: 0 },
               };
-            byPhylum[phylum].samples++;
-            /** include country code from sample meta */
-            if (!byPhylum[phylum].codes.includes(runToCode[sample]))
-              byPhylum[phylum].codes.push(runToCode[sample]);
+            byPhylum[phylum].samples.total++;
             phylumCounted[phylum] = true;
           }
 
@@ -209,13 +201,9 @@ const processTaxonomic = async (
                 kingdom,
                 phylum,
                 _class,
-                samples: 0,
-                codes: [],
+                samples: { total: 0 },
               };
-            byClass[_class].samples++;
-            /** include country code from sample meta */
-            if (!byClass[_class].codes.includes(runToCode[sample]))
-              byClass[_class].codes.push(runToCode[sample]);
+            byClass[_class].samples.total++;
             classCounted[_class] = true;
           }
         }
@@ -226,8 +214,12 @@ const processTaxonomic = async (
   }
 
   return {
-    byPhylum: Object.values(byPhylum).sort((a, b) => b.samples - a.samples),
-    byClass: Object.values(byClass).sort((a, b) => b.samples - a.samples),
+    byPhylum: Object.values(byPhylum).sort(
+      (a, b) => b.samples.total - a.samples.total,
+    ),
+    byClass: Object.values(byClass).sort(
+      (a, b) => b.samples.total - a.samples.total,
+    ),
   };
 };
 
@@ -235,10 +227,7 @@ const processTaxonomic = async (
 const processSample = async (): Promise<{
   byProject: ByProject;
   countries: ByGeo;
-  runToCode: RunToCode;
 }> => {
-  /** map of sample run names to country code */
-  const runToCode: RunToCode = {};
   /** map of unique projects */
   const byProject: { [key: ByProject[number]["project"]]: ByProject[number] } =
     {};
@@ -250,7 +239,7 @@ const processSample = async (): Promise<{
     if (rowIndex++ === 0) continue;
 
     /** project and sample info */
-    const [sample, project, run] = row;
+    const [sample, project] = row;
     if (!byProject[project]) byProject[project] = { project, samples: [] };
     byProject[project].samples.push(sample);
 
@@ -261,15 +250,11 @@ const processSample = async (): Promise<{
     if (!countries[code])
       countries[code] = { region, country, code, samples: 0 };
     countries[code].samples++;
-
-    /** save code for sample run */
-    runToCode[run] = code;
   }
 
   return {
     byProject: Object.values(byProject),
     countries: Object.values(countries),
-    runToCode,
   };
 };
 
@@ -404,11 +389,11 @@ const deriveMetadata = (
   // for (const { contentUrl } of ld.distribution) await download(contentUrl);
 
   console.info("Transform sample metadata");
-  const { byProject, countries, runToCode } = await processSample();
+  const { byProject, countries } = await processSample();
   write("../public/by-project.json", byProject);
 
   console.info("Transforming taxonomic table data");
-  const { byPhylum, byClass } = await processTaxonomic(runToCode);
+  const { byPhylum, byClass } = await processTaxonomic();
   write("../public/by-phylum.json", byPhylum);
   write("../public/by-class.json", byClass);
 
