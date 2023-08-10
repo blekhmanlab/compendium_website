@@ -8,7 +8,7 @@ const Recipes = () => (
     <h2>Recipes</h2>
 
     <p>
-      <a href={import.meta.env.VITE_R_PACKAGE}>
+      <a href={import.meta.env.VITE_R_PACKAGE} target="_blank">
         <DownloadIcon className="inline-svg" />
         Download the R package
       </a>{" "}

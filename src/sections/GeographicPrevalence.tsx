@@ -48,7 +48,10 @@ const GeographicPrevalence = () => {
       {by === "Region" && (
         <span>
           Countries grouped into regions according to{" "}
-          <a href="https://unstats.un.org/sdgs/indicators/regional-groups/">
+          <a
+            href="https://unstats.un.org/sdgs/indicators/regional-groups/"
+            target="_blank"
+          >
             the UN's Sustainable Development Goals
           </a>
         </span>

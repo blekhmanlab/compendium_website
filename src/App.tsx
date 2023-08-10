@@ -1,4 +1,5 @@
 import { loadData } from "@/data";
+import Footer from "@/sections/Footer";
 import GeographicPrevalence from "@/sections/GeographicPrevalence";
 import Header from "@/sections/Header";
 import Overview from "@/sections/Overview";
@@ -19,6 +20,7 @@ const App = () => (
       <TaxonomicPrevalence />
       <GeographicPrevalence />
       <Recipes />
+      <Footer />
     </main>
   </>
 );

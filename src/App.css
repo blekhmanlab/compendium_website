@@ -61,8 +61,7 @@ footer {
   gap: 40px;
 }
 
-header,
-footer {
+header {
   --col: 600px;
 }
 
@@ -70,8 +69,12 @@ section {
   --col: 1200px;
 }
 
+footer {
+  --col: 1200px;
+}
+
 section:nth-child(odd) {
-  background: #8080ff10;
+  background: #8080ff08;
 }
 
 h1,
@@ -98,6 +101,7 @@ h3 {
   font-weight: 400;
   font-size: 1.1rem;
   text-align: center;
+  margin-bottom: 1em;
 }
 
 b,
@@ -114,8 +118,11 @@ code {
 }
 
 p {
-  width: 66%;
   text-align: justify;
+}
+
+section > p {
+  width: 66%;
 }
 
 a {
