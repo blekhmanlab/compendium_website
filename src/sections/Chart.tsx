@@ -9,7 +9,7 @@ import { useViewBox } from "@/util/hooks";
 /** show prevalence of samples at certain taxonomic level as bar chart */
 
 type Props = {
-  id: string;
+  id?: string;
   data: Data["byClass"] | Data["byPhylum"];
   datumKey:
     | keyof NonNullable<Data["byClass"]>[number]
