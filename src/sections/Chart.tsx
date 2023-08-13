@@ -2,13 +2,14 @@ import { useEffect } from "react";
 import * as d3 from "d3";
 import { startCase } from "lodash";
 import Placeholder from "@/components/Placeholder";
-import { Data, useData } from "@/data";
+import { ByTaxLevel, Data, useData } from "@/data";
 import { getColor } from "@/util/colors";
-import { useId, useViewBox } from "@/util/hooks";
+import { useViewBox } from "@/util/hooks";
 
 /** show prevalence of samples at certain taxonomic level as bar chart */
 
 type Props = {
+  id: string;
   data: Data["byClass"] | Data["byPhylum"];
   datumKey:
     | keyof NonNullable<Data["byClass"]>[number]
@@ -16,35 +17,43 @@ type Props = {
 };
 
 /** svg dimensions */
-const width = 400;
-const bandHeight = width / 15;
+const width = 350;
+const bandHeight = width / 10;
 const height = (rows: number) => bandHeight * (rows || 10);
 
-const Chart = ({ data, datumKey }: Props) => {
+const Chart = ({ id = "chart", data, datumKey }: Props) => {
   /** get global state */
   const selectedFeature = useData((state) => state.selectedFeature);
 
   /** unique id */
-  const id = useId();
+  // const id = CSS.escape(useId());
   /** infer title from key we're accessing on datum */
-  const title = startCase(datumKey);
+  const title = "By " + startCase(datumKey);
+  /** which sample count to use */
+  const sampleKey = (selectedFeature?.code ||
+    selectedFeature?.region ||
+    "total") as keyof ByTaxLevel[number]["samples"];
 
   /** filtered data */
-  const filtered = data?.slice(0, 20);
+  const filtered = data
+    ?.sort((a, b) => {
+      return (b.samples[sampleKey] || 0) - (a.samples[sampleKey] || 0);
+    })
+    .slice(0, 20);
 
   const [svg, fit] = useViewBox(20);
 
   /** rerun d3 code when props change */
   useEffect(() => {
-    chart(id, filtered, datumKey, selectedFeature);
+    chart(id, filtered, datumKey, sampleKey);
     fit();
-  }, [id, filtered, datumKey, selectedFeature, fit]);
+  }, [id, filtered, datumKey, sampleKey, fit]);
 
   if (!filtered) return <Placeholder>Loading "{title}" table</Placeholder>;
 
   return (
     <svg ref={svg} id={id}>
-      <text className="title" x={width / 2} y={-20} textAnchor="middle">
+      <text className="title" x={width / 2} y={-50} textAnchor="middle">
         {title}
       </text>
       <g className="bars"></g>
@@ -53,7 +62,7 @@ const Chart = ({ data, datumKey }: Props) => {
       <text
         className="axis-title"
         x={width / 2}
-        y={height(filtered?.length || 0) + 60}
+        y={height(filtered?.length || 0) + 80}
         textAnchor="middle"
       >
         # of samples
@@ -69,17 +78,14 @@ const chart = (
   id: string,
   data: Props["data"],
   datumKey: Props["datumKey"],
-  selectedFeature: Data["selectedFeature"],
+  sampleKey: keyof ByTaxLevel[number]["samples"],
 ) => {
   if (!data) return;
 
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
 
   /** get appropriate sample count */
-  const getSamples = (d: (typeof data)[number]) =>
-    selectedFeature
-      ? d.samples[selectedFeature.code as "US"] || 0.00001
-      : d.samples.total;
+  const getSamples = (d: (typeof data)[number]) => d.samples[sampleKey] || 0;
 
   /** get range of sample counts */
   const [xMin = 0, xMax = 100] = d3.extent(data, getSamples);

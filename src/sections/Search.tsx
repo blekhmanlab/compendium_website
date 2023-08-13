@@ -1,6 +1,17 @@
 import Tabs from "@/components/Tabs";
 import SearchBox from "@/sections/SearchBox";
 
+export const tooltips = {
+  project:
+    "Collection of multiple samples, by <a href='https://www.ncbi.nlm.nih.gov/bioproject/' target='_blank'>BioProject</a> accession.",
+  sample:
+    "Individual sample, by <a href='https://www.ncbi.nlm.nih.gov/sra' target='_blank'>SRA</a> run accession.",
+  country:
+    "Geographic origin of samples, based on <a href='https://www.naturalearthdata.com/' target='_blank'>Natural Earth</a> country data.",
+  region:
+    "Geographic origin of samples, grouped into regions according to <a href='https://unstats.un.org/sdgs/indicators/regional-groups/' target='_blank'>the UN's Sustainable Development Goals</a>.",
+};
+
 const Search = () => (
   <section>
     <h2>Search</h2>
@@ -10,25 +21,14 @@ const Search = () => (
         {
           name: "Metadata",
           description: (
-            <p>
+            <>
               Search for a{" "}
-              <span data-tooltip="Collection of multiple samples, by <a href='https://www.ncbi.nlm.nih.gov/bioproject/' target='_blank'>BioProject</a> accession.">
-                project
-              </span>
-              ,{" "}
-              <span data-tooltip="Individual sample, by <a href='https://www.ncbi.nlm.nih.gov/sra' target='_blank'>SRA</a> run accession.">
-                sample
-              </span>
-              ,{" "}
-              <span data-tooltip="Geographic origin of samples, based on <a href='https://www.naturalearthdata.com/' target='_blank'>Natural Earth</a> country data.">
-                country
-              </span>
-              , or{" "}
-              <span data-tooltip="Geographic origin of samples, grouped into regions according to <a href='https://unstats.un.org/sdgs/indicators/regional-groups/' target='_blank'>the UN's Sustainable Development Goals</a>.">
-                region
-              </span>{" "}
-              in the dataset.
-            </p>
+              <span data-tooltip={tooltips["project"]}>project</span>,{" "}
+              <span data-tooltip={tooltips["sample"]}>sample</span>,{" "}
+              <span data-tooltip={tooltips["region"]}>region</span>, or{" "}
+              <span data-tooltip={tooltips["country"]}>country</span> in the
+              dataset.
+            </>
           ),
           content: (
             <SearchBox filters={["Project", "Sample", "Country", "Region"]} />
@@ -36,7 +36,7 @@ const Search = () => (
         },
         {
           name: "Taxa",
-          description: <p>Search for a phylum or class in the dataset.</p>,
+          description: <>Search for a phylum or class in the dataset.</>,
           content: <SearchBox filters={["Phylum", "Class"]} />,
         },
       ]}

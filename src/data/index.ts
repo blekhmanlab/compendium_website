@@ -32,7 +32,11 @@ export type Data = {
   byRegion?: ByMap;
   byCountry?: ByMap;
   searchList?: ReturnType<typeof compileSearchList>;
-  selectedFeature?: { region: string; country: string; code: string };
+  selectedFeature?: {
+    region: string;
+    country: string;
+    code: string;
+  };
 };
 
 export const useData = create<Data>(() => ({}));

@@ -42,11 +42,11 @@ const Footer = () => (
         </a>
         <br />
         <a href="link" target="_blank">
-          Processing scripts
+          R Package
         </a>
         <br />
         <a href="link" target="_blank">
-          R Package
+          Scripts
         </a>
       </div>
     </div>

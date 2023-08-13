@@ -5,7 +5,6 @@ import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import { Data, setSelectedFeature, useData } from "@/data";
 import { getCssVariable } from "@/util/dom";
-import { useId } from "@/util/hooks";
 import { clamp } from "@/util/math";
 import classes from "./Map.module.css";
 
@@ -16,14 +15,11 @@ const height = 400;
 const byOptions = ["Country", "Region"];
 type By = (typeof byOptions)[number];
 
-const Map = () => {
+const Map = ({ id = "map" }) => {
   /** get global state */
   const byCountry = useData((state) => state.byCountry);
   const byRegion = useData((state) => state.byRegion);
   const selectedFeature = useData((state) => state.selectedFeature);
-
-  /** unique id */
-  const id = useId();
 
   /** local state */
   const [by, setBy] = useState<By>(byOptions[0]);
@@ -60,22 +56,6 @@ const Map = () => {
         <span className={classes.gradient}></span>
         <span>More Samples</span>
       </div>
-
-      {selectedFeature && (
-        <>Selected: {selectedFeature.country || selectedFeature.region}</>
-      )}
-
-      {by === "Region" && (
-        <span>
-          Countries grouped into regions according to{" "}
-          <a
-            href="https://unstats.un.org/sdgs/indicators/regional-groups/"
-            target="_blank"
-          >
-            the UN's Sustainable Development Goals
-          </a>
-        </span>
-      )}
     </div>
   );
 };
@@ -276,5 +256,7 @@ const chart = (
   });
 
   /** unset selected feature when clicking off map */
-  d3.select(window).on("click", () => setSelectedFeature());
+  d3.select(window).on("click", () => {
+    setSelectedFeature();
+  });
 };

@@ -22,7 +22,7 @@ const Tabs = ({ tabs }: Props) => (
             </Tab>
           ))}
         </Tab.List>
-        <div>{tabs[selectedIndex].description}</div>
+        <p>{tabs[selectedIndex].description}</p>
         <Tab.Panels className={classes.panels}>
           {tabs.map((tab, index) => (
             <Tab.Panel key={index} className="content">

@@ -1,3 +1,4 @@
+/** types for json-ld from zenodo */
 /** view-source:https://doi.org/10.5281/zenodo.8186993 */
 /** https://jvilk.com/MakeTypes/ */
 
