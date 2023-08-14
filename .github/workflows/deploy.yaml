@@ -1,10 +1,9 @@
-name: Compile data and deploy web app
+name: Deploy web app
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   deploy-web-app:
@@ -16,14 +15,6 @@ jobs:
 
       - name: Install packages
         run: yarn install
-
-      - name: Compile data
-        run: yarn compile
-
-      - name: Commit results
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "Update compiled data"
 
       - name: Build app
         run: yarn build

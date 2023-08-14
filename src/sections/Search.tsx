@@ -22,12 +22,12 @@ const Search = () => (
           name: "Metadata",
           description: (
             <>
-              Search for a{" "}
+              Does this dataset have what you're looking for? Search for a{" "}
               <span data-tooltip={tooltips["project"]}>project</span>,{" "}
               <span data-tooltip={tooltips["sample"]}>sample</span>,{" "}
               <span data-tooltip={tooltips["region"]}>region</span>, or{" "}
-              <span data-tooltip={tooltips["country"]}>country</span> in the
-              dataset.
+              <span data-tooltip={tooltips["country"]}>country</span> to see if
+              we have it before you download.
             </>
           ),
           content: (
@@ -36,7 +36,12 @@ const Search = () => (
         },
         {
           name: "Taxa",
-          description: <>Search for a phylum or class in the dataset.</>,
+          description: (
+            <>
+              Search for a phylum or class to see if it is present in the
+              dataset.
+            </>
+          ),
           content: <SearchBox filters={["Phylum", "Class"]} />,
         },
       ]}
