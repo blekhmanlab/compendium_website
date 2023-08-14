@@ -1,9 +1,11 @@
 {
-  "classes": 214,
-  "phyla": 93,
-  "countries": 64,
+  "projects": 482,
+  "samples": 168464,
+  "phyla": 94,
+  "classes": 213,
   "regions": 7,
-  "samples": 170672,
-  "projects": 483,
-  "size": "1.1 GB"
+  "countries": 65,
+  "date": "2023-08-08",
+  "url": "https://doi.org/10.5281/zenodo.8226567",
+  "version": "0.2.0"
 }
