@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-web-app:
+  compile:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,4 +22,6 @@ jobs:
         with:
           commit_message: "Update compiled data"
 
-      - uses: ./.github/workflows/deploy.yaml
+  deploy:
+    needs: compile
+    uses: ./.github/workflows/deploy.yaml
