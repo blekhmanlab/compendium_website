@@ -1,0 +1,11 @@
+.search {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.table :where(th, td):not(:first-child) {
+  width: 100px;
+  text-align: center;
+}

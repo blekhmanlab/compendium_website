@@ -1,0 +1,23 @@
+.graticule {
+  fill: none;
+  stroke: var(--dark-gray);
+  stroke-width: 0.5;
+}
+
+.feature {
+  stroke: var(--black);
+  stroke-width: 0.5;
+  cursor: pointer;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gradient {
+  width: 100px;
+  height: 10px;
+  background: linear-gradient(to right, var(--gray), var(--primary));
+}

@@ -5,6 +5,7 @@ import "tippy.js/dist/tippy.css";
 const options: Partial<Props> = {
   delay: [50, 0],
   duration: [100, 100],
+  offset: [15, 15],
   allowHTML: true,
   appendTo: document.body,
   // onHide: () => false,

@@ -1,0 +1,11 @@
+.buttons {
+  display: inline-flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.buttons a {
+  justify-content: flex-start;
+  text-align: left;
+}

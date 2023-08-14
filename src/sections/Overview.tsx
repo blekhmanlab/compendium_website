@@ -1,11 +1,12 @@
 import { ReactComponent as ClassesIcon } from "@/assets/bars.svg";
 import { ReactComponent as SizeIcon } from "@/assets/database.svg";
 import { ReactComponent as CountriesIcon } from "@/assets/earth.svg";
-import { ReactComponent as SamplesIcon } from "@/assets/pipette.svg";
+import { ReactComponent as SamplesIcon } from "@/assets/microscope.svg";
 import { useData } from "@/data";
 import classes from "./Overview.module.css";
 
 const Overview = () => {
+  /** get global state */
   const metadata = useData((state) => state.metadata);
 
   /** round down to nearest large amount */
@@ -34,16 +35,33 @@ const Overview = () => {
     },
     {
       icon: CountriesIcon,
-      text: `${(metadata?.countries || 0).toLocaleString()} countries`,
+      text: (
+        <>
+          {(metadata?.countries || 0).toLocaleString()} countries
+          <br />
+          {(metadata?.regions || 0).toLocaleString()} regions
+        </>
+      ),
     },
     {
       icon: SizeIcon,
-      text: `${metadata?.size || 0} data size`,
+      text: (
+        <>
+          Ver. {metadata?.version}
+          <br />
+          {(new Date(metadata?.date || "") || new Date()).toLocaleString(
+            undefined,
+            { dateStyle: "medium" },
+          )}
+        </>
+      ),
     },
   ];
 
   return (
-    <>
+    <section>
+      <h2>Overview</h2>
+
       <p>
         Our dataset includes over {samplesRound.toLocaleString()} samples of
         publicly available 16S rRNA amplicon sequencing data, all processed
@@ -54,17 +72,17 @@ const Overview = () => {
         {tiles.map(({ icon, text }, index) => {
           /** icon color */
           const percent = (index / (tiles.length - 1)) * 100;
-          const color = `color-mix(in hsl, var(--primary), ${percent}% var(--secondary))`;
+          const color = `color-mix(in hsl, var(--primary-light), ${percent}% var(--secondary-light))`;
 
           return (
             <div key={index} className={classes.tile}>
               {icon({ style: { color } })}
-              <p>{text}</p>
+              <span>{text}</span>
             </div>
           );
         })}
       </div>
-    </>
+    </section>
   );
 };
 

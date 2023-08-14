@@ -1,0 +1,27 @@
+name: Compile data
+
+on:
+  workflow_dispatch:
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install packages
+        run: yarn install
+
+      - name: Compile data
+        run: yarn compile
+
+      - name: Commit results
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update compiled data"
+
+  deploy:
+    needs: compile
+    uses: ./.github/workflows/deploy.yaml

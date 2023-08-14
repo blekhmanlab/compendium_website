@@ -2,9 +2,6 @@
   display: flex;
   z-index: 0;
   position: relative;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   padding-top: 100px;
   padding-bottom: 100px;
   overflow: hidden;
@@ -34,9 +31,10 @@
 }
 
 .subtitle {
+  text-wrap: balance;
   color: var(--off-white);
   font-weight: 200;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   text-align: center;
 }
 

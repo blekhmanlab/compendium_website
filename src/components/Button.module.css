@@ -10,16 +10,29 @@
   color: inherit;
   font: inherit;
   line-height: var(--compact);
+  text-align: center;
   text-decoration: none;
-  white-space: nowrap;
   cursor: pointer;
   transition:
     background var(--fast),
     color var(--fast);
 }
 
+.button[aria-selected] {
+  border-radius: 999px;
+}
+
+.button[aria-selected="false"] {
+  background: none;
+}
+
+.button[aria-selected="true"] {
+  background: var(--gray);
+}
+
 .button:hover {
   background: var(--gray);
+  color: inherit;
 }
 
 .button[data-design="big"] {
@@ -27,6 +40,7 @@
   padding: 10px 20px;
   background: none;
   color: var(--off-white);
+  white-space: nowrap;
 }
 
 .button[data-design="big"]:hover {
@@ -78,4 +92,24 @@
   flex-shrink: 0;
   height: 1em;
   transition: transform var(--fast);
+}
+
+.button[data-design="big"]:hover .icon {
+  stroke: currentColor;
+  stroke-width: 20;
+  stroke-dasharray: 100;
+  animation: draw 1s both;
+}
+
+@keyframes draw {
+  0% {
+    stroke-opacity: 1;
+    fill-opacity: 0;
+    stroke-dashoffset: 300;
+  }
+  100% {
+    stroke-opacity: 0;
+    fill-opacity: 1;
+    stroke-dashoffset: 0;
+  }
 }

@@ -11,16 +11,16 @@ export const useViewBox = (padding = 0): [Ref<SVGSVGElement>, () => void] => {
     if (!svg.current) return;
 
     /** get bbox of content in svg */
-    const { x, y, width, height } = svg.current.getBBox();
+    let { x, y, width, height } = svg.current.getBBox();
+
+    /** incorporate padding */
+    x -= padding;
+    y -= padding;
+    width += padding * 2;
+    height += padding * 2;
+
     /** set view box to bbox, essentially fitting view to content */
-    const viewBox = [
-      x - padding,
-      y - padding,
-      width + padding * 2,
-      height + padding * 2,
-    ]
-      .map((v) => Math.round(v))
-      .join(" ");
+    const viewBox = [x, y, width, height].map(Math.round).join(" ");
 
     svg.current.setAttribute("viewBox", viewBox);
   }, [padding]);

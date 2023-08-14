@@ -1,5 +1,9 @@
 {
-  "plugins": ["prettier-plugin-jsdoc", "@ianvs/prettier-plugin-sort-imports"],
+  "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
+    "./node_modules/prettier-plugin-jsdoc/dist/index.js",
+    "prettier-plugin-css-order"
+  ],
   "importOrder": ["^react", "^[a-zA-Z]", "^@[a-zA-Z]", "^@/", "^./"],
   "order": "smacss",
   "jsdocCapitalizeDescription": false,

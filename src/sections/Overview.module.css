@@ -20,12 +20,9 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  text-align: center;
 }
 
 .tile svg {
   height: 1.5em;
-}
-
-.tile p {
-  text-align: center;
 }
