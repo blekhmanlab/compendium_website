@@ -20,6 +20,11 @@ jobs:
       - name: Compile data
         run: yarn compile
 
+      - name: Commit results
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update compiled data"
+
       - name: Build app
         run: yarn build
 

@@ -136,9 +136,14 @@ const compileSearchList = (
   return list;
 };
 
-/** select country code */
+/** select feature (country or region) */
 export const setSelectedFeature = (feature?: {
   region: string;
   country: string;
   code: string;
-}) => useData.setState({ selectedFeature: feature });
+}) =>
+  useData.setState({
+    selectedFeature:
+      /** if feature already selected, deselect */
+      useData.getState().selectedFeature === feature ? undefined : feature,
+  });
