@@ -1,7 +1,7 @@
 import { ReactComponent as ClassesIcon } from "@/assets/bars.svg";
 import { ReactComponent as SizeIcon } from "@/assets/database.svg";
 import { ReactComponent as CountriesIcon } from "@/assets/earth.svg";
-import { ReactComponent as SamplesIcon } from "@/assets/pipette.svg";
+import { ReactComponent as SamplesIcon } from "@/assets/microscope.svg";
 import { useData } from "@/data";
 import classes from "./Overview.module.css";
 
@@ -47,9 +47,12 @@ const Overview = () => {
       icon: SizeIcon,
       text: (
         <>
-          v{metadata?.version}
+          Ver. {metadata?.version}
           <br />
-          {metadata?.date}
+          {(new Date(metadata?.date || "") || new Date()).toLocaleString(
+            undefined,
+            { dateStyle: "medium" },
+          )}
         </>
       ),
     },

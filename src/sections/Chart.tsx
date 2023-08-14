@@ -65,7 +65,7 @@ const Chart = ({ id = "chart", data, datumKey }: Props) => {
         y={height(filtered?.length || 0) + 80}
         textAnchor="middle"
       >
-        # of samples
+        number of samples
       </text>
     </svg>
   );
@@ -88,13 +88,15 @@ const chart = (
   const getSamples = (d: (typeof data)[number]) => d.samples[sampleKey] || 0;
 
   /** get range of sample counts */
-  const [xMin = 0, xMax = 100] = d3.extent(data, getSamples);
+  let [xMin = 0, xMax = 100] = d3.extent(data, getSamples);
+
+  /** limit x scale */
+  xMin *= 0.9;
+  if (xMin < 0.1) xMin = 0.1;
+  if (xMax < 100) xMax = 100;
 
   /** create x scale computer */
-  const xScale = d3
-    .scaleLog()
-    .domain([Math.max(xMin * 0.9, 0.1), xMax])
-    .range([0, width]);
+  const xScale = d3.scaleLog().domain([xMin, xMax]).range([0, width]);
 
   /** create y scale computer */
   const yScale = d3
@@ -133,7 +135,7 @@ const chart = (
     .attr("class", "bar")
     .attr("x", 0)
     .attr("y", (d) => yScale(d.kingdom + d.phylum + d._class) || 0)
-    .attr("width", (d) => xScale(getSamples(d)))
+    .attr("width", (d) => xScale(getSamples(d)) || 0)
     .attr("height", () => yScale.bandwidth())
     .attr("fill", (d) => getColor(d.phylum))
     .attr("data-tooltip", (d) =>

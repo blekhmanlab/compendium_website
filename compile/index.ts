@@ -287,7 +287,7 @@ console.info("Getting data download links and meta");
 const ld = await getLd(ldUrl);
 
 console.info("Downloading raw data");
-// for (const { contentUrl } of ld.distribution) await download(contentUrl);
+for (const { contentUrl } of ld.distribution) await download(contentUrl);
 
 console.info("Getting and cleaning world map data");
 const worldMap = await processNaturalEarth();

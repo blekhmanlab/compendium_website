@@ -54,6 +54,7 @@ body {
 header,
 section,
 footer {
+  --col: 1200px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -61,16 +62,7 @@ footer {
   gap: 40px;
 }
 
-header {
-  --col: 600px;
-}
-
-section {
-  --col: 1200px;
-}
-
 footer {
-  --col: 1200px;
   background: #8080ff08;
 }
 
@@ -120,13 +112,8 @@ code {
 
 p {
   text-wrap: balance;
+  max-width: 800px;
   text-align: center;
-}
-
-@media (min-width: 1000px) {
-  p {
-    width: 66%;
-  }
 }
 
 a {
