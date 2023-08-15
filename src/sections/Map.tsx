@@ -285,7 +285,7 @@ const chart = (
   svg.call(drag);
 
   /** zoom handler */
-  svg.on("wheel", (event: WheelEvent) => moveView(event));
+  svg.on("wheel", (event: WheelEvent) => moveView(event), { passive: true });
 
   /** double click handler */
   svg.on("dblclick.zoom", () => {

@@ -1,16 +1,11 @@
 :root {
-  /* https://tailwindcolor.com/ */
+  /* https://tailwindcss.com/docs/customizing-colors */
   /* https://www.materialpalette.com/colors */
 
-  /* 900 */
   --black: #101829;
-  /* 700 */
   --dark-gray: #354153;
-  /** 500 */
   --gray: #687386;
-  /** 400 */
   --light-gray: #94a3b8;
-  /** 200 */
   --white: #e4e8ee;
 
   --primary: #e23fff;
@@ -31,6 +26,7 @@
   src: url("@/assets/MonaSans.woff2") format("woff2");
   font-stretch: 75% 125%;
   font-family: "Mona Sans";
+  font-display: swap;
 }
 
 * {
@@ -129,7 +125,7 @@ code {
   padding: 2px 5px;
   border-radius: var(--rounded);
   background: var(--dark-gray);
-  font-family: "IBM Plex Mono", monospace;
+  font-family: monospace;
 }
 
 li {

@@ -27,7 +27,7 @@
 }
 
 .button[aria-selected="true"] {
-  background: var(--gray);
+  background: var(--dark-gray);
 }
 
 .button:hover {
