@@ -189,6 +189,7 @@ const chart = (
         ? secondary
         : darkGray,
     )
+    .attr("role", "graphics-symbol")
     .attr(
       "data-tooltip",
       ({ properties: { region, country, code, samples } }) =>
@@ -285,7 +286,7 @@ const chart = (
   svg.call(drag);
 
   /** zoom handler */
-  svg.on("wheel", (event: WheelEvent) => moveView(event), { passive: true });
+  svg.on("wheel", (event: WheelEvent) => moveView(event));
 
   /** double click handler */
   svg.on("dblclick.zoom", () => {

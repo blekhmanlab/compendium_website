@@ -147,6 +147,7 @@ const chart = (
     .attr("width", (d) => xScale(getSamples(d)) || 0)
     .attr("height", () => yScale.bandwidth())
     .attr("fill", (d) => getColor(d.phylum))
+    .attr("role", "graphics-symbol")
     .attr("data-tooltip", (d) =>
       [
         `<div class="tooltip-table">`,

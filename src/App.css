@@ -1,4 +1,5 @@
 :root {
+  /** references */
   /* https://tailwindcss.com/docs/customizing-colors */
   /* https://www.materialpalette.com/colors */
 
@@ -39,7 +40,7 @@ html {
   font-weight: 300;
   font-size: 14pt;
   line-height: var(--spacing);
-  font-family: "Mona Sans";
+  font-family: "Mona Sans", sans-serif;
 }
 
 body {
