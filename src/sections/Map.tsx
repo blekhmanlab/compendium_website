@@ -41,8 +41,13 @@ const Map = ({ id = "map" }) => {
         options={byOptions}
       />
 
-      <svg viewBox={[0, 0, width, height].join(" ")} id={id}>
+      <svg
+        viewBox={[0, 0, width, height].join(" ")}
+        id={id}
+        className={classes.svg}
+      >
         <g className="map-container">
+          <g className="outline"></g>
           <g className="graticules"></g>
           <g className="features"></g>
         </g>
@@ -83,6 +88,12 @@ const fitProjection = () =>
   });
 fitProjection();
 
+/** get mouse position in projection coordinates */
+const getMouse = (event: WheelEvent) => {
+  const [x = 0, y = 0] = projection.invert?.(d3.pointer(event)) || [];
+  return { x, y: -y };
+};
+
 /** get scale when projection fit to earth bbox */
 const baseScale = projection.scale();
 
@@ -99,6 +110,15 @@ const chart = (
   if (!data) return;
 
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
+
+  /** draw projection outline */
+  svg
+    .select(".outline")
+    .selectAll("." + classes.outline)
+    .data([graticules])
+    .join("path")
+    .attr("class", classes.outline)
+    .attr("d", () => path({ type: "Sphere" }));
 
   /** draw graticules */
   svg
@@ -188,40 +208,71 @@ const chart = (
   };
 
   type DragEvent = d3.D3DragEvent<Element, Data, unknown>;
-  type ZoomEvent = d3.D3ZoomEvent<SVGSVGElement, Data>;
 
   /** move map view pan and zoom */
-  const moveView = (event?: DragEvent | ZoomEvent) => {
+  const moveView = (event?: DragEvent | WheelEvent) => {
     /** get current projection components */
     let [x, y] = projection.center();
     let scale = projection.scale();
     let [lambda, phi] = projection.rotate();
 
-    /** update components based on transform */
+    /** update components based on event/transform */
     if (event) {
-      /** zoom event */
-      if ("transform" in event) {
-        /** get mouse position in geo coordinates */
-        // projection.invert?.(d3.pointer(event)) || [];
-        scale = event.transform.k;
+      if ("deltaY" in event) {
+        /** zoom event */
+
+        /** prevent page scroll */
+        event.preventDefault();
+        /** set new zoom */
+        scale = event.deltaY < 0 ? scale * 1.1 : scale / 1.1;
+        /** limit zoom */
+        scale = clamp(scale, baseScale, baseScale * 10);
+
+        /** original coords of mouse */
+        const oldMouse = getMouse(event);
+
+        /** apply zoom */
+        projection.scale(scale);
+
+        /**
+         * iteratively pan map under mouse such that new mouse coords approach
+         * original
+         */
+        for (let iterations = 0; iterations < 3; iterations++) {
+          /** new coords of mouse */
+          const newMouse = getMouse(event);
+
+          /** set new pan */
+          lambda += newMouse.x - oldMouse.x;
+          y += newMouse.y - oldMouse.y;
+
+          /** update pan */
+          projection.rotate([lambda, phi]);
+          projection.center([x, y]);
+        }
       } else {
         /** drag event */
+
+        /** set new pan */
         lambda += (baseScale / 2) * (event.dx / scale);
         y += (baseScale / 2) * (event.dy / scale);
       }
     }
 
-    /** limit projection */
-    const angleLimit = 90 - 90 * (baseScale / scale);
+    /** limit pan */
+    const angleLimit = 90 - 90 * Math.pow(baseScale / scale, 0.8);
     y = clamp(y, -angleLimit, angleLimit);
-    projection.center([x, y]);
+    if (lambda < -180) lambda += 360;
+    if (lambda > 180) lambda -= 360;
 
-    /** update projection */
-    projection.scale(scale);
+    /** apply pan */
     projection.rotate([lambda, phi]);
     projection.center([x, y]);
 
     /** update paths based on projection */
+    svg
+      .selectAll<Element, Feature>("." + classes.outline)
+      .attr("d", () => path({ type: "Sphere" }));
     svg.selectAll<Element, Feature>("." + classes.graticule).attr("d", path);
     svg.selectAll<Element, Feature>("." + classes.feature).attr("d", path);
   };
@@ -233,21 +284,10 @@ const chart = (
   svg.call(drag);
 
   /** zoom handler */
-  const zoom = d3
-    .zoom<SVGSVGElement, unknown>()
-    .scaleExtent([baseScale, baseScale * 10])
-    .on("zoom", moveView);
-
-  /** connect zoom handler to svg */
-  svg
-    .call(zoom)
-    /** always prevent scroll on wheel, not just when under scale limit */
-    .on("wheel", (event) => event.preventDefault());
+  svg.on("wheel", (event: WheelEvent) => moveView(event));
 
   /** double click handler */
   svg.on("dblclick.zoom", () => {
-    /** reset zoom handler */
-    zoom.transform(svg, d3.zoomIdentity);
     resetView();
     moveView();
   });

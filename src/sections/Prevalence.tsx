@@ -9,8 +9,6 @@ const Prevalence = () => {
   const byPhylum = useData((state) => state.byPhylum);
   const selectedFeature = useData((state) => state.selectedFeature);
 
-  console.log(byPhylum?.map((p) => p.phylum));
-
   return (
     <section>
       <h2>Prevalence</h2>
@@ -18,8 +16,8 @@ const Prevalence = () => {
       {!selectedFeature && (
         <p>
           Select a <span data-tooltip={tooltips["country"]}>country</span> or{" "}
-          <span data-tooltip={tooltips["region"]}>region</span> to filter by #
-          of samples.
+          <span data-tooltip={tooltips["region"]}>region</span> to filter by
+          number of samples.
         </p>
       )}
 

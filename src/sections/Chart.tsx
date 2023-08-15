@@ -74,7 +74,7 @@ const Chart = ({ id = "chart", data, datumKey }: Props) => {
         y={height(filtered?.length || 0) + 80}
         textAnchor="middle"
       >
-        number of samples
+        Number of samples
       </text>
     </svg>
   );

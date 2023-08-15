@@ -1,3 +1,13 @@
+.svg {
+  /* outline: solid 1px var(--gray); */
+}
+
+.outline {
+  fill: none;
+  stroke: var(--gray);
+  stroke-width: 0.5;
+}
+
 .graticule {
   fill: none;
   stroke: var(--dark-gray);

@@ -147,19 +147,7 @@ const processData = async (
     if (sampleDone && taxDone) break;
 
     /** get row cell values */
-    const [
-      sample,
-      project,
-      run,
-      libraryStrategy,
-      librarySource,
-      pubdate,
-      totalBases,
-      instrument,
-      geoLoc,
-      code,
-      region,
-    ] = sampleRow;
+    const [sample, project, , , , , , , , code, region] = sampleRow;
     // const country = _.startCase(geoLoc.split(":").shift());
 
     /** count country */
