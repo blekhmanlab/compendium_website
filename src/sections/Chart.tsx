@@ -5,6 +5,7 @@ import Placeholder from "@/components/Placeholder";
 import { ByTaxLevel, Data, useData } from "@/data";
 import { getColor } from "@/util/colors";
 import { useViewBox } from "@/util/hooks";
+import classes from "./Chart.module.css";
 
 /** show prevalence of samples at certain taxonomic level as bar chart */
 
@@ -21,12 +22,13 @@ const width = 350;
 const bandHeight = width / 10;
 const height = (rows: number) => bandHeight * (rows || 10);
 
+/** flag to only fit svg viewbox once */
+let fitted = false;
+
 const Chart = ({ id = "chart", data, datumKey }: Props) => {
   /** get global state */
   const selectedFeature = useData((state) => state.selectedFeature);
 
-  /** unique id */
-  // const id = CSS.escape(useId());
   /** infer title from key we're accessing on datum */
   const title = "By " + startCase(datumKey);
   /** which sample count to use */
@@ -46,13 +48,20 @@ const Chart = ({ id = "chart", data, datumKey }: Props) => {
   /** rerun d3 code when props change */
   useEffect(() => {
     chart(id, filtered, datumKey, sampleKey);
-    fit();
-  }, [id, filtered, datumKey, sampleKey, fit]);
+  }, [id, filtered, datumKey, sampleKey]);
+
+  /** fit on first mount */
+  useEffect(() => {
+    if (filtered?.length && !fitted) {
+      fit();
+      fitted = true;
+    }
+  }, [filtered, fit]);
 
   if (!filtered) return <Placeholder>Loading "{title}" table</Placeholder>;
 
   return (
-    <svg ref={svg} id={id}>
+    <svg ref={svg} id={id} className={classes.chart}>
       <text className="title" x={width / 2} y={-50} textAnchor="middle">
         {title}
       </text>

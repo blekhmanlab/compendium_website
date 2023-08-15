@@ -27,18 +27,17 @@ type ByTaxLevel = {
   samples: { [key: string]: number };
 }[];
 
-type Countries = {
-  [key: string]: {
+type WorldMap = FeatureCollection<Geometry, { [key: string]: string | number }>;
+
+type ByGeo = FeatureCollection<
+  Geometry,
+  {
     region: string;
     country: string;
     code: string;
     samples: number;
-  };
-};
-
-type Features = FeatureCollection<Geometry, { [key: string]: string | number }>;
-
-type ByMap = FeatureCollection<Geometry, ByGeo[number]>;
+  }
+>;
 
 type ByProject = {
   project: string;

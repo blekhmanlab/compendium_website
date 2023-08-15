@@ -42,13 +42,10 @@ const Map = ({ id = "map" }) => {
       />
 
       <svg viewBox={[0, 0, width, height].join(" ")} id={id}>
-        <g className="map-container" clipPath="url(#map-clip)">
+        <g className="map-container">
           <g className="graticules"></g>
           <g className="features"></g>
         </g>
-        <clipPath id="map-clip">
-          <rect x="0" y="0" width={width} height={height} />
-        </clipPath>
       </svg>
 
       <div className={classes.legend}>

@@ -9,6 +9,8 @@ const Prevalence = () => {
   const byPhylum = useData((state) => state.byPhylum);
   const selectedFeature = useData((state) => state.selectedFeature);
 
+  console.log(byPhylum?.map((p) => p.phylum));
+
   return (
     <section>
       <h2>Prevalence</h2>
