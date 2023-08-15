@@ -21,13 +21,13 @@ import { download, getLd, read, stream, throttle, write } from "./util";
 const ldUrl = "https://doi.org/10.5281/zenodo.8186993";
 
 /** raw taxonomic data */
-const taxonomicData = "taxonomic_table.csv";
+const taxonomicFile = "taxonomic_table.csv";
 
 /** raw sample metadata */
-const sampleData = "sample_metadata.tsv";
+const metadataFile = "sample_metadata.tsv";
 
 /** raw natural earth data */
-const naturalEarthData = "natural-earth.json";
+const naturalEarthFile = "natural-earth.json";
 /** https://www.naturalearthdata.com/downloads/110m-cultural-vectors/ */
 /** https://github.com/nvkelso/natural-earth-vector/blob/master/geojson */
 /** https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson */
@@ -38,7 +38,7 @@ chdir(dirname(fileURLToPath(import.meta.url)));
 /** process natural earth world map data */
 const processNaturalEarth = async (): Promise<ByGeo> => {
   /** load natural earth data */
-  const worldMap = read<WorldMap>(naturalEarthData);
+  const worldMap = read<WorldMap>(naturalEarthFile);
 
   /** filter out null property */
   const clean = (value: unknown) => {
@@ -71,13 +71,13 @@ const processNaturalEarth = async (): Promise<ByGeo> => {
 
 /** process main data */
 const processData = async (
-  taxonomicData: string,
-  sampleData: string,
+  taxonomicFile: string,
+  metadataFile: string,
   worldMap: ByGeo,
 ) => {
   /** stream files line by line */
-  const taxonomicStream = stream(taxonomicData);
-  const sampleStream = stream(sampleData);
+  const taxonomicStream = stream(taxonomicFile);
+  const metadataStream = stream(metadataFile);
 
   /** map of unique projects */
   const byProject: { [key: ByProject[number]["project"]]: ByProject[number] } =
@@ -120,7 +120,7 @@ const processData = async (
   /** get first/header row of files */
   const [{ value: taxonomicHeaderRaw = [] }] = await Promise.all([
     taxonomicStream.next(),
-    sampleStream.next(),
+    metadataStream.next(),
   ]);
 
   /** process headers */
@@ -139,15 +139,15 @@ const processData = async (
 
     /** read current row from files */
     const [
-      { value: taxonomicRow = [], done: taxDone },
-      { value: sampleRow = [], done: sampleDone },
-    ] = await Promise.all([taxonomicStream.next(), sampleStream.next()]);
+      { value: taxonomicRow = [], done: taxonomicDone },
+      { value: metadataRow = [], done: metadataDone },
+    ] = await Promise.all([taxonomicStream.next(), metadataStream.next()]);
 
     /** if no more data, exit */
-    if (sampleDone && taxDone) break;
+    if (taxonomicDone && metadataDone) break;
 
-    /** get row cell values */
-    const [sample, project, , , , , , , , code, region] = sampleRow;
+    /** get sample metadata cols */
+    const [sample, project, , , , , , , , code, region] = metadataRow;
     // const country = _.startCase(geoLoc.split(":").shift());
 
     /** count country */
@@ -163,7 +163,7 @@ const processData = async (
     const phylumCounted: { [key: string]: boolean } = {};
     const classCounted: { [key: string]: boolean } = {};
 
-    /** loop through taxonomic columns */
+    /** loop through taxonomic table columns */
     for (let col = 2; col < taxonomicRow.length; col++) {
       const cell = taxonomicRow[col];
 
@@ -228,8 +228,8 @@ const deriveMetadata = (
     (total, { samples }) => total + samples.length,
     0,
   );
-  const phyla = byPhylum.filter((tax) => tax.samples).length;
-  const classes = byClass.filter((tax) => tax.samples).length;
+  const phyla = byPhylum.filter((taxon) => taxon.samples).length;
+  const classes = byClass.filter((taxon) => taxon.samples).length;
   const regions = byRegion.features.filter(
     (feature) => feature.properties.samples,
   ).length;
@@ -265,8 +265,8 @@ const worldMap = await processNaturalEarth();
 
 console.info("Processing data");
 const { byProject, byPhylum, byClass, byCountry, byRegion } = await processData(
-  taxonomicData,
-  sampleData,
+  taxonomicFile,
+  metadataFile,
   worldMap,
 );
 write("../public/by-project.json", byProject);

@@ -70,7 +70,7 @@ export default Map;
 const projection = d3.geoNaturalEarth1();
 
 /** fit projection to bbox of earth */
-const fitProjection = () =>
+const fit = () =>
   projection.fitSize([width, height], {
     type: "Feature",
     properties: {},
@@ -86,16 +86,24 @@ const fitProjection = () =>
       ],
     },
   });
-fitProjection();
+fit();
+
+/** get scale when projection fit to earth bbox */
+const baseScale = projection.scale();
+
+/** reset projection */
+const reset = () => {
+  projection.center([0, 0]);
+  projection.rotate([0, 0]);
+  projection.scale(baseScale);
+};
+reset();
 
 /** get mouse position in projection coordinates */
 const getMouse = (event: WheelEvent) => {
   const [x = 0, y = 0] = projection.invert?.(d3.pointer(event)) || [];
   return { x, y: -y };
 };
-
-/** get scale when projection fit to earth bbox */
-const baseScale = projection.scale();
 
 /** path calculator for projection */
 const path = d3.geoPath().projection(projection);
@@ -200,13 +208,6 @@ const chart = (
     .on("keydown", selectFeature)
     .on("click", selectFeature);
 
-  /** reset map view */
-  const resetView = () => {
-    projection.center([0, 0]);
-    projection.rotate([0, 0]);
-    fitProjection();
-  };
-
   type DragEvent = d3.D3DragEvent<Element, Data, unknown>;
 
   /** move map view pan and zoom */
@@ -288,7 +289,7 @@ const chart = (
 
   /** double click handler */
   svg.on("dblclick.zoom", () => {
-    resetView();
+    reset();
     moveView();
   });
 
