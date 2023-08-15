@@ -262,8 +262,8 @@ const chart = (
     }
 
     /** limit pan */
-    const angleLimit = 90 - 90 * Math.pow(baseScale / scale, 0.8);
-    y = clamp(y, -angleLimit, angleLimit);
+    const yLimit = 0.89 * (90 - 90 * (baseScale / scale));
+    y = clamp(y, -yLimit, yLimit);
     if (lambda < -180) lambda += 360;
     if (lambda > 180) lambda -= 360;
 
