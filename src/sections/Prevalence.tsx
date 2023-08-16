@@ -22,12 +22,12 @@ const Prevalence = () => {
       )}
 
       {selectedFeature && (
-        <>Selected: {selectedFeature.country || selectedFeature.region}</>
+        <p>Selected: {selectedFeature.country || selectedFeature.region}</p>
       )}
 
       <div className={classes.cols}>
-        <Chart data={byPhylum} datumKey="phylum" />
         <Map />
+        <Chart data={byPhylum} datumKey="phylum" />
       </div>
     </section>
   );

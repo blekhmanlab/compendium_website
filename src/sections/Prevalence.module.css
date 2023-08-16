@@ -1,6 +1,6 @@
 .cols {
   display: grid;
-  grid-template-columns: 0.95fr 2fr;
+  grid-template-columns: 2fr 0.95fr;
   width: 100%;
   gap: 40px;
 }
