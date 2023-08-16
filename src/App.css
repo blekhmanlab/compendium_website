@@ -59,10 +59,7 @@ footer {
   gap: 40px;
 }
 
-footer {
-  background: #8080ff08;
-}
-
+footer,
 section:nth-child(odd) {
   background: #8080ff08;
 }

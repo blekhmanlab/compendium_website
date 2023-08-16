@@ -30,10 +30,12 @@
   overflow-wrap: anywhere;
 }
 
+.legend > :first-child {
+  text-align: right;
+}
+
 .gradient {
-  flex-grow: 1;
-  min-width: 50px;
-  max-width: 100px;
+  width: 100px;
   height: 10px;
   background: linear-gradient(to right, var(--gray), var(--primary));
 }

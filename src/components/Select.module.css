@@ -4,6 +4,10 @@
   gap: 10px;
 }
 
+.label > :first-child {
+  text-align: right;
+}
+
 .wrapper {
   position: relative;
 }
