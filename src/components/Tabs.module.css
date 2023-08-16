@@ -8,8 +8,3 @@
 .panels {
   width: 100%;
 }
-
-.panels p {
-  text-wrap: balance;
-  text-align: center;
-}
