@@ -4,9 +4,18 @@
   gap: 10px;
 }
 
+.label > :first-child {
+  text-align: right;
+}
+
+.wrapper {
+  position: relative;
+}
+
 .select {
+  appearance: none;
   height: 40px;
-  padding: 0 10px;
+  padding: 0 35px 0 10px;
   border: none;
   border-radius: var(--rounded);
   background: var(--dark-gray);
@@ -14,6 +23,14 @@
   font: inherit;
   cursor: pointer;
   transition: background var(--fast);
+}
+
+.wrapper svg {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .select:hover {

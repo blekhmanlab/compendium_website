@@ -105,7 +105,7 @@ const Search = ({ filters }: Props) => {
               matches
                 .slice(0, limit)
                 .map(({ name, type, samples, fuzzy }, index) => (
-                  <tr key={index} style={{ opacity: fuzzy ? 0.75 : 1 }}>
+                  <tr key={index} style={{ opacity: fuzzy ? 0.5 : 1 }}>
                     <td>{name}</td>
                     <td>{type}</td>
                     <td>{samples.toLocaleString()}</td>

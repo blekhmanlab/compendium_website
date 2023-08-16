@@ -1,16 +1,12 @@
 :root {
-  /* https://tailwindcolor.com/ */
+  /** references */
+  /* https://tailwindcss.com/docs/customizing-colors */
   /* https://www.materialpalette.com/colors */
 
-  /* 900 */
   --black: #101829;
-  /* 700 */
   --dark-gray: #354153;
-  /** 500 */
   --gray: #687386;
-  /** 400 */
   --light-gray: #94a3b8;
-  /** 200 */
   --white: #e4e8ee;
 
   --primary: #e23fff;
@@ -22,8 +18,8 @@
   --fast: 0.25s ease;
   --shadow: 0 0 10px #00000020;
 
-  --spacing: 2em;
-  --compact: 1.5em;
+  --xl-spacing: 2em;
+  --spacing: 1.5em;
 }
 
 @font-face {
@@ -31,6 +27,7 @@
   src: url("@/assets/MonaSans.woff2") format("woff2");
   font-stretch: 75% 125%;
   font-family: "Mona Sans";
+  font-display: swap;
 }
 
 * {
@@ -43,7 +40,7 @@ html {
   font-weight: 300;
   font-size: 14pt;
   line-height: var(--spacing);
-  font-family: "Mona Sans";
+  font-family: "Mona Sans", sans-serif;
 }
 
 body {
@@ -62,19 +59,23 @@ footer {
   gap: 40px;
 }
 
-footer {
+footer,
+section:nth-child(odd) {
   background: #8080ff08;
 }
 
-section:nth-child(odd) {
-  background: #8080ff08;
+.sub-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
 }
 
 h1,
 h2,
 h3 {
   margin: 0;
-  line-height: var(--compact);
 }
 
 h1 {
@@ -104,15 +105,15 @@ strong {
 
 p,
 ul,
-ol,
-code {
+ol {
   width: 100%;
   margin: 0;
+  line-height: var(--xl-spacing);
 }
 
 p {
   text-wrap: balance;
-  max-width: 800px;
+  max-width: 720px;
   text-align: center;
 }
 
@@ -129,7 +130,7 @@ code {
   padding: 2px 5px;
   border-radius: var(--rounded);
   background: var(--dark-gray);
-  font-family: "IBM Plex Mono", monospace;
+  font-family: monospace;
 }
 
 li {
@@ -141,14 +142,6 @@ hr {
   height: 2px;
   border: none;
   background: var(--dark-gray);
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  gap: 20px;
 }
 
 .table-wrapper {
@@ -180,12 +173,16 @@ td {
 }
 
 svg .title {
-  font-size: 40px;
+  font-size: 35px;
 }
 
 svg text {
   fill: currentColor;
   font-size: 30px;
+}
+
+svg * {
+  transition: fill var(--fast);
 }
 
 svg [data-tooltip]:hover {
@@ -214,7 +211,6 @@ span[data-tooltip] {
   background: var(--white);
   color: var(--black);
   font-size: 1rem;
-  line-height: var(--compact);
 }
 
 .tippy-content {
@@ -243,17 +239,4 @@ span[data-tooltip] {
 
 .tooltip-table > *:nth-child(odd) {
   font-weight: 500;
-}
-
-/* https://tailwindcss.com/docs/screen-readers */
-.sr-only {
-  clip: rect(0, 0, 0, 0);
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  border-width: 0;
-  white-space: nowrap;
 }

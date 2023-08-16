@@ -1,5 +1,5 @@
 import { execSync } from "child_process";
-import { createReadStream, writeFileSync } from "fs";
+import { createReadStream, readFileSync, writeFileSync } from "fs";
 import readline from "readline";
 import { parse as parseHTML } from "node-html-parser";
 import Downloader from "nodejs-file-downloader";
@@ -61,6 +61,10 @@ export async function* stream(
     else return;
   }
 }
+
+/** read local json file */
+export const read = <T>(filename: string) =>
+  JSON.parse(readFileSync(filename, "utf-8")) as T;
 
 /** write local json file */
 export const write = (filename: string, data: unknown, pretty = false) =>

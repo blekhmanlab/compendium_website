@@ -10,12 +10,11 @@ export type ByProject = typeof import("../../public/by-project.json");
 /** by class or phylum or other taxonomic level */
 export type ByTaxLevel = typeof import("../../public/by-class.json");
 
-/** by country or by region */
-export type ByGeo =
-  typeof import("../../public/by-country.json")["features"][number]["properties"][];
-
 /** by country or by region, combined with natural earth geojson feature data */
-export type ByMap = FeatureCollection<Geometry, ByGeo[number]>;
+export type ByGeo = FeatureCollection<
+  Geometry,
+  typeof import("../../public/by-country.json")["features"][number]["properties"]
+>;
 
 export type SearchList = {
   name: string;
@@ -29,8 +28,8 @@ export type Data = {
   byProject?: ByProject;
   byPhylum?: ByTaxLevel;
   byClass?: ByTaxLevel;
-  byRegion?: ByMap;
-  byCountry?: ByMap;
+  byRegion?: ByGeo;
+  byCountry?: ByGeo;
   searchList?: ReturnType<typeof compileSearchList>;
   selectedFeature?: {
     region: string;
@@ -49,8 +48,8 @@ export const loadData = async () => {
       request<ByProject>("by-project.json"),
       request<ByTaxLevel>("by-phylum.json"),
       request<ByTaxLevel>("by-class.json"),
-      request<ByMap>("by-region.json"),
-      request<ByMap>("by-country.json"),
+      request<ByGeo>("by-region.json"),
+      request<ByGeo>("by-country.json"),
     ]);
 
   const searchList = compileSearchList(
@@ -88,8 +87,8 @@ const compileSearchList = (
   byProject: ByProject,
   byPhylum: ByTaxLevel,
   byClass: ByTaxLevel,
-  byRegion: ByMap,
-  byCountry: ByMap,
+  byRegion: ByGeo,
+  byCountry: ByGeo,
 ) => {
   /** collect complete list */
   let list: SearchList = [];

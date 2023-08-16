@@ -3,22 +3,14 @@
 // eslint-disable-next-line
 /// <reference path="./types.d.ts" />
 
-import { readFileSync } from "fs";
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
 import dissolve from "geojson-dissolve";
 import _ from "lodash";
 import { LD } from "./ld";
-import {
-  ByMap,
-  ByProject,
-  ByTaxLevel,
-  Countries,
-  Features,
-  Metadata,
-} from "./types";
-import { download, getLd, request, stream, throttle, write } from "./util";
+import { ByGeo, ByProject, ByTaxLevel, Metadata, WorldMap } from "./types";
+import { download, getLd, read, stream, throttle, write } from "./util";
 
 /**
  * pre-compile step that takes the "raw" distributed data (csv/tsv), and
@@ -29,24 +21,24 @@ import { download, getLd, request, stream, throttle, write } from "./util";
 const ldUrl = "https://doi.org/10.5281/zenodo.8186993";
 
 /** raw taxonomic data */
-const taxonomicData = "taxonomic_table.csv";
+const taxonomicFile = "taxonomic_table.csv";
 
 /** raw sample metadata */
-const sampleData = "sample_metadata.tsv";
+const metadataFile = "sample_metadata.tsv";
 
 /** raw natural earth data */
-const naturalEarthData =
-  "https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson";
+const naturalEarthFile = "natural-earth.json";
 /** https://www.naturalearthdata.com/downloads/110m-cultural-vectors/ */
 /** https://github.com/nvkelso/natural-earth-vector/blob/master/geojson */
+/** https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson */
 
 /** set working directory to directory of this script */
 chdir(dirname(fileURLToPath(import.meta.url)));
 
 /** process natural earth world map data */
-const processNaturalEarth = async (): Promise<ByMap> => {
-  /** fetch natural earth data */
-  const data = await request<Features>(naturalEarthData);
+const processNaturalEarth = async (): Promise<ByGeo> => {
+  /** load natural earth data */
+  const worldMap = read<WorldMap>(naturalEarthFile);
 
   /** filter out null property */
   const clean = (value: unknown) => {
@@ -56,11 +48,11 @@ const processNaturalEarth = async (): Promise<ByMap> => {
   };
 
   /** map of all countries to their regions */
-  const countryToRegion = JSON.parse(
-    readFileSync("./country-to-region.json", "utf-8"),
+  const countryToRegion = read<{ [key: string]: string }>(
+    "./country-to-region.json",
   );
 
-  for (const feature of data.features) {
+  for (const feature of worldMap.features) {
     const country = _.startCase(clean(feature.properties.NAME));
     const code = (
       clean(feature.properties.ISO_A2_EH) ||
@@ -74,36 +66,69 @@ const processNaturalEarth = async (): Promise<ByMap> => {
     feature.properties = { region, country, code, samples: 0 };
   }
 
-  return data as ByMap;
+  return worldMap as ByGeo;
 };
 
 /** process main data */
-const processData = async (taxonomicData, sampleData) => {
+const processData = async (
+  taxonomicFile: string,
+  metadataFile: string,
+  worldMap: ByGeo,
+) => {
   /** stream files line by line */
-  const taxonomicStream = stream(taxonomicData);
-  const sampleStream = stream(sampleData);
+  const taxonomicStream = stream(taxonomicFile);
+  const metadataStream = stream(metadataFile);
 
   /** map of unique projects */
   const byProject: { [key: ByProject[number]["project"]]: ByProject[number] } =
     {};
+  /** map of unique countries */
+  const byCountry: { [key: string]: ByGeo["features"][number] } = {};
+  /** map of unique regions */
+  const byRegion: { [key: string]: ByGeo["features"][number] } = {};
   /** map of unique phyla */
   const byPhylum: { [key: string]: ByTaxLevel[number] } = {};
   /** map of unique classes */
   const byClass: { [key: string]: ByTaxLevel[number] } = {};
-  /** map of unique countries */
-  const countries: Countries = {};
+
+  /** whether country feature has already been dissolved into region feature */
+  const countryDissolved: { [key: string]: boolean } = {};
+
+  /** add all natural earth features */
+  for (const feature of worldMap.features) {
+    const { region, code } = feature.properties;
+
+    /** add feature as country */
+    byCountry[code] = _.cloneDeep(feature);
+
+    if (!byRegion[region]) {
+      /** add feature as region */
+      byRegion[region] = _.cloneDeep(feature);
+
+      /** unset country specific info */
+      byRegion[region].properties.country = "";
+      byRegion[region].properties.code = "";
+    } else {
+      /** merge features together into region */
+      if (!countryDissolved[code]) {
+        byRegion[region].geometry = dissolve([byRegion[region], feature]);
+        countryDissolved[code] = true;
+      }
+    }
+  }
 
   /** get first/header row of files */
   const [{ value: taxonomicHeaderRaw = [] }] = await Promise.all([
     taxonomicStream.next(),
-    sampleStream.next(),
+    metadataStream.next(),
   ]);
 
   /** process headers */
   const taxonomicHeader = taxonomicHeaderRaw.map((cell) => {
     const [kingdom = "", phylum = "", _class = ""] = cell
       .replace(/"/g, "")
-      .split(".");
+      .split(".")
+      .filter((taxon) => taxon !== "NA");
     return { kingdom, phylum, _class };
   });
 
@@ -114,43 +139,31 @@ const processData = async (taxonomicData, sampleData) => {
 
     /** read current row from files */
     const [
-      { value: taxonomicRow = [], done: taxDone },
-      { value: sampleRow = [], done: sampleDone },
-    ] = await Promise.all([taxonomicStream.next(), sampleStream.next()]);
+      { value: taxonomicRow = [], done: taxonomicDone },
+      { value: metadataRow = [], done: metadataDone },
+    ] = await Promise.all([taxonomicStream.next(), metadataStream.next()]);
 
     /** if no more data, exit */
-    if (sampleDone && taxDone) break;
+    if (taxonomicDone && metadataDone) break;
 
-    /** get row cell values */
-    const [
-      sample,
-      project,
-      run,
-      libraryStrategy,
-      librarySource,
-      pubdate,
-      totalBases,
-      instrument,
-      geoLoc,
-      code,
-      region,
-    ] = sampleRow;
+    /** get sample metadata cols */
+    const [sample, project, , , , , , , , code, region] = metadataRow;
+    // const country = _.startCase(geoLoc.split(":").shift());
 
-    const country = _.startCase(geoLoc.split(":").pop());
+    /** count country */
+    if (byCountry[code]) byCountry[code].properties.samples++;
+    /** count region */
+    if (byRegion[region]) byRegion[region].properties.samples++;
 
     /** accumulate projects and samples */
     byProject[project] ??= { project, samples: [] };
     byProject[project].samples.push(sample);
 
-    /** accumulate countries */
-    countries[code] ??= { region, country, code, samples: 0 };
-    countries[code].samples++;
-
     /** whether row (sample) has already been counted toward taxon */
     const phylumCounted: { [key: string]: boolean } = {};
     const classCounted: { [key: string]: boolean } = {};
 
-    /** loop through taxonomic columns */
+    /** loop through taxonomic table columns */
     for (let col = 2; col < taxonomicRow.length; col++) {
       const cell = taxonomicRow[col];
 
@@ -186,63 +199,34 @@ const processData = async (taxonomicData, sampleData) => {
     }
   }
 
+  /** turn maps into lists, and do final sorting and such */
   return {
-    byProject: Object.values(byProject),
-    byPhylum: Object.values(byPhylum).sort(
-      (a, b) => b.samples.total - a.samples.total,
+    byProject: Object.values(byProject).sort(
+      (a, b) => b.samples.length - a.samples.length,
     ),
-    byClass: Object.values(byClass).sort(
-      (a, b) => b.samples.total - a.samples.total,
-    ),
-    countries,
+    byPhylum: Object.values(byPhylum)
+      .filter(({ phylum }) => phylum)
+      .sort((a, b) => b.samples.total - a.samples.total),
+    byClass: Object.values(byClass)
+      .filter(({ _class }) => _class)
+      .sort((a, b) => b.samples.total - a.samples.total),
+    byCountry: {
+      ...worldMap,
+      features: Object.values(byCountry).sort(
+        (a, b) =>
+          b.properties.samples - a.properties.samples ||
+          (a.properties.country < b.properties.country ? -1 : 1),
+      ),
+    },
+    byRegion: {
+      ...worldMap,
+      features: Object.values(byRegion).sort(
+        (a, b) =>
+          b.properties.samples - a.properties.samples ||
+          (a.properties.country < b.properties.country ? -1 : 1),
+      ),
+    },
   };
-};
-
-/** process "by geography" data */
-const processByGeographic = (worldMap: ByMap, countries: Countries) => {
-  /** accumulate countries */
-  const byCountry = _.cloneDeep(worldMap) as ByMap;
-
-  /** lookup sample count from matching country */
-  for (const { properties } of byCountry.features)
-    properties.samples = countries[properties.code]?.samples || 0;
-
-  /** accumulate regions */
-  const byRegion = _.cloneDeep(byCountry);
-
-  /** map of region to feature */
-  const regions: { [key: string]: ByMap["features"][number] } = {};
-
-  for (const feature of byRegion.features) {
-    /** catch countries without regions */
-    if (!feature.properties.region) {
-      regions[feature.properties.code] = feature;
-      continue;
-    }
-
-    /** get region to add to */
-    let region = regions[feature.properties.region];
-
-    if (region) {
-      /** merge with existing entry */
-      region.geometry = dissolve([region, feature]);
-      region.properties.samples += feature.properties.samples;
-    } else
-    /** set new entry */
-      region = feature;
-
-    /** unset country-specific details */
-    region.properties.country = "";
-    region.properties.code = "";
-
-    /** set entry */
-    regions[feature.properties.region] = region;
-  }
-
-  /** transform object map back to array */
-  byRegion.features = Object.values(regions);
-
-  return { byCountry, byRegion };
 };
 
 /** derive metadata about data */
@@ -250,8 +234,8 @@ const deriveMetadata = (
   byProject: ByProject,
   byPhylum: ByTaxLevel,
   byClass: ByTaxLevel,
-  byRegion: ByMap,
-  byCountry: ByMap,
+  byRegion: ByGeo,
+  byCountry: ByGeo,
   ld: LD,
 ): Metadata => {
   const projects = byProject.length;
@@ -259,8 +243,8 @@ const deriveMetadata = (
     (total, { samples }) => total + samples.length,
     0,
   );
-  const phyla = byPhylum.filter((tax) => tax.samples).length;
-  const classes = byClass.filter((tax) => tax.samples).length;
+  const phyla = byPhylum.filter((taxon) => taxon.samples).length;
+  const classes = byClass.filter((taxon) => taxon.samples).length;
   const regions = byRegion.features.filter(
     (feature) => feature.properties.samples,
   ).length;
@@ -286,23 +270,23 @@ const deriveMetadata = (
 console.info("Getting data download links and meta");
 const ld = await getLd(ldUrl);
 
-console.info("Downloading raw data");
-for (const { contentUrl } of ld.distribution) await download(contentUrl);
+if (!process.env.SKIP_DOWNLOAD) {
+  console.info("Downloading raw data");
+  for (const { contentUrl } of ld.distribution) await download(contentUrl);
+}
 
-console.info("Getting and cleaning world map data");
+console.info("Cleaning world map data");
 const worldMap = await processNaturalEarth();
 
 console.info("Processing data");
-const { byProject, byPhylum, byClass, countries } = await processData(
-  taxonomicData,
-  sampleData,
+const { byProject, byPhylum, byClass, byCountry, byRegion } = await processData(
+  taxonomicFile,
+  metadataFile,
+  worldMap,
 );
 write("../public/by-project.json", byProject);
 write("../public/by-phylum.json", byPhylum);
 write("../public/by-class.json", byClass);
-
-const { byCountry, byRegion } = processByGeographic(worldMap, countries);
-
 write("../public/by-country.json", byCountry);
 write("../public/by-region.json", byRegion);
 

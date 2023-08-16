@@ -1,5 +1,6 @@
 import { SelectHTMLAttributes } from "react";
 import { startCase } from "lodash";
+import { ReactComponent as AngleIcon } from "@/assets/angle.svg";
 import classes from "./Select.module.css";
 
 type Props<Options extends string[]> = {
@@ -18,18 +19,21 @@ const Select = <Options extends string[]>({
 }: Props<Options>) => (
   <label className={classes.label}>
     <span>{label}</span>
-    <select
-      className={classes.select}
-      {...props}
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-    >
-      {options.map((option, index) => (
-        <option key={index} value={option}>
-          {startCase(option)}
-        </option>
-      ))}
-    </select>
+    <span className={classes.wrapper}>
+      <select
+        className={classes.select}
+        {...props}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      >
+        {options.map((option, index) => (
+          <option key={index} value={option}>
+            {startCase(option)}
+          </option>
+        ))}
+      </select>
+      <AngleIcon />
+    </span>
   </label>
 );
 

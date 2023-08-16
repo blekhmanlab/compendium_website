@@ -1,4 +1,4 @@
-import tippy, { Instance, Props } from "tippy.js";
+import tippy, { followCursor, Instance, Props } from "tippy.js";
 import "tippy.js/dist/tippy.css";
 
 /** tippy options */
@@ -8,6 +8,7 @@ const options: Partial<Props> = {
   offset: [15, 15],
   allowHTML: true,
   appendTo: document.body,
+  plugins: [followCursor],
   // onHide: () => false,
 };
 
@@ -54,8 +55,12 @@ const update = (element: Element) => {
   const instance: Instance =
     (element as _Element)._tippy || tippy(element, options);
 
-  /** only make interactive if content includes link to click on */
-  instance.setProps({ interactive: content.includes("<a") });
+  instance.setProps({
+    /** only make interactive if content includes link to click on */
+    interactive: content.includes("<a"),
+    /** follow cursor on map */
+    followCursor: element.closest("#map") ? "horizontal" : false,
+  });
 
   /** set aria label to content */
   instance.reference.setAttribute("aria-label", makeLabel(content));

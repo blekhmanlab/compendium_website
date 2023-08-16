@@ -1,3 +1,14 @@
+.svg {
+  width: 100%;
+  /* outline: solid 1px var(--gray); */
+}
+
+.outline {
+  fill: none;
+  stroke: var(--gray);
+  stroke-width: 0.5;
+}
+
 .graticule {
   fill: none;
   stroke: var(--dark-gray);
@@ -13,7 +24,14 @@
 .legend {
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 100%;
   gap: 10px;
+  overflow-wrap: anywhere;
+}
+
+.legend > :first-child {
+  text-align: right;
 }
 
 .gradient {
