@@ -199,18 +199,33 @@ const processData = async (
     }
   }
 
+  /** turn maps into lists, and do final sorting and such */
   return {
     byProject: Object.values(byProject).sort(
       (a, b) => b.samples.length - a.samples.length,
     ),
     byPhylum: Object.values(byPhylum)
-      .sort((a, b) => b.samples.total - a.samples.total)
-      .filter(({ phylum }) => phylum),
+      .filter(({ phylum }) => phylum)
+      .sort((a, b) => b.samples.total - a.samples.total),
     byClass: Object.values(byClass)
-      .sort((a, b) => b.samples.total - a.samples.total)
-      .filter(({ _class }) => _class),
-    byCountry: { ...worldMap, features: Object.values(byCountry) },
-    byRegion: { ...worldMap, features: Object.values(byRegion) },
+      .filter(({ _class }) => _class)
+      .sort((a, b) => b.samples.total - a.samples.total),
+    byCountry: {
+      ...worldMap,
+      features: Object.values(byCountry).sort(
+        (a, b) =>
+          b.properties.samples - a.properties.samples ||
+          (a.properties.country < b.properties.country ? -1 : 1),
+      ),
+    },
+    byRegion: {
+      ...worldMap,
+      features: Object.values(byRegion).sort(
+        (a, b) =>
+          b.properties.samples - a.properties.samples ||
+          (a.properties.country < b.properties.country ? -1 : 1),
+      ),
+    },
   };
 };
 
