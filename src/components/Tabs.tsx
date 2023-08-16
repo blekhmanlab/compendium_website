@@ -14,7 +14,7 @@ type Props = {
 const Tabs = ({ tabs }: Props) => (
   <Tab.Group>
     {({ selectedIndex }) => (
-      <div className="content">
+      <div className="sub-section">
         <Tab.List className={classes.tabs}>
           {tabs.map((tab, index) => (
             <Tab key={index} as={Button}>

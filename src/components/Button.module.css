@@ -9,7 +9,6 @@
   background: var(--dark-gray);
   color: inherit;
   font: inherit;
-  line-height: var(--compact);
   text-align: center;
   text-decoration: none;
   cursor: pointer;

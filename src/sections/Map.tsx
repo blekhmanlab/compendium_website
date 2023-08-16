@@ -33,7 +33,7 @@ const Map = ({ id = "map" }) => {
   if (!byCountry || !byRegion) return <Placeholder>Loading map</Placeholder>;
 
   return (
-    <div className="content">
+    <div className="sub-section">
       <Select
         label="Group by:"
         value={by}

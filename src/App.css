@@ -18,8 +18,8 @@
   --fast: 0.25s ease;
   --shadow: 0 0 10px #00000020;
 
-  --spacing: 2em;
-  --compact: 1.5em;
+  --xl-spacing: 2em;
+  --spacing: 1.5em;
 }
 
 @font-face {
@@ -67,11 +67,18 @@ section:nth-child(odd) {
   background: #8080ff08;
 }
 
+.sub-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
+}
+
 h1,
 h2,
 h3 {
   margin: 0;
-  line-height: var(--compact);
 }
 
 h1 {
@@ -101,10 +108,10 @@ strong {
 
 p,
 ul,
-ol,
-code {
+ol {
   width: 100%;
   margin: 0;
+  line-height: var(--xl-spacing);
 }
 
 p {
@@ -138,14 +145,6 @@ hr {
   height: 2px;
   border: none;
   background: var(--dark-gray);
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  gap: 20px;
 }
 
 .table-wrapper {
@@ -185,6 +184,10 @@ svg text {
   font-size: 30px;
 }
 
+svg * {
+  transition: fill var(--fast);
+}
+
 svg [data-tooltip]:hover {
   fill: var(--white);
 }
@@ -211,7 +214,6 @@ span[data-tooltip] {
   background: var(--white);
   color: var(--black);
   font-size: 1rem;
-  line-height: var(--compact);
 }
 
 .tippy-content {
@@ -240,17 +242,4 @@ span[data-tooltip] {
 
 .tooltip-table > *:nth-child(odd) {
   font-weight: 500;
-}
-
-/* https://tailwindcss.com/docs/screen-readers */
-.sr-only {
-  clip: rect(0, 0, 0, 0);
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  border-width: 0;
-  white-space: nowrap;
 }

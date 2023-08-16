@@ -9,7 +9,7 @@ type Props = {
 const Accordion = ({ title, children }: Props) => (
   <details className={classes.details}>
     <summary className={classes.summary}>{title}</summary>
-    <div className={["content", classes.content].join(" ")}>{children}</div>
+    <div className={["sub-section", classes.content].join(" ")}>{children}</div>
   </details>
 );
 

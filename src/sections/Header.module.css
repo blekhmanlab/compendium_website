@@ -49,10 +49,10 @@
 
 @media (max-width: 500px) {
   .h1 {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
   .title {
-    height: 70px;
+    height: 60px;
   }
 }

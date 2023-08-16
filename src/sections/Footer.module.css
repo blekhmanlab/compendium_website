@@ -4,6 +4,7 @@
   width: 100%;
   padding-top: 50px;
   gap: 40px;
+  line-height: var(--xl-spacing);
 }
 
 .footer h3 {
