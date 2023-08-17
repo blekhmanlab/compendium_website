@@ -12,8 +12,7 @@ const Recipes = () => (
         <DownloadIcon className="inline-svg" />
         Download the R package
       </a>{" "}
-      to do more advanced filtering and analyses on this data. Here are some of
-      the things you can do with it:
+      to do more advanced filtering and analyses with the data, such as...
     </p>
 
     <div className={classes.buttons}>

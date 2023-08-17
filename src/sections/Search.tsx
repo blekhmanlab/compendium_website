@@ -26,8 +26,8 @@ const Search = () => (
               <span data-tooltip={tooltips["project"]}>project</span>,{" "}
               <span data-tooltip={tooltips["sample"]}>sample</span>,{" "}
               <span data-tooltip={tooltips["region"]}>region</span>, or{" "}
-              <span data-tooltip={tooltips["country"]}>country</span> to see if
-              we have it before you download.
+              <span data-tooltip={tooltips["country"]}>country</span> to see how
+              many samples are tagged with it.
             </>
           ),
           content: (
@@ -39,7 +39,7 @@ const Search = () => (
           description: (
             <>
               Does this dataset have what you're looking for? Search for a
-              phylum or class to see if it is present in the dataset.
+              phylum or class to see how many samples it's present in.
             </>
           ),
           content: <SearchBox filters={["Phylum", "Class"]} />,

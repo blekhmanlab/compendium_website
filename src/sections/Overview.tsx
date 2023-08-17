@@ -64,7 +64,7 @@ const Overview = () => {
       <h2>Overview</h2>
 
       <p>
-        Our dataset includes{" "}
+        This dataset includes{" "}
         {samplesRound
           ? "over " + samplesRound.toLocaleString()
           : "thousands of"}{" "}

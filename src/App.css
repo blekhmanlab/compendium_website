@@ -216,11 +216,16 @@ span[data-tooltip] {
 }
 
 .tippy-box {
+  max-width: 350px !important;
   padding: 10px 15px;
   border-radius: var(--rounded);
   background: var(--white);
   color: var(--black);
   font-size: 1rem;
+}
+
+.tippy-box:has(.tooltip-table) {
+  max-width: 500px !important;
 }
 
 .tippy-content {

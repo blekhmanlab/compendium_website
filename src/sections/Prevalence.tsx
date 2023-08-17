@@ -16,8 +16,7 @@ const Prevalence = () => {
       {!selectedFeature && (
         <p>
           Select a <span data-tooltip={tooltips["country"]}>country</span> or{" "}
-          <span data-tooltip={tooltips["region"]}>region</span> to filter by
-          number of samples.
+          <span data-tooltip={tooltips["region"]}>region</span> to filter.
         </p>
       )}
 

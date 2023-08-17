@@ -23,7 +23,7 @@ const Header = () => (
         icon={PaperIcon}
         design="big"
         href={import.meta.env.VITE_PAPER}
-        data-tooltip="Learn about the methods behind and significance of this dataset."
+        data-tooltip="Learn more about the methods and significance behind this project."
       >
         Paper
       </Button>
@@ -31,7 +31,7 @@ const Header = () => (
         icon={PackageIcon}
         design="big"
         href={import.meta.env.VITE_R_PACKAGE}
-        data-tooltip="Use our R package to do more advanced filtering and analyses with the dataset."
+        data-tooltip="Do advanced filtering and analyses with the data."
       >
         R Package
       </Button>
@@ -39,7 +39,7 @@ const Header = () => (
         icon={DownloadIcon}
         design="big"
         href={import.meta.env.VITE_DATA}
-        data-tooltip="Download the data directly as CSV/TSV files."
+        data-tooltip="Download the dataset directly as CSV/TSV files."
       >
         CSV data
       </Button>
