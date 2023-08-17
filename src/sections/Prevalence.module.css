@@ -1,6 +1,7 @@
 .cols {
   display: grid;
-  grid-template-columns: 2fr 0.95fr;
+  grid-template-columns: 2fr 1fr;
+  align-items: center;
   width: 100%;
   gap: 40px;
 }
