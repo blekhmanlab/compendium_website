@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { renderToString } from "react-dom/server";
 import * as d3 from "d3";
 import { Feature } from "geojson";
 import Placeholder from "@/components/Placeholder";
@@ -39,8 +40,8 @@ const Map = ({ id = "map" }) => {
     );
   }, [id, byCountry, byRegion, by, selectedFeature]);
 
-  /** show status */
-  if (!byCountry || !byRegion) return <Placeholder>Loading map</Placeholder>;
+  if (!byCountry || !byRegion)
+    return <Placeholder height={424}>Loading map...</Placeholder>;
 
   return (
     <div className="sub-section">
@@ -65,7 +66,10 @@ const Map = ({ id = "map" }) => {
 
       <div className={classes.legend}>
         <span>Less Samples</span>
-        <span className={classes.gradient}></span>
+        <span
+          className={classes.gradient}
+          data-selected={!!selectedFeature}
+        ></span>
         <span>More Samples</span>
       </div>
     </div>
@@ -190,6 +194,8 @@ const map = () => {
   ) => {
     if (!data) return;
 
+    type Datum = (typeof data)["features"][number];
+
     /** get svg selection */
     const svg = d3.select<SVGSVGElement, unknown>("#" + id);
 
@@ -221,52 +227,57 @@ const map = () => {
 
     /** get css variable colors */
     const primary = getCssVariable("--primary");
-    const gray = getCssVariable("--gray");
     const secondary = getCssVariable("--secondary");
+    const gray = getCssVariable("--gray");
     const darkGray = getCssVariable("--dark-gray");
+
+    /** check if feature/datum is selected */
+    const isSelected = (d: Datum) =>
+      selectedFeature?.country === ""
+        ? selectedFeature?.region === d.properties.region
+        : selectedFeature?.country === d.properties.country;
 
     /** color scale */
     const scale = d3
       .scaleLog<string>()
       .domain([1, max])
-      .range([gray, primary])
+      .range(selectedFeature ? [darkGray, gray] : [gray, primary])
       .interpolate(d3.interpolateLab);
 
     /** draw features */
     svg
       .select(".features")
       .selectAll("." + classes.feature)
-      .data(data.features)
+      .data(data.features, (d) => {
+        const { region, country } = (d as Datum).properties;
+        return region + " | " + country;
+      })
       .join("path")
       .attr("class", classes.feature)
       .attr("d", path)
       .attr("fill", (d) =>
-        !selectedFeature
-          ? scale(d.properties.samples || 1)
-          : (
-              selectedFeature.country
-                ? selectedFeature.country === d.properties.country
-                : selectedFeature.region === d.properties.region
-            )
-          ? secondary
-          : darkGray,
+        isSelected(d) ? secondary : scale(d.properties.samples || 1),
       )
       .attr("role", "graphics-symbol")
       .attr(
         "data-tooltip",
         ({ properties: { region, country, code, samples } }) =>
-          [
-            `<div class="tooltip-table">`,
-            region && `<span>Region</span><span>${region || "???"}</span>`,
-            (country || code) &&
-              `<span>Country</span><span>${country || "???"} (${
-                code || "??"
-              })</span>`,
-            `<span>Samples</span><span>${samples.toLocaleString()}</span>`,
-            `</div>`,
-          ]
-            .filter(Boolean)
-            .join(""),
+          renderToString(
+            <div className="tooltip-table">
+              {country && (
+                <>
+                  <span>Country</span>
+                  <span>
+                    {country} ({code})
+                  </span>
+                </>
+              )}
+              <span>Region</span>
+              <span>{region}</span>
+              <span>Samples</span>
+              <span>{samples.toLocaleString()}</span>
+            </div>,
+          ),
       )
       .on("keydown", selectFeature)
       .on("click", selectFeature);

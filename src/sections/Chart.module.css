@@ -1,4 +1,5 @@
 .chart {
   width: 100%;
   overflow: visible;
+  max-width: 400px;
 }

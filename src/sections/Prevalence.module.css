@@ -1,12 +1,12 @@
 .cols {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  align-items: center;
+  place-items: center;
   width: 100%;
   gap: 40px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 750px) {
   .cols {
     grid-template-columns: 1fr;
   }

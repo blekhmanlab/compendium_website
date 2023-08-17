@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import Button from "@/components/Button";
+import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import Textbox from "@/components/Textbox";
 import { Data, SearchList, useData } from "@/data";
 import { thread } from "@/workers";
 import classes from "./SearchBox.module.css";
 
+/** filter options, from search list types */
 type Filters = NonNullable<Data["searchList"]>[number]["type"][];
+/** filters options, including all */
 type FiltersAll = ("All" | Props["filters"][number])[];
 
 type Props = {
@@ -73,6 +76,9 @@ const Search = ({ filters }: Props) => {
   useEffect(() => {
     setLimit(10);
   }, [search]);
+
+  if (!searchList)
+    return <Placeholder height={547}>Loading search...</Placeholder>;
 
   return (
     <>

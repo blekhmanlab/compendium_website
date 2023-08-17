@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { renderToString } from "react-dom/server";
 import * as d3 from "d3";
 import { startCase } from "lodash";
 import Placeholder from "@/components/Placeholder";
@@ -54,11 +55,13 @@ const Chart = ({ id = "chart", data, datumKey }: Props) => {
   useEffect(() => {
     if (filtered?.length && !fitted) {
       fit();
+      // window.setTimeout(fit, 0);
       fitted = true;
     }
   }, [filtered, fit]);
 
-  if (!filtered) return <Placeholder>Loading "{title}" table</Placeholder>;
+  if (!filtered)
+    return <Placeholder height={424}>Loading "{title}" chart...</Placeholder>;
 
   return (
     <svg ref={svg} id={id} className={classes.chart}>
@@ -91,10 +94,12 @@ const chart = (
 ) => {
   if (!data) return;
 
+  type Datum = (typeof data)[number];
+
   const svg = d3.select<SVGSVGElement, unknown>("#" + id);
 
   /** get appropriate sample count */
-  const getSamples = (d: (typeof data)[number]) => d.samples[sampleKey] || 0;
+  const getSamples = (d: Datum) => d.samples[sampleKey] || 0;
 
   /** get range of sample counts */
   let [xMin = 0, xMax = 100] = d3.extent(data, getSamples);
@@ -133,7 +138,16 @@ const chart = (
     .call(xAxis);
 
   /** update y axis */
-  svg.select<SVGGElement>(".y-axis").call(yAxis);
+  svg
+    .select<SVGGElement>(".y-axis")
+    [
+      /**
+       * only transition on subsequent renders. if transition on first render,
+       * no axis labels exist for first frame, messing up bbox/fit.
+       */
+      fitted ? "transition" : "interrupt"
+    ]()
+    .call(yAxis);
 
   /** update bars */
   svg
@@ -149,15 +163,21 @@ const chart = (
     .attr("fill", (d) => getColor(d.phylum))
     .attr("role", "graphics-symbol")
     .attr("data-tooltip", (d) =>
-      [
-        `<div class="tooltip-table">`,
-        d.kingdom ? `<span>Kingdom</span><span>${d.kingdom}</span>` : "",
-        d.phylum ? `<span>Phylum</span><span>${d.phylum}</span>` : "",
-        d._class ? `<span>Class</span><span>${d._class}</span>` : "",
-        `<span>Samples</span><span>${getSamples(d).toLocaleString()}</span>`,
-        `</div>`,
-      ]
-        .filter(Boolean)
-        .join(""),
+      renderToString(
+        <div className="tooltip-table">
+          {d._class && (
+            <>
+              <span>Class</span>
+              <span>{d._class}</span>
+            </>
+          )}
+          <span>Phylum</span>
+          <span>{d.phylum}</span>
+          <span>Kingdom</span>
+          <span>{d.kingdom}</span>
+          <span>Samples</span>
+          <span>{getSamples(d).toLocaleString()}</span>
+        </div>,
+      ),
     );
 };

@@ -5,7 +5,7 @@
 
   --black: #101829;
   --dark-gray: #354153;
-  --gray: #687386;
+  --gray: #596579;
   --light-gray: #94a3b8;
   --white: #e4e8ee;
 
@@ -182,7 +182,9 @@ svg text {
 }
 
 svg * {
-  transition: fill var(--fast);
+  transition:
+    fill var(--fast),
+    width var(--fast);
 }
 
 svg [data-tooltip]:hover {

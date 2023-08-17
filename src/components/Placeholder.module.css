@@ -1,11 +1,10 @@
 .placeholder {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
+  width: 100%;
   padding: 10px;
   border-radius: var(--rounded);
-  background: var(--dark-gray);
 }
 
 .placeholder p {

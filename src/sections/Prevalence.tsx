@@ -22,7 +22,10 @@ const Prevalence = () => {
       )}
 
       {selectedFeature && (
-        <p>Selected: {selectedFeature.country || selectedFeature.region}</p>
+        <p>
+          Selected:&nbsp;&nbsp;&nbsp;
+          {selectedFeature.country || selectedFeature.region}
+        </p>
       )}
 
       <div className={classes.cols}>

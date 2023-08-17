@@ -63,8 +63,8 @@ export async function* stream(
 }
 
 /** read local json file */
-export const read = <T>(filename: string) =>
-  JSON.parse(readFileSync(filename, "utf-8")) as T;
+export const read = <Type>(filename: string) =>
+  JSON.parse(readFileSync(filename, "utf-8")) as Type;
 
 /** write local json file */
 export const write = (filename: string, data: unknown, pretty = false) =>
