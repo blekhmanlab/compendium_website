@@ -40,6 +40,6 @@
   background: linear-gradient(to right, var(--gray), var(--primary));
 }
 
-.gradient[data-selected="true"] {
+.gradient[data-inactive="true"] {
   background: linear-gradient(to right, var(--dark-gray), var(--gray));
 }

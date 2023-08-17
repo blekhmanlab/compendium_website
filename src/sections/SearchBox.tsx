@@ -78,7 +78,7 @@ const Search = ({ filters }: Props) => {
   }, [search]);
 
   if (!searchList)
-    return <Placeholder height={547}>Loading search...</Placeholder>;
+    return <Placeholder height={400}>Loading search...</Placeholder>;
 
   return (
     <>

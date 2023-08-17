@@ -61,13 +61,18 @@ const Chart = ({ id = "chart", data, datumKey }: Props) => {
   }, [filtered, fit]);
 
   if (!filtered)
-    return <Placeholder height={424}>Loading "{title}" chart...</Placeholder>;
+    return <Placeholder height={400}>Loading "{title}" chart...</Placeholder>;
 
   return (
     <svg ref={svg} id={id} className={classes.chart}>
       <text className="title" x={width / 2} y={-50} textAnchor="middle">
         {title}
       </text>
+      {selectedFeature && (
+        <text className="sub-title" x={width / 2} y={-15} textAnchor="middle">
+          {selectedFeature.country || selectedFeature.region}
+        </text>
+      )}
       <g className="bars"></g>
       <g className="x-axis"></g>
       <g className="y-axis"></g>

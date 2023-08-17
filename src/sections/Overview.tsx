@@ -85,7 +85,7 @@ const Overview = () => {
           })}
         </div>
       ) : (
-        <Placeholder height={94}>Loading metadata...</Placeholder>
+        <Placeholder height={100}>Loading metadata...</Placeholder>
       )}
     </section>
   );

@@ -41,7 +41,7 @@ const Map = ({ id = "map" }) => {
   }, [id, byCountry, byRegion, by, selectedFeature]);
 
   if (!byCountry || !byRegion)
-    return <Placeholder height={424}>Loading map...</Placeholder>;
+    return <Placeholder height={400}>Loading map...</Placeholder>;
 
   return (
     <div className="sub-section">
@@ -68,7 +68,7 @@ const Map = ({ id = "map" }) => {
         <span>Less Samples</span>
         <span
           className={classes.gradient}
-          data-selected={!!selectedFeature}
+          data-inactive={!!selectedFeature}
         ></span>
         <span>More Samples</span>
       </div>
@@ -366,7 +366,7 @@ const selectFeature = (
   /** key press */
   if ("key" in event) {
     if (event.key === "Enter") setSelectedFeature(feature);
-    if (event.key === "Escape") setSelectedFeature(undefined);
+    if (event.key === "Escape") setSelectedFeature();
   } else {
     /** pointer click */
     setSelectedFeature(feature);
@@ -375,4 +375,7 @@ const selectFeature = (
 };
 
 /** unset selected feature when clicking off map */
-d3.select(window).on("click", () => setSelectedFeature());
+d3.select(window).on(
+  "click",
+  () => document.activeElement === document.body && setSelectedFeature(),
+);
