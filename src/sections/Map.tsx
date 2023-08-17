@@ -289,17 +289,23 @@ const map = () => {
       .on("zoom", (event) => updateMap(svg, event));
 
     /** connect zoom handler to svg */
-    svg
-      .call((event) => zoom(svg, event))
-      /** always prevent scroll on wheel, not just when at scale limit */
-      .on("wheel", (event) => event.preventDefault());
+    zoom(svg);
 
-    /** double click handler */
-    svg.on("dblclick.zoom", () => {
-      zoom.transform(svg, d3.zoomIdentity);
-      resetProjection();
-      updateMap(svg);
-    });
+    /** reset zoom */
+    const resetZoom = () =>
+      /** start scale at lower limit so first zoom has effect */
+      zoom.transform(svg, d3.zoomIdentity.scale(baseScale));
+    resetZoom();
+
+    svg
+      /** always prevent scroll on wheel, not just when at scale limit */
+      .on("wheel", (event) => event.preventDefault())
+      /** double click handler */
+      .on("dblclick.zoom", () => {
+        resetZoom();
+        resetProjection();
+        updateMap(svg);
+      });
   };
 };
 

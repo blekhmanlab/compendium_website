@@ -7,7 +7,7 @@
     "compile": "npx ts-node --transpileOnly --esm --experimental-specifier-resolution=node --files ./compile/index.ts",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext .tsx,.ts --fix && prettier --write \"**/*.{tsx,ts,css,json,yaml,svg,md}\" --no-error-on-unmatched-pattern"
+    "lint": "eslint . --ext .tsx,.ts --fix && prettier --write \"**/*.{tsx,ts,css}\" --no-error-on-unmatched-pattern"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.16",
