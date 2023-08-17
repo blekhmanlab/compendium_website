@@ -38,8 +38,8 @@ const Search = () => (
           name: "Taxa",
           description: (
             <>
-              Search for a phylum or class to see if it is present in the
-              dataset.
+              Does this dataset have what you're looking for? Search for a
+              phylum or class to see if it is present in the dataset.
             </>
           ),
           content: <SearchBox filters={["Phylum", "Class"]} />,

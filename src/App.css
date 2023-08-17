@@ -4,6 +4,7 @@
   /* https://www.materialpalette.com/colors */
 
   --black: #101829;
+  --off-black: #111a2e;
   --dark-gray: #354153;
   --gray: #596579;
   --light-gray: #94a3b8;
@@ -51,7 +52,7 @@ body {
 header,
 section,
 footer {
-  --col: 1200px;
+  --col: 720px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -61,7 +62,11 @@ footer {
 
 footer,
 section:nth-child(odd) {
-  background: #8080ff08;
+  background: var(--off-black);
+}
+
+footer {
+  --col: 1200px;
 }
 
 .sub-section {
@@ -113,7 +118,6 @@ ol {
 
 p {
   text-wrap: balance;
-  max-width: 720px;
   text-align: center;
 }
 

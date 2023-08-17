@@ -42,14 +42,14 @@ export const useData = create<Data>(() => ({}));
 
 /** one-time load app-wide data */
 export const loadData = async () => {
-  const [metadata, byProject, byPhylum, byClass, byRegion, byCountry] =
+  const [, byProject, byPhylum, byClass, byRegion, byCountry] =
     await Promise.all([
-      request<Metadata>("metadata.json"),
-      request<ByProject>("by-project.json"),
-      request<ByTaxLevel>("by-phylum.json"),
-      request<ByTaxLevel>("by-class.json"),
-      request<ByGeo>("by-region.json"),
-      request<ByGeo>("by-country.json"),
+      load("metadata.json", "metadata"),
+      load("by-project.json", "byProject"),
+      load("by-phylum.json", "byPhylum"),
+      load("by-class.json", "byClass"),
+      load("by-region.json", "byRegion"),
+      load("by-country.json", "byCountry"),
     ]);
 
   const searchList = compileSearchList(
@@ -60,23 +60,19 @@ export const loadData = async () => {
     byCountry,
   );
 
-  useData.setState({
-    metadata,
-    byProject,
-    byPhylum,
-    byClass,
-    byRegion,
-    byCountry,
-    searchList,
-  });
+  useData.setState({ searchList });
 };
 
-/** fetch json */
-const request = async <Type>(url: string): Promise<Type> => {
+/** load json and set state */
+const load = async <Key extends keyof Data>(
+  url: string,
+  key: Key,
+): Promise<NonNullable<Data[Key]>> => {
   const response = await fetch(url);
   if (!response.ok) throw Error("Response not OK");
-  const data = await response.json();
-  return data as Type;
+  const data = (await response.json()) as NonNullable<Data[Key]>;
+  useData.setState({ [key]: data });
+  return data;
 };
 
 /**

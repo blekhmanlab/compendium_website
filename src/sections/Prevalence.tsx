@@ -10,7 +10,7 @@ const Prevalence = () => {
   const selectedFeature = useData((state) => state.selectedFeature);
 
   return (
-    <section>
+    <section className={classes.section}>
       <h2>Prevalence</h2>
 
       {!selectedFeature && (

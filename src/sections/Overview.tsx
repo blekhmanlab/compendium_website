@@ -64,9 +64,12 @@ const Overview = () => {
       <h2>Overview</h2>
 
       <p>
-        Our dataset includes over {samplesRound.toLocaleString()} samples of
-        publicly available 16S rRNA amplicon sequencing data, all processed
-        using the same pipeline and reference database.
+        Our dataset includes{" "}
+        {samplesRound
+          ? "over " + samplesRound.toLocaleString()
+          : "thousands of"}{" "}
+        samples of publicly available 16S rRNA amplicon sequencing data, all
+        processed using the same pipeline and reference database.
       </p>
 
       {metadata ? (
