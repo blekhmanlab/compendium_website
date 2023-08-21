@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { renderToString } from "react-dom/server";
 import * as d3 from "d3";
-import { startCase } from "lodash";
+import { orderBy, startCase } from "lodash";
 import Placeholder from "@/components/Placeholder";
 import { ByTaxLevel, Data, useData } from "@/data";
 import { getColor } from "@/util/colors";
@@ -38,11 +38,13 @@ const Chart = ({ id = "chart", data, datumKey }: Props) => {
     "total") as keyof ByTaxLevel[number]["samples"];
 
   /** filtered data */
-  const filtered = data
-    ?.sort((a, b) => {
-      return (b.samples[sampleKey] || 0) - (a.samples[sampleKey] || 0);
-    })
-    .slice(0, 20);
+  const filtered =
+    data &&
+    orderBy(
+      data,
+      [(d) => d.samples[sampleKey] || 0, "_class", "phylum"],
+      ["desc", "asc", "asc"],
+    ).slice(0, 20);
 
   const [svg, fit] = useViewBox(20);
 
@@ -55,13 +57,15 @@ const Chart = ({ id = "chart", data, datumKey }: Props) => {
   useEffect(() => {
     if (filtered?.length && !fitted) {
       fit();
-      // window.setTimeout(fit, 0);
       fitted = true;
     }
   }, [filtered, fit]);
 
   if (!filtered)
     return <Placeholder height={400}>Loading "{title}" chart...</Placeholder>;
+
+  /** if no samples for first bar, then no samples for any because list sorted */
+  const blank = !filtered[0].samples[sampleKey];
 
   return (
     <svg ref={svg} id={id} className={classes.chart}>
@@ -79,11 +83,21 @@ const Chart = ({ id = "chart", data, datumKey }: Props) => {
       <text
         className="axis-title"
         x={width / 2}
-        y={height(filtered?.length || 0) + 80}
+        y={height(filtered.length || 0) + 80}
         textAnchor="middle"
       >
         Number of samples
       </text>
+      {blank && (
+        <text
+          className="axis-title"
+          x={width / 2}
+          y={height(filtered?.length || 0) / 2}
+          textAnchor="middle"
+        >
+          No Samples
+        </text>
+      )}
     </svg>
   );
 };

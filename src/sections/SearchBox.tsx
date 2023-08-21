@@ -85,7 +85,7 @@ const Search = ({ filters }: Props) => {
       <div className={classes.search}>
         <Textbox value={search} onChange={setSearch} placeholder="Search" />
         <Select
-          label="Filter by type:"
+          label="Type:"
           options={["All", ...filters] as FiltersAll}
           value={filter}
           onChange={setFilter}

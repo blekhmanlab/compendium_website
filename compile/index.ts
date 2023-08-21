@@ -201,29 +201,35 @@ const processData = async (
 
   /** turn maps into lists, and do final sorting and such */
   return {
-    byProject: Object.values(byProject).sort(
-      (a, b) => b.samples.length - a.samples.length,
+    byProject: _.orderBy(
+      Object.values(byProject),
+      ["samples.length", "project"],
+      ["desc", "asc"],
     ),
-    byPhylum: Object.values(byPhylum)
-      .filter(({ phylum }) => phylum)
-      .sort((a, b) => b.samples.total - a.samples.total),
-    byClass: Object.values(byClass)
-      .filter(({ _class }) => _class)
-      .sort((a, b) => b.samples.total - a.samples.total),
+    byPhylum: _.orderBy(
+      Object.values(byPhylum).filter(({ phylum }) => phylum),
+      [(d) => d.samples.total, "phylum"],
+      ["desc", "asc"],
+    ),
+    byClass: _.orderBy(
+      Object.values(byClass).filter(({ _class }) => _class),
+      [(d) => d.samples.total, "_class"],
+      ["desc", "asc"],
+    ),
     byCountry: {
       ...worldMap,
-      features: Object.values(byCountry).sort(
-        (a, b) =>
-          b.properties.samples - a.properties.samples ||
-          (a.properties.country < b.properties.country ? -1 : 1),
+      features: _.orderBy(
+        Object.values(byCountry),
+        [(d) => d.properties.samples, (d) => d.properties.country],
+        ["desc", "asc"],
       ),
     },
     byRegion: {
       ...worldMap,
-      features: Object.values(byRegion).sort(
-        (a, b) =>
-          b.properties.samples - a.properties.samples ||
-          (a.properties.country < b.properties.country ? -1 : 1),
+      features: _.orderBy(
+        Object.values(byRegion),
+        [(d) => d.properties.samples, (d) => d.properties.region],
+        ["desc", "asc"],
       ),
     },
   };

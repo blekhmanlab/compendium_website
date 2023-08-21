@@ -1,4 +1,5 @@
 import { FeatureCollection, Geometry } from "geojson";
+import { orderBy } from "lodash";
 import { create } from "zustand";
 
 /** metadata about overall project */
@@ -122,8 +123,8 @@ const compileSearchList = (
   } of byCountry.features)
     list.push({ type: "Country", name: country, samples: samples });
 
-  /** sort by number of samples */
-  list.sort((a, b) => b.samples - a.samples);
+  /** sort by number of samples or name */
+  list = orderBy(list, ["samples", "name"], ["desc", "asc"]);
 
   /** remove entries with no name (regions) */
   list = list.filter(({ name }) => name.trim());
