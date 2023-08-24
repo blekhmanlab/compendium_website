@@ -7,8 +7,8 @@ import Map from "@/sections/Map";
 import { tooltips } from "@/sections/Search";
 import classes from "./Prevalence.module.css";
 
-const vizOptions = ["Phyla", "Reads"];
-type Viz = (typeof vizOptions)[number];
+const chartOptions = ["Phyla", "Reads"];
+type Chart = (typeof chartOptions)[number];
 
 const Prevalence = () => {
   /** get global state */
@@ -17,7 +17,7 @@ const Prevalence = () => {
   const selectedFeature = useData((state) => state.selectedFeature);
 
   /** local state */
-  const [viz, setViz] = useState<Viz>(vizOptions[0]);
+  const [chart, setChart] = useState<Chart>(chartOptions[0]);
 
   return (
     <section className={classes.section}>
@@ -43,14 +43,14 @@ const Prevalence = () => {
         <div className="sub-section">
           <Select
             label="Chart:"
-            value={viz}
-            onChange={setViz}
-            options={vizOptions}
+            value={chart}
+            onChange={setChart}
+            options={chartOptions}
           />
-          {viz === "Phyla" && (
+          {chart === "Phyla" && (
             <Bar title="Phyla" data={byPhylum} datumKey="phylum" />
           )}
-          {viz === "Reads" && <Histogram title="Reads" data={byReads} />}
+          {chart === "Reads" && <Histogram title="Reads" data={byReads} />}
         </div>
       </div>
     </section>
