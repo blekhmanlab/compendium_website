@@ -163,14 +163,20 @@ const chart = (
     .axisLeft(yScale)
     .tickFormat((_, i) => String(data[i][datumKey]));
 
-  /** tick label font size */
-  svg.selectAll(".tick").attr("font-size", "25px");
-
   /** update x axis */
-  svg.select<SVGGElement>(".x-axis").transition().call(xAxis);
+  svg
+    .select<SVGGElement>(".x-axis")
+    .transition()
+    .call(xAxis)
+    .selectAll(".tick")
+    .attr("font-size", "25px");
 
   /** update y axis */
-  svg.select<SVGGElement>(".y-axis").transition().call(yAxis);
+  svg
+    .select<SVGGElement>(".y-axis")
+    .transition()
+    .call(yAxis)
+    .attr("font-size", "25px");
 
   /** update bars */
   svg

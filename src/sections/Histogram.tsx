@@ -167,16 +167,23 @@ const histogram = (
     .ticks(5)
     .tickFormat((d) => formatNumber(d as number, true));
 
-  /** tick label font size */
-  svg.selectAll(".tick").attr("font-size", "25px");
-
   const secondary = getCssVariable("--secondary");
 
   /** update x axis */
-  svg.select<SVGGElement>(".x-axis").transition().call(xAxis);
+  svg
+    .select<SVGGElement>(".x-axis")
+    .transition()
+    .call(xAxis)
+    .selectAll(".tick")
+    .attr("font-size", "25px");
 
   /** update y axis */
-  svg.select<SVGGElement>(".y-axis").transition().call(yAxis);
+  svg
+    .select<SVGGElement>(".y-axis")
+    .transition()
+    .call(yAxis)
+    .selectAll(".tick")
+    .attr("font-size", "25px");
 
   /** update bars */
   svg

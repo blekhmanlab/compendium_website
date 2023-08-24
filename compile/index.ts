@@ -237,11 +237,14 @@ const processData = async (
   const [min = 0, max = 10000000] = d3.extent(totalReads);
   // const [min, max] = [100, 1000000];
 
+  /** number of bins to split reads into */
+  const bins = 50;
+
   /** d3 binner to put read counts into bins */
   const binner = d3
     .bin()
     .domain([min, max])
-    .thresholds(logSpace(min, max, 50));
+    .thresholds(logSpace(min, max, bins));
 
   /** reads histogram data */
   const byReads = {
