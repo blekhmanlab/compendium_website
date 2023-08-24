@@ -5,7 +5,6 @@
 .cols {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  place-items: center;
   width: 100%;
   gap: 40px;
 }

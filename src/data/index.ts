@@ -17,6 +17,9 @@ export type ByGeo = FeatureCollection<
   typeof import("../../public/by-country.json")["features"][number]["properties"]
 >;
 
+/** sample read counts */
+export type ByReads = typeof import("../../public/by-reads.json");
+
 export type SearchList = {
   name: string;
   type: "Project" | "Sample" | "Phylum" | "Class" | "Region" | "Country";
@@ -31,6 +34,7 @@ export type Data = {
   byClass?: ByTaxLevel;
   byRegion?: ByGeo;
   byCountry?: ByGeo;
+  byReads?: ByReads;
   searchList?: ReturnType<typeof compileSearchList>;
   selectedFeature?: {
     region: string;
@@ -51,6 +55,7 @@ export const loadData = async () => {
       load("by-class.json", "byClass"),
       load("by-region.json", "byRegion"),
       load("by-country.json", "byCountry"),
+      load("by-reads.json", "byReads"),
     ]);
 
   const searchList = compileSearchList(

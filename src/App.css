@@ -176,17 +176,11 @@ td {
   text-align: left;
 }
 
-svg .title {
-  font-size: 35px;
-}
 
-svg .sub-title {
-  font-size: 20px;
-}
+
 
 svg text {
   fill: currentColor;
-  font-size: 30px;
 }
 
 svg * {

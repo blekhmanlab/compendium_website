@@ -1,6 +1,7 @@
 import { execSync } from "child_process";
 import { createReadStream, readFileSync, writeFileSync } from "fs";
 import readline from "readline";
+import _ from "lodash";
 import { parse as parseHTML } from "node-html-parser";
 import Downloader from "nodejs-file-downloader";
 import { LD } from "./ld";
@@ -81,4 +82,13 @@ export const getLd = async (url: string): Promise<LD> => {
     parseHTML(response).querySelector("script[type='application/ld+json']")
       ?.innerText || "-";
   return JSON.parse(json);
+};
+
+/** generate n equally spaced (in log space) intervals between a and b */
+export const logSpace = (a: number, b: number, n: number) => {
+  a = Math.log10(a);
+  b = Math.log10(b);
+  return _.range(a, b, (b - a) / n)
+    .concat([b])
+    .map((value) => Math.pow(10, value));
 };

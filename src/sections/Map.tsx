@@ -5,8 +5,8 @@ import { Feature } from "geojson";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import { Data, setSelectedFeature, useData } from "@/data";
-import { getCssVariable } from "@/util/dom";
-import { clamp } from "@/util/math";
+import { downloadSvg, getCssVariable } from "@/util/dom";
+import { clamp, formatNumber } from "@/util/math";
 import classes from "./Map.module.css";
 
 /** svg dimensions */
@@ -43,6 +43,8 @@ const Map = ({ id = "map" }) => {
   if (!byCountry || !byRegion)
     return <Placeholder height={400}>Loading map...</Placeholder>;
 
+  const gray = getCssVariable("--gray");
+
   return (
     <div className="sub-section">
       <Select
@@ -56,16 +58,25 @@ const Map = ({ id = "map" }) => {
         viewBox={[0, 0, width, height].join(" ")}
         id={id}
         className={classes.svg}
+        onClick={(event) => {
+          if (event.shiftKey)
+            downloadSvg(event.currentTarget as Element, "map");
+        }}
       >
         <g className="map-container">
-          <g className="outline"></g>
-          <g className="graticules"></g>
-          <g className="features"></g>
+          <path
+            className="outline"
+            fill="none"
+            stroke={gray}
+            strokeWidth={0.5}
+          />
+          <g className="graticules" />
+          <g className="features" />
         </g>
       </svg>
 
       <div className={classes.legend}>
-        <span>Less Samples</span>
+        <span>Fewer Samples</span>
         <span
           className={classes.gradient}
           data-inactive={!!selectedFeature}
@@ -179,11 +190,9 @@ const map = () => {
     projection.center([x, y]);
 
     /** update paths based on projection */
-    svg
-      .selectAll<Element, Feature>("." + classes.outline)
-      .attr("d", () => path({ type: "Sphere" }));
-    svg.selectAll<Element, Feature>("." + classes.graticule).attr("d", path);
-    svg.selectAll<Element, Feature>("." + classes.feature).attr("d", path);
+    svg.select(".outline").attr("d", () => path({ type: "Sphere" }));
+    svg.selectAll<Element, Feature>(".graticule").attr("d", path);
+    svg.selectAll<Element, Feature>(".feature").attr("d", path);
   };
 
   /** return func to run for updating map */
@@ -194,6 +203,12 @@ const map = () => {
   ) => {
     if (!data) return;
 
+    const primary = getCssVariable("--primary");
+    const secondary = getCssVariable("--secondary");
+    const gray = getCssVariable("--gray");
+    const darkGray = getCssVariable("--dark-gray");
+    const black = getCssVariable("--black");
+
     type Datum = (typeof data)["features"][number];
 
     /** get svg selection */
@@ -202,34 +217,25 @@ const map = () => {
     if (!svg.node()) return;
 
     /** draw projection outline */
-    svg
-      .select(".outline")
-      .selectAll("." + classes.outline)
-      .data([graticules])
-      .join("path")
-      .attr("class", classes.outline)
-      .attr("d", () => path({ type: "Sphere" }));
+    svg.select(".outline").attr("d", () => path({ type: "Sphere" }));
 
     /** draw graticules */
     svg
       .select(".graticules")
-      .selectAll("." + classes.graticule)
+      .selectAll(".graticule")
       .data([graticules])
       .join("path")
-      .attr("class", classes.graticule)
-      .attr("d", path);
+      .attr("class", "graticule")
+      .attr("d", path)
+      .attr("fill", "none")
+      .attr("stroke", darkGray)
+      .attr("stroke-width", 0.5);
 
     /** get range of sample counts */
     const [, max = 1000] = d3.extent(
       data.features,
       (d) => d.properties.samples,
     );
-
-    /** get css variable colors */
-    const primary = getCssVariable("--primary");
-    const secondary = getCssVariable("--secondary");
-    const gray = getCssVariable("--gray");
-    const darkGray = getCssVariable("--dark-gray");
 
     /** check if feature/datum is selected */
     const isSelected = (d: Datum) =>
@@ -247,17 +253,20 @@ const map = () => {
     /** draw features */
     svg
       .select(".features")
-      .selectAll("." + classes.feature)
+      .selectAll(".feature")
       .data(data.features, (d) => {
         const { region, country } = (d as Datum).properties;
         return region + " | " + country;
       })
       .join("path")
-      .attr("class", classes.feature)
+      .attr("class", "feature")
       .attr("d", path)
       .attr("fill", (d) =>
         isSelected(d) ? secondary : scale(d.properties.samples || 1),
       )
+      .attr("stroke", black)
+      .attr("stroke-width", 0.5)
+      .style("cursor", "pointer")
       .attr("role", "graphics-symbol")
       .attr(
         "data-tooltip",
@@ -275,7 +284,7 @@ const map = () => {
               <span>Region</span>
               <span>{region}</span>
               <span>Samples</span>
-              <span>{samples.toLocaleString()}</span>
+              <span>{formatNumber(samples)}</span>
             </div>,
           ),
       )

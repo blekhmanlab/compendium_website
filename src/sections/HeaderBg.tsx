@@ -26,7 +26,6 @@ export default HeaderBg;
     transform: getMatrix(svg, path),
   }));
 
-  /** get css variable colors */
   const primary = getCssVariable("--primary");
   const secondary = getCssVariable("--secondary");
   const gray = getCssVariable("--gray");

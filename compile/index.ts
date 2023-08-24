@@ -6,11 +6,20 @@
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
+import * as d3 from "d3";
 import dissolve from "geojson-dissolve";
 import _ from "lodash";
 import { LD } from "./ld";
 import { ByGeo, ByProject, ByTaxLevel, Metadata, WorldMap } from "./types";
-import { download, getLd, read, stream, throttle, write } from "./util";
+import {
+  download,
+  getLd,
+  logSpace,
+  read,
+  stream,
+  throttle,
+  write,
+} from "./util";
 
 /**
  * pre-compile step that takes the "raw" distributed data (csv/tsv), and
@@ -80,8 +89,7 @@ const processData = async (
   const metadataStream = stream(metadataFile);
 
   /** map of unique projects */
-  const byProject: { [key: ByProject[number]["project"]]: ByProject[number] } =
-    {};
+  const byProject: { [key: string]: ByProject[number] } = {};
   /** map of unique countries */
   const byCountry: { [key: string]: ByGeo["features"][number] } = {};
   /** map of unique regions */
@@ -90,6 +98,14 @@ const processData = async (
   const byPhylum: { [key: string]: ByTaxLevel[number] } = {};
   /** map of unique classes */
   const byClass: { [key: string]: ByTaxLevel[number] } = {};
+  /** map of unique samples for counting reads */
+  const bySample: {
+    [key: string]: {
+      reads: number;
+      code: string;
+      region: string;
+    };
+  } = {};
 
   /** whether country feature has already been dissolved into region feature */
   const countryDissolved: { [key: string]: boolean } = {};
@@ -163,12 +179,19 @@ const processData = async (
     const phylumCounted: { [key: string]: boolean } = {};
     const classCounted: { [key: string]: boolean } = {};
 
+    /** start counting reads for this sample */
+    bySample[sample] = { reads: 0, code, region };
+
     /** loop through taxonomic table columns */
     for (let col = 2; col < taxonomicRow.length; col++) {
-      const cell = taxonomicRow[col];
+      /** number of sequence reads */
+      const reads = Number(taxonomicRow[col]);
+
+      /** tally reads for this sample */
+      bySample[sample].reads += reads;
 
       /** if taxon present in sample */
-      if (cell !== "0") {
+      if (reads > 0) {
         /** get props from header row */
         const taxon = { ...taxonomicHeader[col], samples: { total: 0 } };
         const { phylum, _class } = taxon;
@@ -197,6 +220,54 @@ const processData = async (
         }
       }
     }
+  }
+
+  /** get reads for particular feature */
+  const getReads = (key) =>
+    Object.values(bySample)
+      .filter(
+        ({ code, region }) => key === "total" || key === code || key === region,
+      )
+      .map(({ reads }) => reads);
+
+  /** reads for all samples */
+  const totalReads = getReads("total");
+
+  /** get global min and max reads */
+  const [min = 0, max = 10000000] = d3.extent(totalReads);
+  // const [min, max] = [100, 1000000];
+
+  /** d3 binner to put read counts into bins */
+  const binner = d3
+    .bin()
+    .domain([min, max])
+    .thresholds(logSpace(min, max, 50));
+
+  /** reads histogram data */
+  const byReads = {
+    histogram: binner(totalReads).map(({ length, x0 = 0, x1 = 10000000 }) => ({
+      samples: { total: length },
+      min: x0 || 0,
+      max: x1 || 10000000,
+      mid: Math.pow(10, (Math.log10(x0) + Math.log10(x1)) / 2),
+    })),
+    median: { total: d3.median(totalReads) },
+  };
+
+  /** record total sample counts and for each geographic feature */
+  const features = Object.keys(byCountry).concat(Object.keys(byRegion));
+
+  for (const feature of features) {
+    console.info(`Binning read counts for ${feature}`);
+
+    /** reads for this feature */
+    const reads = getReads(feature);
+
+    byReads.median[feature] = d3.median(reads);
+
+    /** go through bins of reads for this feature */
+    for (const [index, bin] of Object.entries(binner(reads)))
+      if (bin.length) byReads.histogram[index].samples[feature] = bin.length;
   }
 
   /** turn maps into lists, and do final sorting and such */
@@ -232,6 +303,7 @@ const processData = async (
         ["desc", "asc"],
       ),
     },
+    byReads,
   };
 };
 
@@ -285,16 +357,14 @@ console.info("Cleaning world map data");
 const worldMap = await processNaturalEarth();
 
 console.info("Processing data");
-const { byProject, byPhylum, byClass, byCountry, byRegion } = await processData(
-  taxonomicFile,
-  metadataFile,
-  worldMap,
-);
+const { byProject, byPhylum, byClass, byCountry, byRegion, byReads } =
+  await processData(taxonomicFile, metadataFile, worldMap);
 write("../public/by-project.json", byProject);
 write("../public/by-phylum.json", byPhylum);
 write("../public/by-class.json", byClass);
 write("../public/by-country.json", byCountry);
 write("../public/by-region.json", byRegion);
+write("../public/by-reads.json", byReads);
 
 console.info("Deriving metadata");
 const metadata = deriveMetadata(
