@@ -1,26 +1,3 @@
-.svg {
-  width: 100%;
-  /* outline: solid 1px var(--gray); */
-}
-
-.outline {
-  fill: none;
-  stroke: var(--gray);
-  stroke-width: 0.5;
-}
-
-.graticule {
-  fill: none;
-  stroke: var(--dark-gray);
-  stroke-width: 0.5;
-}
-
-.feature {
-  stroke: var(--black);
-  stroke-width: 0.5;
-  cursor: pointer;
-}
-
 .legend {
   display: flex;
   align-items: center;

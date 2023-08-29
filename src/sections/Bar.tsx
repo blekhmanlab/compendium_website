@@ -1,17 +1,18 @@
 import { useEffect } from "react";
 import { renderToString } from "react-dom/server";
 import * as d3 from "d3";
-import { orderBy, startCase } from "lodash";
+import { orderBy } from "lodash";
 import Placeholder from "@/components/Placeholder";
 import { ByTaxLevel, Data, useData } from "@/data";
 import { getColor } from "@/util/colors";
-import { useViewBox } from "@/util/hooks";
-import classes from "./Chart.module.css";
+import { downloadSvg } from "@/util/dom";
+import { formatNumber } from "@/util/math";
 
 /** show prevalence of samples at certain taxonomic level as bar chart */
 
 type Props = {
   id?: string;
+  title: string;
   data: Data["byClass"] | Data["byPhylum"];
   datumKey:
     | keyof NonNullable<Data["byClass"]>[number]
@@ -19,19 +20,14 @@ type Props = {
 };
 
 /** svg dimensions */
-const width = 350;
-const bandHeight = width / 10;
-const height = (rows: number) => bandHeight * (rows || 10);
+const width = 300;
+const height = 600;
+const padding = 100;
 
-/** flag to only fit svg viewbox once */
-let fitted = false;
-
-const Chart = ({ id = "chart", data, datumKey }: Props) => {
+const Chart = ({ id = "chart", title, data, datumKey }: Props) => {
   /** get global state */
   const selectedFeature = useData((state) => state.selectedFeature);
 
-  /** infer title from key we're accessing on datum */
-  const title = "By " + startCase(datumKey);
   /** which sample count to use */
   const sampleKey = (selectedFeature?.code ||
     selectedFeature?.region ||
@@ -46,20 +42,10 @@ const Chart = ({ id = "chart", data, datumKey }: Props) => {
       ["desc", "asc", "asc"],
     ).slice(0, 20);
 
-  const [svg, fit] = useViewBox(20);
-
   /** rerun d3 code when props change */
   useEffect(() => {
     chart(id, filtered, datumKey, sampleKey);
   }, [id, filtered, datumKey, sampleKey]);
-
-  /** fit on first mount */
-  useEffect(() => {
-    if (filtered?.length && !fitted) {
-      fit();
-      fitted = true;
-    }
-  }, [filtered, fit]);
 
   if (!filtered)
     return <Placeholder height={400}>Loading "{title}" chart...</Placeholder>;
@@ -68,31 +54,60 @@ const Chart = ({ id = "chart", data, datumKey }: Props) => {
   const blank = !filtered[0].samples[sampleKey];
 
   return (
-    <svg ref={svg} id={id} className={classes.chart}>
-      <text className="title" x={width / 2} y={-50} textAnchor="middle">
+    <svg
+      viewBox={[
+        -padding - padding * 2,
+        -padding,
+        width + padding * 2 + padding * 2,
+        height + padding * 2,
+      ].join(" ")}
+      id={id}
+      className="chart"
+      onClick={(event) => {
+        if (event.shiftKey)
+          downloadSvg(event.currentTarget as Element, "phyla-chart");
+      }}
+    >
+      <text
+        className="title"
+        x={width / 2}
+        y={-padding * 0.9}
+        style={{ fontSize: "35px" }}
+        textAnchor="middle"
+        dominantBaseline="hanging"
+      >
         {title}
       </text>
       {selectedFeature && (
-        <text className="sub-title" x={width / 2} y={-15} textAnchor="middle">
+        <text
+          className="sub-title"
+          x={width / 2}
+          y={-padding / 2}
+          style={{ fontSize: "20px" }}
+          textAnchor="middle"
+          dominantBaseline="hanging"
+        >
           {selectedFeature.country || selectedFeature.region}
         </text>
       )}
-      <g className="bars"></g>
-      <g className="x-axis"></g>
-      <g className="y-axis"></g>
+      <g className="bars" />
+      <g className="x-axis" transform={`translate(0, ${height})`} />
+      <g className="y-axis" />
       <text
         className="axis-title"
         x={width / 2}
-        y={height(filtered.length || 0) + 80}
+        y={height + padding * 0.9}
+        style={{ fontSize: "30px" }}
         textAnchor="middle"
       >
-        Number of samples
+        Samples
       </text>
       {blank && (
         <text
           className="axis-title"
           x={width / 2}
-          y={height(filtered?.length || 0) / 2}
+          y={height / 2}
+          style={{ fontSize: "30px" }}
           textAnchor="middle"
         >
           No Samples
@@ -135,15 +150,13 @@ const chart = (
   const yScale = d3
     .scaleBand()
     .domain(data.map((d) => d.kingdom + d.phylum + d._class))
-    .range([0, height(data.length)])
+    .range([0, height])
     .padding(0.2);
 
   /** create x axis */
   const xAxis = d3
     .axisBottom(xScale)
-    .ticks(3, (d: number) =>
-      d.toLocaleString(undefined, { notation: "compact" }),
-    );
+    .ticks(3, (d: number) => formatNumber(d, true));
 
   /** create y axis */
   const yAxis = d3
@@ -153,20 +166,17 @@ const chart = (
   /** update x axis */
   svg
     .select<SVGGElement>(".x-axis")
-    .attr("transform", `translate(0, ${height(data.length)})`)
-    .call(xAxis);
+    .transition()
+    .call(xAxis)
+    .selectAll(".tick")
+    .attr("font-size", "25px");
 
   /** update y axis */
   svg
     .select<SVGGElement>(".y-axis")
-    [
-      /**
-       * only transition on subsequent renders. if transition on first render,
-       * no axis labels exist for first frame, messing up bbox/fit.
-       */
-      fitted ? "transition" : "interrupt"
-    ]()
-    .call(yAxis);
+    .transition()
+    .call(yAxis)
+    .attr("font-size", "25px");
 
   /** update bars */
   svg
@@ -178,7 +188,7 @@ const chart = (
     .attr("x", 0)
     .attr("y", (d) => yScale(d.kingdom + d.phylum + d._class) || 0)
     .attr("width", (d) => xScale(getSamples(d)) || 0)
-    .attr("height", () => yScale.bandwidth())
+    .attr("height", () => yScale.bandwidth() || 0)
     .attr("fill", (d) => getColor(d.phylum))
     .attr("role", "graphics-symbol")
     .attr("data-tooltip", (d) =>
@@ -195,7 +205,7 @@ const chart = (
           <span>Kingdom</span>
           <span>{d.kingdom}</span>
           <span>Samples</span>
-          <span>{getSamples(d).toLocaleString()}</span>
+          <span>{formatNumber(getSamples(d))}</span>
         </div>,
       ),
     );

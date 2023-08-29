@@ -4,6 +4,7 @@ import { ReactComponent as CountriesIcon } from "@/assets/earth.svg";
 import { ReactComponent as SamplesIcon } from "@/assets/microscope.svg";
 import Placeholder from "@/components/Placeholder";
 import { useData } from "@/data";
+import { formatNumber } from "@/util/math";
 import classes from "./Overview.module.css";
 
 const Overview = () => {
@@ -18,9 +19,9 @@ const Overview = () => {
       icon: SamplesIcon,
       text: (
         <>
-          {(metadata?.samples || 0).toLocaleString()} samples
+          {formatNumber(metadata?.samples)} samples
           <br />
-          {(metadata?.projects || 0).toLocaleString()} projects
+          {formatNumber(metadata?.projects)} projects
         </>
       ),
     },
@@ -28,9 +29,9 @@ const Overview = () => {
       icon: ClassesIcon,
       text: (
         <>
-          {(metadata?.classes || 0).toLocaleString()} classes
+          {formatNumber(metadata?.classes)} classes
           <br />
-          {(metadata?.phyla || 0).toLocaleString()} phyla
+          {formatNumber(metadata?.phyla)} phyla
         </>
       ),
     },
@@ -38,9 +39,9 @@ const Overview = () => {
       icon: CountriesIcon,
       text: (
         <>
-          {(metadata?.countries || 0).toLocaleString()} countries
+          {formatNumber(metadata?.countries)} countries
           <br />
-          {(metadata?.regions || 0).toLocaleString()} regions
+          {formatNumber(metadata?.regions)} regions
         </>
       ),
     },
@@ -65,9 +66,7 @@ const Overview = () => {
 
       <p>
         This dataset includes{" "}
-        {samplesRound
-          ? "over " + samplesRound.toLocaleString()
-          : "thousands of"}{" "}
+        {samplesRound ? "over " + formatNumber(samplesRound) : "thousands of"}{" "}
         samples of publicly available 16S rRNA amplicon sequencing data, all
         processed using the same pipeline and reference database.
       </p>

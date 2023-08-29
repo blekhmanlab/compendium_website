@@ -20,3 +20,10 @@ export const scale = ({ x, y }: Point, scale: number): Point => ({
 /** clamp value between min and max */
 export const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
+
+/** format number to string */
+export const formatNumber = (value?: number, compact = false) =>
+  (value || 0).toLocaleString(
+    undefined,
+    compact ? { notation: "compact" } : undefined,
+  );
