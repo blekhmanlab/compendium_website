@@ -117,6 +117,7 @@ const Histogram = ({ id = "histogram", title, data }: Props) => {
           className="axis-title"
           x={width / 2}
           y={height / 2}
+          style={{ fontSize: "30px" }}
           textAnchor="middle"
         >
           No Samples
