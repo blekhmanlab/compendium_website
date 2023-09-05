@@ -130,6 +130,10 @@ a:hover {
   color: var(--primary-light);
 }
 
+img {
+  max-width: 100%;
+}
+
 code {
   padding: 2px 5px;
   border-radius: var(--rounded);
@@ -191,9 +195,12 @@ svg [data-tooltip]:hover {
 }
 
 .inline-svg {
+  position: relative;
+  top: -1px;
   height: 1em;
   margin-right: 0.35em;
   margin-left: 0.15em;
+  vertical-align: middle;
 }
 
 :focus:not(:focus-visible) {

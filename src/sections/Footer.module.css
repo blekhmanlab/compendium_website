@@ -1,24 +1,28 @@
-.footer {
+.cols {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
   width: 100%;
-  padding-top: 50px;
   gap: 40px;
-  line-height: var(--xl-spacing);
 }
 
-.footer h3 {
+.cols h3 {
   text-align: left;
 }
 
-@media (max-width: 1000px) {
-  .footer {
-    grid-template-columns: 2fr 1fr;
-  }
+.logo {
+  display: flex;
+  align-self: center;
+}
+
+.logo img {
+  width: 100%;
+  max-width: 300px;
+  max-height: 50px;
 }
 
 @media (max-width: 800px) {
-  .footer {
+  .cols {
     grid-template-columns: 1fr;
   }
 }
