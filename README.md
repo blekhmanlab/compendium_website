@@ -31,5 +31,3 @@ Notable technologies/packages/etc. used:
 | `yarn build`   | Build production version of app                   |
 | `yarn preview` | Serve built version of app (must run build first) |
 | `yarn lint`    | Fix linting and formatting                        |
-
-**Note**: `yarn dev` [won't work Firefox](https://caniuse.com/?search=module%20worker) (`yarn build` [will work fine](https://vitejs.dev/guide/features.html#import-with-query-suffixes)).
