@@ -27,10 +27,6 @@ const Footer = () => (
         <a href="http://greenelab.com/" target="_blank">
           Greene Lab
         </a>
-        ,{" "}
-        <a href="https://seandavi.github.io/" target="_blank">
-          Davis Lab
-        </a>
         , and{" "}
         <a href="https://albert-lab.org/" target="_blank">
           Albert Lab
