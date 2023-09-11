@@ -6,7 +6,7 @@ import Placeholder from "@/components/Placeholder";
 import { ByTaxLevel, Data, useData } from "@/data";
 import { getColor } from "@/util/colors";
 import { downloadSvg } from "@/util/dom";
-import { formatNumber } from "@/util/math";
+import { formatNumber } from "@/util/string";
 
 /** show prevalence of samples at certain taxonomic level as bar chart */
 
@@ -154,9 +154,7 @@ const chart = (
     .padding(0.2);
 
   /** create x axis */
-  const xAxis = d3
-    .axisBottom(xScale)
-    .ticks(3, (d: number) => formatNumber(d, true));
+  const xAxis = d3.axisBottom(xScale).ticks(3, (d: number) => formatNumber(d));
 
   /** create y axis */
   const yAxis = d3
@@ -205,7 +203,7 @@ const chart = (
           <span>Kingdom</span>
           <span>{d.kingdom}</span>
           <span>Samples</span>
-          <span>{formatNumber(getSamples(d))}</span>
+          <span>{formatNumber(getSamples(d), false)}</span>
         </div>,
       ),
     );

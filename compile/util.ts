@@ -2,9 +2,7 @@ import { execSync } from "child_process";
 import { createReadStream, readFileSync, writeFileSync } from "fs";
 import readline from "readline";
 import _ from "lodash";
-import { parse as parseHTML } from "node-html-parser";
 import Downloader from "nodejs-file-downloader";
-import { LD } from "./ld";
 
 const lastCall: { [key: string]: number } = {};
 /** return true only if enough time has passed since last call */
@@ -74,15 +72,6 @@ export const write = (filename: string, data: unknown, pretty = false) =>
     JSON.stringify(data, null, pretty ? 2 : undefined),
     "utf8",
   );
-
-/** scrape JSON-LD from url */
-export const getLd = async (url: string): Promise<LD> => {
-  const response = await request<string>(url, "text");
-  const json =
-    parseHTML(response).querySelector("script[type='application/ld+json']")
-      ?.innerText || "-";
-  return JSON.parse(json);
-};
 
 /** generate n equally spaced (in log space) intervals between a and b */
 export const logSpace = (a: number, b: number, n: number) => {

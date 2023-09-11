@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import Placeholder from "@/components/Placeholder";
 import { ByReads, Data, useData } from "@/data";
 import { downloadSvg, getCssVariable } from "@/util/dom";
-import { formatNumber } from "@/util/math";
+import { formatNumber } from "@/util/string";
 
 /** show sample counts vs binned read counts */
 
@@ -160,13 +160,13 @@ const histogram = (
   /** create x axis */
   const xAxis = d3
     .axisBottom(xScale)
-    .ticks(null, (d: number) => formatNumber(d, true));
+    .ticks(null, (d: number) => formatNumber(d));
 
   /** create y axis */
   const yAxis = d3
     .axisLeft(yScale)
     .ticks(5)
-    .tickFormat((d) => formatNumber(d as number, true));
+    .tickFormat((d) => formatNumber(d as number));
 
   const secondary = getCssVariable("--secondary");
 
@@ -203,10 +203,10 @@ const histogram = (
       renderToString(
         <div className="tooltip-table">
           <span>There are...</span>
-          <span>{formatNumber(getSamples(d), true)} samples</span>
+          <span>{formatNumber(getSamples(d))} samples</span>
           <span>That have between...</span>
           <span>
-            {formatNumber(d.min, true)} and {formatNumber(d.max, true)} reads
+            {formatNumber(d.min)} and {formatNumber(d.max)} reads
           </span>
         </div>,
       ),

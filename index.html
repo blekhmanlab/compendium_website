@@ -17,6 +17,21 @@
     <meta property="og:description" content="%VITE_DESCRIPTION%" />
 
     <link rel="canonical" href="%VITE_URL%" />
+
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-HBBNT6BWYH"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-HBBNT6BWYH");
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -6,7 +6,8 @@ import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import { Data, setSelectedFeature, useData } from "@/data";
 import { downloadSvg, getCssVariable } from "@/util/dom";
-import { clamp, formatNumber } from "@/util/math";
+import { clamp } from "@/util/math";
+import { formatNumber } from "@/util/string";
 import classes from "./Map.module.css";
 
 /** svg dimensions */
@@ -284,7 +285,7 @@ const map = () => {
               <span>Region</span>
               <span>{region}</span>
               <span>Samples</span>
-              <span>{formatNumber(samples)}</span>
+              <span>{formatNumber(samples, false)}</span>
             </div>,
           ),
       )

@@ -3,7 +3,7 @@ import classes from "./Footer.module.css";
 const Footer = () => (
   <footer>
     <div className="sub-section">
-      <p>
+      {/* <p>
         Source code: &nbsp;
         <a href="link" target="_blank">
           Database
@@ -16,16 +16,24 @@ const Footer = () => (
         <a href="link" target="_blank">
           Scripts
         </a>
-      </p>
+      </p> */}
 
       <p>
         A project of the{" "}
         <a href="http://blekhmanlab.org/" target="_blank">
           Blekhman Lab
-        </a>{" "}
-        and{" "}
+        </a>
+        ,{" "}
         <a href="http://greenelab.com/" target="_blank">
           Greene Lab
+        </a>
+        ,{" "}
+        <a href="https://seandavi.github.io/" target="_blank">
+          Davis Lab
+        </a>
+        , and{" "}
+        <a href="https://albert-lab.org/" target="_blank">
+          Albert Lab
         </a>
         , in affiliation with...
       </p>
