@@ -1,3 +1,4 @@
+import { Zenodo } from "../../compile/zenodo-api";
 import { FeatureCollection, Geometry } from "geojson";
 import { orderBy } from "lodash";
 import { create } from "zustand";
@@ -45,9 +46,12 @@ export type Data = {
 
 export const useData = create<Data>(() => ({}));
 
+/** record of downloads, version, and other info */
+const recordUrl = "https://zenodo.org/api/records/8186993";
+
 /** one-time load app-wide data */
 export const loadData = async () => {
-  const [, byProject, byPhylum, byClass, byRegion, byCountry] =
+  const [metadata, byProject, byPhylum, byClass, byRegion, byCountry] =
     await Promise.all([
       load("metadata.json", "metadata"),
       load("by-project.json", "byProject"),
@@ -65,8 +69,17 @@ export const loadData = async () => {
     byRegion,
     byCountry,
   );
-
   useData.setState({ searchList });
+
+  /** pull in live stats from record */
+  const record = await request<Zenodo>(recordUrl);
+  useData.setState(() => ({
+    metadata: {
+      ...metadata,
+      downloads: record.stats.version_downloads,
+      views: record.stats.version_views,
+    },
+  }));
 };
 
 /** load json and set state */
@@ -74,11 +87,17 @@ const load = async <Key extends keyof Data>(
   url: string,
   key: Key,
 ): Promise<NonNullable<Data[Key]>> => {
-  const response = await fetch(url);
-  if (!response.ok) throw Error("Response not OK");
-  const data = (await response.json()) as NonNullable<Data[Key]>;
+  const data = await request<NonNullable<Data[Key]>>(url);
   useData.setState({ [key]: data });
   return data;
+};
+
+/** generic request wrapper */
+const request = async <T>(url: string) => {
+  const response = await fetch(url);
+  if (!response.ok) throw Error("Response not OK");
+  const data = await response.json();
+  return data as T;
 };
 
 /**

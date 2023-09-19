@@ -1,4 +1,4 @@
-import { ReactComponent as DownloadIcon } from "@/assets/download.svg";
+import { ReactComponent as PackageIcon } from "@/assets/package.svg";
 import { ReactComponent as RecipeIcon } from "@/assets/recipe.svg";
 import Button from "@/components/Button";
 import classes from "./Recipes.module.css";
@@ -31,11 +31,12 @@ const Recipes = () => (
     <h2>Recipes</h2>
 
     <p>
+      Some of the things you can do with{" "}
       <a href={import.meta.env.VITE_R_PACKAGE} target="_blank">
-        <DownloadIcon className="inline-svg" />
-        Download the R package
-      </a>{" "}
-      to do more advanced filtering and analyses with the data, such as...
+        <PackageIcon className="inline-svg" />
+        the R package
+      </a>
+      :
     </p>
 
     <div className={classes.buttons}>

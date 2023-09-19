@@ -18,6 +18,11 @@ type Metadata = {
   date: string;
   url: string;
   version: string;
+  downloads: number;
+  views: number;
+  size: number;
+  uncompressed: number;
+  doi: string;
 };
 
 type ByTaxLevel = {

@@ -4,7 +4,7 @@ import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import Textbox from "@/components/Textbox";
 import { Data, SearchList, useData } from "@/data";
-import { formatNumber } from "@/util/math";
+import { formatNumber } from "@/util/string";
 import { thread } from "@/workers";
 import classes from "./SearchBox.module.css";
 
@@ -115,7 +115,7 @@ const Search = ({ filters }: Props) => {
                   <tr key={index} style={{ opacity: fuzzy ? 0.5 : 1 }}>
                     <td>{name}</td>
                     <td>{type}</td>
-                    <td>{formatNumber(samples)}</td>
+                    <td>{formatNumber(samples, false)}</td>
                   </tr>
                 ))
             ) : (

@@ -3,31 +3,32 @@
 // eslint-disable-next-line
 /// <reference path="./types.d.ts" />
 
+import { lstatSync, readdirSync } from "fs";
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
 import * as d3 from "d3";
 import dissolve from "geojson-dissolve";
 import _ from "lodash";
-import { LD } from "./ld";
 import { ByGeo, ByProject, ByTaxLevel, Metadata, WorldMap } from "./types";
 import {
   download,
-  getLd,
   logSpace,
   read,
+  request,
   stream,
   throttle,
   write,
 } from "./util";
+import { Zenodo } from "./zenodo-api";
 
 /**
  * pre-compile step that takes the "raw" distributed data (csv/tsv), and
  * processs and pares it down to just what the website needs (json).
  */
 
-/** url with JSON-LD containing latest downloads and other metadata */
-const ldUrl = "https://doi.org/10.5281/zenodo.8186993";
+/** record of downloads, version, and other info */
+export const recordUrl = "https://zenodo.org/api/records/8186993";
 
 /** raw taxonomic data */
 const taxonomicFile = "taxonomic_table.csv";
@@ -317,7 +318,7 @@ const deriveMetadata = (
   byClass: ByTaxLevel,
   byRegion: ByGeo,
   byCountry: ByGeo,
-  ld: LD,
+  record: Zenodo,
 ): Metadata => {
   const projects = byProject.length;
   const samples = byProject.reduce(
@@ -340,20 +341,31 @@ const deriveMetadata = (
     classes,
     regions,
     countries,
-    date: ld.datePublished,
-    url: ld["@id"],
-    version: ld.version,
+    date: record.updated,
+    url: record.links.latest_html,
+    version: record.metadata.version,
+    downloads: record.stats.version_downloads,
+    views: record.stats.version_views,
+    size:
+      record.files
+        ?.map((file) => file.size)
+        ?.reduce((total, value) => total + value, 0) || 0,
+    uncompressed: readdirSync("./")
+      .filter((file) => [".csv", ".tsv"].some((ext) => file.endsWith(ext)))
+      .map((file) => lstatSync(file).size)
+      .reduce((total, value) => total + value, 0),
+    doi: record.doi,
   };
 };
 
 /** main workflow */
 
-console.info("Getting data download links and meta");
-const ld = await getLd(ldUrl);
+console.info("Getting data download links and other info");
+const record = await request<Zenodo>(recordUrl);
 
 if (!process.env.SKIP_DOWNLOAD) {
   console.info("Downloading raw data");
-  for (const { contentUrl } of ld.distribution) await download(contentUrl);
+  for (const { links } of record.files || []) await download(links.self);
 }
 
 console.info("Cleaning world map data");
@@ -376,6 +388,6 @@ const metadata = deriveMetadata(
   byClass,
   byRegion,
   byCountry,
-  ld,
+  record,
 );
 write("../public/metadata.json", metadata, true);

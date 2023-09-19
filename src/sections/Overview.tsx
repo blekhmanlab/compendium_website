@@ -1,10 +1,13 @@
-import { ReactComponent as ClassesIcon } from "@/assets/bars.svg";
-import { ReactComponent as SizeIcon } from "@/assets/database.svg";
-import { ReactComponent as CountriesIcon } from "@/assets/earth.svg";
-import { ReactComponent as SamplesIcon } from "@/assets/microscope.svg";
+import { ReactComponent as BarsIcon } from "@/assets/bars.svg";
+import { ReactComponent as DatabaseIcon } from "@/assets/database.svg";
+import { ReactComponent as EarthIcon } from "@/assets/earth.svg";
+import { ReactComponent as EyeIcon } from "@/assets/eye.svg";
+import { ReactComponent as MicroscopeIcon } from "@/assets/microscope.svg";
+import { ReactComponent as PackageIcon } from "@/assets/package.svg";
+import { ReactComponent as TableIcon } from "@/assets/table.svg";
 import Placeholder from "@/components/Placeholder";
 import { useData } from "@/data";
-import { formatNumber } from "@/util/math";
+import { formatBytes, formatDate, formatNumber } from "@/util/string";
 import classes from "./Overview.module.css";
 
 const Overview = () => {
@@ -16,17 +19,17 @@ const Overview = () => {
 
   const tiles = [
     {
-      icon: SamplesIcon,
+      icon: MicroscopeIcon,
       text: (
         <>
-          {formatNumber(metadata?.samples)} samples
+          {formatNumber(metadata?.samples, false)} samples
           <br />
           {formatNumber(metadata?.projects)} projects
         </>
       ),
     },
     {
-      icon: ClassesIcon,
+      icon: BarsIcon,
       text: (
         <>
           {formatNumber(metadata?.classes)} classes
@@ -36,7 +39,7 @@ const Overview = () => {
       ),
     },
     {
-      icon: CountriesIcon,
+      icon: EarthIcon,
       text: (
         <>
           {formatNumber(metadata?.countries)} countries
@@ -46,15 +49,33 @@ const Overview = () => {
       ),
     },
     {
-      icon: SizeIcon,
+      icon: DatabaseIcon,
       text: (
         <>
           Ver. {metadata?.version}
           <br />
-          {(new Date(metadata?.date || "") || new Date()).toLocaleString(
-            undefined,
-            { dateStyle: "medium" },
-          )}
+          {formatDate(metadata?.date)}
+        </>
+      ),
+    },
+
+    {
+      icon: EyeIcon,
+      text: (
+        <>
+          {formatNumber(metadata?.downloads)} downloads
+          <br />
+          {formatNumber(metadata?.views)} views
+        </>
+      ),
+    },
+    {
+      icon: TableIcon,
+      text: (
+        <>
+          {formatBytes(metadata?.size)} download
+          <br />
+          {formatBytes(metadata?.uncompressed)} uncompressed
         </>
       ),
     },
@@ -89,6 +110,18 @@ const Overview = () => {
       ) : (
         <Placeholder height={100}>Loading metadata...</Placeholder>
       )}
+
+      <hr />
+
+      <p>
+        This website lets you search and explore the data at a high level before
+        downloading.{" "}
+        <a href={import.meta.env.VITE_R_PACKAGE} target="_blank">
+          <PackageIcon className="inline-svg" />
+          Use the R package
+        </a>{" "}
+        to do all kinds of filtering and analyses with the data!
+      </p>
     </section>
   );
 };
