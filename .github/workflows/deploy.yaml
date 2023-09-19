@@ -21,10 +21,8 @@ jobs:
       - name: Build app
         run: yarn build
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Deploy to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          keep_files: false
-          publish_branch: gh-pages
-          publish_dir: dist
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          clean: true
+          folder: dist
