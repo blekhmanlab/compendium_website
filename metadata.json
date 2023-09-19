@@ -5,7 +5,12 @@
   "classes": 212,
   "regions": 8,
   "countries": 65,
-  "date": "2023-08-08",
-  "url": "https://doi.org/10.5281/zenodo.8226567",
-  "version": "0.2.0"
+  "date": "2023-08-09T02:26:49.759297+00:00",
+  "url": "https://zenodo.org/record/8226567",
+  "version": "0.2.0",
+  "downloads": 249,
+  "views": 235,
+  "size": 54836407,
+  "uncompressed": 1397242949,
+  "doi": "10.5281/zenodo.8226567"
 }
