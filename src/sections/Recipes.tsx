@@ -13,12 +13,16 @@ const recipes = [
     name: "Get samples from a specific world region",
   },
   {
-    link: "histogram-of-total-bases-per-sample",
-    name: "See a histogram of total bases per sample",
+    link: "samples-from-a-specific-country",
+    name: "Get samples from a specific country",
   },
   {
-    link: "read-counts-aggregated-to-order",
-    name: "See read counts aggregated to order",
+    link: "enrich-data-with-country-names",
+    name: "Enrich data with country names",
+  },
+  {
+    link: "histogram-of-total-bases-per-sample",
+    name: "Generate histogram of total bases per sample"
   },
   {
     link: "samples-filtered-by-presence-of-microbe",
