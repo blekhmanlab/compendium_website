@@ -26,8 +26,7 @@ export const request = async <Type>(
 };
 
 /** download file */
-export const download = async (url: string) => {
-  const filename = url.split("/").pop() || "";
+export const download = async (url: string, filename: string) => {
   console.info(`Downloading ${filename}`);
   await new Downloader({
     url,

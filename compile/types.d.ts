@@ -15,14 +15,12 @@ type Metadata = {
   classes: number;
   countries: number;
   regions: number;
-  date: string;
-  url: string;
   version: string;
+  date: string;
   downloads: number;
   views: number;
   size: number;
   uncompressed: number;
-  doi: string;
 };
 
 type ByTaxLevel = {

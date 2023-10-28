@@ -75,7 +75,7 @@ const Overview = () => {
         <>
           {formatBytes(metadata?.size)} download
           <br />
-          {formatBytes(metadata?.uncompressed)} uncompressed
+          {formatBytes(metadata?.uncompressed)} uncomp.
         </>
       ),
     },

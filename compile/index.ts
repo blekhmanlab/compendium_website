@@ -20,7 +20,7 @@ import {
   throttle,
   write,
 } from "./util";
-import { Zenodo } from "./zenodo-api";
+import { Record, Zenodo } from "./zenodo-api";
 
 /**
  * pre-compile step that takes the "raw" distributed data (csv/tsv), and
@@ -28,7 +28,8 @@ import { Zenodo } from "./zenodo-api";
  */
 
 /** record of downloads, version, and other info */
-export const recordUrl = "https://zenodo.org/api/records/8186993";
+export const recordUrl =
+  "https://zenodo.org/api/records?q=conceptrecid:8186993";
 
 /** raw taxonomic data */
 const taxonomicFile = "taxonomic_table.csv";
@@ -318,7 +319,7 @@ const deriveMetadata = (
   byClass: ByTaxLevel,
   byRegion: ByGeo,
   byCountry: ByGeo,
-  record: Zenodo,
+  record: Record,
 ): Metadata => {
   const projects = byProject.length;
   const samples = byProject.reduce(
@@ -341,11 +342,10 @@ const deriveMetadata = (
     classes,
     regions,
     countries,
-    date: record.updated,
-    url: record.links.latest_html,
     version: record.metadata.version,
-    downloads: record.stats.version_downloads,
-    views: record.stats.version_views,
+    date: record.updated,
+    downloads: record.stats.unique_downloads,
+    views: record.stats.unique_views,
     size:
       record.files
         ?.map((file) => file.size)
@@ -354,18 +354,18 @@ const deriveMetadata = (
       .filter((file) => [".csv", ".tsv"].some((ext) => file.endsWith(ext)))
       .map((file) => lstatSync(file).size)
       .reduce((total, value) => total + value, 0),
-    doi: record.doi,
   };
 };
 
 /** main workflow */
 
 console.info("Getting data download links and other info");
-const record = await request<Zenodo>(recordUrl);
+const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
 
 if (!process.env.SKIP_DOWNLOAD) {
   console.info("Downloading raw data");
-  for (const { links } of record.files || []) await download(links.self);
+  for (const { key, links } of record.files || [])
+    await download(links.self, key);
 }
 
 console.info("Cleaning world map data");

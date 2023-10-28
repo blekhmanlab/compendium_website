@@ -47,7 +47,8 @@ export type Data = {
 export const useData = create<Data>(() => ({}));
 
 /** record of downloads, version, and other info */
-const recordUrl = "https://zenodo.org/api/records/8186993";
+export const recordUrl =
+  "https://zenodo.org/api/records?q=conceptrecid:8186993";
 
 /** one-time load app-wide data */
 export const loadData = async () => {
@@ -71,13 +72,20 @@ export const loadData = async () => {
   );
   useData.setState({ searchList });
 
-  /** pull in live stats from record */
-  const record = await request<Zenodo>(recordUrl);
+  /** update meta with live stats */
+  const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
   useData.setState(() => ({
     metadata: {
       ...metadata,
-      downloads: record.stats.version_downloads,
-      views: record.stats.version_views,
+      /** recalc any line from compile script that involves record */
+      version: record.metadata.version,
+      date: record.updated,
+      downloads: record.stats.unique_downloads,
+      views: record.stats.unique_views,
+      size:
+        record.files
+          ?.map((file) => file.size)
+          ?.reduce((total, value) => total + value, 0) || 0,
     },
   }));
 };

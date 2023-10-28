@@ -1,96 +1,155 @@
 /** https://jvilk.com/MakeTypes/ */
-
 export interface Zenodo {
-  conceptdoi: string;
-  conceptrecid: string;
+  hits: Hits;
+  aggregations: Aggregations;
+}
+export interface Hits {
+  hits: Record[];
+  total: number;
+}
+export interface Record {
   created: string;
-  doi: string;
-  files?: FilesEntity[] | null;
+  modified: string;
   id: number;
-  links: Links;
-  metadata: Metadata;
-  owners?: number[] | null;
-  revision: number;
-  stats: Stats;
-  updated: string;
-}
-export interface FilesEntity {
-  bucket: string;
-  checksum: string;
-  key: string;
-  links: Links1;
-  size: number;
-  type: string;
-}
-export interface Links1 {
-  self: string;
-}
-export interface Links {
-  badge: string;
-  bucket: string;
-  conceptbadge: string;
-  conceptdoi: string;
+  conceptrecid: string;
   doi: string;
-  html: string;
-  latest: string;
-  latest_html: string;
-  self: string;
+  conceptdoi: string;
+  doi_url: string;
+  metadata: Metadata;
+  title: string;
+  links: Links;
+  updated: string;
+  recid: string;
+  revision: number;
+  files?: File[];
+  owners?: Owner[];
+  status: string;
+  stats: Stats;
+  state: string;
+  submitted: boolean;
 }
 export interface Metadata {
-  access_right: string;
-  access_right_category: string;
-  creators?: CreatorsEntity[] | null;
-  description: string;
-  doi: string;
-  language: string;
-  license: License;
-  publication_date: string;
-  related_identifiers?: RelatedIdentifiersEntity[] | null;
-  relations: Relations;
-  resource_type: ResourceType;
   title: string;
+  doi: string;
+  publication_date: string;
+  description: string;
+  access_right: string;
+  creators?: Creator[];
+  keywords?: string[];
+  related_identifiers?: RelatedIdentifier[];
   version: string;
+  language: string;
+  resource_type: ResourceType;
+  license: License;
+  relations: Relations;
 }
-export interface CreatorsEntity {
-  affiliation: string;
+export interface Creator {
   name: string;
+  affiliation: string;
   orcid: string;
 }
-export interface License {
-  id: string;
-}
-export interface RelatedIdentifiersEntity {
+export interface RelatedIdentifier {
   identifier: string;
   relation: string;
+  resource_type: string;
   scheme: string;
-}
-export interface Relations {
-  version?: VersionEntity[] | null;
-}
-export interface VersionEntity {
-  count: number;
-  index: number;
-  is_last: boolean;
-  last_child: LastChildOrParent;
-  parent: LastChildOrParent;
-}
-export interface LastChildOrParent {
-  pid_type: string;
-  pid_value: string;
 }
 export interface ResourceType {
   title: string;
   type: string;
 }
+export interface License {
+  id: string;
+}
+export interface Relations {
+  version?: Version[];
+}
+export interface Version {
+  index: number;
+  is_last: boolean;
+  parent: Parent;
+}
+export interface Parent {
+  pid_type: string;
+  pid_value: string;
+}
+export interface Links {
+  self: string;
+  self_html: string;
+  self_doi: string;
+  doi: string;
+  parent: string;
+  parent_html: string;
+  parent_doi: string;
+  self_iiif_manifest: string;
+  self_iiif_sequence: string;
+  files: string;
+  media_files: string;
+  archive: string;
+  archive_media: string;
+  latest: string;
+  latest_html: string;
+  draft: string;
+  versions: string;
+  access_links: string;
+  access_users: string;
+  access_request: string;
+  access: string;
+  reserve_doi: string;
+  communities: string;
+  "communities-suggestions": string;
+  requests: string;
+}
+export interface File {
+  id: string;
+  key: string;
+  size: number;
+  checksum: string;
+  links: Links1;
+}
+export interface Links1 {
+  self: string;
+}
+export interface Owner {
+  id: number;
+}
 export interface Stats {
   downloads: number;
   unique_downloads: number;
+  views: number;
   unique_views: number;
   version_downloads: number;
   version_unique_downloads: number;
   version_unique_views: number;
   version_views: number;
-  version_volume: number;
-  views: number;
-  volume: number;
+}
+export interface Aggregations {
+  access_status: AccessStatusOrSubjectOrFileType;
+  resource_type: ResourceType1;
+  subject: AccessStatusOrSubjectOrFileType;
+  file_type: AccessStatusOrSubjectOrFileType;
+}
+export interface AccessStatusOrSubjectOrFileType {
+  buckets?: Bucket[];
+  label: string;
+}
+export interface Bucket {
+  key: string;
+  doc_count: number;
+  label: string;
+  is_selected: boolean;
+}
+export interface ResourceType1 {
+  buckets?: Bucket1[];
+  label: string;
+}
+export interface Bucket1 {
+  key: string;
+  doc_count: number;
+  label: string;
+  is_selected: boolean;
+  inner: Inner;
+}
+export interface Inner {
+  buckets?: null[];
 }

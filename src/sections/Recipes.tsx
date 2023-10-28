@@ -22,7 +22,7 @@ const recipes = [
   },
   {
     link: "histogram-of-total-bases-per-sample",
-    name: "Generate histogram of total bases per sample"
+    name: "Generate histogram of total bases per sample",
   },
   {
     link: "samples-filtered-by-presence-of-microbe",

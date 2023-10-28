@@ -25,3 +25,4 @@ dist-ssr
 
 compile/*.tsv
 compile/*.csv
+compile/*.gz
