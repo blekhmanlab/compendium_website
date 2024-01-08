@@ -391,3 +391,6 @@ const metadata = deriveMetadata(
   record,
 );
 write("../public/metadata.json", metadata, true);
+
+console.info("Summary");
+console.info(metadata);

@@ -14,6 +14,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: main
+      
+      - name: Summary info
+        run: echo Commit && git rev-parse HEAD && cat ./public/metadata.json
 
       - if: runner.debug == '1'
         uses: mxschmitt/action-tmate@v3
