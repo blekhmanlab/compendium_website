@@ -57,5 +57,6 @@ export const preserveScroll = async (element: Element) => {
   const oldY = element.getBoundingClientRect().top;
   await sleep(0);
   const newY = element.getBoundingClientRect().top;
+  if (!element.isConnected) return;
   window.scrollBy({ top: newY - oldY, behavior: "instant" });
 };

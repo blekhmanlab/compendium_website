@@ -25,7 +25,7 @@ const Tabs = ({ tabs }: Props) => (
         <p>{tabs[selectedIndex].description}</p>
         <Tab.Panels className={classes.panels}>
           {tabs.map((tab, index) => (
-            <Tab.Panel key={index} className="sub-section">
+            <Tab.Panel key={index} className="sub-section" unmount={false}>
               {tab.content}
             </Tab.Panel>
           ))}
