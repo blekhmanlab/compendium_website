@@ -19,16 +19,21 @@ type Col<Datum extends object, Key extends keyof Datum> = {
 };
 
 type Props<Datum extends object> = {
-  /** https://github.com/orgs/vuejs/discussions/8851 */
+  /** col definitions https://github.com/orgs/vuejs/discussions/8851 */
   cols: { [Key in keyof Datum]: Col<Datum, Key> }[keyof Datum][];
+  /** data */
   rows: Datum[];
+  /** max rows to show at a time */
   limit?: number;
+  /** extra rows to add at end, for messages */
+  extraRows?: string[];
 };
 
 const Table = <Datum extends object>({
   cols,
   rows,
   limit = 10,
+  extraRows,
 }: Props<Datum>) => {
   const [slice, setSlice] = useState(limit);
 
@@ -46,7 +51,7 @@ const Table = <Datum extends object>({
             </tr>
           </thead>
           <tbody>
-            {rows.length ? (
+            {!!rows.length &&
               rows.slice(0, slice).map((row, index) => (
                 <tr key={index}>
                   {cols.map((col, index) => {
@@ -61,12 +66,14 @@ const Table = <Datum extends object>({
                     );
                   })}
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={cols.length}>No results</td>
-              </tr>
-            )}
+              ))}
+
+            {!!extraRows?.length &&
+              extraRows.filter(Boolean).map((row, index) => (
+                <tr key={index} style={{ opacity: 0.5 }}>
+                  <td colSpan={cols.length}>{row}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

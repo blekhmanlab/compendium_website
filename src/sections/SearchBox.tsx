@@ -24,6 +24,7 @@ const Search = ({ filters }: Props) => {
   /** local state */
   const [search, setSearch] = useState("");
   const [fuzzy, setFuzzy] = useState<SearchList>([]);
+  const [fuzzySearching, setFuzzySearching] = useState(false);
   const [filter, setFilter] = useState<FiltersAll[number]>("All");
 
   /** filter full search list before any other steps */
@@ -44,18 +45,23 @@ const Search = ({ filters }: Props) => {
     /** reset fuzzy */
     setFuzzy([]);
 
-    if (searchList && search.trim())
+    if (searchList && search.trim()) {
+      setFuzzySearching(true);
       /** fuzzy search then set recommendations */
       thread((worker) => worker.fuzzySearch(searchList, "name", search)).then(
         (fuzzy) => {
           /** if not latest run of use effect (superseded), ignore result */
-          if (latest) setFuzzy(fuzzy as SearchList);
+          if (!latest) return;
+
+          setFuzzy(fuzzy as SearchList);
+          setFuzzySearching(false);
         },
       );
-    else setFuzzy([]);
+    } else setFuzzy([]);
 
     return () => {
       latest = false;
+      setFuzzySearching(false);
     };
   }, [searchList, search]);
 
@@ -124,6 +130,13 @@ const Search = ({ filters }: Props) => {
           },
         ]}
         rows={matches}
+        extraRows={[
+          fuzzySearching
+            ? "... fuzzy searching ..."
+            : !matches.length
+              ? "No Results"
+              : "",
+        ]}
       />
     </>
   );
