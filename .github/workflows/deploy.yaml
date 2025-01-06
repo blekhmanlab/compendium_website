@@ -13,21 +13,25 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: main
-      
+
       - name: Summary info
         run: echo Commit && git rev-parse HEAD && cat ./public/metadata.json
 
-      - if: runner.debug == '1'
+      - name: SSH debug
+        if: runner.debug == '1'
         uses: mxschmitt/action-tmate@v3
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
       - name: Install packages
-        run: yarn install
+        run: bun install
 
       - name: Build app
-        run: yarn build
+        run: bun run build
 
       - name: Deploy to gh-pages
         uses: JamesIves/github-pages-deploy-action@v4

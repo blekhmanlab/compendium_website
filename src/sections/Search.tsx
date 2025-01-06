@@ -16,18 +16,20 @@ const Search = () => (
   <section>
     <h2>Search</h2>
 
+    <p>Does this dataset have what you're looking for?</p>
+
     <Tabs
       tabs={[
         {
           name: "Metadata",
           description: (
             <>
-              Does this dataset have what you're looking for? Search for a{" "}
+              Search for a{" "}
               <span data-tooltip={tooltips["project"]}>project</span>,{" "}
               <span data-tooltip={tooltips["sample"]}>sample</span>,{" "}
               <span data-tooltip={tooltips["region"]}>region</span>, or{" "}
               <span data-tooltip={tooltips["country"]}>country</span> to see how
-              many samples are tagged with it.
+              many samples are associated with it.
             </>
           ),
           content: (
@@ -38,11 +40,21 @@ const Search = () => (
           name: "Taxa",
           description: (
             <>
-              Does this dataset have what you're looking for? Search for a
-              phylum or class to see how many samples it's present in.
+              Search for a phylum or class to see how many samples it's present
+              in.
             </>
           ),
           content: <SearchBox filters={["Phylum", "Class"]} />,
+        },
+        {
+          name: "Tags",
+          description: (
+            <>
+              Search for a tag to see how many samples/projects are tagged with
+              it.
+            </>
+          ),
+          content: <SearchBox filters={["Tag"]} />,
         },
       ]}
     />

@@ -15,15 +15,26 @@ export type ByTaxLevel = typeof import("../../public/by-class.json");
 /** by country or by region, combined with natural earth geojson feature data */
 export type ByGeo = FeatureCollection<
   Geometry,
-  typeof import("../../public/by-country.json")["features"][number]["properties"]
+  (typeof import("../../public/by-country.json"))["features"][number]["properties"]
 >;
 
 /** sample read counts */
 export type ByReads = typeof import("../../public/by-reads.json");
 
+/** tag project and sample counts */
+export type ByTag = typeof import("../../public/by-tag.json");
+
 export type SearchList = {
   name: string;
-  type: "Project" | "Sample" | "Phylum" | "Class" | "Region" | "Country";
+  type:
+    | "Project"
+    | "Sample"
+    | "Phylum"
+    | "Class"
+    | "Region"
+    | "Country"
+    | "Tag";
+  projects?: number;
   samples: number;
   fuzzy?: boolean;
 }[];
@@ -36,6 +47,7 @@ export type Data = {
   byRegion?: ByGeo;
   byCountry?: ByGeo;
   byReads?: ByReads;
+  byTag?: ByTag;
   searchList?: ReturnType<typeof compileSearchList>;
   selectedFeature?: {
     region: string;
@@ -52,7 +64,7 @@ export const recordUrl =
 
 /** one-time load app-wide data */
 export const loadData = async () => {
-  const [metadata, byProject, byPhylum, byClass, byRegion, byCountry] =
+  const [metadata, byProject, byPhylum, byClass, byRegion, byCountry, , byTag] =
     await Promise.all([
       load("metadata.json", "metadata"),
       load("by-project.json", "byProject"),
@@ -61,6 +73,7 @@ export const loadData = async () => {
       load("by-region.json", "byRegion"),
       load("by-country.json", "byCountry"),
       load("by-reads.json", "byReads"),
+      load("by-tag.json", "byTag"),
     ]);
 
   const searchList = compileSearchList(
@@ -69,6 +82,7 @@ export const loadData = async () => {
     byClass,
     byRegion,
     byCountry,
+    byTag,
   );
   useData.setState({ searchList });
 
@@ -118,6 +132,7 @@ const compileSearchList = (
   byClass: ByTaxLevel,
   byRegion: ByGeo,
   byCountry: ByGeo,
+  byTag: ByTag,
 ) => {
   /** collect complete list */
   let list: SearchList = [];
@@ -147,13 +162,22 @@ const compileSearchList = (
   for (const {
     properties: { region, samples },
   } of byRegion.features)
-    list.push({ type: "Region", name: region, samples: samples });
+    list.push({ type: "Region", name: region, samples });
 
   /** include countries */
   for (const {
     properties: { country, samples },
   } of byCountry.features)
-    list.push({ type: "Country", name: country, samples: samples });
+    list.push({ type: "Country", name: country, samples });
+
+  /** include tags */
+  for (const { tag, samples, projects } of byTag)
+    list.push({
+      type: "Tag",
+      name: tag,
+      samples,
+      projects,
+    });
 
   /** sort by number of samples or name */
   list = orderBy(list, ["samples", "name"], ["desc", "asc"]);

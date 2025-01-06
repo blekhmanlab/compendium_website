@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import Button from "@/components/Button";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
+import Table from "@/components/Table";
 import Textbox from "@/components/Textbox";
 import { Data, SearchList, useData } from "@/data";
 import { formatNumber } from "@/util/string";
@@ -25,7 +25,6 @@ const Search = ({ filters }: Props) => {
   const [search, setSearch] = useState("");
   const [fuzzy, setFuzzy] = useState<SearchList>([]);
   const [filter, setFilter] = useState<FiltersAll[number]>("All");
-  const [limit, setLimit] = useState(10);
 
   /** filter full search list before any other steps */
   const searchList = useMemo(
@@ -36,11 +35,6 @@ const Search = ({ filters }: Props) => {
           : false,
       ),
     [filters, filter, fullSearchList],
-  );
-
-  /** get exact matches */
-  const exact = (searchList || []).filter((entry) =>
-    entry.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   /** get fuzzy (trigram) matches (in worker to not freeze ui) */
@@ -65,6 +59,14 @@ const Search = ({ filters }: Props) => {
     };
   }, [searchList, search]);
 
+  if (!searchList)
+    return <Placeholder height={400}>Loading search...</Placeholder>;
+
+  /** get exact matches */
+  const exact = (searchList || []).filter((entry) =>
+    entry.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
   /** full list of matches */
   const matches = exact.concat(
     /** de-duplicate items already in exact */
@@ -73,63 +75,56 @@ const Search = ({ filters }: Props) => {
       .map((fuzzy) => ({ ...fuzzy, fuzzy: true })),
   );
 
-  /** reset limit when search changes */
-  useEffect(() => {
-    setLimit(10);
-  }, [search]);
-
-  if (!searchList)
-    return <Placeholder height={400}>Loading search...</Placeholder>;
-
   return (
     <>
       <div className={classes.search}>
         <Textbox value={search} onChange={setSearch} placeholder="Search" />
-        <Select
-          label="Type:"
-          options={["All", ...filters] as FiltersAll}
-          value={filter}
-          onChange={setFilter}
-        />
+        {filters.length > 1 && (
+          <Select
+            label="Type:"
+            options={["All", ...filters] as FiltersAll}
+            value={filter}
+            onChange={setFilter}
+          />
+        )}
       </div>
 
-      <div className="table-wrapper">
-        <table className={classes.table}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Samples</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr>
-              <td colSpan={3}>{/* spacer */}</td>
-            </tr>
-
-            {matches.length ? (
-              matches
-                .slice(0, limit)
-                .map(({ name, type, samples, fuzzy }, index) => (
-                  <tr key={index} style={{ opacity: fuzzy ? 0.5 : 1 }}>
-                    <td>{name}</td>
-                    <td>{type}</td>
-                    <td>{formatNumber(samples, false)}</td>
-                  </tr>
-                ))
-            ) : (
-              <tr>
-                <td colSpan={3}>No results</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {matches.length > limit && (
-        <Button onClick={() => setLimit(limit + 10)}>Show More</Button>
-      )}
+      <Table
+        cols={[
+          {
+            key: "name",
+            name: "Name",
+            render: (cell) => cell.split("_").join(" "),
+            style: (_, row) => ({
+              opacity: row?.fuzzy ? 0.5 : 1,
+              width: "100%",
+            }),
+          },
+          !filters.includes("Tag")
+            ? {
+                key: "type",
+                name: "Type",
+                style: (_, row) => ({
+                  opacity: row?.fuzzy ? 0.5 : 1,
+                }),
+              }
+            : {
+                key: "projects",
+                name: "Projects",
+                render: (cell) => formatNumber(cell, false),
+                style: (_, row) => ({
+                  opacity: row?.fuzzy ? 0.5 : 1,
+                }),
+              },
+          {
+            key: "samples",
+            name: "Samples",
+            render: (cell) => formatNumber(cell, false),
+            style: (_, row) => ({ opacity: row?.fuzzy ? 0.5 : 1 }),
+          },
+        ]}
+        rows={matches}
+      />
     </>
   );
 };

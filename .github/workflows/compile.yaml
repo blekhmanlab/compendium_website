@@ -9,19 +9,20 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - if: runner.debug == '1'
+      - name: SSH debug
+        if: runner.debug == '1'
         uses: mxschmitt/action-tmate@v3
 
-      - name: Install packages
-        run: yarn install
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Compile data
-        run: yarn compile
+        run: bun run compile
 
       - name: Commit results
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Update compiled data"
 

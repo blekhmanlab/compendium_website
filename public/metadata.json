@@ -1,14 +1,15 @@
 {
   "projects": 482,
   "samples": 168464,
-  "phyla": 93,
-  "classes": 212,
+  "phyla": 100,
+  "classes": 213,
   "regions": 8,
   "countries": 65,
-  "version": "1.0.1",
-  "date": "2024-01-08T16:12:35.936224+00:00",
-  "downloads": 360,
-  "views": 484,
-  "size": 54848872,
-  "uncompressed": 1397255838
+  "tags": 2609,
+  "version": "1.1.0",
+  "date": "2024-09-19T20:11:50.172936+00:00",
+  "downloads": 2519,
+  "views": 1602,
+  "size": 495377012,
+  "uncompressed": 0
 }

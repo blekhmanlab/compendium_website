@@ -4,7 +4,6 @@
   /* https://www.materialpalette.com/colors */
 
   --black: #101829;
-  --off-black: #111a2e;
   --dark-gray: #354153;
   --gray: #596579;
   --light-gray: #94a3b8;
@@ -60,9 +59,12 @@ footer {
   gap: 40px;
 }
 
-footer,
+section:nth-child(even) {
+  background: color-mix(in hsl, var(--black), var(--white) 5%);
+}
+
 section:nth-child(odd) {
-  background: var(--off-black);
+  background: color-mix(in hsl, var(--black), var(--white) 10%);
 }
 
 footer {
@@ -117,8 +119,8 @@ ol {
 }
 
 p {
-  text-wrap: balance;
   text-align: center;
+  text-wrap: balance;
 }
 
 a {
@@ -176,7 +178,7 @@ tbody tr:nth-child(even) {
 
 th,
 td {
-  padding: 5px 10px;
+  padding: 5px 20px;
   text-align: left;
 }
 

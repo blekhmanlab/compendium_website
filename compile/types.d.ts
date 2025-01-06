@@ -15,6 +15,7 @@ type Metadata = {
   classes: number;
   countries: number;
   regions: number;
+  tags: number;
   version: string;
   date: string;
   downloads: number;
@@ -45,4 +46,10 @@ type ByGeo = FeatureCollection<
 type ByProject = {
   project: string;
   samples: string[];
+}[];
+
+type ByTag = {
+  tag: string;
+  projects: number;
+  samples: number;
 }[];

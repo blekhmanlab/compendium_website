@@ -1,3 +1,5 @@
+import { sleep } from "@/util/async";
+
 /**
  * get transform matrix that converts point from one element coordinate system
  * to another
@@ -45,4 +47,15 @@ export const downloadSvg = (
   link.download = filename + ".svg";
   link.click();
   window.URL.revokeObjectURL(url);
+};
+
+/**
+ * scroll page so that mouse stays at same position in document relative to
+ * element
+ */
+export const preserveScroll = async (element: Element) => {
+  const oldY = element.getBoundingClientRect().top;
+  await sleep(0);
+  const newY = element.getBoundingClientRect().top;
+  window.scrollBy({ top: newY - oldY, behavior: "instant" });
 };
