@@ -1,5 +1,6 @@
 import Tabs from "@/components/Tabs";
-import SearchBox from "@/sections/SearchBox";
+import { loadTagValueData, useData } from "@/data";
+import SearchList from "@/sections/SearchList";
 
 export const tooltips = {
   project:
@@ -12,53 +13,94 @@ export const tooltips = {
     "Geographic origin of samples, grouped into regions according to <a href='https://unstats.un.org/sdgs/indicators/regional-groups/' target='_blank'>the UN's Sustainable Development Goals</a>.",
 };
 
-const Search = () => (
-  <section>
-    <h2>Search</h2>
+const Search = () => {
+  /** get global state */
+  const metaSearchList = useData((state) => state.metaSearchList);
+  const taxaSearchList = useData((state) => state.taxaSearchList);
+  const tagSearchList = useData((state) => state.tagSearchList);
+  const tagValueSearchList = useData((state) => state.tagValueSearchList);
+  const byTagValue = useData((state) => state.byTagValue);
 
-    <p>Does this dataset have what you're looking for?</p>
+  return (
+    <section>
+      <h2>Search</h2>
 
-    <Tabs
-      tabs={[
-        {
-          name: "Metadata",
-          description: (
-            <>
-              Search for a{" "}
-              <span data-tooltip={tooltips["project"]}>project</span>,{" "}
-              <span data-tooltip={tooltips["sample"]}>sample</span>,{" "}
-              <span data-tooltip={tooltips["region"]}>region</span>, or{" "}
-              <span data-tooltip={tooltips["country"]}>country</span> to see how
-              many samples are associated with it.
-            </>
-          ),
-          content: (
-            <SearchBox filters={["Project", "Sample", "Country", "Region"]} />
-          ),
-        },
-        {
-          name: "Taxa",
-          description: (
-            <>
-              Search for a phylum or class to see how many samples it's present
-              in.
-            </>
-          ),
-          content: <SearchBox filters={["Phylum", "Class"]} />,
-        },
-        {
-          name: "Tags",
-          description: (
-            <>
-              Search for a tag to see how many samples/projects are tagged with
-              it.
-            </>
-          ),
-          content: <SearchBox filters={["Tag"]} />,
-        },
-      ]}
-    />
-  </section>
-);
+      <p>Does this dataset have what you're looking for?</p>
+
+      <Tabs
+        onChange={(index) => {
+          /** load full tag value data (large) on demand */
+          if (index === 2 && !byTagValue) loadTagValueData();
+        }}
+        tabs={[
+          {
+            name: "Metadata",
+            description: (
+              <>
+                Search for a{" "}
+                <span data-tooltip={tooltips["project"]}>project</span>,{" "}
+                <span data-tooltip={tooltips["sample"]}>sample</span>,{" "}
+                <span data-tooltip={tooltips["region"]}>region</span>, or{" "}
+                <span data-tooltip={tooltips["country"]}>country</span> to see
+                how many samples are associated with it.
+              </>
+            ),
+            content: metaSearchList && (
+              <SearchList
+                list={metaSearchList}
+                cols={["name", "type", "samples"]}
+                filters={["Project", "Sample", "Country", "Region"]}
+              />
+            ),
+          },
+          {
+            name: "Taxa",
+            description: (
+              <>
+                Search for a phylum or class to see how many samples it's
+                present in.
+              </>
+            ),
+            content: taxaSearchList && (
+              <SearchList
+                list={taxaSearchList}
+                cols={["name", "type", "samples"]}
+                filters={["Phylum", "Class"]}
+              />
+            ),
+          },
+          {
+            name: "Tags",
+            description: (
+              <>
+                Search for a tag to see how many samples/projects are tagged
+                with it.
+              </>
+            ),
+            content: (
+              <>
+                {tagSearchList && (
+                  <SearchList
+                    list={tagSearchList}
+                    cols={["name", "projects", "samples"]}
+                    filters={["Tag"]}
+                  />
+                )}
+                <p>Tag values:</p>
+                {tagValueSearchList && (
+                  <SearchList
+                    list={tagValueSearchList}
+                    cols={["name", "value", "project", "samples"]}
+                    filters={["TagValue"]}
+                  />
+                )}
+              </>
+            ),
+          },
+        ]}
+      />
+    </section>
+  );
+};
 
 export default Search;

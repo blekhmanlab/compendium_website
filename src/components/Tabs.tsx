@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, type ComponentProps } from "react";
 import { Tab } from "@headlessui/react";
 import Button from "@/components/Button";
 import classes from "./Tabs.module.css";
@@ -9,10 +9,11 @@ type Props = {
     description: ReactNode;
     content: ReactNode;
   }[];
+  onChange: ComponentProps<typeof Tab.Group>["onChange"];
 };
 
-const Tabs = ({ tabs }: Props) => (
-  <Tab.Group>
+const Tabs = ({ tabs, onChange }: Props) => (
+  <Tab.Group onChange={onChange}>
     {({ selectedIndex }) => (
       <div className="sub-section">
         <Tab.List className={classes.tabs}>

@@ -43,20 +43,20 @@ export const example = async () => {
   /** in sequence */
   const a = await thread(
     (worker) => worker.expensiveFunction(),
-    (status) => console.info(status),
+    (status) => console.debug(status),
   );
 
   /** in parallel */
   const [b, c] = await Promise.all([
     thread(
       (worker) => worker.expensiveFunction(),
-      (status) => console.info(status),
+      (status) => console.debug(status),
     ),
     thread(
       (worker) => worker.expensiveFunction(),
-      (status) => console.info(status),
+      (status) => console.debug(status),
     ),
   ]);
 
-  console.info(a, b, c);
+  console.debug(a, b, c);
 };

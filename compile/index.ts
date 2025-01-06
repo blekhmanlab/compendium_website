@@ -127,6 +127,15 @@ const processData = async (
       samples: { [key: string]: string };
     };
   } = {};
+  /** map of of unique tag values */
+  const byTagValue: {
+    [key: string]: {
+      tag: string;
+      value: string;
+      project: string;
+      samples: number;
+    };
+  } = {};
 
   /** whether country feature has already been dissolved into region feature */
   const countryDissolved: { [key: string]: boolean } = {};
@@ -192,7 +201,7 @@ const processData = async (
     /** count region */
     if (byRegion[region]) byRegion[region].properties.samples++;
 
-    /** accumulate projects and samples */
+    /** count projects and samples */
     byProject[project] ??= { project, samples: [] };
     byProject[project].samples.push(sample);
 
@@ -306,13 +315,20 @@ const processData = async (
     if (throttle("data")) console.info(`Processing tag row ${row}`);
 
     /** read row */
-    const { value: [project, , sample, tag = ""] = [], done } =
-      await tagsStream.next();
+    const {
+      value: [project = "", , sample = "", tag = "", value = ""] = [],
+      done,
+    } = await tagsStream.next();
 
-    /** accumulate projects and samples */
+    /** count tags */
     byTag[tag] ??= { tag, projects: {}, samples: {} };
     byTag[tag].projects[project] = project;
     byTag[tag].samples[sample] = sample;
+
+    /** count tag values */
+    const key = [tag, value, project].join("-");
+    byTagValue[key] ??= { tag, value, project, samples: 0 };
+    byTagValue[key].samples++;
 
     if (done) break;
   }
@@ -359,6 +375,11 @@ const processData = async (
       })),
       [(d) => d.samples, (d) => d.projects],
       ["desc", "desc"],
+    ),
+    byTagValue: _.orderBy(
+      Object.values(byTagValue),
+      [(d) => d.samples],
+      ["desc"],
     ),
   };
 };
@@ -425,8 +446,16 @@ console.info("Cleaning world map data");
 const worldMap = await processNaturalEarth();
 
 console.info("Processing data");
-const { byProject, byPhylum, byClass, byCountry, byRegion, byReads, byTag } =
-  await processData(taxonomicFile, metadataFile, worldMap);
+const {
+  byProject,
+  byPhylum,
+  byClass,
+  byCountry,
+  byRegion,
+  byReads,
+  byTag,
+  byTagValue,
+} = await processData(taxonomicFile, metadataFile, worldMap);
 write("../public/by-project.json", byProject);
 write("../public/by-phylum.json", byPhylum);
 write("../public/by-class.json", byClass);
@@ -434,6 +463,7 @@ write("../public/by-country.json", byCountry);
 write("../public/by-region.json", byRegion);
 write("../public/by-reads.json", byReads);
 write("../public/by-tag.json", byTag);
+write("../public/by-tag-value.json", byTagValue);
 
 console.info("Deriving metadata");
 const metadata = deriveMetadata(

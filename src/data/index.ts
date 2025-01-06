@@ -24,17 +24,40 @@ export type ByReads = typeof import("../../public/by-reads.json");
 /** tag project and sample counts */
 export type ByTag = typeof import("../../public/by-tag.json");
 
-export type SearchList = {
+/** tag value sample counts */
+// export type ByTagValue = typeof import("../../public/by-tag-value.json");
+export type ByTagValue = {
+  tag: string;
+  value: string;
+  project: string;
+  samples: number;
+}[];
+
+export type MetaSearchList = {
   name: string;
-  type:
-    | "Project"
-    | "Sample"
-    | "Phylum"
-    | "Class"
-    | "Region"
-    | "Country"
-    | "Tag";
-  projects?: number;
+  type: "Project" | "Sample" | "Region" | "Country";
+  samples: number;
+  fuzzy?: boolean;
+}[];
+
+export type TaxaSearchList = {
+  name: string;
+  type: "Phylum" | "Class";
+  samples: number;
+  fuzzy?: boolean;
+}[];
+
+export type TagSearchList = {
+  name: string;
+  projects: number;
+  samples: number;
+  fuzzy?: boolean;
+}[];
+
+export type TagValueSearchList = {
+  name: string;
+  value: string;
+  project: string;
   samples: number;
   fuzzy?: boolean;
 }[];
@@ -48,7 +71,11 @@ export type Data = {
   byCountry?: ByGeo;
   byReads?: ByReads;
   byTag?: ByTag;
-  searchList?: ReturnType<typeof compileSearchList>;
+  byTagValue?: ByTagValue;
+  metaSearchList?: ReturnType<typeof compileMetaSearchList>;
+  taxaSearchList?: ReturnType<typeof compileTaxaSearchList>;
+  tagSearchList?: ReturnType<typeof compileTagSearchList>;
+  tagValueSearchList?: ReturnType<typeof compileTagValueSearchList>;
   selectedFeature?: {
     region: string;
     country: string;
@@ -76,22 +103,18 @@ export const loadData = async () => {
       load("by-tag.json", "byTag"),
     ]);
 
-  const searchList = compileSearchList(
-    byProject,
-    byPhylum,
-    byClass,
-    byRegion,
-    byCountry,
-    byTag,
-  );
-  useData.setState({ searchList });
+  useData.setState({
+    metaSearchList: compileMetaSearchList(byProject, byRegion, byCountry),
+    taxaSearchList: compileTaxaSearchList(byPhylum, byClass),
+    tagSearchList: compileTagSearchList(byTag),
+  });
 
   /** update meta with live stats */
   const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
   useData.setState(() => ({
     metadata: {
       ...metadata,
-      /** recalc any line from compile script that involves record */
+      /** recalc any line from compile script that involves "record" */
       version: record.metadata.version,
       date: record.updated,
       downloads: record.stats.unique_downloads,
@@ -102,6 +125,14 @@ export const loadData = async () => {
           ?.reduce((total, value) => total + value, 0) || 0,
     },
   }));
+};
+
+/** load tag value data (large) */
+export const loadTagValueData = async () => {
+  const tagValues = await load("by-tag-value.json", "byTagValue");
+  useData.setState({
+    tagValueSearchList: compileTagValueSearchList(tagValues),
+  });
 };
 
 /** load json and set state */
@@ -123,40 +154,26 @@ const request = async <T>(url: string) => {
 };
 
 /**
- * collate all data into single list of entries to search. can't do this as
- * compile pre-process because file ends up being very large.
+ * collate data into lists of entries to search. can't do this as compile
+ * pre-process because file ends up being very large.
  */
-const compileSearchList = (
+
+const compileMetaSearchList = (
   byProject: ByProject,
-  byPhylum: ByTaxLevel,
-  byClass: ByTaxLevel,
   byRegion: ByGeo,
   byCountry: ByGeo,
-  byTag: ByTag,
 ) => {
   /** collect complete list */
-  let list: SearchList = [];
+  let list: MetaSearchList = [];
 
   /** include projects */
   for (const { project, samples } of byProject)
-    list.push({
-      type: "Project",
-      name: project,
-      samples: samples.length,
-    });
+    list.push({ type: "Project", name: project, samples: samples.length });
 
   /** include samples */
   for (const { samples } of byProject)
     for (const sample of samples)
       list.push({ type: "Sample", name: sample, samples: 1 });
-
-  /** include phyla */
-  for (const { phylum, samples } of byPhylum)
-    list.push({ type: "Phylum", name: phylum, samples: samples.total });
-
-  /** include classes */
-  for (const { _class, samples } of byClass)
-    list.push({ type: "Class", name: _class, samples: samples.total });
 
   /** include regions */
   for (const {
@@ -170,14 +187,60 @@ const compileSearchList = (
   } of byCountry.features)
     list.push({ type: "Country", name: country, samples });
 
+  /** sort by number of samples or name */
+  list = orderBy(list, ["samples", "name"], ["desc", "asc"]);
+
+  /** remove entries with no name (regions) */
+  list = list.filter(({ name }) => name.trim());
+
+  return list;
+};
+
+const compileTaxaSearchList = (byPhylum: ByTaxLevel, byClass: ByTaxLevel) => {
+  /** collect complete list */
+  let list: TaxaSearchList = [];
+
+  /** include phyla */
+  for (const { phylum, samples } of byPhylum)
+    list.push({ type: "Phylum", name: phylum, samples: samples.total });
+
+  /** include classes */
+  for (const { _class, samples } of byClass)
+    list.push({ type: "Class", name: _class, samples: samples.total });
+
+  /** sort by number of samples or name */
+  list = orderBy(list, ["samples", "name"], ["desc", "asc"]);
+
+  /** remove entries with no name */
+  list = list.filter(({ name }) => name.trim());
+
+  return list;
+};
+
+const compileTagSearchList = (byTag: ByTag) => {
+  /** collect complete list */
+  let list: TagSearchList = [];
+
   /** include tags */
   for (const { tag, samples, projects } of byTag)
-    list.push({
-      type: "Tag",
-      name: tag,
-      samples,
-      projects,
-    });
+    list.push({ name: tag, samples, projects });
+
+  /** sort by number of samples or name */
+  list = orderBy(list, ["samples", "name"], ["desc", "asc"]);
+
+  /** remove entries with no name (regions) */
+  list = list.filter(({ name }) => name.trim());
+
+  return list;
+};
+
+const compileTagValueSearchList = (byTagValue: ByTagValue) => {
+  /** collect complete list */
+  let list: TagValueSearchList = [];
+
+  /** include tags */
+  for (const { tag, value, samples, project } of byTagValue)
+    list.push({ name: tag, value, project, samples });
 
   /** sort by number of samples or name */
   list = orderBy(list, ["samples", "name"], ["desc", "asc"]);

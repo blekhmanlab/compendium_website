@@ -6,8 +6,9 @@ import {
 } from "react";
 import Button from "@/components/Button";
 import { preserveScroll } from "@/util/dom";
+import { formatNumber } from "@/util/string";
 
-type Col<Datum extends object, Key extends keyof Datum> = {
+export type Col<Datum extends object, Key extends keyof Datum> = {
   /** key of row object to access as cell value */
   key: Key;
   /** label for header */
@@ -61,7 +62,11 @@ const Table = <Datum extends object>({
                         key={index}
                         style={col.style ? col.style(cell, row) : {}}
                       >
-                        {col.render ? col.render(cell, row) : String(cell)}
+                        {col.render
+                          ? col.render(cell, row)
+                          : typeof cell === "number"
+                            ? formatNumber(cell, false)
+                            : String(cell).split("_").join(" ")}
                       </td>
                     );
                   })}

@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "compile": "bun ./compile/index.ts",
+    "compile": "npx tsx ./compile/index.ts",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .tsx,.ts --fix && prettier --write \"**/*.{tsx,ts,css}\" --no-error-on-unmatched-pattern"
