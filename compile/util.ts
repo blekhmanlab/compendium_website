@@ -1,5 +1,7 @@
 import { execSync } from "child_process";
 import { createReadStream, readFileSync, writeFileSync } from "fs";
+import { readdir, stat } from "fs/promises";
+import { join } from "path";
 import readline from "readline";
 import _ from "lodash";
 import Downloader from "nodejs-file-downloader";
@@ -80,3 +82,14 @@ export const logSpace = (a: number, b: number, n: number) => {
     .concat([b])
     .map((value) => Math.pow(10, value));
 };
+
+/** get total folder size */
+export const dirSize = async (path: string) =>
+  _.sumBy(
+    await Promise.all(
+      (await readdir(path, { recursive: true })).map((file) =>
+        stat(join(path, file)),
+      ),
+    ),
+    "size",
+  );

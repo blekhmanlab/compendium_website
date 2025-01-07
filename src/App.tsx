@@ -1,4 +1,4 @@
-import { loadData } from "@/data";
+import { loadMetaData } from "@/data";
 import Footer from "@/sections/Footer";
 import Header from "@/sections/Header";
 import Overview from "@/sections/Overview";
@@ -8,7 +8,7 @@ import Search from "@/sections/Search";
 import "@/components/tooltip";
 import "./App.css";
 
-loadData();
+loadMetaData();
 
 const App = () => (
   <>

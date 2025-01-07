@@ -28,12 +28,9 @@ export const thread = <Type>(
     /** execute specified method */
     method(worker)
       /** return final result */
-      .then((result) => resolve(result))
+      .then(resolve)
       /** catch errors */
-      .catch((error: Error) => {
-        console.error(error);
-        reject(error);
-      })
+      .catch(reject)
       /** mark that final result has happened */
       .finally(() => (resolved = true));
   });

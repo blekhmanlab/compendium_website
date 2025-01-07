@@ -1,101 +1,132 @@
 import { useEffect, useMemo, useState } from "react";
 import { capitalize } from "lodash";
+import { useDebounce } from "@reactuses/core";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import Table, { type Col } from "@/components/Table";
 import Textbox from "@/components/Textbox";
 import { Data } from "@/data";
+import type { KeysOfType } from "@/util/types";
 import { thread } from "@/workers";
 import classes from "./SearchList.module.css";
 
 /** filters options, including all */
-type FiltersAll = ("All" | Props["filters"][number])[];
+type FiltersAll = ("All" | NonNullable<Props["filters"]>[number])[];
 
-type List = NonNullable<
-  | Data["metaSearchList"]
-  | Data["taxaSearchList"]
-  | Data["tagSearchList"]
-  | Data["tagValueSearchList"]
->;
+type List = Data[KeysOfType<Data, `${string}Search`>];
 
 type Props = {
   list: List;
   cols: string[];
-  filters: string[];
+  filters?: string[];
 };
 
-const Search = ({ list: fullList, cols, filters }: Props) => {
+const Search = ({ list: fullList = [], cols, filters }: Props) => {
   /** local state */
-  const [search, setSearch] = useState("");
-  const [fuzzy, setFuzzy] = useState<List>([]);
-  const [fuzzySearching, setFuzzySearching] = useState(false);
   const [filter, setFilter] = useState<FiltersAll[number]>("All");
+  const [_search, setSearch] = useState("");
+  const search = useDebounce(_search);
+  const [exactMatches, setExactMatches] = useState<NonNullable<List>>([]);
+  const [exactSearching, setExactSearching] = useState(false);
+  const [fuzzyMatches, setFuzzyMatches] = useState<NonNullable<List>>([]);
+  const [fuzzySearching, setFuzzySearching] = useState(false);
 
   /** filter full search list before any other steps */
-  const searchList = useMemo(
+  const list = useMemo(
     () =>
-      fullList?.filter((entry) =>
-        !("type" in entry)
-          ? true
-          : entry.type === filter || filter === "All"
-            ? filters.includes(entry.type)
-            : false,
-      ),
+      filters
+        ? fullList.filter((entry) =>
+            !("type" in entry)
+              ? true
+              : entry.type === filter || filter === "All"
+                ? filters.includes(entry.type)
+                : false,
+          )
+        : fullList,
     [filters, filter, fullList],
   );
 
-  /** get fuzzy (trigram) matches (in worker to not freeze ui) */
+  /** exact search */
   useEffect(() => {
     let latest = true;
 
-    /** reset fuzzy */
-    setFuzzy([]);
+    if (search.trim()) {
+      setExactMatches([]);
+      setExactSearching(true);
 
-    if (searchList && search.trim()) {
-      setFuzzySearching(true);
-      /** fuzzy search then set recommendations */
-      thread((worker) => worker.fuzzySearch(searchList, "name", search)).then(
-        (fuzzy) => {
+      /** do in worker to not freeze UI */
+      thread((worker) => worker.exactSearch(list, ["name", "value"], search))
+        .then((result) => {
           /** if not latest run of use effect (superseded), ignore result */
           if (!latest) return;
 
-          setFuzzy(fuzzy as List);
+          setExactMatches(result as typeof exactMatches);
+        })
+        .catch(console.error)
+        .finally(() => {
+          setExactSearching(false);
+        });
+    }
+
+    return () => {
+      latest = false;
+      setExactSearching(false);
+    };
+  }, [list, search, setExactSearching]);
+
+  /** fuzzy search */
+  useEffect(() => {
+    let latest = true;
+
+    if (search.trim()) {
+      setFuzzyMatches([]);
+      setFuzzySearching(true);
+
+      /** do in worker to not freeze UI */
+      thread((worker) => worker.fuzzySearch(list, ["name", "value"], search))
+        .then((result) => {
+          /** if not latest run of use effect (superseded), ignore result */
+          if (!latest) return;
+
+          setFuzzyMatches(result as typeof fuzzyMatches);
+        })
+        .catch(console.error)
+        .finally(() => {
           setFuzzySearching(false);
-        },
-      );
-    } else setFuzzy([]);
+        });
+    }
 
     return () => {
       latest = false;
       setFuzzySearching(false);
     };
-  }, [searchList, search]);
+  }, [list, search, setFuzzySearching]);
 
-  if (!searchList)
-    return <Placeholder height={400}>Loading search...</Placeholder>;
-
-  /** get exact matches */
-  const exact = (searchList || []).filter((entry) =>
-    (entry.name + ("value" in entry ? entry.value : ""))
-      .toLowerCase()
-      .includes(search.toLowerCase()),
+  /** exact match name quick lookup */
+  const exactMatchLookup = useMemo(
+    () => Object.fromEntries(exactMatches.map((match) => [match.name, ""])),
+    [exactMatches],
   );
+
+  if (!list) return <Placeholder height={400}>Loading search...</Placeholder>;
 
   /** full list of matches */
-  const matches = exact.concat(
-    /** de-duplicate items already in exact */
-    fuzzy
-      .filter((fuzzy) => !exact.find((result) => result.name === fuzzy.name))
-      .map((fuzzy) => ({ ...fuzzy, fuzzy: true })),
-  );
+  const matches = search.trim()
+    ? exactMatches.concat(
+        /** de-duplicate items already in exact */
+        fuzzyMatches
+          .filter((fuzzy) => !(fuzzy.name in exactMatchLookup))
+          .map((fuzzy) => ({ ...fuzzy, fuzzy: true })),
+      )
+    : list;
 
   type Datum = (typeof matches)[number];
 
   return (
     <>
       <div className={classes.search}>
-        <Textbox value={search} onChange={setSearch} placeholder="Search" />
-        {filters.length > 1 && (
+        <Textbox value={_search} onChange={setSearch} placeholder="Search" />
+        {filters && (
           <Select
             label="Type:"
             options={["All", ...filters] as FiltersAll}
@@ -118,11 +149,11 @@ const Search = ({ list: fullList, cols, filters }: Props) => {
         )}
         rows={matches}
         extraRows={[
-          fuzzySearching
-            ? "... fuzzy searching ..."
-            : !matches.length
-              ? "No Results"
-              : "",
+          exactSearching ? "Searching for exact matches..." : "",
+          fuzzySearching ? "Searching for close matches..." : "",
+          !exactSearching && !fuzzySearching && !matches.length
+            ? "No results"
+            : "",
         ]}
       />
     </>

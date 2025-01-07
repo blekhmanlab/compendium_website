@@ -21,19 +21,40 @@ export const expensiveFunction = () => {
   return total;
 };
 
+/** exact (case-insensitive) search on large list of items */
+export const exactSearch = <Entry extends { [key: string]: unknown }>(
+  /** array of objects */
+  list: readonly Entry[],
+  /** object keys to search */
+  keys: readonly (keyof Entry)[],
+  /** string to search */
+  search: string,
+) =>
+  list.filter((entry) =>
+    keys
+      .map((key) => String(entry[key] ?? ""))
+      .join(" ")
+      .toLowerCase()
+      .includes(search.toLowerCase()),
+  );
+
 /** fuzzy (trigram) search on large list of items */
 export const fuzzySearch = <Entry extends { [key: string]: unknown }>(
   /** array of objects */
-  list: Entry[],
-  /** key object to search */
-  key: keyof Entry,
+  list: readonly Entry[],
+  /** object key to search */
+  keys: readonly (keyof Entry)[],
   /** string to search */
   search: string,
   /** similarity threshold */
   threshold = 0.25,
 ): Entry[] =>
   list.filter(
-    (entry) => trigramSimilarity(String(entry[key]), search) > threshold,
+    (entry) =>
+      trigramSimilarity(
+        String(keys.map((key) => String(entry[key] ?? "")).join(" ")),
+        search,
+      ) > threshold,
   );
 
 /** progress callback type */
@@ -45,4 +66,4 @@ let progress: OnProgress | undefined;
 /** expose method to set progress callback */
 export const onProgress = (callback: OnProgress) => (progress = callback);
 
-expose({ expensiveFunction, fuzzySearch, onProgress });
+expose({ expensiveFunction, exactSearch, fuzzySearch, onProgress });

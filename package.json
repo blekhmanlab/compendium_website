@@ -3,14 +3,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --open",
     "compile": "npx tsx ./compile/index.ts",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext .tsx,.ts --fix && prettier --write \"**/*.{tsx,ts,css}\" --no-error-on-unmatched-pattern"
+    "lint": "eslint . --ext .tsx,.ts --fix && prettier --write \"**/*.{tsx,ts,css}\" --no-error-on-unmatched-pattern",
+    "clean": "rm -rf node_modules bun.lockb && bun pm cache rm"
   },
   "dependencies": {
     "@headlessui/react": "1.7.19",
+    "@reactuses/core": "^6.0.1",
     "comlink": "4.4.2",
     "d3": "7.9.0",
     "gsap": "3.12.5",

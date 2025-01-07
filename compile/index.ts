@@ -3,7 +3,6 @@
 // eslint-disable-next-line
 /// <reference path="./types.d.ts" />
 
-import { lstatSync, readdirSync } from "fs";
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
@@ -19,6 +18,7 @@ import {
   WorldMap,
 } from "./types";
 import {
+  dirSize,
   download,
   logSpace,
   read,
@@ -385,7 +385,7 @@ const processData = async (
 };
 
 /** derive metadata about data */
-const deriveMetadata = (
+const deriveMetadata = async (
   byProject: ByProject,
   byPhylum: ByTaxLevel,
   byClass: ByTaxLevel,
@@ -393,7 +393,7 @@ const deriveMetadata = (
   byCountry: ByGeo,
   byTag: ByTag,
   record: Record,
-): Metadata => {
+): Promise<Metadata> => {
   const projects = byProject.length;
   const samples = byProject.reduce(
     (total, { samples }) => total + samples.length,
@@ -424,10 +424,7 @@ const deriveMetadata = (
       record.files
         ?.map((file) => file.size)
         ?.reduce((total, value) => total + value, 0) || 0,
-    uncompressed: readdirSync("./")
-      .filter((file) => [".csv", ".tsv"].some((ext) => file.endsWith(ext)))
-      .map((file) => lstatSync(file).size)
-      .reduce((total, value) => total + value, 0),
+    uncompressed: await dirSize("./downloaded"),
   };
 };
 
@@ -466,7 +463,7 @@ write("../public/by-tag.json", byTag);
 write("../public/by-tag-value.json", byTagValue);
 
 console.info("Deriving metadata");
-const metadata = deriveMetadata(
+const metadata = await deriveMetadata(
   byProject,
   byPhylum,
   byClass,

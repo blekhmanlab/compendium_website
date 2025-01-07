@@ -1,5 +1,12 @@
+import { useEffect } from "react";
 import Tabs from "@/components/Tabs";
-import { loadTagValueData, useData } from "@/data";
+import {
+  loadGeoData,
+  loadProjectData,
+  loadTagData,
+  loadTaxaData,
+  useData,
+} from "@/data";
 import SearchList from "@/sections/SearchList";
 
 export const tooltips = {
@@ -11,15 +18,40 @@ export const tooltips = {
     "Geographic origin of samples, based on <a href='https://www.naturalearthdata.com/' target='_blank'>Natural Earth</a> country data.",
   region:
     "Geographic origin of samples, grouped into regions according to <a href='https://unstats.un.org/sdgs/indicators/regional-groups/' target='_blank'>the UN's Sustainable Development Goals</a>.",
+  phylum: "Taxonomic phylum associated with sample.",
+  class: "Taxonomic class associated with sample.",
+  tag: "Piece of metadata associated with an individual sample.",
 };
 
 const Search = () => {
   /** get global state */
-  const metaSearchList = useData((state) => state.metaSearchList);
-  const taxaSearchList = useData((state) => state.taxaSearchList);
-  const tagSearchList = useData((state) => state.tagSearchList);
-  const tagValueSearchList = useData((state) => state.tagValueSearchList);
-  const byTagValue = useData((state) => state.byTagValue);
+  const projectSearch = useData((state) => state.projectSearch);
+  const geoSearch = useData((state) => state.geoSearch);
+  const taxaSearch = useData((state) => state.taxaSearch);
+  const tagSearch = useData((state) => state.tagSearch);
+  const tagValueSearch = useData((state) => state.tagValueSearch);
+
+  const onChange = (index: number) => {
+    /** load data on demand */
+    switch (index) {
+      case 0:
+        if (!projectSearch) loadProjectData();
+        break;
+      case 1:
+        if (!geoSearch) loadGeoData();
+        break;
+      case 2:
+        if (!taxaSearch) loadTaxaData();
+        break;
+      case 3:
+        if (!tagSearch) loadTagData();
+        break;
+    }
+  };
+
+  useEffect(() => {
+    onChange(0);
+  });
 
   return (
     <section>
@@ -28,28 +60,41 @@ const Search = () => {
       <p>Does this dataset have what you're looking for?</p>
 
       <Tabs
-        onChange={(index) => {
-          /** load full tag value data (large) on demand */
-          if (index === 2 && !byTagValue) loadTagValueData();
-        }}
+        onChange={onChange}
         tabs={[
           {
-            name: "Metadata",
+            name: "Project",
             description: (
               <>
                 Search for a{" "}
-                <span data-tooltip={tooltips["project"]}>project</span>,{" "}
-                <span data-tooltip={tooltips["sample"]}>sample</span>,{" "}
-                <span data-tooltip={tooltips["region"]}>region</span>, or{" "}
+                <span data-tooltip={tooltips["project"]}>project</span> or{" "}
+                <span data-tooltip={tooltips["sample"]}>sample</span> to see how
+                many samples are associated with it.
+              </>
+            ),
+            content: (
+              <SearchList
+                list={projectSearch}
+                cols={["name", "type", "samples"]}
+                filters={["Project", "Sample"]}
+              />
+            ),
+          },
+          {
+            name: "Geography",
+            description: (
+              <>
+                Search for a{" "}
+                <span data-tooltip={tooltips["region"]}>region</span> or{" "}
                 <span data-tooltip={tooltips["country"]}>country</span> to see
                 how many samples are associated with it.
               </>
             ),
-            content: metaSearchList && (
+            content: (
               <SearchList
-                list={metaSearchList}
+                list={geoSearch}
                 cols={["name", "type", "samples"]}
-                filters={["Project", "Sample", "Country", "Region"]}
+                filters={["Country", "Region"]}
               />
             ),
           },
@@ -57,13 +102,15 @@ const Search = () => {
             name: "Taxa",
             description: (
               <>
-                Search for a phylum or class to see how many samples it's
-                present in.
+                Search for a{" "}
+                <span data-tooltip={tooltips["phylum"]}>phylum</span> or{" "}
+                <span data-tooltip={tooltips["class"]}>class</span> to see how
+                many samples it's present in.
               </>
             ),
-            content: taxaSearchList && (
+            content: (
               <SearchList
-                list={taxaSearchList}
+                list={taxaSearch}
                 cols={["name", "type", "samples"]}
                 filters={["Phylum", "Class"]}
               />
@@ -73,27 +120,22 @@ const Search = () => {
             name: "Tags",
             description: (
               <>
-                Search for a tag to see how many samples/projects are tagged
-                with it.
+                Search for a <span data-tooltip={tooltips["tag"]}>tag</span> to
+                see how many samples/projects are tagged with it.
               </>
             ),
             content: (
               <>
-                {tagSearchList && (
-                  <SearchList
-                    list={tagSearchList}
-                    cols={["name", "projects", "samples"]}
-                    filters={["Tag"]}
-                  />
-                )}
+                <SearchList
+                  list={tagSearch}
+                  cols={["name", "projects", "samples"]}
+                />
+
                 <p>Tag values:</p>
-                {tagValueSearchList && (
-                  <SearchList
-                    list={tagValueSearchList}
-                    cols={["name", "value", "project", "samples"]}
-                    filters={["TagValue"]}
-                  />
-                )}
+                <SearchList
+                  list={tagValueSearch}
+                  cols={["name", "value", "project", "samples"]}
+                />
               </>
             ),
           },
