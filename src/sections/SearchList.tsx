@@ -25,7 +25,7 @@ const Search = ({ list: fullList, cols, filters }: Props) => {
   /** local state */
   const [filter, setFilter] = useState<FiltersAll[number]>("All");
   const [_search, setSearch] = useState("");
-  const search = useDebounce(_search);
+  const search = useDebounce(_search, 300);
   const [exactMatches, setExactMatches] = useState<NonNullable<List>>([]);
   const [exactSearching, setExactSearching] = useState(false);
   const [fuzzyMatches, setFuzzyMatches] = useState<NonNullable<List>>([]);
@@ -129,7 +129,7 @@ const Search = ({ list: fullList, cols, filters }: Props) => {
         {filters && (
           <Select
             label="Type:"
-            options={["All", ...filters] as FiltersAll}
+            options={["All", ...filters] as const}
             value={filter}
             onChange={setFilter}
           />

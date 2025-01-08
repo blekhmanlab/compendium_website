@@ -51,8 +51,7 @@ const Histogram = ({ id = "histogram", title, data }: Props) => {
       ].join(" ")}
       className="chart"
       onClick={(event) => {
-        if (event.shiftKey)
-          downloadSvg(event.currentTarget as Element, "reads-histogram");
+        if (event.shiftKey) downloadSvg(event.currentTarget, "reads-histogram");
       }}
     >
       <text
@@ -167,7 +166,7 @@ const histogram = (
   const yAxis = d3
     .axisLeft(yScale)
     .ticks(5)
-    .tickFormat((d) => formatNumber(d as number));
+    .tickFormat((d) => formatNumber(Number(d)));
 
   const secondary = getCssVariable("--secondary");
 

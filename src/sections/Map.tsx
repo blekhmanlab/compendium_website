@@ -61,8 +61,7 @@ const Map = ({ id = "map" }) => {
         id={id}
         className={classes.svg}
         onClick={(event) => {
-          if (event.shiftKey)
-            downloadSvg(event.currentTarget as Element, "map");
+          if (event.shiftKey) downloadSvg(event.currentTarget, "map");
         }}
       >
         <g className="map-container">

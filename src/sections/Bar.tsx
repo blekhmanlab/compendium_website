@@ -65,8 +65,7 @@ const Chart = ({ id = "chart", title, data, datumKey }: Props) => {
       id={id}
       className="chart"
       onClick={(event) => {
-        if (event.shiftKey)
-          downloadSvg(event.currentTarget as Element, "phyla-chart");
+        if (event.shiftKey) downloadSvg(event.currentTarget, "phyla-chart");
       }}
     >
       <text
