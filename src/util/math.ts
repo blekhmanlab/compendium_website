@@ -20,3 +20,7 @@ export const scale = ({ x, y }: Point, scale: number): Point => ({
 /** clamp value between min and max */
 export const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
+
+/** distance */
+export const dist = (a: Point, b: Point) =>
+  Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);

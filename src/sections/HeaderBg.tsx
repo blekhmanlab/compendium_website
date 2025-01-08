@@ -3,10 +3,13 @@ import PoissonDiskSampling from "poisson-disk-sampling";
 import { waitFor } from "@/util/async";
 import { getCssVariable, getMatrix } from "@/util/dom";
 import type { Point } from "@/util/math";
-import { cos, normalize, scale, sin } from "@/util/math";
+import { cos, dist, normalize, scale, sin } from "@/util/math";
 import classes from "./HeaderBg.module.css";
 
 const HeaderBg = () => <canvas className={classes.canvas}></canvas>;
+
+/** "oversampling" of canvas */
+const oversample = 2;
 
 export default HeaderBg;
 
@@ -33,12 +36,9 @@ export default HeaderBg;
 
   /** size and center canvas */
   const resize = () => {
-    /** "oversampling" of canvas */
-    const overscale = Math.min(window.devicePixelRatio * 1, 3);
-
     /** set canvas coordinate dimensions from canvas css dimensions */
-    canvas.width = canvas.clientWidth * overscale;
-    canvas.height = canvas.clientHeight * overscale;
+    canvas.width = canvas.clientWidth * oversample;
+    canvas.height = canvas.clientHeight * oversample;
 
     /** center camera at origin */
     ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -48,6 +48,9 @@ export default HeaderBg;
 
   /** smaller of canvas half width/height */
   const canvasSize = Math.min(canvas.width, canvas.height) / 2;
+
+  /** particle size */
+  const particleSize = canvasSize / 150;
 
   /** get bounding box of svg */
   const [svgLeft = 0, svgTop = 0, svgWidth = 100, svgHeight = 100] = (
@@ -105,9 +108,11 @@ export default HeaderBg;
   type Particle = {
     position: Point;
     destination: Point;
+    size: number;
     alpha: number;
     color: string;
     spin: number;
+    radius: number;
     animations: gsap.core.Timeline[];
   };
 
@@ -116,9 +121,11 @@ export default HeaderBg;
     /** starting values */
     position: scale(normalize(point), canvasSize * 1.5),
     destination: point,
+    size: particleSize,
     color: gray,
     alpha: 0,
     spin: Math.random() * 360,
+    radius: particleSize,
     animations: [],
   }));
 
@@ -137,18 +144,15 @@ export default HeaderBg;
       }),
       gsap
         .timeline()
-        .to(particle, { alpha: 1, duration: 0.25, delay, ease })
+        .to(particle, { alpha: 1, duration: 0.5, delay, ease })
         .to(particle, { alpha: 0.5, duration, ease }),
+      gsap
+        .timeline({ repeat: -1, yoyo: true, delay: -delay * 4 })
+        .to(particle, { color: gray, duration, ease })
+        .to(particle, { color: primary, duration, ease })
+        .to(particle, { color: secondary, duration, ease }),
     ];
-    gsap
-      .timeline({ repeat: -1, yoyo: true, delay: -delay * 4 })
-      .to(particle, { color: gray, duration, ease })
-      .to(particle, { color: primary, duration, ease })
-      .to(particle, { color: secondary, duration, ease });
   }
-
-  /** size of particle in canvas coordinates */
-  const size = canvasSize / 150;
 
   /** draw frame */
   const frame = () => {
@@ -164,13 +168,13 @@ export default HeaderBg;
     );
 
     /** draw particles */
-    for (const { position, color, alpha, spin } of particles) {
+    for (const { position, size, color, alpha, spin, radius } of particles) {
       ctx.globalAlpha = alpha;
       ctx.fillStyle = color;
       ctx.beginPath();
       ctx.arc(
-        position.x + sin(t / 3 + spin) * size,
-        position.y + cos(t / 3 + spin) * size,
+        position.x + sin(t / 3 + spin) * radius,
+        position.y + cos(t / 3 + spin) * radius,
         size,
         0,
         Math.PI * 2,
@@ -179,9 +183,25 @@ export default HeaderBg;
     }
 
     /** call frame again */
-    window.setTimeout(() => window.requestAnimationFrame(frame), 1);
+    window.setTimeout(() => window.requestAnimationFrame(frame), 10);
   };
   frame();
+
+  /** track mouse */
+  window.addEventListener("mousemove", (event) => {
+    const { left, top } = canvas.getBoundingClientRect();
+    const point = new DOMPoint(event.clientX - left, event.clientY - top);
+    point.x *= oversample;
+    point.y *= oversample;
+    const mouse = point.matrixTransform(ctx.getTransform().inverse());
+    /** bulge particles */
+    for (const particle of particles) {
+      const bulge =
+        particleSize +
+        20 * particleSize * 1.01 ** -dist(particle.position, mouse);
+      gsap.to(particle, { radius: bulge });
+    }
+  });
 
   /** restart animations on click */
   canvas.addEventListener("click", () =>
