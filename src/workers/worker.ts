@@ -22,7 +22,7 @@ export const expensiveFunction = () => {
 };
 
 /** exact (case-insensitive) search on large list of items */
-export const exactSearch = <Entry extends { [key: string]: unknown }>(
+export const exactSearch = <Entry extends Record<string, unknown>>(
   /** array of objects */
   list: readonly Entry[],
   /** object keys to search */
@@ -39,7 +39,7 @@ export const exactSearch = <Entry extends { [key: string]: unknown }>(
   );
 
 /** fuzzy (trigram) search on large list of items */
-export const fuzzySearch = <Entry extends { [key: string]: unknown }>(
+export const fuzzySearch = <Entry extends Record<string, unknown>>(
   /** array of objects */
   list: readonly Entry[],
   /** object key to search */

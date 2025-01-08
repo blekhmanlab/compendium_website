@@ -5,6 +5,7 @@
   width: 100%;
   padding: 10px;
   border-radius: var(--rounded);
+  background: var(--dark-gray);
 }
 
 .placeholder p {

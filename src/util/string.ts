@@ -23,6 +23,6 @@ export const formatBytes = (value?: number) => {
 
 /** format date to string */
 export const formatDate = (value?: string) =>
-  (new Date(value || "") || new Date()).toLocaleString(undefined, {
+  new Date(value || "").toLocaleString(undefined, {
     dateStyle: "medium",
   });

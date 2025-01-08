@@ -3,7 +3,8 @@ import { renderToString } from "react-dom/server";
 import * as d3 from "d3";
 import { orderBy } from "lodash";
 import Placeholder from "@/components/Placeholder";
-import { ByTaxLevel, Data, useData } from "@/data";
+import type { ByTaxLevel, Data } from "@/data";
+import { useData } from "@/data";
 import { getColor } from "@/util/colors";
 import { downloadSvg } from "@/util/dom";
 import { formatNumber } from "@/util/string";
@@ -51,7 +52,7 @@ const Chart = ({ id = "chart", title, data, datumKey }: Props) => {
     return <Placeholder height={400}>Loading "{title}" chart...</Placeholder>;
 
   /** if no samples for first bar, then no samples for any because list sorted */
-  const blank = !filtered[0].samples[sampleKey];
+  const blank = !filtered[0]?.samples[sampleKey];
 
   return (
     <svg
@@ -159,7 +160,7 @@ const chart = (
   /** create y axis */
   const yAxis = d3
     .axisLeft(yScale)
-    .tickFormat((_, i) => String(data[i][datumKey]));
+    .tickFormat((_, i) => String(data[i]?.[datumKey] ?? ""));
 
   /** update x axis */
   svg

@@ -6,7 +6,7 @@ import readline from "readline";
 import _ from "lodash";
 import Downloader from "nodejs-file-downloader";
 
-const lastCall: { [key: string]: number } = {};
+const lastCall: Record<string, number> = {};
 /** return true only if enough time has passed since last call */
 export const throttle = (key: string, interval = 1000) => {
   if (!lastCall[key] || performance.now() > lastCall[key] + interval) {

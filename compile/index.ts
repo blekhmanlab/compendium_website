@@ -9,7 +9,7 @@ import { fileURLToPath } from "url";
 import * as d3 from "d3";
 import dissolve from "geojson-dissolve";
 import _ from "lodash";
-import {
+import type {
   ByGeo,
   ByProject,
   ByTag,
@@ -27,11 +27,11 @@ import {
   throttle,
   write,
 } from "./util";
-import { Record, Zenodo } from "./zenodo-api";
+import type { _Record, Zenodo } from "./zenodo-api";
 
 /**
- * pre-compile step that takes the "raw" distributed data (csv/tsv), and
- * processs and pares it down to just what the website needs (json).
+ * pre-compile step that takes the "raw" distributed data (csv/tsv), and process
+ * and pares it down to just what the website needs (json).
  */
 
 /** record of downloads, version, and other info */
@@ -72,7 +72,7 @@ const processNaturalEarth = async (): Promise<ByGeo> => {
   };
 
   /** map of all countries to their regions */
-  const countryToRegion = read<{ [key: string]: string }>(countryToRegionFile);
+  const countryToRegion = read<Record<string, string>>(countryToRegionFile);
 
   for (const feature of worldMap.features) {
     const country = _.startCase(clean(feature.properties.NAME));
@@ -102,43 +102,46 @@ const processData = async (
   const metadataStream = stream(metadataFile);
 
   /** map of unique projects */
-  const byProject: { [key: string]: ByProject[number] } = {};
+  const byProject: Record<string, ByProject[number]> = {};
   /** map of unique countries */
-  const byCountry: { [key: string]: ByGeo["features"][number] } = {};
+  const byCountry: Record<string, ByGeo["features"][number]> = {};
   /** map of unique regions */
-  const byRegion: { [key: string]: ByGeo["features"][number] } = {};
+  const byRegion: Record<string, ByGeo["features"][number]> = {};
   /** map of unique phyla */
-  const byPhylum: { [key: string]: ByTaxLevel[number] } = {};
+  const byPhylum: Record<string, ByTaxLevel[number]> = {};
   /** map of unique classes */
-  const byClass: { [key: string]: ByTaxLevel[number] } = {};
+  const byClass: Record<string, ByTaxLevel[number]> = {};
   /** map of unique samples for counting reads */
-  const bySample: {
-    [key: string]: {
+  const bySample: Record<
+    string,
+    {
       reads: number;
       code: string;
       region: string;
-    };
-  } = {};
+    }
+  > = {};
   /** map of of unique tags */
-  const byTag: {
-    [key: string]: {
+  const byTag: Record<
+    string,
+    {
       tag: string;
-      projects: { [key: string]: string };
-      samples: { [key: string]: string };
-    };
-  } = {};
+      projects: Record<string, string>;
+      samples: Record<string, string>;
+    }
+  > = {};
   /** map of of unique tag values */
-  const byTagValue: {
-    [key: string]: {
+  const byTagValue: Record<
+    string,
+    {
       tag: string;
       value: string;
       project: string;
       samples: number;
-    };
-  } = {};
+    }
+  > = {};
 
   /** whether country feature has already been dissolved into region feature */
-  const countryDissolved: { [key: string]: boolean } = {};
+  const countryDissolved: Record<string, boolean> = {};
 
   /** add all natural earth features */
   for (const feature of worldMap.features) {
@@ -193,7 +196,8 @@ const processData = async (
     if (taxonomicDone && metadataDone) break;
 
     /** get sample metadata cols */
-    const [sample, project, , , , , , , , code, region] = metadataRow;
+    const [sample = "", project = "", , , , , , , , code = "", region = ""] =
+      metadataRow;
     // const country = _.startCase(geoLoc.split(":").shift());
 
     /** count country */
@@ -206,8 +210,8 @@ const processData = async (
     byProject[project].samples.push(sample);
 
     /** whether row (sample) has already been counted toward taxon */
-    const phylumCounted: { [key: string]: boolean } = {};
-    const classCounted: { [key: string]: boolean } = {};
+    const phylumCounted: Record<string, boolean> = {};
+    const classCounted: Record<string, boolean> = {};
 
     /** start counting reads for this sample */
     bySample[sample] = { reads: 0, code, region };
@@ -223,14 +227,14 @@ const processData = async (
       /** if taxon present in sample */
       if (reads > 0) {
         /** get props from header row */
-        const taxon = { ...taxonomicHeader[col], samples: { total: 0 } };
-        const { phylum, _class } = taxon;
+        const taxon = { ...taxonomicHeader[col]!, samples: { total: 0 } };
+        const { phylum = "", _class = "" } = taxon;
 
         /** count sample toward phylum (if not already) */
         if (!phylumCounted[phylum]) {
           byPhylum[phylum] ??= _.cloneDeep(taxon);
           byPhylum[phylum]._class = "";
-          byPhylum[phylum].samples.total++;
+          byPhylum[phylum].samples.total!++;
           byPhylum[phylum].samples[code] ??= 0;
           byPhylum[phylum].samples[code]++;
           byPhylum[phylum].samples[region] ??= 0;
@@ -241,7 +245,7 @@ const processData = async (
         /** count sample toward class (if not already) */
         if (!classCounted[_class]) {
           byClass[_class] ??= _.cloneDeep(taxon);
-          byClass[_class].samples.total++;
+          byClass[_class].samples.total!++;
           byClass[_class].samples[code] ??= 0;
           byClass[_class].samples[code]++;
           byClass[_class].samples[region] ??= 0;
@@ -253,7 +257,7 @@ const processData = async (
   }
 
   /** get reads for particular feature */
-  const getReads = (key) =>
+  const getReads = (key: string) =>
     Object.values(bySample)
       .filter(
         ({ code, region }) => key === "total" || key === code || key === region,
@@ -276,8 +280,22 @@ const processData = async (
     .domain([min, max])
     .thresholds(logSpace(min, max, bins));
 
+  /** object with total value and individual key values */
+  type WithTotal = { total: number | undefined } & Record<
+    string,
+    number | undefined
+  >;
+
   /** reads histogram data */
-  const byReads = {
+  const byReads: {
+    histogram: {
+      samples: WithTotal;
+      min: number;
+      max: number;
+      mid: number;
+    }[];
+    median: WithTotal;
+  } = {
     histogram: binner(totalReads).map(({ length, x0 = 0, x1 = 10000000 }) => ({
       samples: { total: length },
       min: x0 || 0,
@@ -300,7 +318,10 @@ const processData = async (
 
     /** go through bins of reads for this feature */
     for (const [index, bin] of Object.entries(binner(reads)))
-      if (bin.length) byReads.histogram[index].samples[feature] = bin.length;
+      if (bin.length) {
+        const all = byReads.histogram[Number(index)];
+        if (all) all.samples[feature] = bin.length;
+      }
   }
 
   /** parse tag counts */
@@ -392,7 +413,7 @@ const deriveMetadata = async (
   byRegion: ByGeo,
   byCountry: ByGeo,
   byTag: ByTag,
-  record: Record,
+  record: _Record,
 ): Promise<Metadata> => {
   const projects = byProject.length;
   const samples = byProject.reduce(
@@ -432,6 +453,7 @@ const deriveMetadata = async (
 
 console.info("Getting data download links and other info");
 const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
+if (!record) throw Error("No hits");
 
 if (!process.env.SKIP_DOWNLOAD) {
   console.info("Downloading raw data");

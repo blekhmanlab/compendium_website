@@ -7,7 +7,7 @@ import Map from "@/sections/Map";
 import { tooltips } from "@/sections/Search";
 import classes from "./Prevalence.module.css";
 
-const chartOptions = ["Phyla", "Reads"];
+const chartOptions = ["Phyla", "Reads"] as const;
 type Chart = (typeof chartOptions)[number];
 
 const Prevalence = () => {

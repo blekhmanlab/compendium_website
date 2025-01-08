@@ -5,7 +5,7 @@ import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import Table, { type Col } from "@/components/Table";
 import Textbox from "@/components/Textbox";
-import { Data } from "@/data";
+import type { Data } from "@/data";
 import type { KeysOfType } from "@/util/types";
 import { thread } from "@/workers";
 import classes from "./SearchList.module.css";
@@ -21,7 +21,7 @@ type Props = {
   filters?: string[];
 };
 
-const Search = ({ list: fullList = [], cols, filters }: Props) => {
+const Search = ({ list: fullList, cols, filters }: Props) => {
   /** local state */
   const [filter, setFilter] = useState<FiltersAll[number]>("All");
   const [_search, setSearch] = useState("");
@@ -35,7 +35,7 @@ const Search = ({ list: fullList = [], cols, filters }: Props) => {
   const list = useMemo(
     () =>
       filters
-        ? fullList.filter((entry) =>
+        ? fullList?.filter((entry) =>
             !("type" in entry)
               ? true
               : entry.type === filter || filter === "All"
@@ -50,7 +50,7 @@ const Search = ({ list: fullList = [], cols, filters }: Props) => {
   useEffect(() => {
     let latest = true;
 
-    if (search.trim()) {
+    if (list && search.trim()) {
       setExactMatches([]);
       setExactSearching(true);
 
@@ -78,7 +78,7 @@ const Search = ({ list: fullList = [], cols, filters }: Props) => {
   useEffect(() => {
     let latest = true;
 
-    if (search.trim()) {
+    if (list && search.trim()) {
       setFuzzyMatches([]);
       setFuzzySearching(true);
 

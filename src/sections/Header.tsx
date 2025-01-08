@@ -1,7 +1,7 @@
-import { ReactComponent as PaperIcon } from "@/assets/book.svg";
-import { ReactComponent as DownloadIcon } from "@/assets/download.svg";
-import { ReactComponent as Logo } from "@/assets/logo.svg";
-import { ReactComponent as PackageIcon } from "@/assets/package.svg";
+import PaperIcon from "@/assets/book.svg?react";
+import DownloadIcon from "@/assets/download.svg?react";
+import Logo from "@/assets/logo.svg?react";
+import PackageIcon from "@/assets/package.svg?react";
 import Button from "@/components/Button.tsx";
 import HeaderBg from "@/sections/HeaderBg.tsx";
 import classes from "./Header.module.css";

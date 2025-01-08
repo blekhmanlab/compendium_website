@@ -1,5 +1,5 @@
-import { ReactComponent as PackageIcon } from "@/assets/package.svg";
-import { ReactComponent as RecipeIcon } from "@/assets/recipe.svg";
+import PackageIcon from "@/assets/package.svg?react";
+import RecipeIcon from "@/assets/recipe.svg?react";
 import Button from "@/components/Button";
 import classes from "./Recipes.module.css";
 

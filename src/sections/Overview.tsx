@@ -1,10 +1,10 @@
-import { ReactComponent as BarsIcon } from "@/assets/bars.svg";
-import { ReactComponent as DatabaseIcon } from "@/assets/database.svg";
-import { ReactComponent as EarthIcon } from "@/assets/earth.svg";
-import { ReactComponent as EyeIcon } from "@/assets/eye.svg";
-import { ReactComponent as MicroscopeIcon } from "@/assets/microscope.svg";
-import { ReactComponent as PackageIcon } from "@/assets/package.svg";
-import { ReactComponent as TableIcon } from "@/assets/table.svg";
+import BarsIcon from "@/assets/bars.svg?react";
+import DatabaseIcon from "@/assets/database.svg?react";
+import EarthIcon from "@/assets/earth.svg?react";
+import EyeIcon from "@/assets/eye.svg?react";
+import MicroscopeIcon from "@/assets/microscope.svg?react";
+import PackageIcon from "@/assets/package.svg?react";
+import TableIcon from "@/assets/table.svg?react";
 import Placeholder from "@/components/Placeholder";
 import { useData } from "@/data";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
@@ -108,7 +108,7 @@ const Overview = () => {
           })}
         </div>
       ) : (
-        <Placeholder height={100}>Loading metadata...</Placeholder>
+        <Placeholder height={300}>Loading metadata...</Placeholder>
       )}
 
       <hr />

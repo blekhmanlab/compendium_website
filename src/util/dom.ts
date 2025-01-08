@@ -17,7 +17,7 @@ export const getCssVariable = (name: string) =>
 export const downloadSvg = (
   element: Element,
   filename = "chart",
-  addAttrs: { [key: string]: string } = { style: "font-family: sans-serif;" },
+  addAttrs: Record<string, string> = { style: "font-family: sans-serif;" },
   removeAttrs: RegExp[] = [/^data-.*/, /^aria-.*/],
 ) => {
   if (!element) return;

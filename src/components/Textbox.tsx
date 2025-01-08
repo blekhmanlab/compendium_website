@@ -1,5 +1,5 @@
-import { InputHTMLAttributes } from "react";
-import { ReactComponent as XIcon } from "@/assets/x.svg";
+import type { InputHTMLAttributes } from "react";
+import XIcon from "@/assets/x.svg?react";
 import classes from "./Textbox.module.css";
 
 type Props = {

@@ -1,4 +1,5 @@
-import { proxy, Remote, wrap } from "comlink";
+import type { Remote } from "comlink";
+import { proxy, wrap } from "comlink";
 import DataWorker from "./worker?worker";
 
 /** get exports from worker to define types for methods/objects/etc. */

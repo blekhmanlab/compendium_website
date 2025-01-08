@@ -19,11 +19,11 @@ const colors = [
 ];
 
 /** map unique string to color */
-const colorMap: { [key: string]: string } = {};
+const colorMap: Record<string, string> = {};
 
 /** next color to assign */
 let colorIndex = 0;
 
 /** get color for unique string. if not defined, assign next color in order. */
 export const getColor = (key: string) =>
-  (colorMap[key] ??= colors[colorIndex++ % colors.length]);
+  (colorMap[key] ??= colors[colorIndex++ % colors.length]!);

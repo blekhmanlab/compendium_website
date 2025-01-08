@@ -1,7 +1,7 @@
-import { Zenodo } from "../../compile/zenodo-api";
-import { FeatureCollection, Geometry } from "geojson";
+import type { FeatureCollection, Geometry } from "geojson";
 import { orderBy } from "lodash";
 import { create } from "zustand";
+import type { Zenodo } from "../../compile/zenodo-api";
 
 /** metadata about overall project */
 export type Metadata = typeof import("../../public/metadata.json");
@@ -103,6 +103,7 @@ export const loadMetaData = async () => {
 
   /** update with live stats */
   const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
+  if (!record) throw Error("No hits");
   useData.setState(() => ({
     metadata: {
       ...metadata,
@@ -233,17 +234,11 @@ const load = async <Key extends keyof Data>(
 };
 
 /** generic request wrapper */
-const request = async <T>(url: string) => {
+const request = async <Type>(url: string) => {
   const response = await fetch(url);
   if (!response.ok) throw Error("Response not OK");
-  const data = await response.json();
-  return data as T;
+  return (await response.json()) as Type;
 };
-
-/**
- * collate data into lists of entries to search. can't do this as compile
- * pre-process because file ends up being very large.
- */
 
 /** select feature (country or region) */
 export const setSelectedFeature = (feature?: {

@@ -1,22 +1,22 @@
-import { SelectHTMLAttributes } from "react";
+import type { SelectHTMLAttributes } from "react";
 import { startCase } from "lodash";
-import { ReactComponent as AngleIcon } from "@/assets/angle.svg";
+import AngleIcon from "@/assets/angle.svg?react";
 import classes from "./Select.module.css";
 
-type Props<Options extends string[]> = {
+type Props<Option extends string> = {
   label: string;
-  value: Options[number];
-  onChange: (value: Options[number]) => void;
-  options: Options;
+  value: Option;
+  onChange: (value: Option) => void;
+  options: readonly Option[];
 } & Omit<SelectHTMLAttributes<HTMLSelectElement>, "onChange">;
 
-const Select = <Options extends string[]>({
+const Select = <Option extends string>({
   label,
   value,
   onChange,
   options,
   ...props
-}: Props<Options>) => (
+}: Props<Option>) => (
   <label className={classes.label}>
     <span>{label}</span>
     <span className={classes.wrapper}>
@@ -24,7 +24,7 @@ const Select = <Options extends string[]>({
         className={classes.select}
         {...props}
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(event) => onChange(event.target.value as Option)}
       >
         {options.map((option, index) => (
           <option key={index} value={option}>

@@ -2,7 +2,8 @@ import { gsap } from "gsap";
 import PoissonDiskSampling from "poisson-disk-sampling";
 import { waitFor } from "@/util/async";
 import { getCssVariable, getMatrix } from "@/util/dom";
-import { cos, normalize, Point, scale, sin } from "@/util/math";
+import type { Point } from "@/util/math";
+import { cos, normalize, scale, sin } from "@/util/math";
 import classes from "./HeaderBg.module.css";
 
 const HeaderBg = () => <canvas className={classes.canvas}></canvas>;
@@ -49,7 +50,7 @@ export default HeaderBg;
   const canvasSize = Math.min(canvas.width, canvas.height) / 2;
 
   /** get bounding box of svg */
-  const [svgLeft, svgTop, svgWidth, svgHeight] = (
+  const [svgLeft = 0, svgTop = 0, svgWidth = 100, svgHeight = 100] = (
     svg.getAttribute("viewBox") || ""
   )
     .split(" ")
@@ -70,7 +71,7 @@ export default HeaderBg;
   })
     .fill()
     /** shift range into range of svg viewbox */
-    .map(([x, y]) => ({ x: x + svgLeft, y: y + svgTop }))
+    .map(([x = 0, y = 0]) => ({ x: x + svgLeft, y: y + svgTop }))
     /** remove points that aren't inside one of svg's paths */
     .filter(({ x, y }) =>
       paths.some(({ path, fill, stroke, transform }) => {

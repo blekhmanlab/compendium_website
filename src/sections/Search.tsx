@@ -1,12 +1,6 @@
 import { useEffect } from "react";
 import Tabs from "@/components/Tabs";
-import {
-  loadGeoData,
-  loadProjectData,
-  loadTagData,
-  loadTaxaData,
-  useData,
-} from "@/data";
+import { loadTagData, useData } from "@/data";
 import SearchList from "@/sections/SearchList";
 
 export const tooltips = {
@@ -32,21 +26,8 @@ const Search = () => {
   const tagValueSearch = useData((state) => state.tagValueSearch);
 
   const onChange = (index: number) => {
-    /** load data on demand */
-    switch (index) {
-      case 0:
-        if (!projectSearch) loadProjectData();
-        break;
-      case 1:
-        if (!geoSearch) loadGeoData();
-        break;
-      case 2:
-        if (!taxaSearch) loadTaxaData();
-        break;
-      case 3:
-        if (!tagSearch) loadTagData();
-        break;
-    }
+    /** load large data on demand */
+    if (index === 3 && !tagSearch) loadTagData();
   };
 
   useEffect(() => {
