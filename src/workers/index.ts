@@ -1,6 +1,6 @@
 import type { Remote } from "comlink";
 import { proxy, wrap } from "comlink";
-import DataWorker from "./worker?worker";
+import Worker from "./worker?worker";
 
 /** get exports from worker to define types for methods/objects/etc. */
 type API = typeof import("./worker.ts");
@@ -16,10 +16,10 @@ export const thread = <Type>(
     /** flag for if final result has happened */
     let resolved = false;
     /** create worker instance */
-    const worker = wrap<API>(new DataWorker());
-    /** set on progress callback */
-    worker.onProgress(
-      proxy((status) => {
+    const worker = wrap<API>(new Worker());
+    /** set progress func */
+    worker.setProgress(
+      proxy(async (status) => {
         /** make sure on progress message hasn't arrived after final result */
         if (!resolved)
           /** update progress */

@@ -61,17 +61,6 @@ export const fuzzySearch = <Entry extends Record<string, unknown>>(
       ) > threshold,
   );
 
-/** progress callback type */
-type OnProgress = (status: string) => void;
-
-/** currently set progress callback */
-let progress: OnProgress | undefined;
-
-/** expose method to set progress callback */
-export const onProgress = (callback: OnProgress) => (progress = callback);
-
-expose({ expensiveFunction, exactSearch, fuzzySearch, onProgress });
-
 /** split string into n-grams */
 const nGrams = (value: string, n = 3) => {
   /** add start/end padding */
@@ -95,3 +84,14 @@ const nGramSimilarity = (stringA: string, stringB: string, n = 3) => {
 
   return common.size / (total.size || Infinity);
 };
+
+/** progress func type */
+type Progress = (status: string, shouldCancel?: true) => Promise<void>;
+
+/** currently set progress func */
+let progress: Progress | undefined;
+
+/** expose method to set progress func */
+export const setProgress = (func: Progress) => (progress = func);
+
+expose({ expensiveFunction, exactSearch, fuzzySearch, setProgress });

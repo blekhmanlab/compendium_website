@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { capitalize } from "lodash";
 import { useDebounce } from "@reactuses/core";
 import Placeholder from "@/components/Placeholder";
@@ -30,6 +30,8 @@ const Search = ({ list: fullList, cols, filters }: Props) => {
   const [exactSearching, setExactSearching] = useState(false);
   const [fuzzyMatches, setFuzzyMatches] = useState<NonNullable<List>>([]);
   const [fuzzySearching, setFuzzySearching] = useState(false);
+  const latestExact = useRef<symbol>(null);
+  const latestFuzzy = useRef<symbol>(null);
 
   /** filter full search list before any other steps */
   const list = useMemo(
@@ -48,7 +50,8 @@ const Search = ({ list: fullList, cols, filters }: Props) => {
 
   /** exact search */
   useEffect(() => {
-    let latest = true;
+    const current = Symbol();
+    latestExact.current = current;
 
     if (list && search.trim()) {
       setExactMatches([]);
@@ -57,9 +60,9 @@ const Search = ({ list: fullList, cols, filters }: Props) => {
       /** do in worker to not freeze UI */
       thread((worker) => worker.exactSearch(list, ["name", "value"], search))
         .then((result) => {
-          /** if not latest run of use effect (superseded), ignore result */
-          if (!latest) return;
-
+          /** if not latest run, discard result */
+          if (current !== latestExact.current)
+            return console.warn(`Stale search: ${search}`);
           setExactMatches(result as typeof exactMatches);
         })
         .catch(console.error)
@@ -69,14 +72,15 @@ const Search = ({ list: fullList, cols, filters }: Props) => {
     }
 
     return () => {
-      latest = false;
+      latestExact.current = null;
       setExactSearching(false);
     };
   }, [list, search, setExactSearching]);
 
   /** fuzzy search */
   useEffect(() => {
-    let latest = true;
+    const current = Symbol();
+    latestFuzzy.current = current;
 
     if (list && search.trim()) {
       setFuzzyMatches([]);
@@ -85,9 +89,9 @@ const Search = ({ list: fullList, cols, filters }: Props) => {
       /** do in worker to not freeze UI */
       thread((worker) => worker.fuzzySearch(list, ["name", "value"], search))
         .then((result) => {
-          /** if not latest run of use effect (superseded), ignore result */
-          if (!latest) return;
-
+          /** if not latest run, discard result */
+          if (current !== latestFuzzy.current)
+            return console.warn(`Stale search: ${search}`);
           setFuzzyMatches(result as typeof fuzzyMatches);
         })
         .catch(console.error)
@@ -97,7 +101,7 @@ const Search = ({ list: fullList, cols, filters }: Props) => {
     }
 
     return () => {
-      latest = false;
+      latestFuzzy.current = null;
       setFuzzySearching(false);
     };
   }, [list, search, setFuzzySearching]);
