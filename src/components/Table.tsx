@@ -66,7 +66,7 @@ const Table = <Datum extends object>({
                           ? col.render(cell, row)
                           : typeof cell === "number"
                             ? formatNumber(cell, false)
-                            : String(cell).split("_").join(" ")}
+                            : String(cell).replaceAll("_", " ")}
                       </td>
                     );
                   })}

@@ -125,7 +125,7 @@ export default HeaderBg;
     color: gray,
     alpha: 0,
     spin: Math.random() * 360,
-    radius: particleSize,
+    radius: 0,
     animations: [],
   }));
 
@@ -196,9 +196,7 @@ export default HeaderBg;
     const mouse = point.matrixTransform(ctx.getTransform().inverse());
     /** bulge particles */
     for (const particle of particles) {
-      const bulge =
-        particleSize +
-        20 * particleSize * 1.01 ** -dist(particle.position, mouse);
+      const bulge = 20 * particleSize * 1.01 ** -dist(particle.position, mouse);
       gsap.to(particle, { radius: bulge });
     }
   });

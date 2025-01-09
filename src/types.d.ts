@@ -14,9 +14,3 @@ declare module "*.svg?react" {
 
   export default ReactComponent;
 }
-
-/** library doesn't provide type defs */
-declare module "trigram-similarity" {
-  const trigramSimilarity: (input1: string, input2: string) => number;
-  export default trigramSimilarity;
-}
