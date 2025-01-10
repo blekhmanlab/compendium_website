@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 import * as d3 from "d3";
 import type { Feature } from "geojson";
+import { clamp } from "lodash";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import type { Data } from "@/data";
 import { setSelectedFeature, useData } from "@/data";
 import { downloadSvg, getCssVariable } from "@/util/dom";
-import { clamp } from "@/util/math";
 import { formatNumber } from "@/util/string";
 import classes from "./Map.module.css";
 

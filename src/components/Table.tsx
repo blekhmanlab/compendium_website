@@ -4,6 +4,7 @@ import {
   type MouseEventHandler,
   type ReactNode,
 } from "react";
+import { clamp } from "lodash";
 import AngleIcon from "@/assets/angle.svg?react";
 import Button from "@/components/Button";
 import CheckButton from "@/components/CheckButton";
@@ -48,7 +49,14 @@ const Table = <Datum extends DatumShape>({
   onSelect,
 }: Props<Datum>) => {
   /** row cutoff */
-  const [slice, setSlice] = useState(limit);
+  let [cutoff, setCutoff] = useState(limit);
+
+  /** limit cutoff */
+  cutoff = clamp(cutoff, limit, limit * Math.ceil(rows.length / limit));
+
+  /** whether to show more/less buttons */
+  const less = cutoff - limit >= limit;
+  const more = cutoff < rows.length;
 
   /** selected rows */
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -100,7 +108,7 @@ const Table = <Datum extends DatumShape>({
           </thead>
           <tbody>
             {!!rows.length &&
-              rows.slice(0, slice).map((row, rowIndex) => (
+              rows.slice(0, cutoff).map((row, rowIndex) => (
                 <tr
                   key={rowIndex}
                   style={{ cursor: selectEnabled ? "pointer" : "" }}
@@ -155,11 +163,11 @@ const Table = <Datum extends DatumShape>({
       </div>
 
       <div className={classes.buttons}>
-        {slice - limit >= limit && (
+        {less && (
           <Button
             onClick={
               ((event) => {
-                setSlice(slice - limit);
+                setCutoff(cutoff - limit);
                 preserveScroll(event.currentTarget.parentElement);
               }) satisfies MouseEventHandler<HTMLButtonElement>
             }
@@ -168,11 +176,11 @@ const Table = <Datum extends DatumShape>({
             Less
           </Button>
         )}
-        {slice + limit <= rows.length && (
+        {more && (
           <Button
             onClick={
               ((event) => {
-                setSlice(slice + limit);
+                setCutoff(cutoff + limit);
                 preserveScroll(event.currentTarget.parentElement);
               }) satisfies MouseEventHandler<HTMLButtonElement>
             }

@@ -11,15 +11,11 @@ export const normalize = ({ x, y }: Point): Point => {
   return { x: x / dist, y: y / dist };
 };
 
-/** normalize point as vector */
+/** scale point */
 export const scale = ({ x, y }: Point, scale: number): Point => ({
   x: x * scale,
   y: y * scale,
 });
-
-/** clamp value between min and max */
-export const clamp = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max);
 
 /** distance */
 export const dist = (a: Point, b: Point) =>
