@@ -51,7 +51,7 @@ body {
 header,
 section,
 footer {
-  --col: 720px;
+  --col: 800px;
   display: flex;
   flex-direction: column;
   align-items: center;

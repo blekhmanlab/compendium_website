@@ -1,9 +1,21 @@
 .search {
   display: flex;
-  position: relative;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   width: 100%;
+  min-width: 0;
   gap: 20px;
+}
+
+.box {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  max-width: 100%;
+}
+
+.box > svg:first-child {
+  position: absolute;
+  right: calc(100% + 20px);
 }

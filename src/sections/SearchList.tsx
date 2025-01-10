@@ -126,18 +126,19 @@ const Search = ({ list: fullList, cols, types, names, onSelect }: Props) => {
   return (
     <>
       <div className={classes.search}>
-        <LoadingIcon
-          style={{
-            opacity:
-              exactSearching || fuzzySearching
-                ? !exactSearching && fuzzySearching
-                  ? 0.5
-                  : 1
-                : 0,
-          }}
-        />
-
-        <Textbox value={_search} onChange={setSearch} placeholder="Search" />
+        <div className={classes.box}>
+          <LoadingIcon
+            style={{
+              opacity:
+                exactSearching || fuzzySearching
+                  ? !exactSearching && fuzzySearching
+                    ? 0.5
+                    : 1
+                  : 0,
+            }}
+          />
+          <Textbox value={_search} onChange={setSearch} placeholder="Search" />
+        </div>
 
         {types && (
           <Select
