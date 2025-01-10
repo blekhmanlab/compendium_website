@@ -1,5 +1,6 @@
 import type { Remote } from "comlink";
 import { proxy, wrap } from "comlink";
+import { sleep } from "@/util/async.ts";
 import Worker from "./worker?worker";
 
 /** get exports from worker to define types for methods/objects/etc. */
@@ -37,7 +38,11 @@ export const thread = <Type>(
     /** execute specified method */
     method(worker)
       /** return final result */
-      .then(resolve)
+      .then(async (result) => {
+        /** for testing */
+        await sleep(100);
+        resolve(result);
+      })
       /** catch errors */
       .catch(reject)
       .finally(() => {

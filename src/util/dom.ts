@@ -53,10 +53,11 @@ export const downloadSvg = (
  * scroll page so that mouse stays at same position in document relative to
  * element
  */
-export const preserveScroll = async (element: Element) => {
+export const preserveScroll = async (element?: Element | null) => {
+  if (!element) return;
   const oldY = element.getBoundingClientRect().top;
   await sleep(0);
   const newY = element.getBoundingClientRect().top;
   if (!element.isConnected) return;
-  window.scrollBy({ top: newY - oldY, behavior: "instant" });
+  window.scrollBy({ top: newY - oldY, behavior: "smooth" });
 };

@@ -4,11 +4,16 @@ import {
   type MouseEventHandler,
   type ReactNode,
 } from "react";
+import AngleIcon from "@/assets/angle.svg?react";
 import Button from "@/components/Button";
+import CheckButton from "@/components/CheckButton";
 import { preserveScroll } from "@/util/dom";
 import { formatNumber } from "@/util/string";
+import classes from "./Table.module.css";
 
-export type Col<Datum extends object, Key extends keyof Datum> = {
+type DatumShape = object & { name: string };
+
+export type Col<Datum extends DatumShape, Key extends keyof Datum> = {
   /** key of row object to access as cell value */
   key: Key;
   /** label for header */
@@ -19,7 +24,7 @@ export type Col<Datum extends object, Key extends keyof Datum> = {
   style?: (cell?: NoInfer<Datum[Key]>, row?: Datum) => CSSProperties;
 };
 
-type Props<Datum extends object> = {
+type Props<Datum extends DatumShape> = {
   /** col definitions https://github.com/orgs/vuejs/discussions/8851 */
   cols: { [Key in keyof Datum]: Col<Datum, Key> }[keyof Datum][];
   /** data */
@@ -28,15 +33,38 @@ type Props<Datum extends object> = {
   limit?: number;
   /** extra rows to add at end, for messages */
   extraRows?: string[];
+  /** when selected rows change */
+  onSelect?: (selected: string[]) => void;
 };
 
-const Table = <Datum extends object>({
+export type OnSelect = NonNullable<Props<DatumShape>["onSelect"]>;
+export type SelectedRows = Parameters<OnSelect>[0];
+
+const Table = <Datum extends DatumShape>({
   cols,
   rows,
-  limit = 10,
+  limit = 7,
   extraRows,
+  onSelect,
 }: Props<Datum>) => {
+  /** row cutoff */
   const [slice, setSlice] = useState(limit);
+
+  /** selected rows */
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  /** are rows selectable */
+  const selectEnabled = !!onSelect;
+
+  /** are some rows selected */
+  const someSelected =
+    !!rows.length && rows.some((row) => selected.has(row.name));
+
+  /** set selected */
+  const updateSelected = (newSelected: typeof selected) => {
+    onSelect?.([...newSelected]);
+    setSelected(newSelected);
+  };
 
   return (
     <>
@@ -44,6 +72,25 @@ const Table = <Datum extends object>({
         <table>
           <thead>
             <tr>
+              {selectEnabled && (
+                <th>
+                  <CheckButton
+                    label={
+                      someSelected
+                        ? `Deselect ${formatNumber(selected.size)} rows`
+                        : `Select ${formatNumber(rows.length)} rows`
+                    }
+                    checked={someSelected}
+                    onChange={() =>
+                      updateSelected(
+                        someSelected
+                          ? new Set()
+                          : new Set(rows.map((row) => row.name)),
+                      )
+                    }
+                  />
+                </th>
+              )}
               {cols.map((col, index) => (
                 <th key={index} style={col.style ? col.style() : {}}>
                   {col.name}
@@ -53,13 +100,37 @@ const Table = <Datum extends object>({
           </thead>
           <tbody>
             {!!rows.length &&
-              rows.slice(0, slice).map((row, index) => (
-                <tr key={index}>
-                  {cols.map((col, index) => {
+              rows.slice(0, slice).map((row, rowIndex) => (
+                <tr
+                  key={rowIndex}
+                  style={{ cursor: selectEnabled ? "pointer" : "" }}
+                  onClick={
+                    onSelect &&
+                    ((event) =>
+                      event.currentTarget.querySelector("button")?.click())
+                  }
+                >
+                  {selectEnabled && (
+                    <td>
+                      <CheckButton
+                        label={
+                          selected.has(row.name) ? "Deselect row" : "Select row"
+                        }
+                        checked={selected.has(row.name)}
+                        onChange={(checked) => {
+                          const newSelected = new Set(selected);
+                          if (checked) newSelected.add(row.name);
+                          else newSelected.delete(row.name);
+                          updateSelected(newSelected);
+                        }}
+                      />
+                    </td>
+                  )}
+                  {cols.map((col, colIndex) => {
                     const cell = row[col.key];
                     return (
                       <td
-                        key={index}
+                        key={colIndex}
                         style={col.style ? col.style(cell, row) : {}}
                       >
                         {col.render
@@ -74,7 +145,7 @@ const Table = <Datum extends object>({
               ))}
 
             {!!extraRows?.length &&
-              extraRows.filter(Boolean).map((row, index) => (
+              extraRows.map((row, index) => (
                 <tr key={index} style={{ opacity: 0.5 }}>
                   <td colSpan={cols.length}>{row}</td>
                 </tr>
@@ -83,18 +154,34 @@ const Table = <Datum extends object>({
         </table>
       </div>
 
-      {rows.length > slice && (
-        <Button
-          onClick={
-            ((event) => {
-              setSlice(slice + 10 * limit);
-              preserveScroll(event.currentTarget);
-            }) satisfies MouseEventHandler<HTMLButtonElement>
-          }
-        >
-          Show More
-        </Button>
-      )}
+      <div className={classes.buttons}>
+        {slice + limit <= rows.length && (
+          <Button
+            onClick={
+              ((event) => {
+                setSlice(slice + limit);
+                preserveScroll(event.currentTarget.parentElement);
+              }) satisfies MouseEventHandler<HTMLButtonElement>
+            }
+          >
+            <AngleIcon />
+            More
+          </Button>
+        )}
+        {slice - limit >= limit && (
+          <Button
+            onClick={
+              ((event) => {
+                setSlice(slice - limit);
+                preserveScroll(event.currentTarget.parentElement);
+              }) satisfies MouseEventHandler<HTMLButtonElement>
+            }
+          >
+            <AngleIcon style={{ scale: "1 -1" }} />
+            Less
+          </Button>
+        )}
+      </div>
     </>
   );
 };

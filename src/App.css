@@ -215,6 +215,13 @@ span[data-tooltip] {
   text-underline-offset: 4px;
 }
 
+.icon {
+  flex-shrink: 0;
+  width: unset;
+  height: 1em;
+  vertical-align: middle;
+}
+
 .tippy-box {
   max-width: 350px !important;
   padding: 10px 15px;

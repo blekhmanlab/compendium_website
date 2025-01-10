@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100">
+  <style>
+    .loading {
+      animation: loading 4s linear infinite;
+      stroke-dasharray: 0.0625;
+    }
+
+    @keyframes loading {
+      to {
+        rotate: 360deg;
+      }
+    }
+  </style>
+  <circle
+    class="loading"
+    r="40"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="20"
+    pathLength="1"
+  />
+</svg>

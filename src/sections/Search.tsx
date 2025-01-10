@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { startTransition, useState } from "react";
 import Tabs from "@/components/Tabs";
 import { loadTagData, useData } from "@/data";
 import SearchList from "@/sections/SearchList";
@@ -30,15 +30,11 @@ const Search = () => {
     if (index === 3 && !tagSearch) loadTagData();
   };
 
-  useEffect(() => {
-    onChange(0);
-  });
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   return (
     <section>
       <h2>Search</h2>
-
-      <p>Does this dataset have what you're looking for?</p>
 
       <Tabs
         onChange={onChange}
@@ -56,7 +52,7 @@ const Search = () => {
                 <SearchList
                   list={projectSearch}
                   cols={["name", "type", "samples"]}
-                  filters={["Project", "Sample"]}
+                  types={["Project", "Sample"]}
                 />
               </>
             ),
@@ -74,7 +70,7 @@ const Search = () => {
                 <SearchList
                   list={geoSearch}
                   cols={["name", "type", "samples"]}
-                  filters={["Country", "Region"]}
+                  types={["Country", "Region"]}
                 />
               </>
             ),
@@ -92,7 +88,7 @@ const Search = () => {
                 <SearchList
                   list={taxaSearch}
                   cols={["name", "type", "samples"]}
-                  filters={["Phylum", "Class"]}
+                  types={["Phylum", "Class"]}
                 />
               </>
             ),
@@ -103,20 +99,24 @@ const Search = () => {
               <>
                 <p>
                   Search for a <span data-tooltip={tooltips["tag"]}>tag</span>{" "}
-                  to see how many samples/projects have it.
+                  to see how many projects/samples have it.
                 </p>
                 <SearchList
                   list={tagSearch}
                   cols={["name", "projects", "samples"]}
+                  onSelect={(selected) =>
+                    startTransition(() => setSelectedTags(selected))
+                  }
                 />
                 <p>
-                  Search for a{" "}
-                  <span data-tooltip={tooltips["tag"]}>tag or value</span> to
-                  see which projects and how many samples have it.
+                  Select <span data-tooltip={tooltips["tag"]}>tags</span> above,
+                  then search for a name/value to see which projects and how
+                  many samples have it.
                 </p>
                 <SearchList
                   list={tagValueSearch}
                   cols={["name", "value", "project", "samples"]}
+                  names={selectedTags}
                 />
               </>
             ),

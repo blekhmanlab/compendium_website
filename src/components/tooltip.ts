@@ -10,61 +10,27 @@ const options: Partial<Props> = {
   allowHTML: true,
   appendTo: document.body,
   plugins: [followCursor],
+  hideOnClick: false,
   // onHide: () => false,
 };
 
-/** listen for changes to document */
-new MutationObserver((mutations) => {
-  for (const mutation of mutations) {
-    /** when nodes added/removed */
-    if (mutation.type === "childList") {
-      for (const node of mutation.addedNodes)
-        if (node instanceof Element)
-          selectAll(node, "[data-tooltip]").forEach(update);
+/** update all tooltips in document */
+const updateAll = () =>
+  document.querySelectorAll("[data-tooltip]").forEach(update);
 
-      for (const node of mutation.removedNodes)
-        if (node instanceof Element)
-          selectAll(node, "[data-tooltip]").forEach(remove);
-    }
+/** update tippy instance */
+const update = (element: Element & { _tippy?: Instance }) => {
+  /** if element unmounted, remove */
+  if (!element.isConnected) return element._tippy?.destroy();
 
-    /** when data-tooltip attrs updated */
-    if (mutation.type === "attributes" && mutation.target instanceof Element)
-      update(mutation.target);
-  }
-}).observe(document.body, {
-  childList: true,
-  subtree: true,
-  attributes: true,
-  attributeFilter: ["data-tooltip"],
-});
-
-/** extend normal element with attached tippy instance */
-type _Element = Element & { _tippy?: Instance };
-
-/** create or update tippy instance */
-const update = (element: Element) => {
   /** get tooltip content from attribute */
   const content = element.getAttribute("data-tooltip")?.trim() || "";
 
   /** don't show if content blank */
-  if (!content) {
-    remove(element);
-    return;
-  }
+  if (!content) return element._tippy?.destroy();
 
   /** get existing tippy instance or create new */
-  const instance: Instance =
-    (element as _Element)._tippy || tippy(element, options);
-
-  instance.setProps({
-    /** only make interactive if content includes link to click on */
-    interactive: content.includes("<a"),
-    /** follow cursor on map */
-    followCursor: element.closest("#map") ? "horizontal" : false,
-  });
-
-  /** set aria label to content */
-  instance.reference.setAttribute("aria-label", makeLabel(content));
+  const instance = element._tippy ?? tippy(element, options);
 
   /** update tippy content */
   instance.setContent(content);
@@ -74,17 +40,10 @@ const update = (element: Element) => {
     window.setTimeout(instance.popperInstance.update, 20);
 };
 
-/** remove tippy instance */
-const remove = (element: Element) => (element as _Element)._tippy?.destroy();
-
-/** make aria label from html string */
-export const makeLabel = (string: string) =>
-  (
-    new DOMParser().parseFromString(string, "text/html").body.textContent || ""
-  ).replaceAll(/\s+/g, " ");
-
-/** query select all, including self */
-const selectAll = <T extends Element>(element: Element, selector: string) => [
-  ...(element.matches(selector) ? [element] : []),
-  ...element.querySelectorAll<T>(selector),
-];
+/** listen for changes to document */
+new MutationObserver(updateAll).observe(document.body, {
+  childList: true,
+  subtree: true,
+  attributes: true,
+  attributeFilter: ["data-tooltip"],
+});

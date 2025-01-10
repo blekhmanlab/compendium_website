@@ -1,31 +1,28 @@
-import type {
-  AnchorHTMLAttributes,
-  ButtonHTMLAttributes,
-  ReactNode,
-  Ref,
-} from "react";
+import type { ComponentProps, ReactNode } from "react";
+import clsx from "clsx";
 import type { SyncFunctionComponent } from "@/util/types";
 import classes from "./Button.module.css";
 
-type Anchor = {
-  ref?: Ref<HTMLAnchorElement>;
-} & AnchorHTMLAttributes<HTMLAnchorElement>;
-type Button = {
-  ref?: Ref<HTMLButtonElement>;
-} & ButtonHTMLAttributes<HTMLButtonElement>;
+type Anchor = ComponentProps<"a">;
+type Button = ComponentProps<"button">;
 
-type Props = {
+type Props = (Anchor | Button) & {
   icon?: SyncFunctionComponent;
   design?: string;
   children: ReactNode;
-} & (Anchor | Button);
+};
 
-const Button = ({ ref, icon, design = "", children, ...props }: Props) => {
+const Button = ({
+  icon,
+  design = "",
+  className,
+  children,
+  ...props
+}: Props) => {
   if ("href" in props)
     return (
       <a
-        ref={ref as Ref<HTMLAnchorElement>}
-        className={classes.button}
+        className={clsx(classes.button, className)}
         data-design={design}
         target="_blank"
         {...(props as Anchor)}
@@ -37,8 +34,7 @@ const Button = ({ ref, icon, design = "", children, ...props }: Props) => {
   if ("onClick" in props)
     return (
       <button
-        ref={ref as Ref<HTMLButtonElement>}
-        className={classes.button}
+        className={clsx(classes.button, className)}
         data-design={design}
         {...(props as Button)}
       >

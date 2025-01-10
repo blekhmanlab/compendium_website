@@ -12,7 +12,7 @@ type Props = {
 };
 
 const Tabs = ({ tabs, onChange }: Props) => (
-  <TabGroup onChange={onChange}>
+  <TabGroup onChange={onChange} className="sub-section">
     {() => (
       <div className="sub-section">
         <TabList className={classes.tabs}>
