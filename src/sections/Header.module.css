@@ -34,6 +34,7 @@
   max-width: 500px;
   font-weight: 200;
   font-size: 1.2rem;
+  line-height: var(--compact);
 }
 
 .buttons {

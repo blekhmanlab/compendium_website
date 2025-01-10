@@ -181,11 +181,11 @@ export default HeaderBg;
       );
       ctx.fill();
     }
-
-    /** call frame again */
-    window.setTimeout(() => window.requestAnimationFrame(frame), 10);
   };
-  frame();
+
+  /** call frames */
+  gsap.ticker.add(frame);
+  gsap.ticker.fps(60);
 
   /** track mouse */
   window.addEventListener("mousemove", (event) => {
