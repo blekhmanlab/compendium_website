@@ -47,7 +47,7 @@ const Search = () => {
                   Search for a{" "}
                   <span data-tooltip={tooltips["project"]}>project</span> or{" "}
                   <span data-tooltip={tooltips["sample"]}>sample</span> to see
-                  how many samples are associated with it.
+                  its accession or how many samples are associated with it.
                 </p>
                 <SearchList
                   list={projectSearch}

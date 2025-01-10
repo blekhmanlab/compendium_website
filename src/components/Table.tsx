@@ -155,19 +155,6 @@ const Table = <Datum extends DatumShape>({
       </div>
 
       <div className={classes.buttons}>
-        {slice + limit <= rows.length && (
-          <Button
-            onClick={
-              ((event) => {
-                setSlice(slice + limit);
-                preserveScroll(event.currentTarget.parentElement);
-              }) satisfies MouseEventHandler<HTMLButtonElement>
-            }
-          >
-            <AngleIcon />
-            More
-          </Button>
-        )}
         {slice - limit >= limit && (
           <Button
             onClick={
@@ -179,6 +166,19 @@ const Table = <Datum extends DatumShape>({
           >
             <AngleIcon style={{ scale: "1 -1" }} />
             Less
+          </Button>
+        )}
+        {slice + limit <= rows.length && (
+          <Button
+            onClick={
+              ((event) => {
+                setSlice(slice + limit);
+                preserveScroll(event.currentTarget.parentElement);
+              }) satisfies MouseEventHandler<HTMLButtonElement>
+            }
+          >
+            <AngleIcon />
+            More
           </Button>
         )}
       </div>
