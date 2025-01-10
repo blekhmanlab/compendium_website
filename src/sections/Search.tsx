@@ -109,7 +109,6 @@ const Search = () => {
                   list={tagSearch}
                   cols={["name", "projects", "samples"]}
                 />
-                <br />
                 <p>
                   Search for a{" "}
                   <span data-tooltip={tooltips["tag"]}>tag or value</span> to
