@@ -1,15 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100">
-  <path
-    fill="none"
-    stroke="currentColor"
-    stroke-width="10"
-    stroke-linecap="round"
-    d="
-      M -45 -40 L 45 -40
-      M -20 -20 L 45 -20
-      M 0 0 L 45 0
-      M 15 20 L 45 20
-      M 20 40 L 45 40
-    "
-  />
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class="lucide lucide-chart-bar-decreasing"
+>
+  <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+  <path d="M7 11h8" />
+  <path d="M7 16h3" />
+  <path d="M7 6h12" />
 </svg>

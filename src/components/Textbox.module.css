@@ -44,7 +44,6 @@
 }
 
 .button svg {
-  width: 33%;
   color: var(--light-gray);
   transition: color var(--fast);
 }

@@ -59,12 +59,12 @@ footer {
   gap: 40px;
 }
 
-section:nth-child(even) {
-  background: color-mix(in hsl, var(--black), var(--white) 5%);
+section:nth-child(odd) {
+  background: color-mix(in hsl, var(--black), var(--white) 8%);
 }
 
-section:nth-child(odd) {
-  background: color-mix(in hsl, var(--black), var(--white) 10%);
+section:nth-child(even) {
+  background: color-mix(in hsl, var(--black), var(--white) 5%);
 }
 
 footer {
