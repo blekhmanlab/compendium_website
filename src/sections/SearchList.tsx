@@ -30,8 +30,8 @@ const Search = ({ list: fullList, cols, filters }: Props) => {
   const [exactSearching, setExactSearching] = useState(false);
   const [fuzzyMatches, setFuzzyMatches] = useState<NonNullable<List>>([]);
   const [fuzzySearching, setFuzzySearching] = useState(false);
-  const latestExact = useRef<symbol>(null);
-  const latestFuzzy = useRef<symbol>(null);
+  const exactController = useRef<AbortController>(null);
+  const fuzzyController = useRef<AbortController>(null);
 
   /** filter full search list before any other steps */
   const list = useMemo(
@@ -50,58 +50,48 @@ const Search = ({ list: fullList, cols, filters }: Props) => {
 
   /** exact search */
   useEffect(() => {
-    const current = Symbol();
-    latestExact.current = current;
+    exactController.current = new AbortController();
 
     if (list && search.trim()) {
       setExactMatches([]);
       setExactSearching(true);
 
       /** do in worker to not freeze UI */
-      thread((worker) => worker.exactSearch(list, ["name", "value"], search))
-        .then((result) => {
-          /** if not latest run, discard result */
-          if (current !== latestExact.current)
-            return console.warn(`Stale search: ${search}`);
-          setExactMatches(result as typeof exactMatches);
-        })
+      thread(
+        (worker) => worker.exactSearch(list, ["name", "value"], search),
+        exactController.current,
+      )
+        .then((result) => setExactMatches(result as typeof exactMatches))
         .catch(console.error)
-        .finally(() => {
-          setExactSearching(false);
-        });
+        .finally(() => setExactSearching(false));
     }
 
     return () => {
-      latestExact.current = null;
+      exactController.current?.abort(`Stale exact search: ${search}`);
       setExactSearching(false);
     };
   }, [list, search, setExactSearching]);
 
   /** fuzzy search */
   useEffect(() => {
-    const current = Symbol();
-    latestFuzzy.current = current;
+    fuzzyController.current = new AbortController();
 
     if (list && search.trim()) {
       setFuzzyMatches([]);
       setFuzzySearching(true);
 
       /** do in worker to not freeze UI */
-      thread((worker) => worker.fuzzySearch(list, ["name", "value"], search))
-        .then((result) => {
-          /** if not latest run, discard result */
-          if (current !== latestFuzzy.current)
-            return console.warn(`Stale search: ${search}`);
-          setFuzzyMatches(result as typeof fuzzyMatches);
-        })
+      thread(
+        (worker) => worker.fuzzySearch(list, ["name", "value"], search),
+        fuzzyController.current,
+      )
+        .then((result) => setFuzzyMatches(result as typeof fuzzyMatches))
         .catch(console.error)
-        .finally(() => {
-          setFuzzySearching(false);
-        });
+        .finally(() => setFuzzySearching(false));
     }
 
     return () => {
-      latestFuzzy.current = null;
+      fuzzyController.current?.abort(`Stale fuzzy search: ${search}`);
       setFuzzySearching(false);
     };
   }, [list, search, setFuzzySearching]);

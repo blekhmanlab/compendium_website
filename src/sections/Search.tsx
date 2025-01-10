@@ -45,74 +45,76 @@ const Search = () => {
         tabs={[
           {
             name: "Project",
-            description: (
-              <>
-                Search for a{" "}
-                <span data-tooltip={tooltips["project"]}>project</span> or{" "}
-                <span data-tooltip={tooltips["sample"]}>sample</span> to see how
-                many samples are associated with it.
-              </>
-            ),
             content: (
-              <SearchList
-                list={projectSearch}
-                cols={["name", "type", "samples"]}
-                filters={["Project", "Sample"]}
-              />
+              <>
+                <p>
+                  Search for a{" "}
+                  <span data-tooltip={tooltips["project"]}>project</span> or{" "}
+                  <span data-tooltip={tooltips["sample"]}>sample</span> to see
+                  how many samples are associated with it.
+                </p>
+                <SearchList
+                  list={projectSearch}
+                  cols={["name", "type", "samples"]}
+                  filters={["Project", "Sample"]}
+                />
+              </>
             ),
           },
           {
             name: "Geography",
-            description: (
-              <>
-                Search for a{" "}
-                <span data-tooltip={tooltips["region"]}>region</span> or{" "}
-                <span data-tooltip={tooltips["country"]}>country</span> to see
-                how many samples are associated with it.
-              </>
-            ),
             content: (
-              <SearchList
-                list={geoSearch}
-                cols={["name", "type", "samples"]}
-                filters={["Country", "Region"]}
-              />
+              <>
+                <p>
+                  Search for a{" "}
+                  <span data-tooltip={tooltips["region"]}>region</span> or{" "}
+                  <span data-tooltip={tooltips["country"]}>country</span> to see
+                  how many samples are associated with it.
+                </p>
+                <SearchList
+                  list={geoSearch}
+                  cols={["name", "type", "samples"]}
+                  filters={["Country", "Region"]}
+                />
+              </>
             ),
           },
           {
             name: "Taxa",
-            description: (
-              <>
-                Search for a{" "}
-                <span data-tooltip={tooltips["phylum"]}>phylum</span> or{" "}
-                <span data-tooltip={tooltips["class"]}>class</span> to see how
-                many samples it's present in.
-              </>
-            ),
             content: (
-              <SearchList
-                list={taxaSearch}
-                cols={["name", "type", "samples"]}
-                filters={["Phylum", "Class"]}
-              />
+              <>
+                <p>
+                  Search for a{" "}
+                  <span data-tooltip={tooltips["phylum"]}>phylum</span> or{" "}
+                  <span data-tooltip={tooltips["class"]}>class</span> to see how
+                  many samples it's present in.
+                </p>
+                <SearchList
+                  list={taxaSearch}
+                  cols={["name", "type", "samples"]}
+                  filters={["Phylum", "Class"]}
+                />
+              </>
             ),
           },
           {
             name: "Tags",
-            description: (
-              <>
-                Search for a <span data-tooltip={tooltips["tag"]}>tag</span> to
-                see how many samples/projects are tagged with it.
-              </>
-            ),
             content: (
               <>
+                <p>
+                  Search for a <span data-tooltip={tooltips["tag"]}>tag</span>{" "}
+                  to see how many samples/projects have it.
+                </p>
                 <SearchList
                   list={tagSearch}
                   cols={["name", "projects", "samples"]}
                 />
-
-                <p>Tag values:</p>
+                <br />
+                <p>
+                  Search for a{" "}
+                  <span data-tooltip={tooltips["tag"]}>tag or value</span> to
+                  see which projects and how many samples have it.
+                </p>
                 <SearchList
                   list={tagValueSearch}
                   cols={["name", "value", "project", "samples"]}

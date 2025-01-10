@@ -6,7 +6,6 @@ import classes from "./Tabs.module.css";
 type Props = {
   tabs: {
     name: ReactNode;
-    description: ReactNode;
     content: ReactNode;
   }[];
   onChange: ComponentProps<typeof TabGroup>["onChange"];
@@ -14,7 +13,7 @@ type Props = {
 
 const Tabs = ({ tabs, onChange }: Props) => (
   <TabGroup onChange={onChange}>
-    {({ selectedIndex }) => (
+    {() => (
       <div className="sub-section">
         <TabList className={classes.tabs}>
           {tabs.map((tab, index) => (
@@ -23,7 +22,6 @@ const Tabs = ({ tabs, onChange }: Props) => (
             </Tab>
           ))}
         </TabList>
-        <p>{tabs[selectedIndex]?.description}</p>
         <TabPanels className={classes.panels}>
           {tabs.map((tab, index) => (
             <TabPanel key={index} className="sub-section" unmount={false}>

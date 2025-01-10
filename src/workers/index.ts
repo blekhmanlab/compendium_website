@@ -9,6 +9,8 @@ type API = typeof import("./worker.ts");
 export const thread = <Type>(
   /** method to run from worker */
   method: (worker: Remote<API>) => Promise<Type>,
+  /** abort controller to reject */
+  abort?: AbortController,
   /** method to run on progress update */
   onProgress?: (status: string) => void,
 ): Promise<Type> =>
@@ -26,14 +28,23 @@ export const thread = <Type>(
           onProgress?.(status);
       }),
     );
+    /** handle abort */
+    const onAbort = () => {
+      worker.abort(abort?.signal.reason);
+      console.warn(abort?.signal.reason);
+    };
+    abort?.signal.addEventListener("abort", onAbort);
     /** execute specified method */
     method(worker)
       /** return final result */
       .then(resolve)
       /** catch errors */
       .catch(reject)
-      /** mark that final result has happened */
-      .finally(() => (resolved = true));
+      .finally(() => {
+        /** mark that final result has happened */
+        resolved = true;
+        abort?.signal.removeEventListener("abort", onAbort);
+      });
   });
 
 /** example of using thread method */
@@ -41,6 +52,7 @@ export const example = async () => {
   /** in sequence */
   const a = await thread(
     (worker) => worker.expensiveFunction(),
+    undefined,
     (status) => console.debug(status),
   );
 
@@ -48,10 +60,12 @@ export const example = async () => {
   const [b, c] = await Promise.all([
     thread(
       (worker) => worker.expensiveFunction(),
+      undefined,
       (status) => console.debug(status),
     ),
     thread(
       (worker) => worker.expensiveFunction(),
+      undefined,
       (status) => console.debug(status),
     ),
   ]);

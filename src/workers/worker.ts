@@ -33,14 +33,15 @@ export const exactSearch = <Entry extends Record<string, unknown>>(
   /** string to search */
   search: string,
 ) =>
-  list.filter((entry) =>
-    normalize(
+  list.filter((entry) => {
+    if (aborted) throw Error(aborted);
+    return normalize(
       keys
         .map((key) => String(entry[key] ?? ""))
         .join(" ")
         .toLowerCase(),
-    ).includes(normalize(search)),
-  );
+    ).includes(normalize(search));
+  });
 
 /** fuzzy search on large list of items */
 export const fuzzySearch = <Entry extends Record<string, unknown>>(
@@ -53,13 +54,15 @@ export const fuzzySearch = <Entry extends Record<string, unknown>>(
   /** similarity threshold */
   threshold = 0.25,
 ): Entry[] =>
-  list.filter(
-    (entry) =>
+  list.filter((entry) => {
+    if (aborted) throw Error(aborted);
+    return (
       nGramSimilarity(
         normalize(keys.map((key) => String(entry[key] ?? "")).join(" ")),
         normalize(search),
-      ) > threshold,
-  );
+      ) > threshold
+    );
+  });
 
 /** split string into n-grams */
 const nGrams = (value: string, n = 3) => {
@@ -94,4 +97,10 @@ let progress: Progress | undefined;
 /** expose method to set progress func */
 export const setProgress = (func: Progress) => (progress = func);
 
-expose({ expensiveFunction, exactSearch, fuzzySearch, setProgress });
+/** is aborted */
+let aborted = "";
+
+/** abort func */
+export const abort = (reason = "aborted") => (aborted = reason);
+
+expose({ expensiveFunction, exactSearch, fuzzySearch, setProgress, abort });
