@@ -50,14 +50,14 @@ const Search = () => {
         onChange={setTab}
         tabs={[
           {
-            name: "Project",
+            name: "Project/Sample",
             content: (
               <>
                 <p>
                   Search for a{" "}
                   <span data-tooltip={tooltips["project"]}>project</span> or{" "}
-                  <span data-tooltip={tooltips["sample"]}>sample</span> to see
-                  its accession or how many samples are associated with it.
+                  <span data-tooltip={tooltips["sample"]}>sample</span>{" "}
+                  accession to see how many samples are associated with it.
                 </p>
                 <SearchList
                   list={projectSearch}
