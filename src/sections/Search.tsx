@@ -110,7 +110,7 @@ const Search = () => {
                 <div className="sub-section">
                   <p>
                     Search for a <span data-tooltip={tooltips["tag"]}>tag</span>{" "}
-                    to see how many projects/samples have it. Select rows to
+                    to see how many projects or samples have it. Select rows to
                     filter next table.
                   </p>
                   <SearchList
@@ -123,8 +123,8 @@ const Search = () => {
                 </div>
                 <div className="sub-section">
                   <p>
-                    Search for a name/value to see which projects and how many
-                    samples have it.
+                    Search for a name or value to see which projects and how
+                    many samples have it.
                   </p>
                   <SearchList
                     list={tagValueSearch}
