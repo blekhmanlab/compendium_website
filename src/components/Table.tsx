@@ -145,7 +145,7 @@ const Table = <Datum extends DatumShape>({
                           ? col.render(cell, row)
                           : typeof cell === "number"
                             ? formatNumber(cell, false)
-                            : String(cell).replaceAll("_", " ")}
+                            : String(cell)}
                       </td>
                     );
                   })}

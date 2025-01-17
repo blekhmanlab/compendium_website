@@ -50,24 +50,6 @@ const Search = () => {
         onChange={setTab}
         tabs={[
           {
-            name: "Project/Sample",
-            content: (
-              <>
-                <p>
-                  Search for a{" "}
-                  <span data-tooltip={tooltips["project"]}>project</span> or{" "}
-                  <span data-tooltip={tooltips["sample"]}>sample</span>{" "}
-                  accession to see how many samples are associated with it.
-                </p>
-                <SearchList
-                  list={projectSearch}
-                  cols={["name", "type", "samples"]}
-                  types={["Project", "Sample"]}
-                />
-              </>
-            ),
-          },
-          {
             name: "Geography",
             content: (
               <>
@@ -81,6 +63,24 @@ const Search = () => {
                   list={geoSearch}
                   cols={["name", "type", "samples"]}
                   types={["Country", "Region"]}
+                />
+              </>
+            ),
+          },
+          {
+            name: "Project/Sample",
+            content: (
+              <>
+                <p>
+                  Search for a{" "}
+                  <span data-tooltip={tooltips["project"]}>project</span> or{" "}
+                  <span data-tooltip={tooltips["sample"]}>sample</span>{" "}
+                  accession to see how many samples are associated with it.
+                </p>
+                <SearchList
+                  list={projectSearch}
+                  cols={["name", "type", "samples"]}
+                  types={["Project", "Sample"]}
                 />
               </>
             ),
