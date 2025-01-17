@@ -1,3 +1,5 @@
+import { sleep } from "@/util/async";
+
 /**
  * get transform matrix that converts point from one element coordinate system
  * to another
@@ -15,7 +17,7 @@ export const getCssVariable = (name: string) =>
 export const downloadSvg = (
   element: Element,
   filename = "chart",
-  addAttrs: { [key: string]: string } = { style: "font-family: sans-serif;" },
+  addAttrs: Record<string, string> = { style: "font-family: sans-serif;" },
   removeAttrs: RegExp[] = [/^data-.*/, /^aria-.*/],
 ) => {
   if (!element) return;
@@ -45,4 +47,17 @@ export const downloadSvg = (
   link.download = filename + ".svg";
   link.click();
   window.URL.revokeObjectURL(url);
+};
+
+/**
+ * scroll page so that mouse stays at same position in document relative to
+ * element
+ */
+export const preserveScroll = async (element?: Element | null) => {
+  if (!element) return;
+  const oldY = element.getBoundingClientRect().top;
+  await sleep(0);
+  const newY = element.getBoundingClientRect().top;
+  if (!element.isConnected) return;
+  window.scrollBy({ top: newY - oldY, behavior: "smooth" });
 };

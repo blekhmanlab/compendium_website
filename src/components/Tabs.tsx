@@ -1,38 +1,37 @@
-import { ReactNode } from "react";
-import { Tab } from "@headlessui/react";
+import type { ComponentProps, ReactNode } from "react";
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import Button from "@/components/Button";
 import classes from "./Tabs.module.css";
 
 type Props = {
   tabs: {
     name: ReactNode;
-    description: ReactNode;
     content: ReactNode;
   }[];
+  onChange: ComponentProps<typeof TabGroup>["onChange"];
 };
 
-const Tabs = ({ tabs }: Props) => (
-  <Tab.Group>
-    {({ selectedIndex }) => (
+const Tabs = ({ tabs, onChange }: Props) => (
+  <TabGroup onChange={onChange} className="sub-section">
+    {() => (
       <div className="sub-section">
-        <Tab.List className={classes.tabs}>
+        <TabList className={classes.tabs}>
           {tabs.map((tab, index) => (
             <Tab key={index} as={Button}>
               {tab.name}
             </Tab>
           ))}
-        </Tab.List>
-        <p>{tabs[selectedIndex].description}</p>
-        <Tab.Panels className={classes.panels}>
+        </TabList>
+        <TabPanels className={classes.panels}>
           {tabs.map((tab, index) => (
-            <Tab.Panel key={index} className="sub-section">
+            <TabPanel key={index} className="sub-section" unmount={false}>
               {tab.content}
-            </Tab.Panel>
+            </TabPanel>
           ))}
-        </Tab.Panels>
+        </TabPanels>
       </div>
     )}
-  </Tab.Group>
+  </TabGroup>
 );
 
 export default Tabs;

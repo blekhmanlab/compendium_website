@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 import * as d3 from "d3";
-import { Feature } from "geojson";
+import type { Feature } from "geojson";
+import { clamp } from "lodash";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
-import { Data, setSelectedFeature, useData } from "@/data";
+import type { Data } from "@/data";
+import { setSelectedFeature, useData } from "@/data";
 import { downloadSvg, getCssVariable } from "@/util/dom";
-import { clamp } from "@/util/math";
 import { formatNumber } from "@/util/string";
 import classes from "./Map.module.css";
 
@@ -14,7 +15,7 @@ import classes from "./Map.module.css";
 const width = 770;
 const height = 400;
 
-const byOptions = ["Country", "Region"];
+const byOptions = ["Country", "Region"] as const;
 type By = (typeof byOptions)[number];
 
 const Map = ({ id = "map" }) => {
@@ -60,8 +61,7 @@ const Map = ({ id = "map" }) => {
         id={id}
         className={classes.svg}
         onClick={(event) => {
-          if (event.shiftKey)
-            downloadSvg(event.currentTarget as Element, "map");
+          if (event.shiftKey) downloadSvg(event.currentTarget, "map");
         }}
       >
         <g className="map-container">
@@ -355,12 +355,14 @@ const getPointer = (
   /** touch(es) */
   if ("touches" in event) {
     if (event.touches.length === 1) {
-      screenPoint.x = event.touches[0].clientX;
-      screenPoint.y = event.touches[0].clientY;
+      screenPoint.x = event.touches[0]!.clientX;
+      screenPoint.y = event.touches[0]!.clientY;
     }
     if (event.touches.length === 2) {
-      screenPoint.x = (event.touches[0].clientX + event.touches[1].clientX) / 2;
-      screenPoint.y = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+      screenPoint.x =
+        (event.touches[0]!.clientX + event.touches[1]!.clientX) / 2;
+      screenPoint.y =
+        (event.touches[0]!.clientY + event.touches[1]!.clientY) / 2;
     }
   }
 

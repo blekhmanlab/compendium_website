@@ -4,7 +4,6 @@
   /* https://www.materialpalette.com/colors */
 
   --black: #101829;
-  --off-black: #111a2e;
   --dark-gray: #354153;
   --gray: #596579;
   --light-gray: #94a3b8;
@@ -19,8 +18,8 @@
   --fast: 0.25s ease;
   --shadow: 0 0 10px #00000020;
 
-  --xl-spacing: 2em;
-  --spacing: 1.5em;
+  --spacing: 2em;
+  --compact: 1.5em;
 }
 
 @font-face {
@@ -40,7 +39,7 @@ html {
   color: var(--white);
   font-weight: 300;
   font-size: 14pt;
-  line-height: var(--spacing);
+  line-height: var(--compact);
   font-family: "Mona Sans", sans-serif;
 }
 
@@ -52,7 +51,7 @@ body {
 header,
 section,
 footer {
-  --col: 720px;
+  --col: 800px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -60,9 +59,12 @@ footer {
   gap: 40px;
 }
 
-footer,
 section:nth-child(odd) {
-  background: var(--off-black);
+  background: color-mix(in hsl, var(--black), var(--white) 8%);
+}
+
+section:nth-child(even) {
+  background: color-mix(in hsl, var(--black), var(--white) 5%);
 }
 
 footer {
@@ -74,7 +76,7 @@ footer {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 20px;
+  gap: 40px;
 }
 
 h1,
@@ -113,12 +115,12 @@ ul,
 ol {
   width: 100%;
   margin: 0;
-  line-height: var(--xl-spacing);
+  line-height: var(--spacing);
 }
 
 p {
-  text-wrap: balance;
   text-align: center;
+  text-wrap: balance;
 }
 
 a {
@@ -176,7 +178,7 @@ tbody tr:nth-child(even) {
 
 th,
 td {
-  padding: 5px 10px;
+  padding: 5px 20px;
   text-align: left;
 }
 
@@ -211,6 +213,13 @@ span[data-tooltip] {
   text-decoration: underline;
   text-decoration-style: dotted;
   text-underline-offset: 4px;
+}
+
+.icon {
+  flex-shrink: 0;
+  width: unset;
+  height: 1em;
+  vertical-align: middle;
 }
 
 .tippy-box {

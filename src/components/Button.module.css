@@ -4,7 +4,7 @@
   justify-content: center;
   padding: 5px 15px;
   gap: 10px;
-  border: none;
+  border: solid 2px var(--dark-gray);
   border-radius: var(--rounded);
   background: var(--dark-gray);
   color: inherit;
@@ -14,7 +14,8 @@
   cursor: pointer;
   transition:
     background var(--fast),
-    color var(--fast);
+    color var(--fast),
+    border-color var(--fast);
 }
 
 .button[aria-selected] {
@@ -30,6 +31,7 @@
 }
 
 .button:hover {
+  border-color: var(--gray);
   background: var(--gray);
   color: inherit;
 }
@@ -37,6 +39,7 @@
 .button[data-design="big"] {
   position: relative;
   padding: 10px 20px;
+  border: none;
   background: none;
   color: var(--off-white);
   white-space: nowrap;
@@ -95,20 +98,14 @@
 
 .button[data-design="big"]:hover .icon {
   stroke: currentColor;
-  stroke-width: 20;
-  stroke-dasharray: 100;
   animation: draw 1s both;
 }
 
 @keyframes draw {
-  0% {
-    stroke-opacity: 1;
-    fill-opacity: 0;
-    stroke-dashoffset: 300;
+  from {
+    stroke-dasharray: 0 5;
   }
-  100% {
-    stroke-opacity: 0;
-    fill-opacity: 1;
-    stroke-dashoffset: 0;
+  to {
+    stroke-dasharray: 5 0;
   }
 }

@@ -1,10 +1,12 @@
 import { execSync } from "child_process";
 import { createReadStream, readFileSync, writeFileSync } from "fs";
+import { readdir, stat } from "fs/promises";
+import { join } from "path";
 import readline from "readline";
 import _ from "lodash";
 import Downloader from "nodejs-file-downloader";
 
-const lastCall: { [key: string]: number } = {};
+const lastCall: Record<string, number> = {};
 /** return true only if enough time has passed since last call */
 export const throttle = (key: string, interval = 1000) => {
   if (!lastCall[key] || performance.now() > lastCall[key] + interval) {
@@ -80,3 +82,14 @@ export const logSpace = (a: number, b: number, n: number) => {
     .concat([b])
     .map((value) => Math.pow(10, value));
 };
+
+/** get total folder size */
+export const dirSize = async (path: string) =>
+  _.sumBy(
+    await Promise.all(
+      (await readdir(path, { recursive: true })).map((file) =>
+        stat(join(path, file)),
+      ),
+    ),
+    "size",
+  );

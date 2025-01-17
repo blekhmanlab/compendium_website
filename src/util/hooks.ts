@@ -1,4 +1,5 @@
-import { Ref, useCallback, useRef } from "react";
+import type { Ref } from "react";
+import { useCallback, useRef } from "react";
 
 /** set fitted view box of svg */
 export const useViewBox = (padding = 0): [Ref<SVGSVGElement>, () => void] => {

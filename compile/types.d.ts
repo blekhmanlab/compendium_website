@@ -1,4 +1,4 @@
-import { FeatureCollection, Geometry } from "geojson";
+import type { FeatureCollection, Geometry } from "geojson";
 
 /**
  * keep these types separate from those in state data. state data types are
@@ -15,6 +15,7 @@ type Metadata = {
   classes: number;
   countries: number;
   regions: number;
+  tags: number;
   version: string;
   date: string;
   downloads: number;
@@ -27,10 +28,10 @@ type ByTaxLevel = {
   kingdom: string;
   phylum: string;
   _class: string;
-  samples: { [key: string]: number };
+  samples: Record<string, number>;
 }[];
 
-type WorldMap = FeatureCollection<Geometry, { [key: string]: string | number }>;
+type WorldMap = FeatureCollection<Geometry, Record<string, string | number>>;
 
 type ByGeo = FeatureCollection<
   Geometry,
@@ -45,4 +46,10 @@ type ByGeo = FeatureCollection<
 type ByProject = {
   project: string;
   samples: string[];
+}[];
+
+type ByTag = {
+  tag: string;
+  projects: number;
+  samples: number;
 }[];

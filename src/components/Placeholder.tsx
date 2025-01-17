@@ -1,4 +1,5 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
+import LoadingIcon from "@/assets/loading.svg?react";
 import classes from "./Placeholder.module.css";
 
 type Props = {
@@ -12,7 +13,8 @@ const Placeholder = ({ height = 300, className = "", children }: Props) => (
     className={[classes.placeholder, className].join(" ")}
     style={{ height: height + "px" }}
   >
-    <p>{children}</p>
+    <LoadingIcon />
+    {children}
   </div>
 );
 

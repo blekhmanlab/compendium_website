@@ -3,15 +3,22 @@
 // eslint-disable-next-line
 /// <reference path="./types.d.ts" />
 
-import { lstatSync, readdirSync } from "fs";
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
 import * as d3 from "d3";
 import dissolve from "geojson-dissolve";
 import _ from "lodash";
-import { ByGeo, ByProject, ByTaxLevel, Metadata, WorldMap } from "./types";
+import type {
+  ByGeo,
+  ByProject,
+  ByTag,
+  ByTaxLevel,
+  Metadata,
+  WorldMap,
+} from "./types";
 import {
+  dirSize,
   download,
   logSpace,
   read,
@@ -20,11 +27,11 @@ import {
   throttle,
   write,
 } from "./util";
-import { Record, Zenodo } from "./zenodo-api";
+import type { _Record, Zenodo } from "./zenodo-api";
 
 /**
- * pre-compile step that takes the "raw" distributed data (csv/tsv), and
- * processs and pares it down to just what the website needs (json).
+ * pre-compile step that takes the "raw" distributed data (csv/tsv), and process
+ * and pares it down to just what the website needs (json).
  */
 
 /** record of downloads, version, and other info */
@@ -32,16 +39,22 @@ export const recordUrl =
   "https://zenodo.org/api/records?q=conceptrecid:8186993";
 
 /** raw taxonomic data */
-const taxonomicFile = "taxonomic_table.csv";
+const taxonomicFile = "downloaded/taxonomic_table.csv";
 
 /** raw sample metadata */
-const metadataFile = "sample_metadata.tsv";
+const metadataFile = "downloaded/sample_metadata.tsv";
+
+/** raw tag data */
+const tagsFile = "downloaded/tags.tsv";
 
 /** raw natural earth data */
 const naturalEarthFile = "natural-earth.json";
 /** https://www.naturalearthdata.com/downloads/110m-cultural-vectors/ */
 /** https://github.com/nvkelso/natural-earth-vector/blob/master/geojson */
 /** https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson */
+
+/** country to region data */
+const countryToRegionFile = "country-to-region.json";
 
 /** set working directory to directory of this script */
 chdir(dirname(fileURLToPath(import.meta.url)));
@@ -59,9 +72,7 @@ const processNaturalEarth = async (): Promise<ByGeo> => {
   };
 
   /** map of all countries to their regions */
-  const countryToRegion = read<{ [key: string]: string }>(
-    "./country-to-region.json",
-  );
+  const countryToRegion = read<Record<string, string>>(countryToRegionFile);
 
   for (const feature of worldMap.features) {
     const country = _.startCase(clean(feature.properties.NAME));
@@ -91,26 +102,46 @@ const processData = async (
   const metadataStream = stream(metadataFile);
 
   /** map of unique projects */
-  const byProject: { [key: string]: ByProject[number] } = {};
+  const byProject: Record<string, ByProject[number]> = {};
   /** map of unique countries */
-  const byCountry: { [key: string]: ByGeo["features"][number] } = {};
+  const byCountry: Record<string, ByGeo["features"][number]> = {};
   /** map of unique regions */
-  const byRegion: { [key: string]: ByGeo["features"][number] } = {};
+  const byRegion: Record<string, ByGeo["features"][number]> = {};
   /** map of unique phyla */
-  const byPhylum: { [key: string]: ByTaxLevel[number] } = {};
+  const byPhylum: Record<string, ByTaxLevel[number]> = {};
   /** map of unique classes */
-  const byClass: { [key: string]: ByTaxLevel[number] } = {};
+  const byClass: Record<string, ByTaxLevel[number]> = {};
   /** map of unique samples for counting reads */
-  const bySample: {
-    [key: string]: {
+  const bySample: Record<
+    string,
+    {
       reads: number;
       code: string;
       region: string;
-    };
-  } = {};
+    }
+  > = {};
+  /** map of of unique tags */
+  const byTag: Record<
+    string,
+    {
+      tag: string;
+      projects: Record<string, string>;
+      samples: Record<string, string>;
+    }
+  > = {};
+  /** map of of unique tag values */
+  const byTagValue: Record<
+    string,
+    {
+      tag: string;
+      value: string;
+      project: string;
+      samples: number;
+    }
+  > = {};
 
   /** whether country feature has already been dissolved into region feature */
-  const countryDissolved: { [key: string]: boolean } = {};
+  const countryDissolved: Record<string, boolean> = {};
 
   /** add all natural earth features */
   for (const feature of worldMap.features) {
@@ -150,12 +181,12 @@ const processData = async (
     return { kingdom, phylum, _class };
   });
 
-  /** loop through rest of rows (with hard limit) */
+  /** process rest of rows (with hard limit) */
   for (let row = 0; row < 1000000; row++) {
     /** show progress periodically */
-    if (throttle("data")) console.info(`Row ${row}`);
+    if (throttle("data")) console.info(`Processing taxonomic row ${row}`);
 
-    /** read current row from files */
+    /** read rows */
     const [
       { value: taxonomicRow = [], done: taxonomicDone },
       { value: metadataRow = [], done: metadataDone },
@@ -165,7 +196,8 @@ const processData = async (
     if (taxonomicDone && metadataDone) break;
 
     /** get sample metadata cols */
-    const [sample, project, , , , , , , , code, region] = metadataRow;
+    const [sample = "", project = "", , , , , , , , code = "", region = ""] =
+      metadataRow;
     // const country = _.startCase(geoLoc.split(":").shift());
 
     /** count country */
@@ -173,13 +205,13 @@ const processData = async (
     /** count region */
     if (byRegion[region]) byRegion[region].properties.samples++;
 
-    /** accumulate projects and samples */
+    /** count projects and samples */
     byProject[project] ??= { project, samples: [] };
     byProject[project].samples.push(sample);
 
     /** whether row (sample) has already been counted toward taxon */
-    const phylumCounted: { [key: string]: boolean } = {};
-    const classCounted: { [key: string]: boolean } = {};
+    const phylumCounted: Record<string, boolean> = {};
+    const classCounted: Record<string, boolean> = {};
 
     /** start counting reads for this sample */
     bySample[sample] = { reads: 0, code, region };
@@ -195,14 +227,14 @@ const processData = async (
       /** if taxon present in sample */
       if (reads > 0) {
         /** get props from header row */
-        const taxon = { ...taxonomicHeader[col], samples: { total: 0 } };
-        const { phylum, _class } = taxon;
+        const taxon = { ...taxonomicHeader[col]!, samples: { total: 0 } };
+        const { phylum = "", _class = "" } = taxon;
 
         /** count sample toward phylum (if not already) */
         if (!phylumCounted[phylum]) {
           byPhylum[phylum] ??= _.cloneDeep(taxon);
           byPhylum[phylum]._class = "";
-          byPhylum[phylum].samples.total++;
+          byPhylum[phylum].samples.total!++;
           byPhylum[phylum].samples[code] ??= 0;
           byPhylum[phylum].samples[code]++;
           byPhylum[phylum].samples[region] ??= 0;
@@ -213,7 +245,7 @@ const processData = async (
         /** count sample toward class (if not already) */
         if (!classCounted[_class]) {
           byClass[_class] ??= _.cloneDeep(taxon);
-          byClass[_class].samples.total++;
+          byClass[_class].samples.total!++;
           byClass[_class].samples[code] ??= 0;
           byClass[_class].samples[code]++;
           byClass[_class].samples[region] ??= 0;
@@ -225,7 +257,7 @@ const processData = async (
   }
 
   /** get reads for particular feature */
-  const getReads = (key) =>
+  const getReads = (key: string) =>
     Object.values(bySample)
       .filter(
         ({ code, region }) => key === "total" || key === code || key === region,
@@ -248,8 +280,22 @@ const processData = async (
     .domain([min, max])
     .thresholds(logSpace(min, max, bins));
 
+  /** object with total value and individual key values */
+  type WithTotal = { total: number | undefined } & Record<
+    string,
+    number | undefined
+  >;
+
   /** reads histogram data */
-  const byReads = {
+  const byReads: {
+    histogram: {
+      samples: WithTotal;
+      min: number;
+      max: number;
+      mid: number;
+    }[];
+    median: WithTotal;
+  } = {
     histogram: binner(totalReads).map(({ length, x0 = 0, x1 = 10000000 }) => ({
       samples: { total: length },
       min: x0 || 0,
@@ -272,7 +318,40 @@ const processData = async (
 
     /** go through bins of reads for this feature */
     for (const [index, bin] of Object.entries(binner(reads)))
-      if (bin.length) byReads.histogram[index].samples[feature] = bin.length;
+      if (bin.length) {
+        const all = byReads.histogram[Number(index)];
+        if (all) all.samples[feature] = bin.length;
+      }
+  }
+
+  /** parse tag counts */
+  const tagsStream = stream(tagsFile);
+
+  /** ignore header */
+  await tagsStream.next();
+
+  /** process rest of rows (with hard limit) */
+  for (let row = 0; row < 100000000; row++) {
+    /** show progress periodically */
+    if (throttle("data")) console.info(`Processing tag row ${row}`);
+
+    /** read row */
+    const {
+      value: [project = "", , sample = "", tag = "", value = ""] = [],
+      done,
+    } = await tagsStream.next();
+
+    /** count tags */
+    byTag[tag] ??= { tag, projects: {}, samples: {} };
+    byTag[tag].projects[project] = project;
+    byTag[tag].samples[sample] = sample;
+
+    /** count tag values */
+    const key = [tag, value, project].join("-");
+    byTagValue[key] ??= { tag, value, project, samples: 0 };
+    byTagValue[key].samples++;
+
+    if (done) break;
   }
 
   /** turn maps into lists, and do final sorting and such */
@@ -309,18 +388,33 @@ const processData = async (
       ),
     },
     byReads,
+    byTag: _.orderBy(
+      Object.values(byTag).map((d) => ({
+        tag: d.tag,
+        projects: Object.keys(d.projects).length,
+        samples: Object.keys(d.samples).length,
+      })),
+      [(d) => d.samples, (d) => d.projects],
+      ["desc", "desc"],
+    ),
+    byTagValue: _.orderBy(
+      Object.values(byTagValue),
+      [(d) => d.samples],
+      ["desc"],
+    ),
   };
 };
 
 /** derive metadata about data */
-const deriveMetadata = (
+const deriveMetadata = async (
   byProject: ByProject,
   byPhylum: ByTaxLevel,
   byClass: ByTaxLevel,
   byRegion: ByGeo,
   byCountry: ByGeo,
-  record: Record,
-): Metadata => {
+  byTag: ByTag,
+  record: _Record,
+): Promise<Metadata> => {
   const projects = byProject.length;
   const samples = byProject.reduce(
     (total, { samples }) => total + samples.length,
@@ -342,6 +436,7 @@ const deriveMetadata = (
     classes,
     regions,
     countries,
+    tags: Object.keys(byTag).length,
     version: record.metadata.version,
     date: record.updated,
     downloads: record.stats.unique_downloads,
@@ -350,10 +445,7 @@ const deriveMetadata = (
       record.files
         ?.map((file) => file.size)
         ?.reduce((total, value) => total + value, 0) || 0,
-    uncompressed: readdirSync("./")
-      .filter((file) => [".csv", ".tsv"].some((ext) => file.endsWith(ext)))
-      .map((file) => lstatSync(file).size)
-      .reduce((total, value) => total + value, 0),
+    uncompressed: await dirSize("./downloaded"),
   };
 };
 
@@ -361,33 +453,45 @@ const deriveMetadata = (
 
 console.info("Getting data download links and other info");
 const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
+if (!record) throw Error("No hits");
 
 if (!process.env.SKIP_DOWNLOAD) {
   console.info("Downloading raw data");
   for (const { key, links } of record.files || [])
-    await download(links.self, key);
+    await download(links.self, `downloaded/${key}`);
 }
 
 console.info("Cleaning world map data");
 const worldMap = await processNaturalEarth();
 
 console.info("Processing data");
-const { byProject, byPhylum, byClass, byCountry, byRegion, byReads } =
-  await processData(taxonomicFile, metadataFile, worldMap);
+const {
+  byProject,
+  byPhylum,
+  byClass,
+  byCountry,
+  byRegion,
+  byReads,
+  byTag,
+  byTagValue,
+} = await processData(taxonomicFile, metadataFile, worldMap);
 write("../public/by-project.json", byProject);
 write("../public/by-phylum.json", byPhylum);
 write("../public/by-class.json", byClass);
 write("../public/by-country.json", byCountry);
 write("../public/by-region.json", byRegion);
 write("../public/by-reads.json", byReads);
+write("../public/by-tag.json", byTag);
+write("../public/by-tag-value.json", byTagValue);
 
 console.info("Deriving metadata");
-const metadata = deriveMetadata(
+const metadata = await deriveMetadata(
   byProject,
   byPhylum,
   byClass,
   byRegion,
   byCountry,
+  byTag,
   record,
 );
 write("../public/metadata.json", metadata, true);

@@ -1,5 +1,5 @@
-import { ReactComponent as PackageIcon } from "@/assets/package.svg";
-import { ReactComponent as RecipeIcon } from "@/assets/recipe.svg";
+import LightbulbIcon from "@/assets/lightbulb.svg?react";
+import PackageIcon from "@/assets/package.svg?react";
 import Button from "@/components/Button";
 import classes from "./Recipes.module.css";
 
@@ -47,7 +47,7 @@ const Recipes = () => (
       {recipes.map(({ link, name }, index) => (
         <Button
           key={index}
-          icon={RecipeIcon}
+          icon={LightbulbIcon}
           href={
             import.meta.env.VITE_R_PACKAGE + "articles/overview.html#" + link
           }
