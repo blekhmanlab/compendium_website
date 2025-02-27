@@ -298,6 +298,10 @@ const map = () => {
       .scaleExtent([baseScale, baseScale * 10])
       .on("zoom", (event) => updateMap(svg, event));
 
+    /** preserve any existing transform */
+    zoom.transform(svg, d3.zoomTransform(svg.node()!));
+    updateMap(svg);
+
     /** connect zoom handler to svg */
     zoom(svg);
 
