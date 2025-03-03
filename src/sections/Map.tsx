@@ -309,7 +309,6 @@ const map = () => {
     const resetZoom = () =>
       /** start scale at lower limit so first zoom has effect */
       zoom.transform(svg, d3.zoomIdentity.scale(baseScale));
-    resetZoom();
 
     svg
       /** always prevent scroll on wheel, not just when at scale limit */
