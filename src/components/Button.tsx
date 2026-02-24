@@ -1,9 +1,10 @@
 import type { ComponentProps, ReactNode } from "react";
+import { Link } from "react-router";
 import clsx from "clsx";
 import type { SyncFunctionComponent } from "@/util/types";
 import classes from "./Button.module.css";
 
-type Anchor = ComponentProps<"a">;
+type Anchor = ComponentProps<typeof Link>;
 type Button = ComponentProps<"button">;
 
 type Props = (Anchor | Button) & {
@@ -19,18 +20,19 @@ const Button = ({
   children,
   ...props
 }: Props) => {
-  if ("href" in props)
+  if ("to" in props) {
     return (
-      <a
+      <Link
         className={clsx(classes.button, className)}
         data-design={design}
-        target="_blank"
+        target={String(props.to).startsWith("http") ? "_blank" : undefined}
         {...(props as Anchor)}
       >
         {icon?.({ className: classes.icon })}
         {children}
-      </a>
+      </Link>
     );
+  }
   if ("onClick" in props)
     return (
       <button

@@ -6,8 +6,8 @@ import {
 } from "react";
 import Tabs from "@/components/Tabs";
 import { loadTagData, useData } from "@/data";
-import SearchList from "@/sections/SearchList";
 import classes from "./Search.module.css";
+import SearchList from "./SearchList";
 
 export const tooltips = {
   project:

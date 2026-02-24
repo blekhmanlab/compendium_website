@@ -48,9 +48,7 @@ const Recipes = () => (
         <Button
           key={index}
           icon={LightbulbIcon}
-          href={
-            import.meta.env.VITE_R_PACKAGE + "articles/overview.html#" + link
-          }
+          to={import.meta.env.VITE_R_PACKAGE + "articles/overview.html#" + link}
         >
           {name}
         </Button>

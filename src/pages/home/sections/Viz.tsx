@@ -4,14 +4,14 @@ import { waitFor } from "@/util/async";
 import { getCssVariable, getMatrix } from "@/util/dom";
 import type { Point } from "@/util/math";
 import { cos, dist, normalize, scale, sin } from "@/util/math";
-import classes from "./HeaderBg.module.css";
+import classes from "./Viz.module.css";
 
-const HeaderBg = () => <canvas className={classes.canvas}></canvas>;
+const Viz = () => <canvas className={classes.canvas}></canvas>;
 
 /** "oversampling" of canvas */
 const oversample = 2;
 
-export default HeaderBg;
+export default Viz;
 
 /** run once on app load */
 (async () => {

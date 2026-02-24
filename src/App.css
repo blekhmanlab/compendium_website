@@ -44,13 +44,23 @@ html {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   margin: 0;
 }
 
-header,
-section,
-footer {
+#root {
+  display: contents;
+}
+
+main {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+}
+
+section {
   --col: 800px;
   display: flex;
   flex-direction: column;
@@ -67,8 +77,8 @@ section:nth-child(even) {
   background: color-mix(in hsl, var(--black), var(--white) 5%);
 }
 
-footer {
-  --col: 1200px;
+section:last-child {
+  flex-grow: 1;
 }
 
 .sub-section {
@@ -87,14 +97,14 @@ h3 {
 
 h1 {
   font-weight: 600;
-  font-size: 1.9rem;
+  font-size: 1.5rem;
   line-height: 1.25em;
   letter-spacing: 1px;
 }
 
 h2 {
   font-weight: 400;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   text-align: center;
 }
 

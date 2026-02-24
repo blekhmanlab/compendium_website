@@ -1,5 +1,6 @@
 .button {
   display: inline-flex;
+  z-index: 0;
   align-items: center;
   justify-content: center;
   padding: 5px 15px;
@@ -41,12 +42,7 @@
   padding: 10px 20px;
   border: none;
   background: none;
-  color: var(--off-white);
   white-space: nowrap;
-}
-
-.button[data-design="big"]:hover {
-  color: var(--off-white);
 }
 
 .button[data-design="big"]::before,
@@ -69,10 +65,9 @@
 
 .button[data-design="big"]::before {
   padding: 2px;
-  -webkit-mask:
+  mask:
     linear-gradient(white 0 0) content-box,
     linear-gradient(white 0 0);
-  -webkit-mask-composite: xor;
   mask-composite: exclude;
 }
 

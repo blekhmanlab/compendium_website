@@ -1,11 +1,11 @@
 import { useState } from "react";
 import Select from "@/components/Select";
 import { useData } from "@/data";
-import Bar from "@/sections/Bar";
-import Histogram from "@/sections/Histogram";
-import Map from "@/sections/Map";
-import { tooltips } from "@/sections/Search";
+import Bar from "./Bar";
+import Histogram from "./Histogram";
+import Map from "./Map";
 import classes from "./Prevalence.module.css";
+import { tooltips } from "./Search";
 
 const chartOptions = ["Phyla", "Reads"] as const;
 type Chart = (typeof chartOptions)[number];
