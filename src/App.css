@@ -92,7 +92,10 @@ section:last-child {
 h1,
 h2,
 h3 {
+  display: flex;
+  align-items: center;
   margin: 0;
+  gap: 10px;
 }
 
 h1 {
