@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { gsap } from "gsap";
 import PoissonDiskSampling from "poisson-disk-sampling";
 import { waitFor } from "@/util/async";
@@ -6,15 +7,20 @@ import type { Point } from "@/util/math";
 import { cos, dist, normalize, scale, sin } from "@/util/math";
 import classes from "./Viz.module.css";
 
-const Viz = () => <canvas className={classes.canvas}></canvas>;
+const Viz = () => {
+  useEffect(() => {
+    generate();
+  }, []);
+
+  return <canvas className={classes.canvas}></canvas>;
+};
 
 /** "oversampling" of canvas */
 const oversample = 2;
 
 export default Viz;
 
-/** run once on app load */
-(async () => {
+const generate = async () => {
   /** wait for necessary elements to load */
   const canvas = await waitFor(() => document.querySelector("canvas"));
   const svg = await waitFor(() =>
@@ -207,4 +213,4 @@ export default Viz;
       particle.animations.forEach((animation) => animation.restart()),
     ),
   );
-})();
+};

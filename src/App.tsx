@@ -9,7 +9,7 @@ import {
   loadTaxaData,
 } from "@/data";
 import Home from "@/pages/home/Home";
-import Projectionist from "@/Projectionist";
+import Projectionist from "@/pages/projectionist/Projectionist";
 import { redirectPath } from "@/util/url";
 
 loadMetaData();

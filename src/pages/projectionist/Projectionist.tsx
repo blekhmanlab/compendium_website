@@ -1,7 +1,16 @@
+import { create } from "zustand";
 import ConeIcon from "@/assets/cone.svg?react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Meta from "@/components/Meta";
+import Upload from "@/pages/projectionist/sections/Upload";
+
+type Upload = {
+  taxa: Record<string, string>;
+  samples: Record<string, number[]>;
+};
+
+export const useUpload = create<Upload>(() => ({ taxa: {}, samples: {} }));
 
 const Projectionist = () => (
   <>
@@ -18,7 +27,9 @@ const Projectionist = () => (
     </Header>
 
     <main>
-      <section>hello world</section>
+      <section>
+        <Upload />
+      </section>
     </main>
     <Footer />
   </>

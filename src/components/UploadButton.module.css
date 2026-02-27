@@ -1,0 +1,3 @@
+.drag {
+  outline: 2px dashed var(--color-primary);
+}
