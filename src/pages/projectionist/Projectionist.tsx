@@ -5,8 +5,17 @@ import Header from "@/components/Header";
 import Meta from "@/components/Meta";
 import Upload from "@/pages/projectionist/sections/Upload";
 
+type Taxon = {
+  kingdom: string;
+  phylum: string;
+  class: string;
+  order: string;
+  family: string;
+  genus: string;
+};
+
 export type UserData = {
-  taxa: Record<string, string>;
+  taxa: Record<string, Taxon | undefined>;
   samples: Record<string, number[]>;
 };
 

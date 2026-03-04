@@ -1,6 +1,7 @@
 import { expose } from "comlink";
-import { random, sum } from "lodash";
+import { mapValues, random, sum } from "lodash";
 import { parse } from "papaparse";
+import _taxaMap from "@/pages/projectionist/data/taxa-map.tsv?raw";
 import { type UserMeta } from "@/pages/projectionist/Projectionist";
 
 /**
@@ -8,6 +9,21 @@ import { type UserMeta } from "@/pages/projectionist/Projectionist";
  * be serialized/deserialized, which can easily be the biggest bottleneck with
  * large data.
  */
+
+/** progress func type */
+type Progress = (status: string, shouldCancel?: true) => Promise<void>;
+
+/** currently set progress func */
+let progress: Progress | undefined;
+
+/** expose method to set progress func */
+export const setProgress = (func: Progress) => (progress = func);
+
+/** is aborted */
+let aborted = "";
+
+/** abort func */
+export const abort = (reason = "aborted") => (aborted = reason);
 
 /** normalize strings for comparison */
 const normalize = (string: string) =>
@@ -90,8 +106,11 @@ export const parseUserData = (text: string) => {
   if (aborted) throw Error(aborted);
 
   /** map of taxon name to column index */
-  const taxa = Object.fromEntries(
-    (data.shift() as string[]).map((key, index) => [index, key]),
+  const taxa = mapValues(
+    Object.fromEntries(
+      (data.shift() as string[]).map((key, index) => [index, key]),
+    ),
+    (taxon) => taxaMap[taxon],
   );
   /** map of sample name to per-taxon read counts */
   const samples = Object.fromEntries(
@@ -159,20 +178,34 @@ export const parseUserMeta = (text: string) => {
   return data;
 };
 
-/** progress func type */
-type Progress = (status: string, shouldCancel?: true) => Promise<void>;
+type TaxaMap = {
+  /** full taxon name */
+  taxon: string;
+  /** explicit ranks */
+  kingdom: string;
+  phylum: string;
+  class: string;
+  order: string;
+  family: string;
+  genus: string;
+};
 
-/** currently set progress func */
-let progress: Progress | undefined;
+/**
+ * simply splitting by period not reliable b/c some ranks may contain periods,
+ * so we need an explicit map
+ */
 
-/** expose method to set progress func */
-export const setProgress = (func: Progress) => (progress = func);
+/** get split ranks from full taxon name */
+const taxaMap = Object.fromEntries(
+  parse<TaxaMap>(_taxaMap, { header: true }).data.map(({ taxon, ...entry }) => [
+    /** convert all non-letter characters to periods */
+    /** (we're expecting user to upload in this format) */
+    taxon.replaceAll(/\W/g, "."),
+    entry,
+  ]),
+);
 
-/** is aborted */
-let aborted = "";
-
-/** abort func */
-export const abort = (reason = "aborted") => (aborted = reason);
+console.log(taxaMap);
 
 expose({
   exactSearch,

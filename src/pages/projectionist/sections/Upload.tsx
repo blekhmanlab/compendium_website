@@ -9,13 +9,15 @@ import { useUserData, useUserMeta } from "@/pages/projectionist/Projectionist";
 import { formatNumber } from "@/util/string";
 import { useThread } from "@/workers";
 import classes from "./Upload.module.css";
-import exampleData from "../data/example-data.txt?raw";
-import exampleMeta from "../data/example-meta.txt?raw";
+import exampleData from "../data/example-data.tsv?raw";
+import exampleMeta from "../data/example-meta.tsv?raw";
 
 const Upload = () => {
+  /** raw text input */
   const [userRawData, setUserRawData] = useState("");
   const [userRawMeta, setUserRawMeta] = useState("");
 
+  /** parse user input */
   const [userData, userDataStatus] = useThread(
     useCallback(
       (worker) => {
@@ -35,13 +37,15 @@ const Upload = () => {
     ),
   );
 
+  /** update global state with parsed data */
   useEffect(() => {
     if (userData) useUserData.setState({ ...userData });
   }, [userData]);
-
   useEffect(() => {
     if (userMeta) useUserMeta.setState({ ...userMeta });
   }, [userMeta]);
+
+  console.log({ userData, userMeta });
 
   return (
     <>
