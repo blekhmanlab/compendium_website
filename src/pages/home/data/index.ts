@@ -1,31 +1,31 @@
 import type { FeatureCollection, Geometry } from "geojson";
 import { orderBy } from "lodash";
 import { create } from "zustand";
-import type { Zenodo } from "../../compile/zenodo-api";
+import type { Zenodo } from "../../../../compile/zenodo-api";
 
 /** metadata about overall project */
-export type Metadata = typeof import("../../public/metadata.json");
+export type Metadata = typeof import("../../../../public/metadata.json");
 
 /** project and sample name details */
-export type ByProject = typeof import("../../public/by-project.json");
+export type ByProject = typeof import("../../../../public/by-project.json");
 
 /** by class or phylum or other taxonomic level */
-export type ByTaxLevel = typeof import("../../public/by-class.json");
+export type ByTaxLevel = typeof import("../../../../public/by-class.json");
 
 /** by country or by region, combined with natural earth geojson feature data */
 export type ByGeo = FeatureCollection<
   Geometry,
-  (typeof import("../../public/by-country.json"))["features"][number]["properties"]
+  (typeof import("../../../../public/by-country.json"))["features"][number]["properties"]
 >;
 
 /** sample read counts */
-export type ByReads = typeof import("../../public/by-reads.json");
+export type ByReads = typeof import("../../../../public/by-reads.json");
 
 /** tag project and sample counts */
-export type ByTag = typeof import("../../public/by-tag.json");
+export type ByTag = typeof import("../../../../public/by-tag.json");
 
 /** tag value sample counts */
-// export type ByTagValue = typeof import("../../public/by-tag-value.json");
+// export type ByTagValue = typeof import("../../../../public/by-tag-value.json");
 export type ByTagValue = {
   tag: string;
   value: string;

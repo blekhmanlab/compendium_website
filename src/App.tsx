@@ -2,21 +2,9 @@ import "@/components/tooltip";
 import "./App.css";
 import { createBrowserRouter, Outlet, redirect } from "react-router";
 import { RouterProvider } from "react-router/dom";
-import {
-  loadGeoData,
-  loadMetaData,
-  loadProjectData,
-  loadTaxaData,
-} from "@/data";
 import Home from "@/pages/home/Home";
 import Projectionist from "@/pages/projectionist/Projectionist";
 import { redirectPath } from "@/util/url";
-
-loadMetaData();
-loadProjectData();
-loadGeoData();
-loadTaxaData();
-/** only load tags data on demand because large */
 
 /** app entrypoint */
 const App = () => <RouterProvider router={router} />;

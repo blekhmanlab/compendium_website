@@ -11,6 +11,7 @@
 .box {
   display: flex;
   position: relative;
+  align-items: center;
   justify-content: center;
   max-width: 100%;
 }

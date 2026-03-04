@@ -1,24 +1,13 @@
 import { expose } from "comlink";
+import { random, sum } from "lodash";
+import { parse } from "papaparse";
+import { type UserMeta } from "@/pages/projectionist/Projectionist";
 
 /**
  * note: every time you communicate with a web worker, the message content must
  * be serialized/deserialized, which can easily be the biggest bottleneck with
  * large data.
  */
-
-/** example of function that takes long time to compute */
-export const expensiveFunction = () => {
-  progress?.("Starting");
-
-  let total = 0;
-  const big = 500000000;
-  for (let a = 0; a < big; a++) {
-    if (a % (big / 100) === 0) progress?.(`${(100 * a) / big}% done`);
-    total += Math.sqrt(Math.random()) ** 2;
-  }
-
-  return total;
-};
 
 /** normalize strings for comparison */
 const normalize = (string: string) =>
@@ -27,9 +16,9 @@ const normalize = (string: string) =>
 /** exact (case-insensitive) search on large list of items */
 export const exactSearch = <Entry extends Record<string, unknown>>(
   /** array of objects */
-  list: readonly Entry[],
+  list: Entry[],
   /** object keys to search */
-  keys: readonly (keyof Entry)[],
+  keys: string[],
   /** string to search */
   search: string,
 ) =>
@@ -46,9 +35,9 @@ export const exactSearch = <Entry extends Record<string, unknown>>(
 /** fuzzy search on large list of items */
 export const fuzzySearch = <Entry extends Record<string, unknown>>(
   /** array of objects */
-  list: readonly Entry[],
+  list: Entry[],
   /** object key to search */
-  keys: readonly (keyof Entry)[],
+  keys: string[],
   /** string to search */
   search: string,
   /** similarity threshold */
@@ -88,6 +77,88 @@ const nGramSimilarity = (stringA: string, stringB: string, n = 3) => {
   return common.size / (total.size || Infinity);
 };
 
+/** max read count to rarify down to */
+const maxReads = 100;
+
+/** parse user uploaded tabular data (see example-data.txt) */
+export const parseUserData = (text: string) => {
+  progress?.("Parsing");
+
+  /** parse data */
+  const { data } = parse<[...number[], string]>(text, { dynamicTyping: true });
+
+  if (aborted) throw Error(aborted);
+
+  /** map of taxon name to column index */
+  const taxa = Object.fromEntries(
+    (data.shift() as string[]).map((key, index) => [index, key]),
+  );
+  /** map of sample name to per-taxon read counts */
+  const samples = Object.fromEntries(
+    data.map((row) => [row.pop() as string, row as number[]]),
+  );
+
+  if (aborted) throw Error(aborted);
+  progress?.("Rarifying");
+
+  /** rarify reads */
+  for (const counts of Object.values(samples)) {
+    if (aborted) throw Error(aborted);
+
+    /** total reads for sample */
+    const total = sum(counts);
+    /** how many reads we need to remove */
+    const reduce = total - maxReads;
+    for (let remove = reduce; remove > 0; remove--) {
+      /** randomly select a read to remove */
+      const randomRead = random(total);
+      let cumulative = 0;
+      /** find first col of reads that contains rand index */
+      const index = counts.findIndex((count) => {
+        cumulative += count;
+        return cumulative > randomRead;
+      });
+      /** remove read from sample */
+      counts[index] = (counts[index] ?? 0) - 1;
+    }
+  }
+
+  if (aborted) throw Error(aborted);
+  progress?.("rCLR transforming");
+
+  /** "robust centered log-ratio transformation" */
+  for (const counts of Object.values(samples)) {
+    if (aborted) throw Error(aborted);
+
+    /** geometric mean */
+    const nonZero = counts.filter((count) => count > 0);
+    const product = nonZero.reduce(
+      (product, count) => product * (count || 1),
+      1,
+    );
+    const mean = product ** (1 / nonZero.length);
+
+    counts.forEach((count, index) => {
+      if (count === 0) return;
+      /** log-ratio of count to geometric mean */
+      counts[index] = Math.log(count / mean);
+    });
+  }
+
+  return { taxa, samples };
+};
+
+/** parse user uploaded tabular data (see example-meta.txt) */
+export const parseUserMeta = (text: string) => {
+  /** parse data */
+  const { data } = parse<UserMeta[number]>(text, {
+    dynamicTyping: true,
+    header: true,
+  });
+
+  return data;
+};
+
 /** progress func type */
 type Progress = (status: string, shouldCancel?: true) => Promise<void>;
 
@@ -103,4 +174,11 @@ let aborted = "";
 /** abort func */
 export const abort = (reason = "aborted") => (aborted = reason);
 
-expose({ expensiveFunction, exactSearch, fuzzySearch, setProgress, abort });
+expose({
+  exactSearch,
+  fuzzySearch,
+  parseUserData,
+  parseUserMeta,
+  setProgress,
+  abort,
+});

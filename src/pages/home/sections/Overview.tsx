@@ -6,7 +6,7 @@ import MicroscopeIcon from "@/assets/microscope.svg?react";
 import PackageIcon from "@/assets/package.svg?react";
 import TableIcon from "@/assets/table.svg?react";
 import Placeholder from "@/components/Placeholder";
-import { useData } from "@/data";
+import { useData } from "@/pages/home/data";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
 import classes from "./Overview.module.css";
 

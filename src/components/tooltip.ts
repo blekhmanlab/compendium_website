@@ -7,6 +7,7 @@ const options: Partial<Props> = {
   duration: [100, 100],
   offset: [15, 15],
   allowHTML: true,
+  interactive: true,
   appendTo: document.body,
   plugins: [followCursor],
   hideOnClick: false,

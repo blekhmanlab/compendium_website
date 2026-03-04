@@ -1,25 +1,44 @@
-import type { InputHTMLAttributes } from "react";
+import type { ComponentProps } from "react";
 import XIcon from "@/assets/x.svg?react";
 import classes from "./Textbox.module.css";
 
-type Props = {
+type Single = { multi?: false } & Omit<ComponentProps<"input">, "onChange">;
+type Multi = { multi: true } & Omit<ComponentProps<"textarea">, "onChange">;
+
+type Base = {
   value: string;
   onChange: (value: string) => void;
-} & Omit<InputHTMLAttributes<HTMLInputElement>, "onChange">;
+};
 
-const Textbox = ({ value, onChange, ...props }: Props) => (
+type Props = Base & (Single | Multi);
+
+const Textbox = ({ multi, value, onChange, ...props }: Props) => (
   <div className={classes.wrapper}>
-    <input
-      type="text"
-      className={classes.input}
-      {...props}
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      autoComplete="off"
-      autoCorrect="off"
-      autoCapitalize="off"
-      spellCheck="false"
-    />
+    {multi ? (
+      <textarea
+        className={classes.input}
+        {...(props as ComponentProps<"textarea">)}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        rows={3}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck="false"
+      />
+    ) : (
+      <input
+        type="text"
+        className={classes.input}
+        {...(props as ComponentProps<"input">)}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck="false"
+      />
+    )}
     <button
       className={classes.button}
       data-tooltip="Clear"

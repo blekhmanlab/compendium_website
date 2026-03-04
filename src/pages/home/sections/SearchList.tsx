@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { capitalize } from "lodash";
 import { useDebounce } from "@reactuses/core";
 import LoadingIcon from "@/assets/loading.svg?react";
@@ -6,10 +6,10 @@ import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import Table, { type Col } from "@/components/Table";
 import Textbox from "@/components/Textbox";
-import type { Data } from "@/data";
+import type { Data } from "@/pages/home/data";
 import { formatNumber } from "@/util/string";
 import type { KeysOfType } from "@/util/types";
-import { thread } from "@/workers";
+import { useThread } from "@/workers";
 import classes from "./SearchList.module.css";
 
 /** type options, including all */
@@ -30,12 +30,6 @@ const Search = ({ list: fullList, cols, types, names, onSelect }: Props) => {
   const [type, setType] = useState<TypesAll[number]>("All");
   const [_search, setSearch] = useState("");
   const search = useDebounce(_search, 300);
-  const [exactMatches, setExactMatches] = useState<List>([]);
-  const [exactSearching, setExactSearching] = useState(false);
-  const [fuzzyMatches, setFuzzyMatches] = useState<List>([]);
-  const [fuzzySearching, setFuzzySearching] = useState(false);
-  const exactController = useRef<AbortController>(null);
-  const fuzzyController = useRef<AbortController>(null);
 
   /** filter full search list by type */
   const list = useMemo(() => {
@@ -56,52 +50,26 @@ const Search = ({ list: fullList, cols, types, names, onSelect }: Props) => {
   }, [fullList, types, type, names]);
 
   /** exact search */
-  useEffect(() => {
-    exactController.current = new AbortController();
-
-    if (list && search.trim()) {
-      setExactMatches([]);
-      setExactSearching(true);
-
-      /** do in worker to not freeze UI */
-      thread(
-        (worker) => worker.exactSearch(list, ["name", "value"], search),
-        exactController.current,
-      )
-        .then((result) => setExactMatches(result as typeof exactMatches))
-        .catch(console.error)
-        .finally(() => setExactSearching(false));
-    }
-
-    return () => {
-      exactController.current?.abort(`Stale exact search: ${search}`);
-      setExactSearching(false);
-    };
-  }, [list, search, setExactSearching]);
+  const [exactMatches = [], exactStatus] = useThread(
+    useCallback(
+      (worker) => {
+        if (!(list && search.trim())) return;
+        return worker.exactSearch(list, ["name", "value"], search);
+      },
+      [list, search],
+    ),
+  );
 
   /** fuzzy search */
-  useEffect(() => {
-    fuzzyController.current = new AbortController();
-
-    if (list && search.trim()) {
-      setFuzzyMatches([]);
-      setFuzzySearching(true);
-
-      /** do in worker to not freeze UI */
-      thread(
-        (worker) => worker.fuzzySearch(list, ["name", "value"], search),
-        fuzzyController.current,
-      )
-        .then((result) => setFuzzyMatches(result as typeof fuzzyMatches))
-        .catch(console.error)
-        .finally(() => setFuzzySearching(false));
-    }
-
-    return () => {
-      fuzzyController.current?.abort(`Stale fuzzy search: ${search}`);
-      setFuzzySearching(false);
-    };
-  }, [list, search, setFuzzySearching]);
+  const [fuzzyMatches = [], fuzzyStatus] = useThread(
+    useCallback(
+      (worker) => {
+        if (!(list && search.trim())) return;
+        return worker.fuzzySearch(list, ["name", "value"], search);
+      },
+      [list, search],
+    ),
+  );
 
   /** exact match name quick lookup */
   const exactMatchLookup = useMemo(
@@ -130,11 +98,7 @@ const Search = ({ list: fullList, cols, types, names, onSelect }: Props) => {
           <LoadingIcon
             style={{
               opacity:
-                exactSearching || fuzzySearching
-                  ? !exactSearching && fuzzySearching
-                    ? 0.5
-                    : 1
-                  : 0,
+                exactStatus === "loading" || fuzzyStatus === "loading" ? 1 : 0,
             }}
           />
           <Textbox value={_search} onChange={setSearch} placeholder="Search" />
@@ -164,7 +128,9 @@ const Search = ({ list: fullList, cols, types, names, onSelect }: Props) => {
         )}
         rows={matches}
         extraRows={
-          !exactSearching && !fuzzySearching && !matches.length
+          exactStatus !== "loading" &&
+          fuzzyStatus !== "loading" &&
+          !matches.length
             ? ["", "No results", ""]
             : undefined
         }

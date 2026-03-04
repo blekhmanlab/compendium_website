@@ -1,6 +1,7 @@
 import type { ChangeEvent, ComponentProps, DragEvent } from "react";
 import { useRef, useState } from "react";
 import clsx from "clsx";
+import UploadIcon from "@/assets/upload.svg?react";
 import Button from "@/components/Button";
 import classes from "./UploadButton.module.css";
 
@@ -23,6 +24,8 @@ const UploadButton = ({
 }: Props) => {
   const ref = useRef<HTMLInputElement>(null);
 
+  const [name, setName] = useState("");
+
   /** dragging */
   const [drag, setDrag] = useState(false);
 
@@ -30,6 +33,8 @@ const UploadButton = ({
   const upload = async (target: HTMLInputElement | DataTransfer | null) => {
     const file = (target?.files || [])[0];
     if (!file) return;
+
+    setName(file.name);
 
     /** extract filename parts */
     const [, filename = "", extension = ""] =
@@ -56,9 +61,10 @@ const UploadButton = ({
   };
 
   return (
-    <>
+    <div className={classes.container}>
       <Button
         className={clsx(drag && classes.drag, className)}
+        icon={UploadIcon}
         onClick={onClick}
         onDragEnter={() => setDrag(true)}
         onDragLeave={() => setDrag(false)}
@@ -71,6 +77,8 @@ const UploadButton = ({
         {...props}
       />
 
+      {name}
+
       <input
         ref={ref}
         type="file"
@@ -78,7 +86,7 @@ const UploadButton = ({
         style={{ display: "none" }}
         onChange={onChange}
       />
-    </>
+    </div>
   );
 };
 

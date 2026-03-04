@@ -1,0 +1,29 @@
+.upload {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  place-items: flex-start;
+  width: 100%;
+  gap: 20px;
+}
+
+.upload > * {
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (max-width: 600px) {
+  .upload {
+    grid-template-columns: 1fr;
+  }
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.example {
+  grid-column: 1 / -1;
+  justify-self: center;
+}

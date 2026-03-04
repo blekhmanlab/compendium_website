@@ -5,12 +5,16 @@ import Header from "@/components/Header";
 import Meta from "@/components/Meta";
 import Upload from "@/pages/projectionist/sections/Upload";
 
-type Upload = {
+export type UserData = {
   taxa: Record<string, string>;
   samples: Record<string, number[]>;
 };
 
-export const useUpload = create<Upload>(() => ({ taxa: {}, samples: {} }));
+export const useUserData = create<UserData>(() => ({ taxa: {}, samples: {} }));
+
+export type UserMeta = Record<string, string>[];
+
+export const useUserMeta = create<UserMeta>(() => []);
 
 const Projectionist = () => (
   <>

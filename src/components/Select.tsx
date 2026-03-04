@@ -1,4 +1,4 @@
-import type { SelectHTMLAttributes } from "react";
+import type { ComponentProps } from "react";
 import { startCase } from "lodash";
 import AngleIcon from "@/assets/angle.svg?react";
 import classes from "./Select.module.css";
@@ -8,7 +8,7 @@ type Props<Option extends string> = {
   value: Option;
   onChange: (value: Option) => void;
   options: readonly Option[];
-} & Omit<SelectHTMLAttributes<HTMLSelectElement>, "onChange">;
+} & Omit<ComponentProps<"select">, "onChange">;
 
 const Select = <Option extends string>({
   label,

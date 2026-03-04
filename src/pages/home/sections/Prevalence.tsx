@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Select from "@/components/Select";
-import { useData } from "@/data";
+import { useData } from "@/pages/home/data";
 import Bar from "./Bar";
 import Histogram from "./Histogram";
 import Map from "./Map";
