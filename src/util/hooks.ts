@@ -1,8 +1,7 @@
-import type { Ref } from "react";
 import { useCallback, useRef } from "react";
 
 /** set fitted view box of svg */
-export const useViewBox = (padding = 0): [Ref<SVGSVGElement>, () => void] => {
+export const useViewBox = (padding = 0) => {
   /** reference to attach to svg element */
   const svg = useRef<SVGSVGElement>(null);
 
@@ -21,10 +20,10 @@ export const useViewBox = (padding = 0): [Ref<SVGSVGElement>, () => void] => {
     height += padding * 2;
 
     /** set view box to bbox, essentially fitting view to content */
-    const viewBox = [x, y, width, height].map(Math.round).join(" ");
+    const viewBox = [x, y, width, height].join(" ");
 
     svg.current.setAttribute("viewBox", viewBox);
   }, [padding]);
 
-  return [svg, setViewBox];
+  return [svg, setViewBox] as const;
 };

@@ -209,7 +209,7 @@ export const parseUserData = (text: string) => {
       const total = sum(
         consolidatedTaxa.map(
           (taxon, taxonIndex) =>
-            (consolidatedReads[sampleIndex]?.[taxonIndex] ?? 0) +
+            (consolidatedReads[sampleIndex]?.[taxonIndex] ?? 0) *
             (compendiumPCA[stringifyTaxon(taxon)]?.[pc] ?? 0),
         ),
       );
@@ -278,7 +278,7 @@ type CompendiumPCA = {
 };
 
 /** map of taxon name to compendium principal components */
-const compendiumPCA = Object.fromEntries(
+export const compendiumPCA = Object.fromEntries(
   parse<CompendiumPCA>(_compendiumPCA, {
     dynamicTyping: true,
     header: true,
