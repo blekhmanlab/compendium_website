@@ -123,7 +123,10 @@ export const loadMetaData = async () => {
 /** load project/sample data */
 export const loadProjectData = async () => {
   /** load static data */
-  const byProject = await load("by-project.json", "byProject");
+  const [byProject] = await Promise.all([
+    load("by-project.json", "byProject"),
+    load("by-reads.json", "byReads"),
+  ]);
 
   /** derive search-friendly list (too big to pre-compile) */
   const list: ProjectSearch = [];
