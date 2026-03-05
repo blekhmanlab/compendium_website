@@ -1,7 +1,8 @@
 import { expose } from "comlink";
 import { groupBy, isEqual, omit, pick, random, sum, uniqWith } from "lodash";
 import { parse } from "papaparse";
-import _compendiumPCA from "@/pages/projectionist/data/compendium-pca.tsv?raw";
+import _compendiumProjected from "@/pages/projectionist/data/compendium-projected-full.tsv?raw";
+import _compendiumWeights from "@/pages/projectionist/data/compendium-weights.tsv?raw";
 import _taxaMap from "@/pages/projectionist/data/taxa-map.tsv?raw";
 import { type UserMeta } from "@/pages/projectionist/Projectionist";
 
@@ -103,7 +104,7 @@ const stringifyTaxon = (value: object | string) =>
     : value;
 
 /** max read count to rarify down to */
-const maxReads = 100;
+const maxReads = Infinity;
 
 /** parse user uploaded tabular data (see example-data.txt) */
 export const parseUserData = (text: string) => {
@@ -210,7 +211,7 @@ export const parseUserData = (text: string) => {
         consolidatedTaxa.map(
           (taxon, taxonIndex) =>
             (consolidatedReads[sampleIndex]?.[taxonIndex] ?? 0) *
-            (compendiumPCA[stringifyTaxon(taxon)]?.[pc] ?? 0),
+            (compendiumWeights[stringifyTaxon(taxon)]?.[pc] ?? 0),
         ),
       );
 
@@ -259,7 +260,7 @@ const taxaMap = Object.fromEntries(
   ]),
 );
 
-type CompendiumPCA = {
+type CompendiumWeights = {
   /** taxon ranks */
   kingdom: string;
   phylum: string;
@@ -277,12 +278,37 @@ type CompendiumPCA = {
   PC8: number;
 };
 
-/** map of taxon name to compendium principal components */
-export const compendiumPCA = Object.fromEntries(
-  parse<CompendiumPCA>(_compendiumPCA, {
+/** map of taxon name to compendium principal component weights */
+export const compendiumWeights = Object.fromEntries(
+  parse<CompendiumWeights>(_compendiumWeights, {
     dynamicTyping: true,
     header: true,
   }).data.map((entry) => [stringifyTaxon(entry), entry]),
+);
+
+type CompendiumProjected = {
+  /** sample details */
+  sample: string;
+  project: string;
+  /** principal components */
+  PC1: number;
+  PC2: number;
+  PC3: number;
+  PC4: number;
+  PC5: number;
+  PC6: number;
+  PC7: number;
+  PC8: number;
+  /** ??? */
+  projection: string;
+};
+
+/** map of sample name to compendium projected principal component values */
+export const compendiumProjected = Object.fromEntries(
+  parse<CompendiumProjected>(_compendiumProjected, {
+    dynamicTyping: true,
+    header: true,
+  }).data.map((entry) => [entry.sample, entry]),
 );
 
 expose({

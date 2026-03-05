@@ -9,7 +9,7 @@ import UploadButton from "@/components/UploadButton";
 import { useUserData, useUserMeta } from "@/pages/projectionist/Projectionist";
 import { formatNumber } from "@/util/string";
 import { useThread } from "@/workers";
-import { compendiumPCA } from "@/workers/worker";
+import { compendiumProjected } from "@/workers/worker";
 import classes from "./Upload.module.css";
 import exampleData from "../data/example-data.tsv?raw";
 import exampleMeta from "../data/example-meta.tsv?raw";
@@ -50,8 +50,8 @@ const Upload = () => {
   const plot1bound =
     d3.max(
       [
-        d3.extent(Object.values(compendiumPCA), (d) => d.PC1),
-        d3.extent(Object.values(compendiumPCA), (d) => d.PC2),
+        d3.extent(Object.values(compendiumProjected), (d) => d.PC1),
+        d3.extent(Object.values(compendiumProjected), (d) => d.PC2),
       ]
         .flat()
         .map((value) => Math.abs(value ?? 0)),
@@ -172,7 +172,7 @@ const Upload = () => {
             stroke="white"
             strokeWidth={plot1bound / 100}
           />
-          {Object.values(compendiumPCA).map(({ PC1, PC2 }, index) => (
+          {Object.values(compendiumProjected).map(({ PC1, PC2 }, index) => (
             <circle
               key={index}
               cx={PC1}
