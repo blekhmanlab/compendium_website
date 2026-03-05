@@ -4,22 +4,15 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Meta from "@/components/Meta";
 import Upload from "@/pages/projectionist/sections/Upload";
+import type { parseUserData } from "@/workers/worker";
 
-type Taxon = {
-  kingdom: string;
-  phylum: string;
-  class: string;
-  order: string;
-  family: string;
-  genus: string;
-};
+export type UserData = ReturnType<typeof parseUserData>;
 
-export type UserData = {
-  taxa: Record<string, Taxon | undefined>;
-  samples: Record<string, number[]>;
-};
-
-export const useUserData = create<UserData>(() => ({ taxa: {}, samples: {} }));
+export const useUserData = create<UserData>(() => ({
+  taxa: [],
+  samples: [],
+  projected: [],
+}));
 
 export type UserMeta = Record<string, string>[];
 

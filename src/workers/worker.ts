@@ -1,6 +1,7 @@
 import { expose } from "comlink";
-import { mapValues, random, sum } from "lodash";
+import { groupBy, isEqual, omit, pick, random, sum, uniqWith } from "lodash";
 import { parse } from "papaparse";
+import _compendiumPCA from "@/pages/projectionist/data/compendium-pca.tsv?raw";
 import _taxaMap from "@/pages/projectionist/data/taxa-map.tsv?raw";
 import { type UserMeta } from "@/pages/projectionist/Projectionist";
 
@@ -93,6 +94,14 @@ const nGramSimilarity = (stringA: string, stringB: string, n = 3) => {
   return common.size / (total.size || Infinity);
 };
 
+/** convert taxon object to string for easier compare/lookup/etc */
+const stringifyTaxon = (value: object | string) =>
+  typeof value === "object"
+    ? JSON.stringify(
+        pick(value, ["kingdom", "phylum", "class", "order", "family", "genus"]),
+      )
+    : value;
+
 /** max read count to rarify down to */
 const maxReads = 100;
 
@@ -100,28 +109,30 @@ const maxReads = 100;
 export const parseUserData = (text: string) => {
   progress?.("Parsing");
 
+  /** trim whitespace to not get null rows at start/end */
+  text = text.trim();
+
   /** parse data */
   const { data } = parse<[...number[], string]>(text, { dynamicTyping: true });
 
   if (aborted) throw Error(aborted);
 
-  /** map of taxon name to column index */
-  const taxa = mapValues(
-    Object.fromEntries(
-      (data.shift() as string[]).map((key, index) => [index, key]),
-    ),
-    (taxon) => taxaMap[taxon],
+  /** taxa row, mapped to split ranks */
+  const taxa = (data.shift() as string[]).map(
+    (taxon) => taxaMap[taxon] ?? taxon,
   );
-  /** map of sample name to per-taxon read counts */
-  const samples = Object.fromEntries(
-    data.map((row) => [row.pop() as string, row as number[]]),
-  );
+
+  /** sample name col (last col on right) */
+  const samples = data.map((row) => row.pop() as string);
+
+  /** read count rows */
+  const reads = data.map((row) => row as number[]);
 
   if (aborted) throw Error(aborted);
   progress?.("Rarifying");
 
   /** rarify reads */
-  for (const counts of Object.values(samples)) {
+  for (const counts of reads) {
     if (aborted) throw Error(aborted);
 
     /** total reads for sample */
@@ -146,7 +157,7 @@ export const parseUserData = (text: string) => {
   progress?.("rCLR transforming");
 
   /** "robust centered log-ratio transformation" */
-  for (const counts of Object.values(samples)) {
+  for (const counts of reads) {
     if (aborted) throw Error(aborted);
 
     /** geometric mean */
@@ -164,7 +175,55 @@ export const parseUserData = (text: string) => {
     });
   }
 
-  return { taxa, samples };
+  /** drop genus rank to consolidate at the family level */
+  let consolidatedTaxa = taxa.map((taxon) =>
+    typeof taxon === "object" ? omit(taxon, "genus") : taxon,
+  );
+
+  /** group together indices that are the same */
+  const indices: number[][] = Object.values(
+    groupBy(Object.entries(consolidatedTaxa), ([, taxon]) =>
+      stringifyTaxon(taxon),
+    ),
+  ).map((group) => group.map(([index]) => Number(index)));
+
+  /** consolidate taxa by consolidatedTaxa */
+  consolidatedTaxa = uniqWith(consolidatedTaxa, isEqual);
+
+  /** consolidate reads by consolidatedTaxa */
+  const consolidatedReads = reads.map((row) =>
+    indices.map((group) => sum(group.map((index) => row[index] ?? 0))),
+  );
+
+  /** projected principal components for each sample */
+  const projected: Record<string, number>[] = [];
+
+  samples.forEach((sampleName, sampleIndex) => {
+    /** principal components for this sample */
+    const sampleProjected: Record<string, number> = {};
+    for (const pc of ["PC1", "PC2"] as const) {
+      if (aborted) throw Error(aborted);
+      progress?.(`Projecting ${pc} ${sampleName}`);
+
+      /** calculate projected principal component */
+      const total = sum(
+        consolidatedTaxa.map(
+          (taxon, taxonIndex) =>
+            (consolidatedReads[sampleIndex]?.[taxonIndex] ?? 0) +
+            (compendiumPCA[stringifyTaxon(taxon)]?.[pc] ?? 0),
+        ),
+      );
+
+      /** add principal component value */
+      sampleProjected[pc] = total;
+    }
+
+    projected.push(sampleProjected);
+  });
+
+  console.log({ taxa, samples, projected });
+
+  return { taxa, samples, projected };
 };
 
 /** parse user uploaded tabular data (see example-meta.txt) */
@@ -190,22 +249,41 @@ type TaxaMap = {
   genus: string;
 };
 
-/**
- * simply splitting by period not reliable b/c some ranks may contain periods,
- * so we need an explicit map
- */
-
-/** get split ranks from full taxon name */
+/** map of full taxon name to split ranks */
 const taxaMap = Object.fromEntries(
   parse<TaxaMap>(_taxaMap, { header: true }).data.map(({ taxon, ...entry }) => [
     /** convert all non-letter characters to periods */
-    /** (we're expecting user to upload in this format) */
+    /** (we're expecting user to upload in this format, from DADA2) */
     taxon.replaceAll(/\W/g, "."),
     entry,
   ]),
 );
 
-console.log(taxaMap);
+type CompendiumPCA = {
+  /** taxon ranks */
+  kingdom: string;
+  phylum: string;
+  class: string;
+  order: string;
+  family: string;
+  /** principal component values */
+  PC1: number;
+  PC2: number;
+  PC3: number;
+  PC4: number;
+  PC5: number;
+  PC6: number;
+  PC7: number;
+  PC8: number;
+};
+
+/** map of taxon name to compendium principal components */
+const compendiumPCA = Object.fromEntries(
+  parse<CompendiumPCA>(_compendiumPCA, {
+    dynamicTyping: true,
+    header: true,
+  }).data.map((entry) => [stringifyTaxon(entry), entry]),
+);
 
 expose({
   exactSearch,

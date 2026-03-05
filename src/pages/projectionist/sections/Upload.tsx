@@ -45,8 +45,6 @@ const Upload = () => {
     if (userMeta) useUserMeta.setState({ ...userMeta });
   }, [userMeta]);
 
-  console.log({ userData, userMeta });
-
   return (
     <>
       <h2>Upload</h2>
