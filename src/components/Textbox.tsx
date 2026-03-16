@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import XIcon from "@/assets/x.svg?react";
+import { XIcon } from "lucide-react";
 import classes from "./Textbox.module.css";
 
 type Single = { multi?: false } & Omit<ComponentProps<"input">, "onChange">;

@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 import { startCase } from "lodash";
-import AngleIcon from "@/assets/angle.svg?react";
+import { ChevronDownIcon } from "lucide-react";
 import classes from "./Select.module.css";
 
 type Props<Option extends string> = {
@@ -32,7 +32,7 @@ const Select = <Option extends string>({
           </option>
         ))}
       </select>
-      <AngleIcon />
+      <ChevronDownIcon />
     </span>
   </label>
 );

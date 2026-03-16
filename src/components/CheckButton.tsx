@@ -1,4 +1,4 @@
-import CheckIcon from "@/assets/check.svg?react";
+import { CheckIcon } from "lucide-react";
 import Button from "@/components/Button";
 import classes from "./CheckButton.module.css";
 

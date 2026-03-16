@@ -1,7 +1,7 @@
 import type { ChangeEvent, ComponentProps, DragEvent } from "react";
 import { useRef, useState } from "react";
 import clsx from "clsx";
-import UploadIcon from "@/assets/upload.svg?react";
+import { UploadIcon } from "lucide-react";
 import Button from "@/components/Button";
 import classes from "./UploadButton.module.css";
 
@@ -64,7 +64,7 @@ const UploadButton = ({
     <div className={classes.container}>
       <Button
         className={clsx(drag && classes.drag, className)}
-        icon={UploadIcon}
+        icon={<UploadIcon />}
         onClick={onClick}
         onDragEnter={() => setDrag(true)}
         onDragLeave={() => setDrag(false)}

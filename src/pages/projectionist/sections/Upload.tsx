@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { size } from "lodash";
-import LightbulbIcon from "@/assets/lightbulb.svg?react";
+import { LightbulbIcon } from "lucide-react";
 import LoadingIcon from "@/assets/loading.svg?react";
 import Button from "@/components/Button";
 import Textbox from "@/components/Textbox";
@@ -118,7 +118,7 @@ const Upload = () => {
         )}
 
         <Button
-          icon={LightbulbIcon}
+          icon={<LightbulbIcon />}
           onClick={() => {
             setUserRawData(exampleData);
             setUserRawMeta(exampleMeta);

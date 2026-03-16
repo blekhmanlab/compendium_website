@@ -1,4 +1,4 @@
-import ConeIcon from "@/assets/cone.svg?react";
+import { ConeIcon } from "lucide-react";
 import Button from "@/components/Button";
 
 const Compare = () => (
@@ -9,7 +9,7 @@ const Compare = () => (
       Compare your data to ours with the <i>Projectionist</i> tool.
     </p>
 
-    <Button icon={ConeIcon} design="big" to="/projectionist">
+    <Button icon={<ConeIcon />} design="big" to="/projectionist">
       Projectionist
     </Button>
   </section>

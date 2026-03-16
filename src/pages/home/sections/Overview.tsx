@@ -1,10 +1,12 @@
-import BarsIcon from "@/assets/bars.svg?react";
-import DatabaseIcon from "@/assets/database.svg?react";
-import EarthIcon from "@/assets/earth.svg?react";
-import EyeIcon from "@/assets/eye.svg?react";
-import MicroscopeIcon from "@/assets/microscope.svg?react";
-import PackageIcon from "@/assets/package.svg?react";
-import TableIcon from "@/assets/table.svg?react";
+import {
+  BarChartHorizontalIcon,
+  DatabaseIcon,
+  EarthIcon,
+  EyeIcon,
+  MicroscopeIcon,
+  PackageIcon,
+  TableIcon,
+} from "lucide-react";
 import Placeholder from "@/components/Placeholder";
 import { useData } from "@/pages/home/data";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
@@ -19,7 +21,7 @@ const Overview = () => {
 
   const tiles = [
     {
-      icon: MicroscopeIcon,
+      icon: <MicroscopeIcon />,
       text: (
         <>
           {formatNumber(metadata?.samples, false)} samples
@@ -29,7 +31,7 @@ const Overview = () => {
       ),
     },
     {
-      icon: BarsIcon,
+      icon: <BarChartHorizontalIcon />,
       text: (
         <>
           {formatNumber(metadata?.classes)} classes
@@ -39,7 +41,7 @@ const Overview = () => {
       ),
     },
     {
-      icon: EarthIcon,
+      icon: <EarthIcon />,
       text: (
         <>
           {formatNumber(metadata?.countries)} countries
@@ -49,7 +51,7 @@ const Overview = () => {
       ),
     },
     {
-      icon: DatabaseIcon,
+      icon: <DatabaseIcon />,
       text: (
         <>
           Ver. {metadata?.version}
@@ -60,7 +62,7 @@ const Overview = () => {
     },
 
     {
-      icon: EyeIcon,
+      icon: <EyeIcon />,
       text: (
         <>
           {formatNumber(metadata?.downloads)} downloads
@@ -70,7 +72,7 @@ const Overview = () => {
       ),
     },
     {
-      icon: TableIcon,
+      icon: <TableIcon />,
       text: (
         <>
           {formatBytes(metadata?.size)} download
@@ -101,7 +103,7 @@ const Overview = () => {
 
             return (
               <div key={index} className={classes.tile}>
-                {icon({ style: { color } })}
+                <span style={{ color }}>{icon}</span>
                 <span>{text}</span>
               </div>
             );

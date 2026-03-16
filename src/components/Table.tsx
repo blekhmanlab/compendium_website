@@ -5,7 +5,7 @@ import {
   type ReactNode,
 } from "react";
 import { clamp } from "lodash";
-import AngleIcon from "@/assets/angle.svg?react";
+import { ChevronDownIcon } from "lucide-react";
 import Button from "@/components/Button";
 import CheckButton from "@/components/CheckButton";
 import { preserveScroll } from "@/util/dom";
@@ -172,7 +172,7 @@ const Table = <Datum extends DatumShape>({
               }) satisfies MouseEventHandler<HTMLButtonElement>
             }
           >
-            <AngleIcon style={{ scale: "1 -1" }} />
+            <ChevronDownIcon style={{ scale: "1 -1" }} />
             Less
           </Button>
         )}
@@ -185,7 +185,7 @@ const Table = <Datum extends DatumShape>({
               }) satisfies MouseEventHandler<HTMLButtonElement>
             }
           >
-            <AngleIcon />
+            <ChevronDownIcon />
             More
           </Button>
         )}

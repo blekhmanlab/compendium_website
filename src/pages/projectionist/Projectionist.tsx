@@ -1,5 +1,5 @@
+import { ConeIcon } from "lucide-react";
 import { create } from "zustand";
-import ConeIcon from "@/assets/cone.svg?react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Meta from "@/components/Meta";
