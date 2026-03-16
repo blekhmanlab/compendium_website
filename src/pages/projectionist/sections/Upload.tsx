@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import * as d3 from "d3";
 import { size } from "lodash";
 import LightbulbIcon from "@/assets/lightbulb.svg?react";
 import LoadingIcon from "@/assets/loading.svg?react";
 import Button from "@/components/Button";
 import Textbox from "@/components/Textbox";
 import UploadButton from "@/components/UploadButton";
-import { useUserData, useUserMeta } from "@/pages/projectionist/Projectionist";
+import { useData, useUserMeta } from "@/pages/projectionist/Projectionist";
 import { formatNumber } from "@/util/string";
 import { useThread } from "@/workers";
-import { compendiumProjected } from "@/workers/worker";
 import classes from "./Upload.module.css";
 import exampleData from "../data/example-data.tsv?raw";
 import exampleMeta from "../data/example-meta.tsv?raw";
@@ -41,37 +39,14 @@ const Upload = () => {
 
   /** update global state with parsed data */
   useEffect(() => {
-    if (userData) useUserData.setState({ ...userData });
+    if (userData) useData.setState({ ...userData });
   }, [userData]);
   useEffect(() => {
     if (userMeta) useUserMeta.setState({ ...userMeta });
   }, [userMeta]);
 
-  const plot1bound =
-    d3.max(
-      [
-        d3.extent(Object.values(compendiumProjected), (d) => d.PC1),
-        d3.extent(Object.values(compendiumProjected), (d) => d.PC2),
-      ]
-        .flat()
-        .map((value) => Math.abs(value ?? 0)),
-    ) ?? 0;
-  const plot2bound =
-    d3.max(
-      [
-        d3.extent(userData?.projected ?? [], (d) => d.PC1),
-        d3.extent(userData?.projected ?? [], (d) => d.PC2),
-      ]
-        .flat()
-        .map((value) => Math.abs(value ?? 0)),
-    ) ?? 0;
-
-  useEffect(() => {
-    console.log({ plot1bound, plot2bound });
-  }, [plot1bound, plot2bound]);
-
   return (
-    <>
+    <section>
       <h2>Upload</h2>
 
       <div className={classes.upload}>
@@ -152,68 +127,8 @@ const Upload = () => {
         >
           Example
         </Button>
-
-        <svg
-          viewBox={[
-            -plot1bound,
-            -plot1bound,
-            plot1bound * 2,
-            plot1bound * 2,
-          ].join(" ")}
-          width="100%"
-          height="100%"
-        >
-          <rect
-            x={-plot1bound}
-            y={-plot1bound}
-            width={plot1bound * 2}
-            height={plot1bound * 2}
-            fill="none"
-            stroke="white"
-            strokeWidth={plot1bound / 100}
-          />
-          {Object.values(compendiumProjected).map(({ PC1, PC2 }, index) => (
-            <circle
-              key={index}
-              cx={PC1}
-              cy={PC2}
-              r={plot1bound / 100}
-              fill="white"
-            />
-          ))}
-        </svg>
-
-        <svg
-          viewBox={[
-            -plot2bound,
-            -plot2bound,
-            plot2bound * 2,
-            plot2bound * 2,
-          ].join(" ")}
-          width="100%"
-          height="100%"
-        >
-          <rect
-            x={-plot2bound}
-            y={-plot2bound}
-            width={plot2bound * 2}
-            height={plot2bound * 2}
-            fill="none"
-            stroke="white"
-            strokeWidth={plot2bound / 100}
-          />
-          {userData?.projected?.map(({ PC1, PC2 }, index) => (
-            <circle
-              key={index}
-              cx={PC1}
-              cy={PC2}
-              r={plot2bound / 100}
-              fill="white"
-            />
-          ))}
-        </svg>
       </div>
-    </>
+    </section>
   );
 };
 

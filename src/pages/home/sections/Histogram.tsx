@@ -93,7 +93,6 @@ const Histogram = ({ id = "histogram", title, data }: Props) => {
       <g className="x-axis" transform={`translate(0, ${height})`} />
       <g className="y-axis" />
       <text
-        className="axis-title"
         x={0}
         y={0}
         style={{ fontSize: "30px" }}
@@ -104,7 +103,6 @@ const Histogram = ({ id = "histogram", title, data }: Props) => {
         Samples
       </text>
       <text
-        className="axis-title"
         x={width / 2}
         y={height + padding * 0.9}
         style={{ fontSize: "30px" }}
@@ -114,7 +112,6 @@ const Histogram = ({ id = "histogram", title, data }: Props) => {
       </text>
       {blank && (
         <text
-          className="axis-title"
           x={width / 2}
           y={height / 2}
           style={{ fontSize: "30px" }}

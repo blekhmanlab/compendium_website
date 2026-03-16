@@ -3,12 +3,13 @@ import ConeIcon from "@/assets/cone.svg?react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Meta from "@/components/Meta";
+import PCs from "@/pages/projectionist/sections/PCs";
 import Upload from "@/pages/projectionist/sections/Upload";
 import type { parseUserData } from "@/workers/worker";
 
 export type UserData = ReturnType<typeof parseUserData>;
 
-export const useUserData = create<UserData>(() => ({
+export const useData = create<UserData>(() => ({
   taxa: [],
   samples: [],
   projected: [],
@@ -33,9 +34,8 @@ const Projectionist = () => (
     </Header>
 
     <main>
-      <section>
-        <Upload />
-      </section>
+      <Upload />
+      <PCs />
     </main>
     <Footer />
   </>

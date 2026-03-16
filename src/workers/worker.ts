@@ -1,5 +1,14 @@
 import { expose } from "comlink";
-import { groupBy, isEqual, omit, pick, random, sum, uniqWith } from "lodash";
+import {
+  groupBy,
+  isEmpty,
+  isEqual,
+  omit,
+  pick,
+  random,
+  sum,
+  uniqWith,
+} from "lodash";
 import { parse } from "papaparse";
 import _compendiumProjected from "@/pages/projectionist/data/compendium-projected-full.tsv?raw";
 import _compendiumWeights from "@/pages/projectionist/data/compendium-weights.tsv?raw";
@@ -16,7 +25,7 @@ import { type UserMeta } from "@/pages/projectionist/Projectionist";
 type Progress = (status: string, shouldCancel?: true) => Promise<void>;
 
 /** currently set progress func */
-let progress: Progress | undefined;
+let progress: Progress = () => Promise.resolve();
 
 /** expose method to set progress func */
 export const setProgress = (func: Progress) => (progress = func);
@@ -108,7 +117,11 @@ const maxReads = Infinity;
 
 /** parse user uploaded tabular data (see example-data.txt) */
 export const parseUserData = (text: string) => {
-  progress?.("Parsing");
+  const taxaMap = getTaxaMap();
+
+  const compendiumWeights = getCompendiumWeights();
+
+  progress("Parsing");
 
   /** trim whitespace to not get null rows at start/end */
   text = text.trim();
@@ -130,7 +143,7 @@ export const parseUserData = (text: string) => {
   const reads = data.map((row) => row as number[]);
 
   if (aborted) throw Error(aborted);
-  progress?.("Rarifying");
+  progress("Rarifying");
 
   /** rarify reads */
   for (const counts of reads) {
@@ -155,7 +168,7 @@ export const parseUserData = (text: string) => {
   }
 
   if (aborted) throw Error(aborted);
-  progress?.("rCLR transforming");
+  progress("rCLR transforming");
 
   /** "robust centered log-ratio transformation" */
   for (const counts of reads) {
@@ -202,9 +215,19 @@ export const parseUserData = (text: string) => {
   samples.forEach((sampleName, sampleIndex) => {
     /** principal components for this sample */
     const sampleProjected: Record<string, number> = {};
-    for (const pc of ["PC1", "PC2"] as const) {
+    const pcs = [
+      "PC1",
+      "PC2",
+      "PC3",
+      "PC4",
+      "PC5",
+      "PC6",
+      "PC7",
+      "PC8",
+    ] as const;
+    for (const pc of pcs) {
       if (aborted) throw Error(aborted);
-      progress?.(`Projecting ${pc} ${sampleName}`);
+      progress(`Projecting ${pc} ${sampleName}`);
 
       /** calculate projected principal component */
       const total = sum(
@@ -221,8 +244,6 @@ export const parseUserData = (text: string) => {
 
     projected.push(sampleProjected);
   });
-
-  console.log({ taxa, samples, projected });
 
   return { taxa, samples, projected };
 };
@@ -251,14 +272,25 @@ type TaxaMap = {
 };
 
 /** map of full taxon name to split ranks */
-const taxaMap = Object.fromEntries(
-  parse<TaxaMap>(_taxaMap, { header: true }).data.map(({ taxon, ...entry }) => [
-    /** convert all non-letter characters to periods */
-    /** (we're expecting user to upload in this format, from DADA2) */
-    taxon.replaceAll(/\W/g, "."),
-    entry,
-  ]),
-);
+let taxaMap: Record<string, Omit<TaxaMap, "taxon">> = {};
+
+/** load on demand */
+const getTaxaMap = () => {
+  progress("Loading taxa map");
+  if (isEmpty(taxaMap)) {
+    taxaMap = Object.fromEntries(
+      parse<TaxaMap>(_taxaMap, { header: true }).data.map(
+        ({ taxon, ...entry }) => [
+          /** convert all non-letter characters to periods */
+          /** (we're expecting user to upload in this format, from DADA2) */
+          taxon.replaceAll(/\W/g, "."),
+          entry,
+        ],
+      ),
+    );
+  }
+  return taxaMap;
+};
 
 type CompendiumWeights = {
   /** taxon ranks */
@@ -279,12 +311,21 @@ type CompendiumWeights = {
 };
 
 /** map of taxon name to compendium principal component weights */
-export const compendiumWeights = Object.fromEntries(
-  parse<CompendiumWeights>(_compendiumWeights, {
-    dynamicTyping: true,
-    header: true,
-  }).data.map((entry) => [stringifyTaxon(entry), entry]),
-);
+let compendiumWeights: Record<string, CompendiumWeights> = {};
+
+/** load on demand */
+const getCompendiumWeights = () => {
+  progress("Loading compendium weights");
+  if (isEmpty(compendiumWeights)) {
+    compendiumWeights = Object.fromEntries(
+      parse<CompendiumWeights>(_compendiumWeights, {
+        dynamicTyping: true,
+        header: true,
+      }).data.map((entry) => [stringifyTaxon(entry), entry]),
+    );
+  }
+  return compendiumWeights;
+};
 
 type CompendiumProjected = {
   /** sample details */
@@ -304,12 +345,21 @@ type CompendiumProjected = {
 };
 
 /** map of sample name to compendium projected principal component values */
-export const compendiumProjected = Object.fromEntries(
-  parse<CompendiumProjected>(_compendiumProjected, {
-    dynamicTyping: true,
-    header: true,
-  }).data.map((entry) => [entry.sample, entry]),
-);
+let compendiumProjected: Record<string, CompendiumProjected> = {};
+
+/** load on demand */
+export const getCompendiumProjected = () => {
+  progress("Loading compendium projected");
+  if (isEmpty(compendiumProjected)) {
+    compendiumProjected = Object.fromEntries(
+      parse<CompendiumProjected>(_compendiumProjected, {
+        dynamicTyping: true,
+        header: true,
+      }).data.map((entry) => [entry.sample, entry]),
+    );
+  }
+  return compendiumProjected;
+};
 
 expose({
   exactSearch,

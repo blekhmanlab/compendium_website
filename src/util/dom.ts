@@ -61,3 +61,20 @@ export const preserveScroll = async (element?: Element | null) => {
   if (!element.isConnected) return;
   window.scrollBy({ top: newY - oldY, behavior: "smooth" });
 };
+
+/** fit svg view box to contents */
+export const fitViewBox = (svg: SVGSVGElement, padding = 0) => {
+  /** get bbox of content in svg */
+  let { x, y, width, height } = svg.getBBox();
+
+  /** incorporate padding */
+  x -= padding;
+  y -= padding;
+  width += padding * 2;
+  height += padding * 2;
+
+  /** set view box to bbox, essentially fitting view to content */
+  const viewBox = [x, y, width, height].join(" ");
+
+  svg.setAttribute("viewBox", viewBox);
+};
