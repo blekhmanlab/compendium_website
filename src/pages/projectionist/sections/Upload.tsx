@@ -5,7 +5,7 @@ import LoadingIcon from "@/assets/loading.svg?react";
 import Button from "@/components/Button";
 import Textbox from "@/components/Textbox";
 import UploadButton from "@/components/UploadButton";
-import { useData, useUserMeta } from "@/pages/projectionist/Projectionist";
+import { useData } from "@/pages/projectionist/Projectionist";
 import { formatNumber } from "@/util/string";
 import { useThread } from "@/workers";
 import classes from "./Upload.module.css";
@@ -39,10 +39,10 @@ const Upload = () => {
 
   /** update global state with parsed data */
   useEffect(() => {
-    if (userData) useData.setState({ ...userData });
+    if (userData) useData.setState({ userData });
   }, [userData]);
   useEffect(() => {
-    if (userMeta) useUserMeta.setState({ ...userMeta });
+    if (userMeta) useData.setState({ userMeta });
   }, [userMeta]);
 
   return (

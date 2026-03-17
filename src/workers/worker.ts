@@ -13,7 +13,6 @@ import { parse } from "papaparse";
 import _compendiumProjected from "@/pages/projectionist/data/compendium-projected-full.tsv?raw";
 import _compendiumWeights from "@/pages/projectionist/data/compendium-weights.tsv?raw";
 import _taxaMap from "@/pages/projectionist/data/taxa-map.tsv?raw";
-import { type UserMeta } from "@/pages/projectionist/Projectionist";
 
 /**
  * note: every time you communicate with a web worker, the message content must
@@ -113,7 +112,7 @@ const stringifyTaxon = (value: object | string) =>
     : value;
 
 /** max read count to rarify down to */
-const maxReads = Infinity;
+const maxReads = 3000;
 
 /** parse user uploaded tabular data (see example-data.txt) */
 export const parseUserData = (text: string) => {
@@ -251,7 +250,7 @@ export const parseUserData = (text: string) => {
 /** parse user uploaded tabular data (see example-meta.txt) */
 export const parseUserMeta = (text: string) => {
   /** parse data */
-  const { data } = parse<UserMeta[number]>(text, {
+  const { data } = parse<Record<string, string | number>>(text, {
     dynamicTyping: true,
     header: true,
   });
@@ -269,6 +268,18 @@ type TaxaMap = {
   order: string;
   family: string;
   genus: string;
+};
+
+/** parse compendium data */
+export const parseCompendiumData = () => {
+  const taxa = getTaxaMap();
+  const weights = getCompendiumWeights();
+  const projected = getCompendiumProjected();
+  return {
+    taxa: Object.values(taxa),
+    weights: Object.values(weights),
+    projected: Object.values(projected),
+  };
 };
 
 /** map of full taxon name to split ranks */
@@ -366,6 +377,7 @@ expose({
   fuzzySearch,
   parseUserData,
   parseUserMeta,
+  parseCompendiumData,
   setProgress,
   abort,
 });

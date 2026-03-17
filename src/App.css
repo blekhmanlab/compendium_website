@@ -195,12 +195,9 @@ td {
   text-align: left;
 }
 
-svg {
-  overflow: visible;
-}
-
 svg text {
   fill: currentColor;
+  font-size: 1rem;
 }
 
 svg * {
