@@ -1,6 +1,5 @@
 import type { ComponentProps } from "react";
 import { XIcon } from "lucide-react";
-import classes from "./Textbox.module.css";
 
 type Single = { multi?: false } & Omit<ComponentProps<"input">, "onChange">;
 type Multi = { multi: true } & Omit<ComponentProps<"textarea">, "onChange">;
@@ -13,10 +12,13 @@ type Base = {
 type Props = Base & (Single | Multi);
 
 const Textbox = ({ multi, value, onChange, ...props }: Props) => (
-  <div className={classes.wrapper}>
+  <div className="relative flex w-full">
     {multi ? (
       <textarea
-        className={classes.input}
+        className="
+          grow rounded-md bg-slate-500/25 px-4 py-2 pr-8 text-inherit transition
+          hover:bg-slate-500/50
+        "
         {...(props as ComponentProps<"textarea">)}
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -29,7 +31,10 @@ const Textbox = ({ multi, value, onChange, ...props }: Props) => (
     ) : (
       <input
         type="text"
-        className={classes.input}
+        className="
+          grow rounded-md bg-slate-500/25 px-4 py-2 pr-8 transition
+          hover:bg-slate-500/50
+        "
         {...(props as ComponentProps<"input">)}
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -40,7 +45,10 @@ const Textbox = ({ multi, value, onChange, ...props }: Props) => (
       />
     )}
     <button
-      className={classes.button}
+      className="
+        absolute top-0 right-0 flex size-10 cursor-pointer items-center
+        justify-center
+      "
       data-tooltip="Clear"
       onClick={() => onChange("")}
     >

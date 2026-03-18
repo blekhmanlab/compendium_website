@@ -1,7 +1,10 @@
-import classes from "./Footer.module.css";
-
 const Footer = () => (
-  <footer className={classes.footer}>
+  <footer
+    className="
+      flex flex-row justify-between gap-8 p-8
+      max-md:flex-col max-md:items-center
+    "
+  >
     <p>
       A project of the{" "}
       <a href="http://blekhmanlab.org/" target="_blank">
@@ -12,7 +15,7 @@ const Footer = () => (
         Greene Lab
       </a>
       ,{" "}
-      <a href="https://seandavi.github.io/" target="_blacnk">
+      <a href="https://seandavi.github.io/" target="_blank">
         Davis Lab
       </a>
       , and{" "}
@@ -22,7 +25,7 @@ const Footer = () => (
       , in affiliation with...
     </p>
 
-    <div className={classes.logos}>
+    <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
       <a
         href="https://medicine.uchicago.edu/sections/genetic-medicine/"
         target="_blank"

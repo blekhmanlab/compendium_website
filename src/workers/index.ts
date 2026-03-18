@@ -1,18 +1,24 @@
+import type { Remote } from "comlink";
 import { useEffect, useMemo, useState } from "react";
 import { proxy, wrap } from "comlink";
-import { sleep } from "@/util/async";
-import type * as worker from "./worker";
-import Worker from "./worker?worker";
 
-type API = typeof worker;
+/** minimum interface every worker must expose */
+type WorkerBase = {
+  setProgress: (func: (status: string) => Promise<void>) => void;
+  abort: (reason?: string) => void;
+};
 
-/** convenience function to call worker method and return results and status */
-export const useThread = <Result>(
-  /** method to run from worker */
-  method: (worker: API) => Result,
+/** convenience function to call worker and return results and status */
+export const useWorker = <_Worker extends WorkerBase, Result>(
+  /** worker constructor, imported with import X from "./worker.ts?worker" */
+  WorkerConstructor: new () => Worker,
+  /** callback receiving wrapped worker. return type determines data. */
+  callback: (worker: Remote<_Worker>) => Result,
 ) => {
-  /** create worker thread for this instance */
-  const worker = useMemo(() => wrap<API>(new Worker()), []);
+  const worker = useMemo(
+    () => wrap<_Worker>(new WorkerConstructor()),
+    [WorkerConstructor],
+  );
 
   /** state/progress */
   const [status, setStatus] = useState("");
@@ -52,8 +58,7 @@ export const useThread = <Result>(
     (async () => {
       try {
         /** execute specified method */
-        await sleep(200);
-        const result = await method(worker as unknown as API);
+        const result = await callback(worker);
         setData(result);
         setStatus("");
       } catch (error) {
@@ -65,11 +70,32 @@ export const useThread = <Result>(
       }
     })();
 
+    /** cleanup */
     return () => {
       abort.signal.removeEventListener("abort", onAbort);
       abort.abort("Stale");
     };
-  }, [worker, method]);
+  }, [worker, callback]);
 
   return [data, status] as const;
+};
+
+/** progress and abort utils */
+export const workerUtils = () => {
+  /** progress func type */
+  type Progress = (status: string, shouldCancel?: true) => Promise<void>;
+
+  /** currently set progress func */
+  let progress: Progress = () => Promise.resolve();
+
+  /** expose method to set progress func */
+  const setProgress = (func: Progress) => (progress = func);
+
+  /** is aborted */
+  let aborted = "";
+
+  /** abort func */
+  const abort = (reason = "aborted") => (aborted = reason);
+
+  return { progress, setProgress, aborted, abort };
 };

@@ -1,8 +1,6 @@
 import { useState } from "react";
 import Select from "@/components/Select";
 import { useData } from "@/pages/projectionist/Projectionist";
-import classes from "./PCs.module.css";
-import XYPlot from "./XYPlot";
 
 const pcs = ["PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8"] as const;
 
@@ -28,20 +26,18 @@ const PCs = () => {
     <section>
       <h2>Principal Components</h2>
 
-      <div className={classes.controls}>
+      <div className="flex gap-4">
         <Select label="X-axis" options={pcs} value={pcA} onChange={setPcA} />
         <Select label="Y-axis" options={pcs} value={pcB} onChange={setPcB} />
       </div>
 
-      <div className={classes.columns}>
-        <XYPlot
-          title="Compendium Data"
-          xLabel={pcA}
-          yLabel={pcB}
-          data={compendium}
-        />
-        <XYPlot title="Your Data" xLabel={pcA} yLabel={pcB} data={user} />
-      </div>
+      <div
+        className="
+          grid w-full grid-cols-2 place-items-start gap-4
+          *:min-h-0 *:min-w-0
+          max-md:grid-cols-1
+        "
+      ></div>
     </section>
   );
 };

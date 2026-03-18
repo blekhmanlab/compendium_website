@@ -2,36 +2,36 @@ import { DownloadIcon, PackageIcon, ScrollIcon } from "lucide-react";
 import Button from "@/components/Button.tsx";
 import Header from "@/components/Header";
 import Viz from "@/pages/home/sections/Viz";
-import classes from "./Title.module.css";
 
 const Title = () => (
   <Header big>
     <Viz />
-    <p className={classes.subtitle}>{import.meta.env.VITE_DESCRIPTION}</p>
+    <p className="max-w-140 text-xl/relaxed font-light">
+      {import.meta.env.VITE_DESCRIPTION}
+    </p>
 
-    <div className={classes.buttons}>
+    <div className="flex flex-wrap items-center justify-center gap-4">
       <Button
-        icon={<ScrollIcon />}
-        design="big"
+        design="accent"
         to={import.meta.env.VITE_PAPER}
         data-tooltip="Learn more about the methods and significance behind this project."
       >
+        <ScrollIcon />
         Paper
       </Button>
       <Button
-        icon={<PackageIcon />}
-        design="big"
+        design="accent"
         to={import.meta.env.VITE_R_PACKAGE}
         data-tooltip="Do advanced filtering and analyses with the data."
       >
-        R Package
+        <PackageIcon />R Package
       </Button>
       <Button
-        icon={<DownloadIcon />}
-        design="big"
+        design="accent"
         to={import.meta.env.VITE_DATA}
         data-tooltip="Download the dataset directly as CSV/TSV files."
       >
+        <DownloadIcon />
         CSV data
       </Button>
     </div>

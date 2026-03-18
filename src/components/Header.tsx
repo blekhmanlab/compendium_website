@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 import Logo from "@/assets/logo.svg?react";
-import classes from "./Header.module.css";
 
 type Props = {
   children: ReactNode;
@@ -10,11 +9,17 @@ type Props = {
 
 const Header = ({ children, big = false }: Props) => {
   return (
-    <header className={classes.header} data-big={big}>
-      <Link className={classes.title} to={!big ? "/" : ""}>
-        <Logo className={classes.logo}></Logo>
-        <div className={classes.divider}></div>
-        <h1 className={classes.h1}>{import.meta.env.VITE_TITLE}</h1>
+    <header className="relative isolate items-center py-24">
+      <Link
+        className="
+          grid max-w-full grid-cols-[auto_auto_min-content] place-items-center
+          gap-6
+        "
+        to={!big ? "/" : ""}
+      >
+        <Logo className="min-h-full"></Logo>
+        <div className="h-full w-0.5 bg-white"></div>
+        <h1 className="-my-2 text-left">{import.meta.env.VITE_TITLE}</h1>
       </Link>
 
       {children}

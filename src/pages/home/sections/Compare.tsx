@@ -9,7 +9,8 @@ const Compare = () => (
       Compare your data to ours with the <i>Projectionist</i> tool.
     </p>
 
-    <Button icon={<ConeIcon />} design="big" to="/projectionist">
+    <Button design="accent" to="/projectionist">
+      <ConeIcon />
       Projectionist
     </Button>
   </section>

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
+import clsx from "clsx";
 import LoadingIcon from "@/assets/loading.svg?react";
-import classes from "./Placeholder.module.css";
 
 type Props = {
   height?: number;
@@ -8,10 +8,15 @@ type Props = {
   children: ReactNode;
 };
 
-const Placeholder = ({ height = 300, className = "", children }: Props) => (
+const Placeholder = ({ className = "", children }: Props) => (
   <div
-    className={[classes.placeholder, className].join(" ")}
-    style={{ height: height + "px" }}
+    className={clsx(
+      `
+        flex w-full items-center justify-center gap-4 rounded-md bg-slate-500/10
+        p-2
+      `,
+      className,
+    )}
   >
     <LoadingIcon />
     {children}

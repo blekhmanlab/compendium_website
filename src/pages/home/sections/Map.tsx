@@ -1,15 +1,14 @@
+import type { Feature } from "geojson";
+import type { Data } from "@/pages/home/data";
 import { useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 import * as d3 from "d3";
-import type { Feature } from "geojson";
 import { clamp } from "lodash";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
-import type { Data } from "@/pages/home/data";
 import { setSelectedFeature, useData } from "@/pages/home/data";
 import { downloadSvg, getCssVariable } from "@/util/dom";
 import { formatNumber } from "@/util/string";
-import classes from "./Map.module.css";
 
 /** svg dimensions */
 const width = 770;
@@ -43,12 +42,12 @@ const Map = ({ id = "map" }) => {
   }, [id, byCountry, byRegion, by, selectedFeature]);
 
   if (!byCountry || !byRegion)
-    return <Placeholder height={400}>Loading map...</Placeholder>;
+    return <Placeholder className="h-100">Loading map...</Placeholder>;
 
   const gray = getCssVariable("--gray");
 
   return (
-    <div className="sub-section">
+    <div className="flex flex-col items-center gap-4">
       <Select
         label="Group by:"
         value={by}
@@ -59,7 +58,7 @@ const Map = ({ id = "map" }) => {
       <svg
         viewBox={[0, 0, width, height].join(" ")}
         id={id}
-        className={classes.svg}
+        className="w-full"
         onClick={(event) => {
           if (event.shiftKey) downloadSvg(event.currentTarget, "map");
         }}
@@ -76,12 +75,9 @@ const Map = ({ id = "map" }) => {
         </g>
       </svg>
 
-      <div className={classes.legend}>
-        <span>Fewer Samples</span>
-        <span
-          className={classes.gradient}
-          data-inactive={!!selectedFeature}
-        ></span>
+      <div className="flex w-full items-center justify-center gap-4 wrap-anywhere">
+        <span className="text-right">Fewer Samples</span>
+        <span className="h-2 w-24" data-inactive={!!selectedFeature}></span>
         <span>More Samples</span>
       </div>
     </div>

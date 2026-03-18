@@ -1,12 +1,12 @@
-import { resolve } from "path";
+import { fileURLToPath } from "url";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import svgr from "vite-plugin-svgr";
-import react from "@vitejs/plugin-react";
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  base: "/",
   plugins: [
+    tailwindcss(),
     react(),
     svgr({
       svgrOptions: {
@@ -20,8 +20,6 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: {
-      "@": resolve(__dirname, "src"),
-    },
+    alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
 });

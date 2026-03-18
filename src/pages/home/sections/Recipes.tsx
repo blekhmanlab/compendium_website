@@ -1,6 +1,5 @@
 import { LightbulbIcon, PackageIcon } from "lucide-react";
 import Button from "@/components/Button";
-import classes from "./Recipes.module.css";
 
 const recipes = [
   {
@@ -36,19 +35,20 @@ const Recipes = () => (
     <p>
       Some of the things you can do with{" "}
       <a href={import.meta.env.VITE_R_PACKAGE} target="_blank">
-        <PackageIcon className="inline-svg" />
+        <PackageIcon />
         the R package
       </a>
       :
     </p>
 
-    <div className={classes.buttons}>
+    <div className="flex flex-col flex-wrap gap-4">
       {recipes.map(({ link, name }, index) => (
         <Button
           key={index}
-          icon={<LightbulbIcon />}
           to={import.meta.env.VITE_R_PACKAGE + "articles/overview.html#" + link}
+          className="justify-start"
         >
+          <LightbulbIcon />
           {name}
         </Button>
       ))}

@@ -4,7 +4,6 @@ import { useData } from "@/pages/home/data";
 import Bar from "./Bar";
 import Histogram from "./Histogram";
 import Map from "./Map";
-import classes from "./Prevalence.module.css";
 import { tooltips } from "./Search";
 
 const chartOptions = ["Phyla", "Reads"] as const;
@@ -20,27 +19,30 @@ const Prevalence = () => {
   const [chart, setChart] = useState<Chart>(chartOptions[0]);
 
   return (
-    <section className={classes.section}>
+    <section>
       <h2>Prevalence</h2>
 
-      {!selectedFeature && (
+      {selectedFeature ? (
+        <p>
+          Selected:&nbsp;&nbsp;&nbsp;
+          {selectedFeature.country || selectedFeature.region}
+        </p>
+      ) : (
         <p>
           Select a <span data-tooltip={tooltips["country"]}>country</span> or{" "}
           <span data-tooltip={tooltips["region"]}>region</span> to filter by.
         </p>
       )}
 
-      {selectedFeature && (
-        <p>
-          Selected:&nbsp;&nbsp;&nbsp;
-          {selectedFeature.country || selectedFeature.region}
-        </p>
-      )}
-
-      <div className={classes.cols}>
+      <div
+        className="
+          grid w-full grid-cols-[2fr_1fr] gap-8
+          max-md:grid-cols-1
+        "
+      >
         <Map />
 
-        <div className="sub-section">
+        <div className="flex flex-col items-center gap-4">
           <Select
             label="Chart:"
             value={chart}

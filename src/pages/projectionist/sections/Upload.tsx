@@ -1,3 +1,5 @@
+import type { Remote } from "comlink";
+import type * as ProjectionistWorkerType from "@/workers/projectionist.ts";
 import { useCallback, useEffect, useState } from "react";
 import { size } from "lodash";
 import { LightbulbIcon } from "lucide-react";
@@ -7,8 +9,8 @@ import Textbox from "@/components/Textbox";
 import UploadButton from "@/components/UploadButton";
 import { useData } from "@/pages/projectionist/Projectionist";
 import { formatNumber } from "@/util/string";
-import { useThread } from "@/workers";
-import classes from "./Upload.module.css";
+import { useWorker } from "@/workers";
+import ProjectionistWorker from "@/workers/projectionist.ts?worker";
 import exampleData from "../data/example-data.tsv?raw";
 import exampleMeta from "../data/example-meta.tsv?raw";
 
@@ -18,18 +20,20 @@ const Upload = () => {
   const [userRawMeta, setUserRawMeta] = useState("");
 
   /** parse user input */
-  const [userData, userDataStatus] = useThread(
+  const [userData, userDataStatus] = useWorker(
+    ProjectionistWorker,
     useCallback(
-      (worker) => {
+      (worker: Remote<typeof ProjectionistWorkerType>) => {
         if (!userRawData) return;
         return worker.parseUserData(userRawData);
       },
       [userRawData],
     ),
   );
-  const [userMeta, userMetaStatus] = useThread(
+  const [userMeta, userMetaStatus] = useWorker(
+    ProjectionistWorker,
     useCallback(
-      (worker) => {
+      (worker: Remote<typeof ProjectionistWorkerType>) => {
         if (!userRawMeta) return;
         return worker.parseUserMeta(userRawMeta);
       },
@@ -49,7 +53,13 @@ const Upload = () => {
     <section>
       <h2>Upload</h2>
 
-      <div className={classes.upload}>
+      <div
+        className="
+          grid w-full grid-cols-2 place-items-start gap-4
+          *:min-h-0 *:min-w-0
+          max-md:grid-cols-1
+        "
+      >
         <strong>Taxa Data</strong>
         <strong>Sample Meta</strong>
 
@@ -96,7 +106,7 @@ const Upload = () => {
         </UploadButton>
 
         {userDataStatus ? (
-          <div className={classes.status}>
+          <div className="flex items-center gap-4">
             <LoadingIcon />
             {userDataStatus}
           </div>
@@ -109,7 +119,7 @@ const Upload = () => {
         )}
 
         {userMetaStatus ? (
-          <div className={classes.status}>
+          <div className="flex items-center gap-4">
             <LoadingIcon />
             {userMetaStatus}
           </div>
@@ -118,13 +128,13 @@ const Upload = () => {
         )}
 
         <Button
-          icon={<LightbulbIcon />}
           onClick={() => {
             setUserRawData(exampleData);
             setUserRawMeta(exampleMeta);
           }}
-          className={classes.example}
+          className="col-span-full justify-self-center"
         >
+          <LightbulbIcon />
           Example
         </Button>
       </div>

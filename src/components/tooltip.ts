@@ -1,5 +1,7 @@
-import tippy, { followCursor } from "tippy.js";
 import type { Instance, Props } from "tippy.js";
+import tippy, { followCursor } from "tippy.js";
+import "tippy.js/dist/tippy.css";
+import "tippy.js/dist/border.css";
 
 /** tippy options */
 const options: Partial<Props> = {

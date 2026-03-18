@@ -1,8 +1,8 @@
+import type { ByReads, Data } from "@/pages/home/data";
 import { useEffect } from "react";
 import { renderToString } from "react-dom/server";
 import * as d3 from "d3";
 import Placeholder from "@/components/Placeholder";
-import type { ByReads, Data } from "@/pages/home/data";
 import { useData } from "@/pages/home/data";
 import { downloadSvg, getCssVariable } from "@/util/dom";
 import { formatNumber } from "@/util/string";

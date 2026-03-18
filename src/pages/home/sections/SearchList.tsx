@@ -1,16 +1,19 @@
+import type { Remote } from "comlink";
+import type { Col } from "@/components/Table";
+import type { Data } from "@/pages/home/data";
+import type { KeysOfType } from "@/util/types";
+import type * as SearchWorkerType from "@/workers/search.ts";
 import { useCallback, useMemo, useState } from "react";
-import { capitalize } from "lodash";
 import { useDebounce } from "@reactuses/core";
+import { capitalize } from "lodash";
 import LoadingIcon from "@/assets/loading.svg?react";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
-import Table, { type Col } from "@/components/Table";
+import Table from "@/components/Table";
 import Textbox from "@/components/Textbox";
-import type { Data } from "@/pages/home/data";
 import { formatNumber } from "@/util/string";
-import type { KeysOfType } from "@/util/types";
-import { useThread } from "@/workers";
-import classes from "./SearchList.module.css";
+import { useWorker } from "@/workers";
+import SearchWorker from "@/workers/search?worker";
 
 /** type options, including all */
 type TypesAll = ("All" | NonNullable<Props["types"]>[number])[];
@@ -50,22 +53,32 @@ const Search = ({ list: fullList, cols, types, names, onSelect }: Props) => {
   }, [fullList, types, type, names]);
 
   /** exact search */
-  const [exactMatches = [], exactStatus] = useThread(
+  const [exactMatches = [], exactStatus] = useWorker(
+    SearchWorker,
     useCallback(
-      (worker) => {
+      (worker: Remote<typeof SearchWorkerType>) => {
         if (!(list && search.trim())) return;
-        return worker.exactSearch(list, ["name", "value"], search);
+        return worker.exactSearch(
+          list,
+          ["name", "value"],
+          search,
+        ) as Promise<List>;
       },
       [list, search],
     ),
   );
 
   /** fuzzy search */
-  const [fuzzyMatches = [], fuzzyStatus] = useThread(
+  const [fuzzyMatches = [], fuzzyStatus] = useWorker(
+    SearchWorker,
     useCallback(
-      (worker) => {
+      (worker: Remote<typeof SearchWorkerType>) => {
         if (!(list && search.trim())) return;
-        return worker.fuzzySearch(list, ["name", "value"], search);
+        return worker.fuzzySearch(
+          list,
+          ["name", "value"],
+          search,
+        ) as Promise<List>;
       },
       [list, search],
     ),
@@ -77,7 +90,8 @@ const Search = ({ list: fullList, cols, types, names, onSelect }: Props) => {
     [exactMatches],
   );
 
-  if (!list) return <Placeholder height={400}>Loading search...</Placeholder>;
+  if (!list)
+    return <Placeholder className="h-100">Loading search...</Placeholder>;
 
   /** full list of matches */
   const matches = search.trim()
@@ -93,8 +107,18 @@ const Search = ({ list: fullList, cols, types, names, onSelect }: Props) => {
 
   return (
     <>
-      <div className={classes.search}>
-        <div className={classes.box}>
+      <div
+        className="
+          flex w-full min-w-0 flex-wrap items-center justify-center gap-4
+        "
+      >
+        <div
+          className="
+            relative flex max-w-full grow items-center justify-center
+            [&>svg:first-child]:absolute
+            [&>svg:first-child]:right-[calc(100%+1.25rem)]
+          "
+        >
           <LoadingIcon
             style={{
               opacity:
@@ -113,7 +137,7 @@ const Search = ({ list: fullList, cols, types, names, onSelect }: Props) => {
           />
         )}
 
-        <div style={{ width: 100 }}>{formatNumber(matches.length)} items </div>
+        <div>{formatNumber(matches.length)} items </div>
       </div>
 
       <Table

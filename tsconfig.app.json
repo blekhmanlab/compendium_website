@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "types": ["node"],
+    "types": ["vite/client", "vite-plugin-svgr/client"],
     "skipLibCheck": true,
+    "isolatedModules": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -12,6 +13,7 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "jsx": "react-jsx",
 
     /* Linting */
     "strict": true,
@@ -24,5 +26,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["vite.config.ts", "playwright.config.ts", "tests"]
+  "include": ["src", "fixtures"]
 }

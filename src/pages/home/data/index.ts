@@ -1,7 +1,7 @@
 import type { FeatureCollection, Geometry } from "geojson";
+import type { Zenodo } from "../../../../compile/zenodo-api";
 import { orderBy } from "lodash";
 import { create } from "zustand";
-import type { Zenodo } from "../../../../compile/zenodo-api";
 
 /** metadata about overall project */
 export type Metadata = typeof import("../../../../public/metadata.json");

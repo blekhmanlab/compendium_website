@@ -1,3 +1,5 @@
+import type { Remote } from "comlink";
+import type * as ProjectionistWorkerType from "@/workers/projectionist.ts";
 import { useCallback, useEffect } from "react";
 import { ConeIcon } from "lucide-react";
 import { create } from "zustand";
@@ -6,16 +8,18 @@ import Header from "@/components/Header";
 import Meta from "@/components/Meta";
 import PCs from "@/pages/projectionist/sections/PCs";
 import Upload from "@/pages/projectionist/sections/Upload";
-import { useThread } from "@/workers";
-import type {
-  parseCompendiumData,
-  parseUserData,
-  parseUserMeta,
-} from "@/workers/worker";
+import { useWorker } from "@/workers";
+import ProjectionistWorker from "@/workers/projectionist.ts?worker";
 
-export type UserData = ReturnType<typeof parseUserData>;
-export type UserMeta = ReturnType<typeof parseUserMeta>;
-export type CompendiumData = ReturnType<typeof parseCompendiumData>;
+export type UserData = Awaited<
+  ReturnType<typeof ProjectionistWorkerType.parseUserData>
+>;
+export type UserMeta = Awaited<
+  ReturnType<typeof ProjectionistWorkerType.parseUserMeta>
+>;
+export type CompendiumData = Awaited<
+  ReturnType<typeof ProjectionistWorkerType.parseCompendiumData>
+>;
 
 export const useData = create<{
   compendium: CompendiumData;
@@ -37,8 +41,13 @@ export const useData = create<{
 
 const Projectionist = () => {
   /** parse compendium data */
-  const [compendiumData] = useThread(
-    useCallback((worker) => worker.parseCompendiumData(), []),
+  const [compendiumData] = useWorker(
+    ProjectionistWorker,
+    useCallback(
+      (worker: Remote<typeof ProjectionistWorkerType>) =>
+        worker.parseCompendiumData(),
+      [],
+    ),
   );
 
   /** update global state with parsed data */

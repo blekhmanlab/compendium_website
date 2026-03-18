@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Mona Sans", sans-serif;
+}
+
+@font-face {
+  font-weight: 200 900;
+  src: url("@/assets/MonaSans.woff2") format("woff2");
+  font-stretch: 75% 125%;
+  font-family: "Mona Sans";
+  font-display: swap;
+}
+
+@layer base {
+  html {
+    @apply bg-slate-900 font-sans text-[110%] leading-normal font-light text-white underline-offset-2;
+  }
+
+  body {
+    @apply flex min-h-dvh flex-col;
+  }
+
+  #root {
+    display: contents;
+  }
+
+  header,
+  footer,
+  section {
+    @apply width-md flex flex-col items-center gap-12 px-[max(var(--pad),(100%---spacing(1)*var(--width))/2)] py-(--pad) [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
+  }
+
+  section {
+    @apply odd:bg-slate-500/10 even:bg-slate-500/15;
+  }
+
+  hr {
+    @apply h-px w-full border-0 bg-slate-500;
+  }
+
+  h1,
+  h2 {
+    @apply flex w-full scroll-mt-8 items-center gap-[0.75em] leading-normal;
+  }
+
+  h1 {
+    @apply justify-center text-center text-4xl leading-tight font-semibold;
+  }
+
+  h2 {
+    @apply justify-center text-center text-2xl font-medium tracking-wider;
+  }
+
+  b,
+  strong {
+    @apply font-semibold;
+  }
+
+  p {
+    @apply text-center leading-loose text-balance;
+  }
+
+  p a {
+    @apply text-indigo-300 underline transition hover:text-fuchsia-300;
+  }
+
+  table {
+    @apply w-full border-collapse text-left;
+  }
+
+  th {
+    @apply bg-slate-500/25;
+  }
+
+  th,
+  td {
+    @apply px-4 py-1 align-middle!;
+  }
+
+  tr {
+    @apply even:bg-slate-500/10;
+  }
+
+  .icon,
+  .lucide {
+    @apply inline-block h-[1em];
+  }
+}
+
+@utility width-sm {
+  --width: 100;
+}
+
+@utility width-md {
+  --width: 200;
+}
+
+@utility width-lg {
+  --width: 300;
+}
+
+.tippy-box {
+  @apply rounded border border-white bg-slate-800 px-2 py-1;
+}
+
+.tippy-content {
+  @apply text-[1rem] leading-relaxed;
+}
+
+.tippy-arrow {
+  @apply text-slate-800!;
+}

@@ -1,12 +1,6 @@
-import {
-  startTransition,
-  useEffect,
-  useState,
-  type CSSProperties,
-} from "react";
+import { startTransition, useEffect, useState } from "react";
 import Tabs from "@/components/Tabs";
 import { loadTagData, useData } from "@/pages/home/data";
-import classes from "./Search.module.css";
 import SearchList from "./SearchList";
 
 export const tooltips = {
@@ -41,9 +35,7 @@ const Search = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   return (
-    <section
-      style={{ "--col": tab === 3 ? "1200px" : undefined } as CSSProperties}
-    >
+    <section>
       <h2>Search</h2>
 
       <Tabs
@@ -106,8 +98,15 @@ const Search = () => {
           {
             name: "Tags",
             content: (
-              <div className={classes.cols}>
-                <div className="sub-section">
+              <div
+                className="
+                  grid w-full
+                  grid-cols-[repeat(auto-fit,minmax(min(400px,100%),1fr))]
+                  gap-x-14 gap-y-10
+                  *:flex *:flex-col *:items-center *:gap-8
+                "
+              >
+                <div>
                   <p>
                     Search for a <span data-tooltip={tooltips["tag"]}>tag</span>{" "}
                     to see how many projects or samples have it. Select rows to
@@ -121,7 +120,7 @@ const Search = () => {
                     }
                   />
                 </div>
-                <div className="sub-section">
+                <div>
                   <p>
                     Search for a name or value to see which projects and how
                     many samples have it.

@@ -1,9 +1,9 @@
+import type { ByTaxLevel, Data } from "@/pages/home/data";
 import { useEffect } from "react";
 import { renderToString } from "react-dom/server";
 import * as d3 from "d3";
 import { orderBy } from "lodash";
 import Placeholder from "@/components/Placeholder";
-import type { ByTaxLevel, Data } from "@/pages/home/data";
 import { useData } from "@/pages/home/data";
 import { getColor } from "@/util/colors";
 import { downloadSvg } from "@/util/dom";
@@ -49,7 +49,9 @@ const Chart = ({ id = "chart", title, data, datumKey }: Props) => {
   }, [id, filtered, datumKey, sampleKey]);
 
   if (!filtered)
-    return <Placeholder height={400}>Loading "{title}" chart...</Placeholder>;
+    return (
+      <Placeholder className="h-100">Loading "{title}" chart...</Placeholder>
+    );
 
   /** if no samples for first bar, then no samples for any because list sorted */
   const blank = !filtered[0]?.samples[sampleKey];

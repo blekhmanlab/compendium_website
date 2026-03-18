@@ -6,9 +6,6 @@
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
-import * as d3 from "d3";
-import dissolve from "geojson-dissolve";
-import _ from "lodash";
 import type {
   ByGeo,
   ByProject,
@@ -17,6 +14,10 @@ import type {
   Metadata,
   WorldMap,
 } from "./types";
+import type { _Record, Zenodo } from "./zenodo-api";
+import * as d3 from "d3";
+import dissolve from "geojson-dissolve";
+import _ from "lodash";
 import {
   dirSize,
   download,
@@ -27,7 +28,6 @@ import {
   throttle,
   write,
 } from "./util";
-import type { _Record, Zenodo } from "./zenodo-api";
 
 /**
  * pre-compile step that takes the "raw" distributed data (csv/tsv), and process

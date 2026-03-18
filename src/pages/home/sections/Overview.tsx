@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import {
   BarChartHorizontalIcon,
   DatabaseIcon,
@@ -10,7 +11,6 @@ import {
 import Placeholder from "@/components/Placeholder";
 import { useData } from "@/pages/home/data";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
-import classes from "./Overview.module.css";
 
 const Overview = () => {
   /** get global state */
@@ -22,6 +22,7 @@ const Overview = () => {
   const tiles = [
     {
       icon: <MicroscopeIcon />,
+      className: "text-fuchsia-500",
       text: (
         <>
           {formatNumber(metadata?.samples, false)} samples
@@ -32,6 +33,7 @@ const Overview = () => {
     },
     {
       icon: <BarChartHorizontalIcon />,
+      className: "text-fuchsia-500",
       text: (
         <>
           {formatNumber(metadata?.classes)} classes
@@ -42,6 +44,7 @@ const Overview = () => {
     },
     {
       icon: <EarthIcon />,
+      className: "text-fuchsia-500",
       text: (
         <>
           {formatNumber(metadata?.countries)} countries
@@ -52,6 +55,7 @@ const Overview = () => {
     },
     {
       icon: <DatabaseIcon />,
+      className: "text-indigo-500",
       text: (
         <>
           Ver. {metadata?.version}
@@ -63,6 +67,7 @@ const Overview = () => {
 
     {
       icon: <EyeIcon />,
+      className: "text-indigo-500",
       text: (
         <>
           {formatNumber(metadata?.downloads)} downloads
@@ -73,6 +78,7 @@ const Overview = () => {
     },
     {
       icon: <TableIcon />,
+      className: "text-indigo-500",
       text: (
         <>
           {formatBytes(metadata?.size)} download
@@ -95,22 +101,36 @@ const Overview = () => {
       </p>
 
       {metadata ? (
-        <div className={classes.tiles}>
-          {tiles.map(({ icon, text }, index) => {
-            /** icon color */
-            const percent = (index / (tiles.length - 1)) * 100;
-            const color = `color-mix(in hsl, var(--primary-light), ${percent}% var(--secondary-light))`;
-
-            return (
-              <div key={index} className={classes.tile}>
-                <span style={{ color }}>{icon}</span>
-                <span>{text}</span>
-              </div>
-            );
-          })}
+        <div
+          className="
+            grid grid-cols-3 gap-10
+            max-md:grid-cols-2
+            max-sm:grid-cols-1
+          "
+        >
+          {tiles.map(({ className, icon, text }, index) => (
+            <div
+              key={index}
+              className="flex flex-col items-center gap-4 text-center"
+            >
+              <span
+                className={clsx(
+                  `
+                    grid size-16 place-items-center rounded-full bg-current/25
+                    *:size-8 *:text-white
+                    **:stroke-1
+                  `,
+                  className,
+                )}
+              >
+                {icon}
+              </span>
+              <span>{text}</span>
+            </div>
+          ))}
         </div>
       ) : (
-        <Placeholder height={300}>Loading metadata...</Placeholder>
+        <Placeholder className="h-100">Loading metadata...</Placeholder>
       )}
 
       <hr />
@@ -119,7 +139,7 @@ const Overview = () => {
         This website lets you <b>search</b> and <b>explore</b> the data at a
         high level before downloading.{" "}
         <a href={import.meta.env.VITE_R_PACKAGE} target="_blank">
-          <PackageIcon className="inline-svg" />
+          <PackageIcon />
           Use the R package
         </a>{" "}
         to do all kinds of filtering and analyses with the data!

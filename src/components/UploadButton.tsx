@@ -3,7 +3,6 @@ import { useRef, useState } from "react";
 import clsx from "clsx";
 import { UploadIcon } from "lucide-react";
 import Button from "@/components/Button";
-import classes from "./UploadButton.module.css";
 
 type Props = {
   /**
@@ -20,6 +19,7 @@ const UploadButton = ({
   onUpload,
   accept = [],
   className,
+  children,
   ...props
 }: Props) => {
   const ref = useRef<HTMLInputElement>(null);
@@ -61,10 +61,12 @@ const UploadButton = ({
   };
 
   return (
-    <div className={classes.container}>
+    <div className="flex items-center justify-center gap-4">
       <Button
-        className={clsx(drag && classes.drag, className)}
-        icon={<UploadIcon />}
+        className={clsx(
+          drag && "outline-2 outline-(--primary) outline-dashed",
+          className,
+        )}
         onClick={onClick}
         onDragEnter={() => setDrag(true)}
         onDragLeave={() => setDrag(false)}
@@ -75,7 +77,10 @@ const UploadButton = ({
           onDrop(event);
         }}
         {...props}
-      />
+      >
+        <UploadIcon />
+        {children}
+      </Button>
 
       {name}
 

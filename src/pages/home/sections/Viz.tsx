@@ -1,18 +1,18 @@
+import type { Point } from "@/util/math";
 import { useEffect } from "react";
 import { gsap } from "gsap";
+import { random } from "lodash";
 import PoissonDiskSampling from "poisson-disk-sampling";
 import { waitFor } from "@/util/async";
-import { getCssVariable, getMatrix } from "@/util/dom";
-import type { Point } from "@/util/math";
+import { getMatrix } from "@/util/dom";
 import { cos, dist, normalize, scale, sin } from "@/util/math";
-import classes from "./Viz.module.css";
 
 const Viz = () => {
   useEffect(() => {
     generate();
   }, []);
 
-  return <canvas className={classes.canvas}></canvas>;
+  return <canvas className="absolute inset-0 -z-10 size-full"></canvas>;
 };
 
 /** "oversampling" of canvas */
@@ -36,9 +36,9 @@ const generate = async () => {
     transform: getMatrix(svg, path),
   }));
 
-  const primary = getCssVariable("--primary");
-  const secondary = getCssVariable("--secondary");
-  const gray = getCssVariable("--gray");
+  const primary = "#e23fff";
+  const secondary = "#556eff";
+  const gray = "#596579";
 
   /** size and center canvas */
   const resize = () => {
@@ -108,8 +108,7 @@ const generate = async () => {
     }));
 
   /** hard limit number of points */
-  while (points.length > 500)
-    points.splice(Math.floor(Math.random() * points.length), 1);
+  while (points.length > 500) points.splice(random(points.length), 1);
 
   type Particle = {
     position: Point;
@@ -130,7 +129,7 @@ const generate = async () => {
     size: particleSize,
     color: gray,
     alpha: 0,
-    spin: Math.random() * 360,
+    spin: random(360),
     radius: 0,
     animations: [],
   }));
@@ -138,7 +137,7 @@ const generate = async () => {
   /** animate each particle */
   for (const particle of particles) {
     const duration = 2;
-    const delay = Math.random() * duration;
+    const delay = random(duration, true);
     const ease = "power4.out";
     particle.animations = [
       gsap.timeline().to(particle.position, {
@@ -175,7 +174,8 @@ const generate = async () => {
 
     /** draw particles */
     for (const { position, size, color, alpha, spin, radius } of particles) {
-      ctx.globalAlpha = alpha;
+      const glow = 1 - 1 / (1 + 0.1 * radius);
+      ctx.globalAlpha = 0.5 * alpha + 0.5 * glow;
       ctx.fillStyle = color;
       ctx.beginPath();
       ctx.arc(
@@ -202,8 +202,9 @@ const generate = async () => {
     const mouse = point.matrixTransform(ctx.getTransform().inverse());
     /** bulge particles */
     for (const particle of particles) {
-      const bulge = 20 * particleSize * 1.01 ** -dist(particle.position, mouse);
-      gsap.to(particle, { radius: bulge });
+      const radius =
+        20 * particleSize * 1.01 ** -dist(particle.position, mouse);
+      gsap.to(particle, { radius });
     }
   });
 
