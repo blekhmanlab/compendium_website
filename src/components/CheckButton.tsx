@@ -1,5 +1,4 @@
 import { CheckIcon } from "lucide-react";
-import Button from "@/components/Button";
 
 type Props = {
   label: string;
@@ -9,7 +8,7 @@ type Props = {
 
 const CheckButton = ({ label, checked, onChange }: Props) => {
   return (
-    <Button
+    <button
       className="
         size-6 cursor-pointer rounded-md bg-slate-500/25
         hover:bg-slate-500/50
@@ -20,7 +19,7 @@ const CheckButton = ({ label, checked, onChange }: Props) => {
       onClick={() => onChange(!checked)}
     >
       <CheckIcon className={checked ? "opacity-100" : "opacity-0"} />
-    </Button>
+    </button>
   );
 };
 
