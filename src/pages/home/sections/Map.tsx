@@ -8,6 +8,7 @@ import { clamp } from "lodash";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import { setSelectedFeature, useData } from "@/pages/home/data";
+import { frame } from "@/util/async";
 import { getCssVariable } from "@/util/dom";
 import { formatNumber } from "@/util/string";
 
@@ -90,8 +91,8 @@ const Map = () => {
   /** path calculator for projection */
   const path = d3.geoPath().projection(projection);
 
-  /** re-draw paths */
-  /** declaratively w/ jsx does full component re-render, which is too slow */
+  /** re-draw paths (imperatively) */
+  /** (declaratively w/ jsx does full component re-render, too slow) */
   const redraw = () => {
     outlineRef.current?.setAttribute("d", path({ type: "Sphere" }) ?? "");
     graticulesRef.current?.setAttribute("d", path(graticules) ?? "");
@@ -107,7 +108,7 @@ const Map = () => {
   const oldTransform = useRef<d3.ZoomTransform>(null);
 
   /** update map view pan and zoom */
-  const onZoom = (fullEvent: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+  const onZoom = async (fullEvent: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
     const { sourceEvent: event, transform } = fullEvent || {};
 
     /** get current projection components */
@@ -171,6 +172,8 @@ const Map = () => {
     projection.rotate([lambda, phi]);
     projection.center([x, y]);
 
+    /** make dragging smoother */
+    await frame();
     redraw();
   };
 
