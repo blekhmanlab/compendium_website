@@ -1,9 +1,20 @@
 import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
+import type { D3ZoomEvent, GeoProjection, ZoomTransform } from "d3";
 import type { ByGeo } from "@/pages/home/data";
 import { useMemo, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 import { useEventListener } from "@reactuses/core";
-import * as d3 from "d3";
+import {
+  extent,
+  geoGraticule,
+  geoNaturalEarth1,
+  geoPath,
+  interpolateLab,
+  scaleLog,
+  select,
+  zoom,
+  zoomIdentity,
+} from "d3";
 import { clamp } from "lodash";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
@@ -51,7 +62,7 @@ const Map = () => {
   type Datum = ByGeo["features"][number];
 
   /** get range of sample counts */
-  const [, max = 1000] = d3.extent(
+  const [, max = 1000] = extent(
     data?.features ?? [],
     (d) => d.properties.samples,
   );
@@ -63,15 +74,14 @@ const Map = () => {
       : selectedFeature?.country === d.properties.country;
 
   /** color scale */
-  const scale = d3
-    .scaleLog<string>()
+  const scale = scaleLog<string>()
     .domain([1, max])
     .range(selectedFeature ? [darkGray, gray] : [gray, primary])
-    .interpolate(d3.interpolateLab);
+    .interpolate(interpolateLab);
 
   const { projection, baseScale } = useMemo(() => {
     /** create projection */
-    const projection = d3.geoNaturalEarth1();
+    const projection = geoNaturalEarth1();
 
     fitProjection(projection);
 
@@ -89,7 +99,7 @@ const Map = () => {
   };
 
   /** path calculator for projection */
-  const path = d3.geoPath().projection(projection);
+  const path = geoPath().projection(projection);
 
   /** re-draw paths (imperatively) */
   /** (declaratively w/ jsx does full component re-render, too slow) */
@@ -105,10 +115,10 @@ const Map = () => {
   };
 
   /** keep track of old transform to calculate deltas */
-  const oldTransform = useRef<d3.ZoomTransform>(null);
+  const oldTransform = useRef<ZoomTransform>(null);
 
   /** update map view pan and zoom */
-  const onZoom = async (fullEvent: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+  const onZoom = async (fullEvent: D3ZoomEvent<SVGSVGElement, unknown>) => {
     const { sourceEvent: event, transform } = fullEvent || {};
 
     /** get current projection components */
@@ -178,8 +188,7 @@ const Map = () => {
   };
 
   /** zoom handler */
-  const zoom = d3
-    .zoom<SVGSVGElement, unknown>()
+  const zoomBehavior = zoom<SVGSVGElement, unknown>()
     // eslint-disable-next-line
     .on("zoom", onZoom)
     .scaleExtent([baseScale, baseScale * 10]);
@@ -202,11 +211,11 @@ const Map = () => {
           if (!element) return;
 
           /** get d3 selection */
-          const selection = d3.select(element);
+          const selection = select(element);
           if (!selection) return;
 
           /** attach zoom behavior */
-          zoom(selection);
+          zoomBehavior(selection);
 
           redraw();
 
@@ -215,7 +224,7 @@ const Map = () => {
             .on("wheel", (event) => event.preventDefault())
             /** reset zoom */
             .on("dblclick.zoom", () => {
-              zoom.transform(selection, d3.zoomIdentity.scale(baseScale));
+              zoomBehavior.transform(selection, zoomIdentity.scale(baseScale));
               resetProjection();
               redraw();
             });
@@ -272,7 +281,12 @@ const Map = () => {
 
       <div className="flex w-full items-center justify-center gap-4 wrap-anywhere">
         <span className="text-right">Fewer Samples</span>
-        <span className="h-2 w-24"></span>
+        <span
+          className="h-3 w-24"
+          style={{
+            background: `linear-gradient(to right, ${scale(1)}, ${scale(max)})`,
+          }}
+        ></span>
         <span>More Samples</span>
       </div>
     </div>
@@ -282,7 +296,7 @@ const Map = () => {
 export default Map;
 
 /** fit projection to bbox of earth */
-const fitProjection = (projection: d3.GeoProjection) =>
+const fitProjection = (projection: GeoProjection) =>
   projection.fitSize([width, height], {
     type: "Feature",
     properties: {},
@@ -300,12 +314,12 @@ const fitProjection = (projection: d3.GeoProjection) =>
   });
 
 /** long/lat lines */
-const graticules = d3.geoGraticule().step([20, 20])() ?? "";
+const graticules = geoGraticule().step([20, 20])() ?? "";
 
 /** get pointer position in projection coordinates */
 const getPointer = (
   svg: SVGSVGElement | null,
-  projection: d3.GeoProjection,
+  projection: GeoProjection,
   event: PointerEvent | WheelEvent | TouchEvent,
 ) => {
   /** point in screen coords */
