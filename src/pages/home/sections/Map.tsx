@@ -92,12 +92,9 @@ const Map = () => {
 
   /** re-draw paths */
   /** declaratively w/ jsx does full component re-render, which is too slow */
-  const update = () => {
-    /** update outline */
+  const redraw = () => {
     outlineRef.current?.setAttribute("d", path({ type: "Sphere" }) ?? "");
-    /** update graticules */
     graticulesRef.current?.setAttribute("d", path(graticules) ?? "");
-    /** update features */
     featuresRef.current?.forEach((element, index) => {
       if (!element) return;
       const feature = data?.features[index];
@@ -174,7 +171,7 @@ const Map = () => {
     projection.rotate([lambda, phi]);
     projection.center([x, y]);
 
-    update();
+    redraw();
   };
 
   /** zoom handler */
@@ -208,7 +205,7 @@ const Map = () => {
           /** attach zoom behavior */
           zoom(selection);
 
-          update();
+          redraw();
 
           selection
             /** always prevent scroll on wheel, not just when at scale limit */
@@ -217,7 +214,7 @@ const Map = () => {
             .on("dblclick.zoom", () => {
               zoom.transform(selection, d3.zoomIdentity.scale(baseScale));
               resetProjection();
-              update();
+              redraw();
             });
         }}
         viewBox={[0, 0, width, height].join(" ")}
