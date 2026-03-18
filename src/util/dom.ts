@@ -1,3 +1,4 @@
+import { formatHex } from "culori";
 import { sleep } from "@/util/async";
 
 /**
@@ -10,8 +11,11 @@ export const getMatrix = (to: SVGGraphicsElement, from: SVGGraphicsElement) =>
     .multiply(from.getScreenCTM() || new SVGMatrix());
 
 /** get css variable */
-export const getCssVariable = (name: string) =>
-  getComputedStyle(document.body).getPropertyValue(name);
+export const getCssVariable = (name: string) => {
+  let value = getComputedStyle(document.body).getPropertyValue(name);
+  if (value.includes("oklch")) value = formatHex(value) ?? value;
+  return value;
+};
 
 /** download element as svg */
 export const downloadSvg = (

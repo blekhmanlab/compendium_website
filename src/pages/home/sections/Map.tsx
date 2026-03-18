@@ -1,13 +1,14 @@
-import type { Feature } from "geojson";
-import type { Data } from "@/pages/home/data";
-import { useEffect, useRef, useState } from "react";
+import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
+import type { ByGeo } from "@/pages/home/data";
+import { useMemo, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
+import { useEventListener } from "@reactuses/core";
 import * as d3 from "d3";
 import { clamp } from "lodash";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import { setSelectedFeature, useData } from "@/pages/home/data";
-import { downloadSvg, getCssVariable } from "@/util/dom";
+import { getCssVariable } from "@/util/dom";
 import { formatNumber } from "@/util/string";
 
 /** svg dimensions */
@@ -17,7 +18,12 @@ const height = 400;
 const byOptions = ["Country", "Region"] as const;
 type By = (typeof byOptions)[number];
 
-const Map = ({ id = "map" }) => {
+const Map = () => {
+  const ref = useRef<SVGSVGElement>(null);
+  const outlineRef = useRef<SVGPathElement>(null);
+  const graticulesRef = useRef<SVGPathElement>(null);
+  const featuresRef = useRef<(SVGPathElement | null)[]>([]);
+
   /** get global state */
   const byCountry = useData((state) => state.byCountry);
   const byRegion = useData((state) => state.byRegion);
@@ -25,78 +31,54 @@ const Map = ({ id = "map" }) => {
 
   /** local state */
   const [by, setBy] = useState<By>(byOptions[0]);
-  const mapInstance = useRef<ReturnType<typeof map> | null>(null);
 
-  /** create unique instance of d3 map */
-  useEffect(() => {
-    mapInstance.current = map();
-  }, []);
+  /** colors */
+  const primary = getCssVariable("--color-fuchsia-500");
+  const secondary = getCssVariable("--color-indigo-500");
+  const gray = getCssVariable("--color-slate-500");
+  const darkGray = getCssVariable("--color-slate-700");
 
-  /** update d3 map instance when props change */
-  useEffect(() => {
-    mapInstance.current?.(
-      id,
-      by === "Country" ? byCountry : byRegion,
-      selectedFeature,
-    );
-  }, [id, byCountry, byRegion, by, selectedFeature]);
-
-  if (!byCountry || !byRegion)
-    return <Placeholder className="h-100">Loading map...</Placeholder>;
-
-  const gray = getCssVariable("--gray");
-
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <Select
-        label="Group by:"
-        value={by}
-        onChange={setBy}
-        options={byOptions}
-      />
-
-      <svg
-        viewBox={[0, 0, width, height].join(" ")}
-        id={id}
-        className="w-full"
-        onClick={(event) => {
-          if (event.shiftKey) downloadSvg(event.currentTarget, "map");
-        }}
-      >
-        <g className="map-container">
-          <path
-            className="outline"
-            fill="none"
-            stroke={gray}
-            strokeWidth={0.5}
-          />
-          <g className="graticules" />
-          <g className="features" />
-        </g>
-      </svg>
-
-      <div className="flex w-full items-center justify-center gap-4 wrap-anywhere">
-        <span className="text-right">Fewer Samples</span>
-        <span className="h-2 w-24" data-inactive={!!selectedFeature}></span>
-        <span>More Samples</span>
-      </div>
-    </div>
+  /** unset selected feature when clicking off map */
+  useEventListener(
+    "click",
+    () => document.activeElement === document.body && setSelectedFeature(),
   );
-};
 
-export default Map;
+  /** data to show */
+  const data = by === "Country" ? byCountry : byRegion;
 
-/** d3 code */
-const map = () => {
-  /** things that require one time setup per map instance */
+  type Datum = ByGeo["features"][number];
 
-  /** create projection */
-  const projection = d3.geoNaturalEarth1();
+  /** get range of sample counts */
+  const [, max = 1000] = d3.extent(
+    data?.features ?? [],
+    (d) => d.properties.samples,
+  );
 
-  fitProjection(projection);
+  /** check if feature/datum is selected */
+  const isSelected = (d: Datum) =>
+    selectedFeature?.country === ""
+      ? selectedFeature?.region === d.properties.region
+      : selectedFeature?.country === d.properties.country;
 
-  /** get scale when projection fit to earth bbox */
-  const baseScale = projection.scale();
+  /** color scale */
+  const scale = d3
+    .scaleLog<string>()
+    .domain([1, max])
+    .range(selectedFeature ? [darkGray, gray] : [gray, primary])
+    .interpolate(d3.interpolateLab);
+
+  const { projection, baseScale } = useMemo(() => {
+    /** create projection */
+    const projection = d3.geoNaturalEarth1();
+
+    fitProjection(projection);
+
+    /** get scale when projection fit to earth bbox */
+    const baseScale = projection.scale();
+
+    return { projection, baseScale };
+  }, []);
 
   /** reset projection */
   const resetProjection = () => {
@@ -104,25 +86,31 @@ const map = () => {
     projection.rotate([0, 0]);
     projection.scale(baseScale);
   };
-  resetProjection();
 
   /** path calculator for projection */
   const path = d3.geoPath().projection(projection);
 
-  /** long/lat lines */
-  const graticules = d3.geoGraticule().step([20, 20])();
-
-  /** d3 svg selection */
-  type SVG = d3.Selection<SVGSVGElement, unknown, HTMLElement, unknown>;
-
-  /** d3 zoom event */
-  type ZoomEvent = d3.D3ZoomEvent<SVGSVGElement, unknown>;
+  /** re-draw paths */
+  /** declaratively w/ jsx does full component re-render, which is too slow */
+  const update = () => {
+    /** update outline */
+    outlineRef.current?.setAttribute("d", path({ type: "Sphere" }) ?? "");
+    /** update graticules */
+    graticulesRef.current?.setAttribute("d", path(graticules) ?? "");
+    /** update features */
+    featuresRef.current?.forEach((element, index) => {
+      if (!element) return;
+      const feature = data?.features[index];
+      if (!feature) return;
+      element.setAttribute("d", path(feature) ?? "");
+    });
+  };
 
   /** keep track of old transform to calculate deltas */
-  let oldTransform: d3.ZoomTransform | undefined;
+  const oldTransform = useRef<d3.ZoomTransform>(null);
 
   /** update map view pan and zoom */
-  const updateMap = (svg: SVG, fullEvent?: ZoomEvent) => {
+  const onZoom = (fullEvent: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
     const { sourceEvent: event, transform } = fullEvent || {};
 
     /** get current projection components */
@@ -131,11 +119,11 @@ const map = () => {
     let [lambda, phi] = projection.rotate();
 
     /** update components based on event transform */
-    if (event && transform && oldTransform) {
+    if (event && transform && oldTransform.current) {
       /** calculate deltas */
-      const dx = transform.x - oldTransform.x;
-      const dy = transform.y - oldTransform.y;
-      const dk = transform.k - oldTransform.k;
+      const dx = transform.x - oldTransform.current.x;
+      const dy = transform.y - oldTransform.current.y;
+      const dk = transform.k - oldTransform.current.k;
 
       /** zoom event */
       if (dk) {
@@ -143,7 +131,7 @@ const map = () => {
         scale = transform.k;
 
         /** original coords of pointer */
-        const oldPointer = getPointer(svg.node(), projection, event);
+        const oldPointer = getPointer(ref.current, projection, event);
 
         /** apply zoom */
         projection.scale(scale);
@@ -154,7 +142,7 @@ const map = () => {
          */
         for (let iterations = 0; iterations < 3; iterations++) {
           /** new coords of pointer */
-          const newPointer = getPointer(svg.node(), projection, event);
+          const newPointer = getPointer(ref.current, projection, event);
 
           /** set new pan */
           lambda += newPointer.x - oldPointer.x;
@@ -174,7 +162,7 @@ const map = () => {
     }
 
     /** store old transform */
-    if (transform) oldTransform = transform;
+    if (transform) oldTransform.current = transform;
 
     /** limit pan */
     const yLimit = 0.89 * (90 - 90 * (baseScale / scale));
@@ -186,137 +174,112 @@ const map = () => {
     projection.rotate([lambda, phi]);
     projection.center([x, y]);
 
-    /** update paths based on projection */
-    svg.select(".outline").attr("d", () => path({ type: "Sphere" }));
-    svg.selectAll<Element, Feature>(".graticule").attr("d", path);
-    svg.selectAll<Element, Feature>(".feature").attr("d", path);
+    update();
   };
 
-  /** return func to run for updating map */
+  /** zoom handler */
+  const zoom = d3
+    .zoom<SVGSVGElement, unknown>()
+    // eslint-disable-next-line
+    .on("zoom", onZoom)
+    .scaleExtent([baseScale, baseScale * 10]);
+
+  if (!byCountry || !byRegion)
+    return <Placeholder className="h-100">Loading map...</Placeholder>;
+
   return (
-    id: string,
-    data: Data["byCountry"] | Data["byRegion"],
-    selectedFeature: Data["selectedFeature"],
-  ) => {
-    if (!data) return;
+    <div className="flex flex-col items-center gap-4">
+      <Select
+        label="Group by:"
+        value={by}
+        onChange={setBy}
+        options={byOptions}
+      />
 
-    const primary = getCssVariable("--primary");
-    const secondary = getCssVariable("--secondary");
-    const gray = getCssVariable("--gray");
-    const darkGray = getCssVariable("--dark-gray");
-    const black = getCssVariable("--black");
+      <svg
+        ref={(element) => {
+          ref.current = element;
+          if (!element) return;
 
-    type Datum = (typeof data)["features"][number];
+          /** get d3 selection */
+          const selection = d3.select(element);
+          if (!selection) return;
 
-    /** get svg selection */
-    const svg = d3.select<SVGSVGElement, unknown>("#" + id);
+          /** attach zoom behavior */
+          zoom(selection);
 
-    if (!svg.node()) return;
+          update();
 
-    /** draw projection outline */
-    svg.select(".outline").attr("d", () => path({ type: "Sphere" }));
-
-    /** draw graticules */
-    svg
-      .select(".graticules")
-      .selectAll(".graticule")
-      .data([graticules])
-      .join("path")
-      .attr("class", "graticule")
-      .attr("d", path)
-      .attr("fill", "none")
-      .attr("stroke", darkGray)
-      .attr("stroke-width", 0.5);
-
-    /** get range of sample counts */
-    const [, max = 1000] = d3.extent(
-      data.features,
-      (d) => d.properties.samples,
-    );
-
-    /** check if feature/datum is selected */
-    const isSelected = (d: Datum) =>
-      selectedFeature?.country === ""
-        ? selectedFeature?.region === d.properties.region
-        : selectedFeature?.country === d.properties.country;
-
-    /** color scale */
-    const scale = d3
-      .scaleLog<string>()
-      .domain([1, max])
-      .range(selectedFeature ? [darkGray, gray] : [gray, primary])
-      .interpolate(d3.interpolateLab);
-
-    /** draw features */
-    svg
-      .select(".features")
-      .selectAll(".feature")
-      .data(data.features, (d) => {
-        const { region, country } = (d as Datum).properties;
-        return region + " | " + country;
-      })
-      .join("path")
-      .attr("class", "feature")
-      .attr("d", path)
-      .attr("fill", (d) =>
-        isSelected(d) ? secondary : scale(d.properties.samples || 1),
-      )
-      .attr("stroke", black)
-      .attr("stroke-width", 0.5)
-      .style("cursor", "pointer")
-      .attr("role", "graphics-symbol")
-      .attr(
-        "data-tooltip",
-        ({ properties: { region, country, code, samples } }) =>
-          renderToString(
-            <div className="tooltip-table">
-              {country && (
-                <>
-                  <span>Country</span>
-                  <span>
-                    {country} ({code})
-                  </span>
-                </>
+          selection
+            /** always prevent scroll on wheel, not just when at scale limit */
+            .on("wheel", (event) => event.preventDefault())
+            /** reset zoom */
+            .on("dblclick.zoom", () => {
+              zoom.transform(selection, d3.zoomIdentity.scale(baseScale));
+              resetProjection();
+              update();
+            });
+        }}
+        viewBox={[0, 0, width, height].join(" ")}
+        className="w-full stroke-[0.5]"
+      >
+        <g className="fill-none stroke-slate-500/50">
+          <path ref={outlineRef} />
+          <path ref={graticulesRef} />
+        </g>
+        <g>
+          {data?.features.map((feature, index) => (
+            <path
+              ref={(element) => {
+                featuresRef.current[index] = element;
+              }}
+              key={index}
+              fill={
+                isSelected(feature)
+                  ? secondary
+                  : scale(feature.properties.samples || 1)
+              }
+              className="
+                cursor-pointer stroke-black transition
+                hover:fill-white
+                focus:fill-white
+                [:not(:focus-visible)]:outline-none
+              "
+              role="graphics-symbol"
+              tabIndex={0}
+              onClick={(event) => selectFeature(event, feature)}
+              onKeyDown={(event) => selectFeature(event, feature)}
+              data-tooltip={renderToString(
+                <dl>
+                  {feature.properties.country && (
+                    <>
+                      <dt>Country</dt>
+                      <dd>
+                        {feature.properties.country} ({feature.properties.code})
+                      </dd>
+                    </>
+                  )}
+                  <dt>Region</dt>
+                  <dd>{feature.properties.region}</dd>
+                  <dt>Samples</dt>
+                  <dd>{formatNumber(feature.properties.samples, false)}</dd>
+                </dl>,
               )}
-              <span>Region</span>
-              <span>{region}</span>
-              <span>Samples</span>
-              <span>{formatNumber(samples, false)}</span>
-            </div>,
-          ),
-      )
-      .on("keydown", selectFeature)
-      .on("click", selectFeature);
+            />
+          ))}
+        </g>
+      </svg>
 
-    /** zoom handler */
-    const zoom = d3
-      .zoom<SVGSVGElement, unknown>()
-      .scaleExtent([baseScale, baseScale * 10])
-      .on("zoom", (event) => updateMap(svg, event));
-
-    /** preserve any existing transform */
-    zoom.transform(svg, d3.zoomTransform(svg.node()!));
-    updateMap(svg);
-
-    /** connect zoom handler to svg */
-    zoom(svg);
-
-    /** reset zoom */
-    const resetZoom = () =>
-      /** start scale at lower limit so first zoom has effect */
-      zoom.transform(svg, d3.zoomIdentity.scale(baseScale));
-
-    svg
-      /** always prevent scroll on wheel, not just when at scale limit */
-      .on("wheel", (event) => event.preventDefault())
-      /** double click handler */
-      .on("dblclick.zoom", () => {
-        resetZoom();
-        resetProjection();
-        updateMap(svg);
-      });
-  };
+      <div className="flex w-full items-center justify-center gap-4 wrap-anywhere">
+        <span className="text-right">Fewer Samples</span>
+        <span className="h-2 w-24"></span>
+        <span>More Samples</span>
+      </div>
+    </div>
+  );
 };
+
+export default Map;
 
 /** fit projection to bbox of earth */
 const fitProjection = (projection: d3.GeoProjection) =>
@@ -335,6 +298,9 @@ const fitProjection = (projection: d3.GeoProjection) =>
       ],
     },
   });
+
+/** long/lat lines */
+const graticules = d3.geoGraticule().step([20, 20])() ?? "";
 
 /** get pointer position in projection coordinates */
 const getPointer = (
@@ -376,8 +342,8 @@ const getPointer = (
 
 /** select country or region on pointer or key click */
 const selectFeature = (
-  event: PointerEvent | KeyboardEvent,
-  d: NonNullable<Data["byCountry"] | Data["byRegion"]>["features"][number],
+  event: MouseEvent | PointerEvent | KeyboardEvent,
+  d: ByGeo["features"][number],
 ) => {
   const feature = d.properties;
   /** key press */
@@ -390,9 +356,3 @@ const selectFeature = (
     event.stopPropagation();
   }
 };
-
-/** unset selected feature when clicking off map */
-d3.select(window).on(
-  "click",
-  () => document.activeElement === document.body && setSelectedFeature(),
-);

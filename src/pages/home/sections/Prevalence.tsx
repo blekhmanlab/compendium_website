@@ -19,7 +19,7 @@ const Prevalence = () => {
   const [chart, setChart] = useState<Chart>(chartOptions[0]);
 
   return (
-    <section>
+    <section className="width-lg">
       <h2>Prevalence</h2>
 
       {selectedFeature ? (
