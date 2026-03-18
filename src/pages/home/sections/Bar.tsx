@@ -1,12 +1,12 @@
+import type { ECharts, EChartsOption } from "echarts";
 import type { ByTaxLevel, Data } from "@/pages/home/data";
-import { useEffect } from "react";
-import { renderToString } from "react-dom/server";
-import * as d3 from "d3";
+import { useEffect, useRef, useState } from "react";
+import * as echarts from "echarts";
 import { orderBy } from "lodash";
 import Placeholder from "@/components/Placeholder";
 import { useData } from "@/pages/home/data";
+import { tooltipTable } from "@/pages/home/sections/Map";
 import { getColor } from "@/util/colors";
-import { downloadSvg } from "@/util/dom";
 import { formatNumber } from "@/util/string";
 
 /** show prevalence of samples at certain taxonomic level as bar chart */
@@ -20,12 +20,10 @@ type Props = {
     | keyof NonNullable<Data["byPhylum"]>[number];
 };
 
-/** svg dimensions */
-const width = 300;
-const height = 600;
-const padding = 100;
+const Bar = ({ title, data, datumKey }: Props) => {
+  const [ref, setRef] = useState<HTMLDivElement | null>(null);
+  const chart = useRef<ECharts>(null);
 
-const Chart = ({ id = "chart", title, data, datumKey }: Props) => {
   /** get global state */
   const selectedFeature = useData((state) => state.selectedFeature);
 
@@ -35,176 +33,165 @@ const Chart = ({ id = "chart", title, data, datumKey }: Props) => {
     "total") as keyof ByTaxLevel[number]["samples"];
 
   /** filtered data */
-  const filtered =
-    data &&
-    orderBy(
-      data,
-      [(d) => d.samples[sampleKey] || 0, "_class", "phylum"],
-      ["desc", "asc", "asc"],
-    ).slice(0, 20);
+  const filtered = data
+    ? orderBy(
+        data,
+        [(d) => d.samples[sampleKey] || 0, "_class", "phylum"],
+        ["desc", "asc", "asc"],
+      )
+        .slice(0, 20)
+        .toReversed()
+    : [];
 
-  /** rerun d3 code when props change */
-  useEffect(() => {
-    chart(id, filtered, datumKey, sampleKey);
-  }, [id, filtered, datumKey, sampleKey]);
-
-  if (!filtered)
-    return (
-      <Placeholder className="h-100">Loading "{title}" chart...</Placeholder>
-    );
-
-  /** if no samples for first bar, then no samples for any because list sorted */
-  const blank = !filtered[0]?.samples[sampleKey];
-
-  return (
-    <svg
-      viewBox={[
-        -padding - padding * 2,
-        -padding,
-        width + padding * 2 + padding * 2,
-        height + padding * 2,
-      ].join(" ")}
-      id={id}
-      className="chart"
-      onClick={(event) => {
-        if (event.shiftKey) downloadSvg(event.currentTarget, "phyla-chart");
-      }}
-    >
-      <text
-        className="title"
-        x={width / 2}
-        y={-padding * 0.9}
-        style={{ fontSize: "35px" }}
-        textAnchor="middle"
-        dominantBaseline="hanging"
-      >
-        {title}
-      </text>
-      {selectedFeature && (
-        <text
-          className="sub-title"
-          x={width / 2}
-          y={-padding / 2}
-          style={{ fontSize: "20px" }}
-          textAnchor="middle"
-          dominantBaseline="hanging"
-        >
-          {selectedFeature.country || selectedFeature.region}
-        </text>
-      )}
-      <g className="bars" />
-      <g className="x-axis" transform={`translate(0, ${height})`} />
-      <g className="y-axis" />
-      <text
-        x={width / 2}
-        y={height + padding * 0.9}
-        style={{ fontSize: "30px" }}
-        textAnchor="middle"
-      >
-        Samples
-      </text>
-      {blank && (
-        <text
-          x={width / 2}
-          y={height / 2}
-          style={{ fontSize: "30px" }}
-          textAnchor="middle"
-        >
-          No Samples
-        </text>
-      )}
-    </svg>
-  );
-};
-
-export default Chart;
-
-/** d3 code */
-const chart = (
-  id: string,
-  data: Props["data"],
-  datumKey: Props["datumKey"],
-  sampleKey: keyof ByTaxLevel[number]["samples"],
-) => {
-  if (!data) return;
-
-  type Datum = (typeof data)[number];
-
-  const svg = d3.select<SVGSVGElement, unknown>("#" + id);
+  type Datum = (typeof filtered)[number];
 
   /** get appropriate sample count */
   const getSamples = (d: Datum) => d.samples[sampleKey] || 0;
 
   /** get range of sample counts */
-  let [xMin = 0, xMax = 100] = d3.extent(data, getSamples);
+
+  let [xMin = 0, xMax = 100] = [
+    Math.min(...filtered.map(getSamples)),
+    Math.max(...filtered.map(getSamples)),
+  ];
 
   /** limit x scale */
   xMin *= 0.9;
   if (xMin < 0.1) xMin = 0.1;
   if (xMax < 100) xMax = 100;
 
-  /** create x scale computer */
-  const xScale = d3.scaleLog().domain([xMin, xMax]).range([0, width]);
+  /** series data */
+  const seriesData = filtered.map((datum) => ({
+    value: getSamples(datum),
+    name: String(datum[datumKey] ?? ""),
+    itemStyle: {
+      color: getColor(datum.phylum),
+    },
+    datum,
+  }));
 
-  /** create y scale computer */
-  const yScale = d3
-    .scaleBand()
-    .domain(data.map((d) => d.kingdom + d.phylum + d._class))
-    .range([0, height])
-    .padding(0.2);
+  const option: EChartsOption = {
+    series: [
+      {
+        type: "bar",
+        barWidth: "90%",
+        data: seriesData,
+      },
+    ],
 
-  /** create x axis */
-  const xAxis = d3.axisBottom(xScale).ticks(3, (d: number) => formatNumber(d));
+    title: [
+      {
+        text: title,
+        left: "center",
+        top: 0,
+        textStyle: {
+          color: "currentColor",
+          fontSize: "1rem",
+          fontWeight: 600,
+        },
+      },
+      {
+        text: selectedFeature
+          ? selectedFeature.country || selectedFeature.region
+          : "",
+        left: "center",
+        top: 24,
+        textStyle: {
+          color: "currentColor",
+          fontSize: "1rem",
+          fontWeight: "normal",
+        },
+      },
+    ],
 
-  /** create y axis */
-  const yAxis = d3
-    .axisLeft(yScale)
-    .tickFormat((_, i) => String(data[i]?.[datumKey] ?? ""));
+    xAxis: {
+      type: "log",
+      min: xMin,
+      max: xMax,
+      splitNumber: 3,
+      axisLine: { lineStyle: { color: "currentColor" } },
+      axisTick: { lineStyle: { color: "currentColor" } },
+      splitLine: { lineStyle: { color: "rgba(255,255,255,0.15)" } },
+      axisLabel: {
+        color: "currentColor",
+        fontSize: "1rem",
+        fontWeight: "normal",
+        formatter: (value: number) => formatNumber(value),
+      },
+      name: "Samples",
+      nameLocation: "middle",
+      nameGap: 55,
+      nameTextStyle: {
+        color: "currentColor",
+        fontSize: "1rem",
+        fontWeight: "normal",
+      },
+    },
 
-  /** update x axis */
-  svg
-    .select<SVGGElement>(".x-axis")
-    .transition()
-    .call(xAxis)
-    .selectAll(".tick")
-    .attr("font-size", "25px");
+    yAxis: {
+      type: "category",
+      data: filtered.map((datum) => String(datum[datumKey] ?? "")),
+      axisLine: { lineStyle: { color: "currentColor" } },
+      axisTick: { lineStyle: { color: "currentColor" } },
+      axisLabel: {
+        interval: 0,
+        hideOverlap: false,
+        color: "currentColor",
+        fontSize: "0.75rem",
+        fontWeight: "normal",
+      },
+    },
 
-  /** update y axis */
-  svg
-    .select<SVGGElement>(".y-axis")
-    .transition()
-    .call(yAxis)
-    .attr("font-size", "25px");
+    tooltip: {
+      trigger: "item",
+      borderColor: "white",
+      backgroundColor: "var(--color-slate-800)",
+      textStyle: {
+        color: "white",
+        fontSize: "inherit",
+        fontWeight: "normal",
+        fontFamily: "inherit",
+      },
+      formatter: (params) => {
+        /** @ts-expect-error types wrong */
+        const datum = params.data.datum;
+        return tooltipTable({
+          Phylum: datum.phylum,
+          Kingdom: datum.kingdom,
+          Samples: formatNumber(getSamples(datum), false),
+        });
+      },
+      position: function (point, params, dom, rect, size) {
+        if (!rect) return point;
+        return [
+          rect.x + rect.width / 2 - size.contentSize[0] / 2,
+          rect.y - size.contentSize[1],
+        ];
+      },
+    },
+  };
 
-  /** update bars */
-  svg
-    .select(".bars")
-    .selectAll(".bar")
-    .data(data)
-    .join("rect")
-    .attr("class", "bar")
-    .attr("x", 0)
-    .attr("y", (d) => yScale(d.kingdom + d.phylum + d._class) || 0)
-    .attr("width", (d) => xScale(getSamples(d)) || 0)
-    .attr("height", () => yScale.bandwidth() || 0)
-    .attr("fill", (d) => getColor(d.phylum))
-    .attr("role", "graphics-symbol")
-    .attr("data-tooltip", (d) =>
-      renderToString(
-        <div className="tooltip-table">
-          {d._class && (
-            <>
-              <span>Class</span>
-              <span>{d._class}</span>
-            </>
-          )}
-          <span>Phylum</span>
-          <span>{d.phylum}</span>
-          <span>Kingdom</span>
-          <span>{d.kingdom}</span>
-          <span>Samples</span>
-          <span>{formatNumber(getSamples(d), false)}</span>
-        </div>,
-      ),
+  useEffect(() => {
+    if (!ref) return;
+    chart.current = echarts.init(ref, undefined, { renderer: "svg" });
+    return () => {
+      chart.current?.dispose();
+      chart.current = null;
+    };
+  }, [ref]);
+
+  useEffect(() => {
+    if (!chart.current) return;
+    chart.current.setOption(option);
+    chart.current?.on("finished", () => chart.current?.resize());
+  });
+
+  if (!data)
+    return (
+      <Placeholder className="h-100">Loading "{title}" chart...</Placeholder>
     );
+
+  return <div ref={setRef} className="size-full!" />;
 };
+
+export default Bar;

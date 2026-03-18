@@ -2,7 +2,6 @@ import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
 import type { D3ZoomEvent, GeoProjection, ZoomTransform } from "d3";
 import type { ByGeo } from "@/pages/home/data";
 import { useMemo, useRef, useState } from "react";
-import { renderToString } from "react-dom/server";
 import { useEventListener } from "@reactuses/core";
 import {
   extent,
@@ -258,22 +257,13 @@ const Map = () => {
               tabIndex={0}
               onClick={(event) => selectFeature(event, feature)}
               onKeyDown={(event) => selectFeature(event, feature)}
-              data-tooltip={renderToString(
-                <dl>
-                  {feature.properties.country && (
-                    <>
-                      <dt>Country</dt>
-                      <dd>
-                        {feature.properties.country} ({feature.properties.code})
-                      </dd>
-                    </>
-                  )}
-                  <dt>Region</dt>
-                  <dd>{feature.properties.region}</dd>
-                  <dt>Samples</dt>
-                  <dd>{formatNumber(feature.properties.samples, false)}</dd>
-                </dl>,
-              )}
+              data-tooltip={tooltipTable({
+                Country: feature.properties.country
+                  ? `${feature.properties.country} (${feature.properties.code})`
+                  : undefined,
+                Region: feature.properties.region,
+                Samples: formatNumber(feature.properties.samples, false),
+              })}
             />
           ))}
         </g>
@@ -370,3 +360,15 @@ const selectFeature = (
     event.stopPropagation();
   }
 };
+
+/** generate tooltip table from entries */
+export const tooltipTable = (entries: Record<string, unknown>) =>
+  [
+    "<dl>",
+    ...Object.entries(entries).flatMap(([key, value]) =>
+      value === null || value === undefined || value === "" || value === false
+        ? []
+        : [`<dt>${key}</dt>`, `<dd>${value}</dd>`],
+    ),
+    "</dl>",
+  ].join("\n");

@@ -37,7 +37,7 @@ const Prevalence = () => {
       <div
         className="
           grid w-full grid-cols-[2fr_1fr] gap-8
-          max-md:grid-cols-1
+          max-lg:grid-cols-1
         "
       >
         <Map />
@@ -49,10 +49,12 @@ const Prevalence = () => {
             onChange={setChart}
             options={chartOptions}
           />
-          {chart === "Phyla" && (
-            <Bar title="Phyla" data={byPhylum} datumKey="phylum" />
-          )}
-          {chart === "Reads" && <Histogram title="Reads" data={byReads} />}
+          <div className="min-h-80 w-full grow">
+            {chart === "Phyla" && (
+              <Bar title="Phyla" data={byPhylum} datumKey="phylum" />
+            )}
+            {chart === "Reads" && <Histogram title="Reads" data={byReads} />}
+          </div>
         </div>
       </div>
     </section>
