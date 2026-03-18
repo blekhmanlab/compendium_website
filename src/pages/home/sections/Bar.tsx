@@ -49,7 +49,6 @@ const Bar = ({ title, data, datumKey }: Props) => {
   const getSamples = (d: Datum) => d.samples[sampleKey] || 0;
 
   /** get range of sample counts */
-
   let [xMin = 0, xMax = 100] = [
     Math.min(...filtered.map(getSamples)),
     Math.max(...filtered.map(getSamples)),
@@ -70,6 +69,7 @@ const Bar = ({ title, data, datumKey }: Props) => {
     datum,
   }));
 
+  /** echarts options */
   const option: EChartsOption = {
     series: [
       {
@@ -79,14 +79,22 @@ const Bar = ({ title, data, datumKey }: Props) => {
       },
     ],
 
+    grid: {
+      left: 150,
+      right: 0,
+      top: 50,
+      bottom: 50,
+    },
+
     title: [
       {
         text: title,
         left: "center",
         top: 0,
         textStyle: {
-          color: "currentColor",
+          color: "white",
           fontSize: "1rem",
+          fontFamily: "inherit",
           fontWeight: 600,
         },
       },
@@ -95,10 +103,11 @@ const Bar = ({ title, data, datumKey }: Props) => {
           ? selectedFeature.country || selectedFeature.region
           : "",
         left: "center",
-        top: 24,
+        top: 20,
         textStyle: {
-          color: "currentColor",
-          fontSize: "1rem",
+          color: "white",
+          fontSize: "0.75rem",
+          fontFamily: "inherit",
           fontWeight: "normal",
         },
       },
@@ -108,22 +117,24 @@ const Bar = ({ title, data, datumKey }: Props) => {
       type: "log",
       min: xMin,
       max: xMax,
-      splitNumber: 3,
-      axisLine: { lineStyle: { color: "currentColor" } },
-      axisTick: { lineStyle: { color: "currentColor" } },
-      splitLine: { lineStyle: { color: "rgba(255,255,255,0.15)" } },
+      axisLine: { lineStyle: { color: "#fff2" } },
+      axisTick: { lineStyle: { color: "#fff2" } },
+      splitLine: { lineStyle: { color: "#fff2" } },
       axisLabel: {
-        color: "currentColor",
+        color: "white",
         fontSize: "1rem",
+        fontFamily: "inherit",
         fontWeight: "normal",
         formatter: (value: number) => formatNumber(value),
+        hideOverlap: true,
       },
       name: "Samples",
       nameLocation: "middle",
-      nameGap: 55,
+      nameGap: 50,
       nameTextStyle: {
-        color: "currentColor",
+        color: "white",
         fontSize: "1rem",
+        fontFamily: "inherit",
         fontWeight: "normal",
       },
     },
@@ -131,13 +142,19 @@ const Bar = ({ title, data, datumKey }: Props) => {
     yAxis: {
       type: "category",
       data: filtered.map((datum) => String(datum[datumKey] ?? "")),
-      axisLine: { lineStyle: { color: "currentColor" } },
-      axisTick: { lineStyle: { color: "currentColor" } },
+      axisLine: { lineStyle: { color: "#fff2" } },
+      axisTick: { lineStyle: { color: "#fff2" } },
+      splitLine: { lineStyle: { color: "#fff2" } },
       axisLabel: {
         interval: 0,
         hideOverlap: false,
-        color: "currentColor",
+        width: 100,
+        overflow: "truncate",
+        ellipsis: "...",
+        align: "right",
+        color: "white",
         fontSize: "0.75rem",
+        fontFamily: "inherit",
         fontWeight: "normal",
       },
     },
@@ -149,8 +166,8 @@ const Bar = ({ title, data, datumKey }: Props) => {
       textStyle: {
         color: "white",
         fontSize: "inherit",
-        fontWeight: "normal",
         fontFamily: "inherit",
+        fontWeight: "normal",
       },
       formatter: (params) => {
         /** @ts-expect-error types wrong */
@@ -171,19 +188,21 @@ const Bar = ({ title, data, datumKey }: Props) => {
     },
   };
 
+  /** initialize and attach chart */
   useEffect(() => {
     if (!ref) return;
     chart.current = echarts.init(ref, undefined, { renderer: "svg" });
+    chart.current?.on("finished", () => chart.current?.resize());
     return () => {
       chart.current?.dispose();
       chart.current = null;
     };
   }, [ref]);
 
+  /** update chart options */
   useEffect(() => {
     if (!chart.current) return;
     chart.current.setOption(option);
-    chart.current?.on("finished", () => chart.current?.resize());
   });
 
   if (!data)
