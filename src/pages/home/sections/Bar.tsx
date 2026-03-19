@@ -54,10 +54,12 @@ const Bar = ({ title, data, datumKey }: Props) => {
     Math.max(...filtered.map(getSamples)),
   ];
 
-  /** limit x scale */
-  xMin *= 0.9;
-  if (xMin < 0.1) xMin = 0.1;
-  if (xMax < 100) xMax = 100;
+  /** round down/up to nearest power of 10 */
+  xMin = 10 ** Math.floor(Math.log10(xMin));
+  xMax = 10 ** (Math.ceil(Math.log10(xMax) * 2) / 2);
+
+  /** prevent negative log values */
+  if (xMin < 1) xMin = 1;
 
   /** series data */
   const seriesData = filtered.map((datum) => ({
@@ -81,7 +83,7 @@ const Bar = ({ title, data, datumKey }: Props) => {
 
     grid: {
       left: 150,
-      right: 0,
+      right: 20,
       top: 50,
       bottom: 50,
     },
