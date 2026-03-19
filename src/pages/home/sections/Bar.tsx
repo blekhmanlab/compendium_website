@@ -6,6 +6,7 @@ import { orderBy } from "lodash";
 import Placeholder from "@/components/Placeholder";
 import { tooltipTable } from "@/pages/home/sections/Map";
 import { useData } from "@/pages/home/state";
+import { sleep } from "@/util/async";
 import { getColor } from "@/util/colors";
 import { formatNumber } from "@/util/string";
 
@@ -15,9 +16,7 @@ type Props = {
   id?: string;
   title: string;
   data: ByPhylum;
-  datumKey:
-    | keyof NonNullable<ByClass>[number]
-    | keyof NonNullable<ByPhylum>[number];
+  datumKey: keyof ByClass[number] | keyof ByPhylum[number];
 };
 
 const Bar = ({ title, data, datumKey }: Props) => {
@@ -196,8 +195,9 @@ const Bar = ({ title, data, datumKey }: Props) => {
   useEffect(() => {
     if (!ref) return;
     chart.current = echarts.init(ref, undefined, { renderer: "svg" });
-    chart.current?.on("finished", () => chart.current?.resize());
+    sleep().then(() => chart.current?.resize());
     return () => {
+      chart.current?.off("finished");
       chart.current?.dispose();
       chart.current = null;
     };

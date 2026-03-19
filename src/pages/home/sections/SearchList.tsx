@@ -39,6 +39,7 @@ const SearchList = ({
   const [type, setType] = useState<TypesAll[number]>("All");
   const [_search, setSearch] = useState("");
   const search = useDebounce(_search, 300);
+
   console.log({ _search, search });
 
   /** filter full search list by type */
