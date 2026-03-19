@@ -13,9 +13,9 @@ import { parse } from "papaparse";
 import compendiumProjectedFile from "@/pages/projectionist/data/compendium-projected-full.tsv?url";
 import compendiumWeightsFile from "@/pages/projectionist/data/compendium-weights.tsv?url";
 import taxaMapFile from "@/pages/projectionist/data/taxa-map.tsv?url";
-import { workerUtils } from "@/workers";
+import { progressUtils } from "@/util/worker";
 
-export const { progress, setProgress, aborted, abort } = workerUtils();
+export const { progress, setProgress, aborted, abort } = progressUtils();
 
 /** convert taxon object to string for easier compare/lookup/etc */
 const stringifyTaxon = (value: object | string) =>

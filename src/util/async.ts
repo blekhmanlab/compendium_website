@@ -22,3 +22,10 @@ export const waitFor = async <T>(
   }
   throw Error("waitFor timed out");
 };
+
+/** generic request wrapper */
+export const request = async <Type>(url: string) => {
+  const response = await fetch(url);
+  if (!response.ok) throw Error("Response not OK");
+  return (await response.json()) as Type;
+};

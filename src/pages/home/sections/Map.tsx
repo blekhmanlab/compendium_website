@@ -1,6 +1,6 @@
 import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
 import type { D3ZoomEvent, GeoProjection, ZoomTransform } from "d3";
-import type { ByGeo } from "@/pages/home/data";
+import type { ByCountry, ByRegion } from "@/pages/home/data/geo";
 import { useMemo, useRef, useState } from "react";
 import { useEventListener } from "@reactuses/core";
 import {
@@ -17,10 +17,12 @@ import {
 import { clamp } from "lodash";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
-import { setSelectedFeature, useData } from "@/pages/home/data";
+import { setSelectedFeature, useData } from "@/pages/home/state";
 import { frame } from "@/util/async";
 import { getCssVariable } from "@/util/dom";
 import { formatNumber } from "@/util/string";
+
+type Feature = (ByRegion | ByCountry)["features"][number];
 
 /** svg dimensions */
 const width = 770;
@@ -58,8 +60,6 @@ const Map = () => {
   /** data to show */
   const data = by === "Country" ? byCountry : byRegion;
 
-  type Datum = ByGeo["features"][number];
-
   /** get range of sample counts */
   const [, max = 1000] = extent(
     data?.features ?? [],
@@ -67,7 +67,7 @@ const Map = () => {
   );
 
   /** check if feature/datum is selected */
-  const isSelected = (d: Datum) =>
+  const isSelected = (d: Feature) =>
     selectedFeature?.country === ""
       ? selectedFeature?.region === d.properties.region
       : selectedFeature?.country === d.properties.country;
@@ -347,7 +347,7 @@ const getPointer = (
 /** select country or region on pointer or key click */
 const selectFeature = (
   event: MouseEvent | PointerEvent | KeyboardEvent,
-  d: ByGeo["features"][number],
+  d: Feature,
 ) => {
   const feature = d.properties;
   /** key press */

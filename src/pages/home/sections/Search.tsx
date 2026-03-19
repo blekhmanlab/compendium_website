@@ -1,6 +1,6 @@
 import { startTransition, useEffect, useState } from "react";
 import Tabs from "@/components/Tabs";
-import { loadTagData, useData } from "@/pages/home/data";
+import { loadTag, useData } from "@/pages/home/state";
 import SearchList from "./SearchList";
 
 export const tooltips = {
@@ -29,8 +29,8 @@ const Search = () => {
 
   useEffect(() => {
     /** load large data on demand */
-    if (tab === 3 && !tagSearch) loadTagData();
-  });
+    if (tab === 3 && !tagSearch) loadTag();
+  }, [tab, tagSearch]);
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 

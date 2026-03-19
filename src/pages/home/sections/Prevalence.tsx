@@ -1,6 +1,8 @@
+import type { ByReads } from "@/pages/home/data/project";
+import type { ByPhylum } from "@/pages/home/data/taxa";
 import { useState } from "react";
 import Select from "@/components/Select";
-import { useData } from "@/pages/home/data";
+import { useData } from "@/pages/home/state";
 import Bar from "./Bar";
 import Histogram from "./Histogram";
 import Map from "./Map";
@@ -51,9 +53,15 @@ const Prevalence = () => {
           />
           <div className="min-h-80 w-full grow">
             {chart === "Phyla" && (
-              <Bar title="Phyla" data={byPhylum} datumKey="phylum" />
+              <Bar
+                title="Phyla"
+                data={byPhylum as ByPhylum}
+                datumKey="phylum"
+              />
             )}
-            {chart === "Reads" && <Histogram title="Reads" data={byReads} />}
+            {chart === "Reads" && (
+              <Histogram title="Reads" data={byReads as ByReads} />
+            )}
           </div>
         </div>
       </div>

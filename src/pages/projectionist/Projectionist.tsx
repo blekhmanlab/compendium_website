@@ -1,15 +1,15 @@
 import type { Remote } from "comlink";
-import type * as ProjectionistWorkerType from "@/workers/projectionist.ts";
+import type * as ProjectionistWorkerType from "@/pages/projectionist/project";
 import { useCallback, useEffect } from "react";
 import { ConeIcon } from "lucide-react";
 import { create } from "zustand";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Meta from "@/components/Meta";
+import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
 import PCs from "@/pages/projectionist/sections/PCs";
 import Upload from "@/pages/projectionist/sections/Upload";
-import { useWorker } from "@/workers";
-import ProjectionistWorker from "@/workers/projectionist.ts?worker";
+import { useWorker } from "@/util/worker";
 
 export type UserData = Awaited<
   ReturnType<typeof ProjectionistWorkerType.parseUserData>

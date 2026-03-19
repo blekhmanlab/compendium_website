@@ -1,3 +1,7 @@
+import chicago from "../assets/chicago.png";
+import colorado from "../assets/colorado.png";
+import minnesota from "../assets/minnesota.png";
+
 const Footer = () => (
   <footer
     className="
@@ -33,7 +37,7 @@ const Footer = () => (
         data-tooltip="University of Chicago | Section of Genetic Medicine"
       >
         <img
-          src="chicago.png"
+          src={chicago}
           alt="University of Chicago logo"
           style={{ maxHeight: "25px" }}
         />
@@ -44,7 +48,7 @@ const Footer = () => (
         data-tooltip="University of Colorado | Department of Biomedical Informatics"
       >
         <img
-          src="colorado.png"
+          src={colorado}
           alt="University of Colorado logo"
           style={{ maxHeight: "40px" }}
         />
@@ -56,7 +60,7 @@ const Footer = () => (
         Development"
       >
         <img
-          src="minnesota.png"
+          src={minnesota}
           alt="University of Minnesota logo"
           style={{ maxHeight: "15px" }}
         />

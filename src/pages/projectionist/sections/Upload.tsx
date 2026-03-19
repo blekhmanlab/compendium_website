@@ -1,5 +1,5 @@
 import type { Remote } from "comlink";
-import type * as ProjectionistWorkerType from "@/workers/projectionist.ts";
+import type * as ProjectionistWorkerType from "@/pages/projectionist/project";
 import { useCallback, useEffect, useState } from "react";
 import { size } from "lodash";
 import { LightbulbIcon } from "lucide-react";
@@ -7,10 +7,10 @@ import LoadingIcon from "@/assets/loading.svg?react";
 import Button from "@/components/Button";
 import Textbox from "@/components/Textbox";
 import UploadButton from "@/components/UploadButton";
+import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
 import { useData } from "@/pages/projectionist/Projectionist";
 import { formatNumber } from "@/util/string";
-import { useWorker } from "@/workers";
-import ProjectionistWorker from "@/workers/projectionist.ts?worker";
+import { useWorker } from "@/util/worker";
 import exampleData from "../data/example-data.tsv?raw";
 import exampleMeta from "../data/example-meta.tsv?raw";
 

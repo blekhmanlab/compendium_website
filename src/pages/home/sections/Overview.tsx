@@ -9,15 +9,15 @@ import {
   TableIcon,
 } from "lucide-react";
 import Placeholder from "@/components/Placeholder";
-import { useData } from "@/pages/home/data";
+import { useData } from "@/pages/home/state";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
 
 const Overview = () => {
   /** get global state */
-  const metadata = useData((state) => state.metadata);
+  const meta = useData((state) => state.meta);
 
   /** round down to nearest large amount */
-  const samplesRound = Math.floor((metadata?.samples || 0) / 10000) * 10000;
+  const samplesRound = Math.floor((meta?.samples || 0) / 10000) * 10000;
 
   const tiles = [
     {
@@ -25,9 +25,9 @@ const Overview = () => {
       className: "text-primary",
       text: (
         <>
-          {formatNumber(metadata?.samples, false)} samples
+          {formatNumber(meta?.samples, false)} samples
           <br />
-          {formatNumber(metadata?.projects)} projects
+          {formatNumber(meta?.projects)} projects
         </>
       ),
     },
@@ -36,9 +36,9 @@ const Overview = () => {
       className: "text-primary",
       text: (
         <>
-          {formatNumber(metadata?.classes)} classes
+          {formatNumber(meta?.classes)} classes
           <br />
-          {formatNumber(metadata?.phyla)} phyla
+          {formatNumber(meta?.phyla)} phyla
         </>
       ),
     },
@@ -47,9 +47,9 @@ const Overview = () => {
       className: "text-primary",
       text: (
         <>
-          {formatNumber(metadata?.countries)} countries
+          {formatNumber(meta?.countries)} countries
           <br />
-          {formatNumber(metadata?.regions)} regions
+          {formatNumber(meta?.regions)} regions
         </>
       ),
     },
@@ -58,9 +58,9 @@ const Overview = () => {
       className: "text-secondary",
       text: (
         <>
-          Ver. {metadata?.version}
+          Ver. {meta?.version}
           <br />
-          {formatDate(metadata?.date)}
+          {formatDate(meta?.date)}
         </>
       ),
     },
@@ -70,9 +70,9 @@ const Overview = () => {
       className: "text-secondary",
       text: (
         <>
-          {formatNumber(metadata?.downloads)} downloads
+          {formatNumber(meta?.downloads)} downloads
           <br />
-          {formatNumber(metadata?.views)} views
+          {formatNumber(meta?.views)} views
         </>
       ),
     },
@@ -81,9 +81,9 @@ const Overview = () => {
       className: "text-secondary",
       text: (
         <>
-          {formatBytes(metadata?.size)} download
+          {formatBytes(meta?.size)} download
           <br />
-          {formatBytes(metadata?.uncompressed)} uncomp.
+          {formatBytes(meta?.uncompressed)} uncomp.
         </>
       ),
     },
@@ -100,7 +100,7 @@ const Overview = () => {
         processed using the same pipeline and reference database.
       </p>
 
-      {metadata ? (
+      {meta ? (
         <div
           className="
             grid grid-cols-3 gap-10
@@ -130,7 +130,7 @@ const Overview = () => {
           ))}
         </div>
       ) : (
-        <Placeholder className="h-100">Loading metadata...</Placeholder>
+        <Placeholder className="h-100">Loading meta...</Placeholder>
       )}
 
       <p>

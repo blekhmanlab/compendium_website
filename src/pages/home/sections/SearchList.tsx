@@ -1,8 +1,8 @@
 import type { Remote } from "comlink";
 import type { Col } from "@/components/Table";
-import type { Data } from "@/pages/home/data";
+import type { Data } from "@/pages/home/state";
+import type * as SearchWorkerType from "@/util/search.ts";
 import type { KeysOfType } from "@/util/types";
-import type * as SearchWorkerType from "@/workers/search.ts";
 import { useCallback, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { capitalize } from "lodash";
@@ -11,9 +11,9 @@ import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import Table from "@/components/Table";
 import Textbox from "@/components/Textbox";
+import SearchWorker from "@/util/search.ts?worker";
 import { formatNumber } from "@/util/string";
-import { useWorker } from "@/workers";
-import SearchWorker from "@/workers/search?worker";
+import { useWorker } from "@/util/worker";
 
 /** type options, including all */
 type TypesAll = ("All" | NonNullable<Props["types"]>[number])[];
@@ -28,11 +28,18 @@ type Props = {
   onSelect?: (selected: string[]) => void;
 };
 
-const Search = ({ list: fullList, cols, types, names, onSelect }: Props) => {
+const SearchList = ({
+  list: fullList,
+  cols,
+  types,
+  names,
+  onSelect,
+}: Props) => {
   /** local state */
   const [type, setType] = useState<TypesAll[number]>("All");
   const [_search, setSearch] = useState("");
   const search = useDebounce(_search, 300);
+  console.log({ _search, search });
 
   /** filter full search list by type */
   const list = useMemo(() => {
@@ -164,4 +171,4 @@ const Search = ({ list: fullList, cols, types, names, onSelect }: Props) => {
   );
 };
 
-export default Search;
+export default SearchList;

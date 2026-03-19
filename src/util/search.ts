@@ -1,7 +1,7 @@
 import { expose } from "comlink";
-import { workerUtils } from "./";
+import { progressUtils } from "@/util/worker";
 
-export const { progress, setProgress, aborted, abort } = workerUtils();
+export const { progress, setProgress, aborted, abort } = progressUtils();
 
 /** normalize strings for comparison */
 const normalize = (string: string) =>

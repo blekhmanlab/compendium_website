@@ -1,11 +1,11 @@
 import type { ECharts, EChartsOption } from "echarts";
-import type { ByReads, Data } from "@/pages/home/data";
+import type { ByReads } from "@/pages/home/data/project";
 import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts";
 import { max, min } from "lodash";
 import Placeholder from "@/components/Placeholder";
-import { useData } from "@/pages/home/data";
 import { tooltipTable } from "@/pages/home/sections/Map";
+import { useData } from "@/pages/home/state";
 import { getCssVariable } from "@/util/dom";
 import { formatNumber } from "@/util/string";
 
@@ -14,7 +14,7 @@ import { formatNumber } from "@/util/string";
 type Props = {
   id?: string;
   title: string;
-  data: Data["byReads"];
+  data: ByReads;
 };
 
 const Histogram = ({ title, data }: Props) => {

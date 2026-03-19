@@ -81,7 +81,7 @@ export const useWorker = <_Worker extends WorkerBase, Result>(
 };
 
 /** progress and abort utils */
-export const workerUtils = () => {
+export const progressUtils = () => {
   /** progress func type */
   type Progress = (status: string, shouldCancel?: true) => Promise<void>;
 

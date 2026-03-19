@@ -18,8 +18,8 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
-    "@reactuses/core": "^6.1.12",
-    "@tailwindcss/vite": "^4.2.1",
+    "@reactuses/core": "^6.2.0",
+    "@tailwindcss/vite": "^4.2.2",
     "comlink": "^4.4.2",
     "culori": "^4.0.2",
     "d3": "^7.9.0",
@@ -32,7 +32,7 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router": "^7.13.1",
-    "tailwindcss": "^4.2.1",
+    "tailwindcss": "^4.2.2",
     "tippy.js": "^6.3.7",
     "zustand": "^5.0.12"
   },
@@ -50,7 +50,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-better-tailwindcss": "^4.0.1",
+    "eslint-plugin-better-tailwindcss": "^4.3.2",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react-hooks": "^7.0.1",
@@ -62,7 +62,7 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.1",
-    "vite": "^8.0.0",
+    "vite": "^8.0.1",
     "vite-plugin-svgr": "^4.5.0"
   }
 }

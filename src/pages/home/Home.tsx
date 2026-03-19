@@ -1,21 +1,16 @@
 import Footer from "@/components/Footer";
-import {
-  loadGeoData,
-  loadMetaData,
-  loadProjectData,
-  loadTaxaData,
-} from "@/pages/home/data";
-import Compare from "./sections/Compare";
-import Overview from "./sections/Overview";
-import Prevalence from "./sections/Prevalence";
-import Recipes from "./sections/Recipes";
-import Search from "./sections/Search";
-import Title from "./sections/Title";
+import Compare from "@/pages/home/sections/Compare";
+import Overview from "@/pages/home/sections/Overview";
+import Prevalence from "@/pages/home/sections/Prevalence";
+import Recipes from "@/pages/home/sections/Recipes";
+import Search from "@/pages/home/sections/Search";
+import Title from "@/pages/home/sections/Title";
+import { loadGeo, loadMeta, loadProject, loadTaxa } from "@/pages/home/state";
 
-loadMetaData();
-loadProjectData();
-loadGeoData();
-loadTaxaData();
+loadMeta();
+loadProject();
+loadGeo();
+loadTaxa();
 /** only load tags data on demand because large */
 
 const Home = () => (

@@ -1,8 +1,3 @@
-// eslint-disable-next-line
-/// <reference path="./dissolve.d.ts" />
-// eslint-disable-next-line
-/// <reference path="./types.d.ts" />
-
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
@@ -30,9 +25,11 @@ import {
 } from "./util";
 
 /**
- * pre-compile step that takes the "raw" distributed data (csv/tsv), and process
- * and pares it down to just what the website needs (json).
+ * pre-compile step that takes the "raw" distributed data (csv/tsv), and pares
+ * it down to just what the website needs (json).
  */
+
+const output = "../src/pages/home/data";
 
 /** record of downloads, version, and other info */
 export const recordUrl =
@@ -45,7 +42,7 @@ const taxonomicFile = "downloaded/taxonomic_table.csv";
 const metadataFile = "downloaded/sample_metadata.tsv";
 
 /** raw tag data */
-const tagsFile = "downloaded/tags.tsv";
+const tagsFile = "downloaded/tag.tsv";
 
 /** raw natural earth data */
 const naturalEarthFile = "natural-earth.json";
@@ -475,14 +472,14 @@ const {
   byTag,
   byTagValue,
 } = await processData(taxonomicFile, metadataFile, worldMap);
-write("../public/by-project.json", byProject);
-write("../public/by-phylum.json", byPhylum);
-write("../public/by-class.json", byClass);
-write("../public/by-country.json", byCountry);
-write("../public/by-region.json", byRegion);
-write("../public/by-reads.json", byReads);
-write("../public/by-tag.json", byTag);
-write("../public/by-tag-value.json", byTagValue);
+write(`${output}/by-project.json`, byProject);
+write(`${output}/by-phylum.json`, byPhylum);
+write(`${output}/by-class.json`, byClass);
+write(`${output}/by-country.json`, byCountry);
+write(`${output}/by-region.json`, byRegion);
+write(`${output}/by-reads.json`, byReads);
+write(`${output}/by-tag.json`, byTag);
+write(`${output}/by-tag-value.json`, byTagValue);
 
 console.info("Deriving metadata");
 const metadata = await deriveMetadata(
@@ -494,7 +491,7 @@ const metadata = await deriveMetadata(
   byTag,
   record,
 );
-write("../public/metadata.json", metadata, true);
+write(`${output}/metadata.json`, metadata, true);
 
 console.info("Summary");
 console.info(metadata);

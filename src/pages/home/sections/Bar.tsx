@@ -1,11 +1,11 @@
 import type { ECharts, EChartsOption } from "echarts";
-import type { ByTaxLevel, Data } from "@/pages/home/data";
+import type { ByClass, ByPhylum } from "@/pages/home/data/taxa";
 import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts";
 import { orderBy } from "lodash";
 import Placeholder from "@/components/Placeholder";
-import { useData } from "@/pages/home/data";
 import { tooltipTable } from "@/pages/home/sections/Map";
+import { useData } from "@/pages/home/state";
 import { getColor } from "@/util/colors";
 import { formatNumber } from "@/util/string";
 
@@ -14,10 +14,10 @@ import { formatNumber } from "@/util/string";
 type Props = {
   id?: string;
   title: string;
-  data: Data["byClass"] | Data["byPhylum"];
+  data: ByPhylum;
   datumKey:
-    | keyof NonNullable<Data["byClass"]>[number]
-    | keyof NonNullable<Data["byPhylum"]>[number];
+    | keyof NonNullable<ByClass>[number]
+    | keyof NonNullable<ByPhylum>[number];
 };
 
 const Bar = ({ title, data, datumKey }: Props) => {
@@ -27,23 +27,25 @@ const Bar = ({ title, data, datumKey }: Props) => {
   /** get global state */
   const selectedFeature = useData((state) => state.selectedFeature);
 
+  type Sample = keyof (ByPhylum | ByClass)[number]["samples"];
+
   /** which sample count to use */
   const sampleKey = (selectedFeature?.code ||
     selectedFeature?.region ||
-    "total") as keyof ByTaxLevel[number]["samples"];
+    "total") as Sample;
+
+  type Datum = (typeof data)[number];
 
   /** filtered data */
   const filtered = data
     ? orderBy(
         data,
-        [(d) => d.samples[sampleKey] || 0, "_class", "phylum"],
+        [(d: Datum) => d.samples[sampleKey] || 0, "_class", "phylum"],
         ["desc", "asc", "asc"],
       )
         .slice(0, 20)
         .toReversed()
     : [];
-
-  type Datum = (typeof filtered)[number];
 
   /** get appropriate sample count */
   const getSamples = (d: Datum) => d.samples[sampleKey] || 0;
