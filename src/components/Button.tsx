@@ -24,8 +24,8 @@ const Button = ({ design = "regular", className, ...props }: Props) => {
       `,
     design === "accent" &&
       `
-        bg-slate-500/25 bg-linear-to-r px-4 py-2 text-lg transition
-        hover:from-fuchsia-600 hover:to-indigo-600
+        bg-slate-500/25 bg-linear-to-r px-4 py-2 text-lg
+        hover:scale-105 hover:from-fuchsia-600 hover:to-indigo-600
       `,
     className,
   );

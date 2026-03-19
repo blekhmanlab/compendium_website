@@ -16,7 +16,7 @@
 
 @layer base {
   html {
-    @apply bg-slate-900 font-sans text-[110%] leading-normal font-light text-white underline-offset-2;
+    @apply bg-slate-900 font-sans text-[115%] leading-normal font-light text-white underline-offset-2;
   }
 
   body {
@@ -34,7 +34,7 @@
   }
 
   section {
-    @apply odd:bg-slate-500/10 even:bg-slate-500/20;
+    @apply bg-linear-to-r odd:from-slate-500/20 odd:to-slate-500/0 even:from-slate-500/30 even:to-slate-500/10;
   }
 
   h1,
@@ -60,7 +60,7 @@
   }
 
   a {
-    @apply text-indigo-300 underline transition hover:text-fuchsia-300;
+    @apply text-indigo-200 underline transition hover:text-fuchsia-200;
   }
 
   table {
