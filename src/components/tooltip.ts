@@ -2,6 +2,7 @@ import type { Instance, Props } from "tippy.js";
 import tippy, { followCursor } from "tippy.js";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/dist/border.css";
+import { sleep } from "@/util/async";
 
 /** tippy options */
 const options: Partial<Props> = {
@@ -38,8 +39,7 @@ const update = (element: Element & { _tippy?: Instance }) => {
   instance.setContent(content);
 
   /** force re-position after rendering updates */
-  if (instance.popperInstance)
-    window.setTimeout(instance.popperInstance.update, 20);
+  if (instance.popperInstance) sleep(20).then(instance.popperInstance?.update);
 };
 
 /** listen for changes to document */

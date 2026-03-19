@@ -61,8 +61,8 @@ const Bar = ({ title, data, datumKey }: Props) => {
 
   /** series data */
   const seriesData = filtered.map((datum) => ({
-    value: getSamples(datum),
     name: String(datum[datumKey] ?? ""),
+    value: getSamples(datum),
     itemStyle: {
       color: getColor(datum.phylum),
     },
@@ -147,7 +147,6 @@ const Bar = ({ title, data, datumKey }: Props) => {
       splitLine: { lineStyle: { color: "#fff2" } },
       axisLabel: {
         interval: 0,
-        hideOverlap: false,
         width: 100,
         overflow: "truncate",
         ellipsis: "...",
@@ -156,12 +155,13 @@ const Bar = ({ title, data, datumKey }: Props) => {
         fontSize: "0.75rem",
         fontFamily: "inherit",
         fontWeight: "normal",
+        hideOverlap: false,
       },
     },
 
     tooltip: {
       trigger: "item",
-      borderColor: "white",
+      borderColor: "var(--color-slate-500)",
       backgroundColor: "var(--color-slate-800)",
       textStyle: {
         color: "white",

@@ -44,8 +44,8 @@ const Map = () => {
   const [by, setBy] = useState<By>(byOptions[0]);
 
   /** colors */
-  const primary = getCssVariable("--color-fuchsia-500");
-  const secondary = getCssVariable("--color-indigo-500");
+  const primary = getCssVariable("--color-primary");
+  const secondary = getCssVariable("--color-secondary");
   const gray = getCssVariable("--color-slate-500");
   const darkGray = getCssVariable("--color-slate-700");
 

@@ -14,7 +14,7 @@ const Button = ({ design = "regular", className, ...props }: Props) => {
   className = clsx(
     `
       inline-flex cursor-pointer items-center justify-center gap-2 rounded-full
-      transition
+      text-inherit no-underline transition
     `,
     design === "regular" &&
       `

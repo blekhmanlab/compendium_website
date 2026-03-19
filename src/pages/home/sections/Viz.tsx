@@ -4,7 +4,7 @@ import { gsap } from "gsap";
 import { random } from "lodash";
 import PoissonDiskSampling from "poisson-disk-sampling";
 import { waitFor } from "@/util/async";
-import { getMatrix } from "@/util/dom";
+import { getCssVariable, getMatrix } from "@/util/dom";
 import { cos, dist, normalize, scale, sin } from "@/util/math";
 
 const Viz = () => {
@@ -36,9 +36,9 @@ const generate = async () => {
     transform: getMatrix(svg, path),
   }));
 
-  const primary = "#e23fff";
-  const secondary = "#556eff";
-  const gray = "#596579";
+  const primary = getCssVariable("--color-primary");
+  const secondary = getCssVariable("--color-secondary");
+  const gray = getCssVariable("--color-slate-500");
 
   /** size and center canvas */
   const resize = () => {

@@ -9,11 +9,16 @@ type Props = {
 
 const Header = ({ children, big = false }: Props) => {
   return (
-    <header className="relative isolate items-center py-24">
+    <header
+      className="
+        relative isolate items-center bg-linear-to-r from-fuchsia-950
+        to-indigo-950 py-24
+      "
+    >
       <Link
         className="
           grid max-w-full grid-cols-[auto_auto_min-content] place-items-center
-          gap-6
+          gap-6 text-inherit no-underline
         "
         to={!big ? "/" : ""}
       >

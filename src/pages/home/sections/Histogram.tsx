@@ -21,7 +21,7 @@ const Histogram = ({ title, data }: Props) => {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const chart = useRef<ECharts>(null);
 
-  const secondary = getCssVariable("--color-indigo-500");
+  const secondary = getCssVariable("--color-secondary");
 
   /** get global state */
   const selectedFeature = useData((state) => state.selectedFeature);
@@ -44,11 +44,12 @@ const Histogram = ({ title, data }: Props) => {
 
   /** series data */
   const seriesData = histogram.map((datum) => ({
-    value: [datum.min, datum.max, getSamples(datum)],
+    value: [datum.mid, getSamples(datum)],
     datum,
   }));
 
-  const median = Math.max(0.1, data?.median[sampleKey] || 0.1);
+  /** median value */
+  const median = data?.median[sampleKey] ?? 0;
 
   /** echarts options */
   const option: EChartsOption = {
@@ -57,7 +58,6 @@ const Histogram = ({ title, data }: Props) => {
         type: "bar",
         barWidth: "100%",
         data: seriesData,
-        encode: { x: [0, 1], y: 2 },
         itemStyle: {
           color: secondary,
         },
@@ -125,6 +125,7 @@ const Histogram = ({ title, data }: Props) => {
         fontFamily: "inherit",
         fontWeight: "normal",
         formatter: (value: number) => formatNumber(value),
+        hideOverlap: true,
       },
       name: "Reads",
       nameLocation: "middle",
@@ -150,6 +151,7 @@ const Histogram = ({ title, data }: Props) => {
         fontFamily: "inherit",
         fontWeight: "normal",
         formatter: (value: number) => formatNumber(value),
+        hideOverlap: true,
       },
       name: "Samples",
       nameLocation: "middle",
@@ -164,7 +166,7 @@ const Histogram = ({ title, data }: Props) => {
 
     tooltip: {
       trigger: "item",
-      borderColor: "white",
+      borderColor: "var(--color-slate-500)",
       backgroundColor: "var(--color-slate-800)",
       textStyle: {
         color: "white",

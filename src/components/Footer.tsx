@@ -1,7 +1,8 @@
 const Footer = () => (
   <footer
     className="
-      flex flex-row justify-between gap-8 p-8
+      flex flex-row justify-between gap-8 bg-linear-to-r from-fuchsia-950
+      to-indigo-950 p-8
       max-md:flex-col max-md:items-center
     "
   >

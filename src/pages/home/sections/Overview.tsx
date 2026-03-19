@@ -22,7 +22,7 @@ const Overview = () => {
   const tiles = [
     {
       icon: <MicroscopeIcon />,
-      className: "text-fuchsia-500",
+      className: "text-primary",
       text: (
         <>
           {formatNumber(metadata?.samples, false)} samples
@@ -33,7 +33,7 @@ const Overview = () => {
     },
     {
       icon: <BarChartHorizontalIcon />,
-      className: "text-fuchsia-500",
+      className: "text-primary",
       text: (
         <>
           {formatNumber(metadata?.classes)} classes
@@ -44,7 +44,7 @@ const Overview = () => {
     },
     {
       icon: <EarthIcon />,
-      className: "text-fuchsia-500",
+      className: "text-primary",
       text: (
         <>
           {formatNumber(metadata?.countries)} countries
@@ -55,7 +55,7 @@ const Overview = () => {
     },
     {
       icon: <DatabaseIcon />,
-      className: "text-indigo-500",
+      className: "text-secondary",
       text: (
         <>
           Ver. {metadata?.version}
@@ -67,7 +67,7 @@ const Overview = () => {
 
     {
       icon: <EyeIcon />,
-      className: "text-indigo-500",
+      className: "text-secondary",
       text: (
         <>
           {formatNumber(metadata?.downloads)} downloads
@@ -78,7 +78,7 @@ const Overview = () => {
     },
     {
       icon: <TableIcon />,
-      className: "text-indigo-500",
+      className: "text-secondary",
       text: (
         <>
           {formatBytes(metadata?.size)} download
@@ -132,8 +132,6 @@ const Overview = () => {
       ) : (
         <Placeholder className="h-100">Loading metadata...</Placeholder>
       )}
-
-      <hr />
 
       <p>
         This website lets you <b>search</b> and <b>explore</b> the data at a

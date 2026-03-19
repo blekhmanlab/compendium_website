@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 @theme {
+  --color-primary: theme(colors.fuchsia.500);
+  --color-secondary: theme(colors.indigo.500);
   --font-sans: "Mona Sans", sans-serif;
 }
 
@@ -32,11 +34,7 @@
   }
 
   section {
-    @apply odd:bg-slate-500/10 even:bg-slate-500/15;
-  }
-
-  hr {
-    @apply h-px w-full border-0 bg-slate-500;
+    @apply odd:bg-slate-500/10 even:bg-slate-500/20;
   }
 
   h1,
@@ -61,7 +59,7 @@
     @apply text-center leading-loose text-balance;
   }
 
-  p a {
+  a {
     @apply text-indigo-300 underline transition hover:text-fuchsia-300;
   }
 
@@ -94,6 +92,10 @@
   .lucide {
     @apply inline-block h-[1em];
   }
+
+  span[data-tooltip] {
+    @apply cursor-help underline decoration-dotted underline-offset-4;
+  }
 }
 
 @utility width-sm {
@@ -109,7 +111,7 @@
 }
 
 .tippy-box {
-  @apply rounded border border-white bg-slate-800 px-2 py-1;
+  @apply rounded border border-slate-500 bg-slate-800 px-2 py-1;
 }
 
 .tippy-content {
