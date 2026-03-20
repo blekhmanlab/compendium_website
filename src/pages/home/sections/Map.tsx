@@ -62,7 +62,7 @@ const Map = () => {
   /** get range of sample counts */
   const [, max = 1000] = extent(
     data?.features ?? [],
-    (d) => d.properties.samples,
+    (datum) => datum.properties.samples,
   );
 
   /** check if feature/datum is selected */

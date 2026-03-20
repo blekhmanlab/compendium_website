@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { parse } from "papaparse";
 import { request } from "@/util/async";
 
@@ -7,3 +8,11 @@ export const getTable = async <Response>(url: string) =>
     dynamicTyping: true,
     header: true,
   }).data;
+
+/** convert taxon object to string for easier compare/lookup/etc */
+export const stringifyTaxon = (value: object | string) =>
+  typeof value === "object"
+    ? JSON.stringify(
+        pick(value, ["kingdom", "phylum", "class", "order", "family", "genus"]),
+      )
+    : value;

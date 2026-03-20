@@ -21,7 +21,7 @@
 
 @layer base {
   html {
-    @apply bg-slate-900 font-sans text-[115%] leading-normal font-light text-white underline-offset-2;
+    @apply bg-slate-900 font-sans text-[110%] leading-normal font-light text-white underline-offset-2;
   }
 
   body {
@@ -41,7 +41,7 @@
   }
 
   h2 {
-    @apply flex items-center gap-4 text-center text-2xl leading-normal font-medium tracking-wider;
+    @apply flex items-center gap-4 text-center text-2xl leading-normal font-light tracking-widest uppercase;
   }
 
   b,

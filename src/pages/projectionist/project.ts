@@ -1,8 +1,9 @@
-import type { SampleWeights } from "@/pages/projectionist/data/sample-weights";
 import type { TaxaMap } from "@/pages/projectionist/data/taxa-map";
+import type { TaxonWeights } from "@/pages/projectionist/data/taxon-weights";
 import { expose } from "comlink";
-import { groupBy, isEqual, omit, pick, random, sum, uniqWith } from "lodash";
+import { groupBy, isEqual, omit, random, sum, uniqWith } from "lodash";
 import { parse } from "papaparse";
+import { stringifyTaxon } from "@/pages/projectionist/data/util";
 
 /** allow aborting from outside worker */
 let aborted = "";
@@ -125,7 +126,7 @@ export const projectUserData = async (
   reads: UserData["reads"],
   samples: UserData["samples"],
   taxaMap: TaxaMap,
-  sampleWeights: SampleWeights["full"],
+  taxonWeights: TaxonWeights,
 ) => {
   /** taxa mapped to split ranks */
   const taxa = _taxa.map((taxon) => taxaMap[taxon] ?? taxon);
@@ -151,7 +152,7 @@ export const projectUserData = async (
   );
 
   /** projected principal components for each sample */
-  const projected: Record<string, number>[] = [];
+  const projected: Record<PC, number>[] = [];
 
   samples.forEach((sampleName, sampleIndex) => {
     /** principal components for this sample */
@@ -166,7 +167,7 @@ export const projectUserData = async (
         consolidatedTaxa.map(
           (taxon, taxonIndex) =>
             (consolidatedReads[sampleIndex]?.[taxonIndex] ?? 0) *
-            (sampleWeights[stringifyTaxon(taxon)]?.[pc] ?? 0),
+            (taxonWeights[stringifyTaxon(taxon)]?.[pc] ?? 0),
         ),
       );
 
@@ -179,14 +180,6 @@ export const projectUserData = async (
 
   return projected;
 };
-
-/** convert taxon object to string for easier compare/lookup/etc */
-const stringifyTaxon = (value: object | string) =>
-  typeof value === "object"
-    ? JSON.stringify(
-        pick(value, ["kingdom", "phylum", "class", "order", "family", "genus"]),
-      )
-    : value;
 
 expose({
   parseUserData,

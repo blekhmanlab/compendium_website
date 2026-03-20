@@ -5,6 +5,7 @@ import { wrap } from "comlink";
 import Select from "@/components/Select";
 import { pcs } from "@/pages/projectionist/project";
 import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
+import PCChart from "@/pages/projectionist/sections/PCChart";
 import { useData } from "@/pages/projectionist/state";
 import { useWorker } from "@/util/worker";
 
@@ -20,35 +21,36 @@ const PCs = () => {
   /** project user input data */
   const [, projectStatus, runProject] = useWorker(projectionistWorker);
 
+  console.log(projectStatus);
+
   /** get inputs for projecting */
   const taxa = useData((state) => state.userData?.taxa);
   const samples = useData((state) => state.userData?.samples);
   const reads = useData((state) => state.userData?.reads);
   const taxaMap = useData((state) => state.taxaMap);
+  const taxonWeights = useData((state) => state.taxonWeights);
   const sampleWeights = useData((state) => state.sampleWeights);
 
   /** run project data */
   useEffect(
     () =>
       runProject(async () => {
-        if (!taxa || !samples || !reads || !taxaMap || !sampleWeights) return;
+        if (!taxa || !samples || !reads || !taxaMap || !taxonWeights) return;
         useData.setState({
           userProjected: await projectionistWorker.projectUserData(
             taxa,
             reads,
             samples,
             taxaMap,
-            sampleWeights.full,
+            taxonWeights,
           ),
         });
       }),
-    [taxa, reads, samples, taxaMap, sampleWeights, runProject],
+    [taxa, reads, samples, taxaMap, taxonWeights, runProject],
   );
 
   /** get outputs of projecting */
   const projected = useData((state) => state.userProjected);
-
-  console.log(sampleWeights?.full);
 
   return (
     <section>
@@ -66,15 +68,33 @@ const PCs = () => {
           max-md:grid-cols-1
         "
       >
-        {sampleWeights && <div>chart</div>}
-        {!sampleWeights && (
+        {sampleWeights?.full && (
+          <PCChart
+            title="Compendium"
+            xLabel={pcA}
+            yLabel={pcB}
+            data={Object.values(sampleWeights.full).map((datum) => ({
+              x: datum[pcA],
+              y: datum[pcB],
+            }))}
+          />
+        )}
+        {!sampleWeights?.full && (
           <div className="placeholder">Loading compendium PCs</div>
         )}
-        {projected && <div>chart</div>}
-        {projectStatus === "loading" && (
-          <div className="placeholder">Loading user PCs</div>
+
+        {projected && (
+          <PCChart
+            title="Yours"
+            xLabel={pcA}
+            yLabel={pcB}
+            data={Object.values(projected).map((datum) => ({
+              x: datum[pcA],
+              y: datum[pcB],
+            }))}
+          />
         )}
-        {projectStatus === "" && (
+        {projectStatus === "" && !projected && (
           <div
             className="
               placeholder border border-dashed border-slate-500 bg-transparent
@@ -82,6 +102,9 @@ const PCs = () => {
           >
             Load your data to compare
           </div>
+        )}
+        {projectStatus === "loading" && (
+          <div className="placeholder">Loading user PCs</div>
         )}
       </div>
     </section>

@@ -10,7 +10,7 @@ import type {
   WorldMap,
 } from "./types";
 import type { _Record, Zenodo } from "./zenodo-api";
-import * as d3 from "d3";
+import { bin, extent, median } from "d3";
 import dissolve from "geojson-dissolve";
 import _ from "lodash";
 import {
@@ -265,15 +265,14 @@ const processData = async (
   const totalReads = getReads("total");
 
   /** get global min and max reads */
-  const [min = 0, max = 10000000] = d3.extent(totalReads);
+  const [min = 0, max = 10000000] = extent(totalReads);
   // const [min, max] = [100, 1000000];
 
   /** number of bins to split reads into */
   const bins = 50;
 
   /** d3 binner to put read counts into bins */
-  const binner = d3
-    .bin()
+  const binner = bin()
     .domain([min, max])
     .thresholds(logSpace(min, max, bins));
 
@@ -299,7 +298,7 @@ const processData = async (
       max: x1 || 10000000,
       mid: Math.pow(10, (Math.log10(x0) + Math.log10(x1)) / 2),
     })),
-    median: { total: d3.median(totalReads) },
+    median: { total: median(totalReads) },
   };
 
   /** record total sample counts and for each geographic feature */
@@ -311,7 +310,7 @@ const processData = async (
     /** reads for this feature */
     const reads = getReads(feature);
 
-    byReads.median[feature] = d3.median(reads);
+    byReads.median[feature] = median(reads);
 
     /** go through bins of reads for this feature */
     for (const [index, bin] of Object.entries(binner(reads)))
@@ -360,19 +359,22 @@ const processData = async (
     ),
     byPhylum: _.orderBy(
       Object.values(byPhylum).filter(({ phylum }) => phylum),
-      [(d) => d.samples.total, "phylum"],
+      [(datum) => datum.samples.total, "phylum"],
       ["desc", "asc"],
     ),
     byClass: _.orderBy(
       Object.values(byClass).filter(({ _class }) => _class),
-      [(d) => d.samples.total, "_class"],
+      [(datum) => datum.samples.total, "_class"],
       ["desc", "asc"],
     ),
     byCountry: {
       ...worldMap,
       features: _.orderBy(
         Object.values(byCountry),
-        [(d) => d.properties.samples, (d) => d.properties.country],
+        [
+          (datum) => datum.properties.samples,
+          (datum) => datum.properties.country,
+        ],
         ["desc", "asc"],
       ),
     },
@@ -380,23 +382,26 @@ const processData = async (
       ...worldMap,
       features: _.orderBy(
         Object.values(byRegion),
-        [(d) => d.properties.samples, (d) => d.properties.region],
+        [
+          (datum) => datum.properties.samples,
+          (datum) => datum.properties.region,
+        ],
         ["desc", "asc"],
       ),
     },
     byReads,
     byTag: _.orderBy(
-      Object.values(byTag).map((d) => ({
-        tag: d.tag,
-        projects: Object.keys(d.projects).length,
-        samples: Object.keys(d.samples).length,
+      Object.values(byTag).map((datum) => ({
+        tag: datum.tag,
+        projects: Object.keys(datum.projects).length,
+        samples: Object.keys(datum.samples).length,
       })),
-      [(d) => d.samples, (d) => d.projects],
+      [(datum) => datum.samples, (datum) => datum.projects],
       ["desc", "desc"],
     ),
     byTagValue: _.orderBy(
       Object.values(byTagValue),
-      [(d) => d.samples],
+      [(datum) => datum.samples],
       ["desc"],
     ),
   };

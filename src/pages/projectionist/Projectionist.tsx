@@ -38,7 +38,7 @@ const Projectionist = () => {
           Projectionist
         </h2>
 
-        <div className="text-right">Compare your data to ours</div>
+        <div className="text-right">Compare your data</div>
       </Header>
 
       <main>

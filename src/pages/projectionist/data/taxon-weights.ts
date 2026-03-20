@@ -1,5 +1,5 @@
 import { expose } from "comlink";
-import { getTable } from "@/pages/projectionist/data/util";
+import { getTable, stringifyTaxon } from "@/pages/projectionist/data/util";
 import url from "./taxon-weights.tsv?url";
 
 type TaxonWeightsRow = {
@@ -23,6 +23,11 @@ type TaxonWeightsRow = {
 export type TaxonWeights = Awaited<ReturnType<typeof getTaxonWeights>>;
 
 /** compendium principal component weights per taxon */
-export const getTaxonWeights = async () => getTable<TaxonWeightsRow>(url);
+export const getTaxonWeights = async () => {
+  const data = await getTable<TaxonWeightsRow>(url);
+  return Object.fromEntries(
+    data.map((datum) => [stringifyTaxon(datum), datum]),
+  );
+};
 
 expose({ getTaxonWeights });

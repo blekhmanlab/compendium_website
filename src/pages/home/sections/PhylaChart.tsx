@@ -1,8 +1,8 @@
 import type { ECharts, EChartsOption } from "echarts";
 import type { ByPhylum } from "@/pages/home/data/taxa";
 import { useEffect, useRef, useState } from "react";
-import * as echarts from "echarts";
-import { orderBy } from "lodash";
+import { init } from "echarts";
+import { max, min, orderBy } from "lodash";
 import { tooltipTable } from "@/pages/home/sections/Map";
 import { useData } from "@/pages/home/state";
 import { sleep } from "@/util/async";
@@ -15,6 +15,8 @@ type Props = {
 
 /** prevalence of samples at phylum level as bar chart */
 const PhylaChart = ({ data }: Props) => {
+  type Datum = (typeof data)[number];
+
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const chart = useRef<ECharts>(null);
 
@@ -27,8 +29,6 @@ const PhylaChart = ({ data }: Props) => {
   const sampleKey = (selectedFeature?.code ||
     selectedFeature?.region ||
     "total") as Sample;
-
-  type Datum = (typeof data)[number];
 
   /** filtered data */
   const filtered = data
@@ -46,8 +46,8 @@ const PhylaChart = ({ data }: Props) => {
 
   /** get range of sample counts */
   let [xMin = 0, xMax = 100] = [
-    Math.min(...filtered.map(getSamples)),
-    Math.max(...filtered.map(getSamples)),
+    min(filtered.map(getSamples)),
+    max(filtered.map(getSamples)),
   ];
 
   /** round down/up to nearest power of 10 */
@@ -65,131 +65,57 @@ const PhylaChart = ({ data }: Props) => {
       color: getColor(datum.phylum),
     },
     datum,
+    tooltip: tooltipTable({
+      Phylum: datum.phylum,
+      Kingdom: datum.kingdom,
+      Samples: formatNumber(getSamples(datum), false),
+    }),
   }));
 
   /** echarts options */
   const option: EChartsOption = {
-    series: [
-      {
-        type: "bar",
-        barWidth: "90%",
-        data: seriesData,
-      },
-    ],
+    series: [{ type: "bar", barWidth: "90%", data: seriesData }],
 
-    grid: {
-      left: 150,
-      right: 20,
-      top: 50,
-      bottom: 50,
-    },
+    grid: { left: 150, right: 20, top: 50, bottom: 50 },
 
     title: [
       {
         text: "Phyla",
-        left: "center",
-        top: 0,
-        textStyle: {
-          color: "white",
-          fontSize: "1rem",
-          fontFamily: "inherit",
-          fontWeight: 600,
-        },
-      },
-      {
-        text: selectedFeature
+        subtext: selectedFeature
           ? selectedFeature.country || selectedFeature.region
           : "",
-        left: "center",
-        top: 20,
-        textStyle: {
-          color: "white",
-          fontSize: "0.75rem",
-          fontFamily: "inherit",
-          fontWeight: "normal",
-        },
       },
     ],
 
     xAxis: {
+      name: "Samples",
       type: "log",
       min: xMin,
       max: xMax,
-      axisLine: { lineStyle: { color: "#fff2" } },
-      axisTick: { lineStyle: { color: "#fff2" } },
-      splitLine: { lineStyle: { color: "#fff2" } },
       axisLabel: {
-        color: "white",
-        fontSize: "1rem",
-        fontFamily: "inherit",
-        fontWeight: "normal",
-        formatter: (value: number) => formatNumber(value),
-        hideOverlap: true,
-      },
-      name: "Samples",
-      nameLocation: "middle",
-      nameGap: 50,
-      nameTextStyle: {
-        color: "white",
-        fontSize: "1rem",
-        fontFamily: "inherit",
-        fontWeight: "normal",
+        formatter: (value) => formatNumber(value),
       },
     },
 
     yAxis: {
       type: "category",
       data: filtered.map((datum) => datum.phylum),
-      axisLine: { lineStyle: { color: "#fff2" } },
-      axisTick: { lineStyle: { color: "#fff2" } },
-      splitLine: { lineStyle: { color: "#fff2" } },
       axisLabel: {
         interval: 0,
         width: 100,
         overflow: "truncate",
         ellipsis: "...",
-        align: "right",
-        color: "white",
         fontSize: "0.75rem",
-        fontFamily: "inherit",
-        fontWeight: "normal",
-        hideOverlap: false,
       },
     },
 
-    tooltip: {
-      trigger: "item",
-      borderColor: "var(--color-slate-500)",
-      backgroundColor: "var(--color-slate-800)",
-      textStyle: {
-        color: "white",
-        fontSize: "inherit",
-        fontFamily: "inherit",
-        fontWeight: "normal",
-      },
-      formatter: (params) => {
-        /** @ts-expect-error types wrong */
-        const datum = params.data.datum;
-        return tooltipTable({
-          Phylum: datum.phylum,
-          Kingdom: datum.kingdom,
-          Samples: formatNumber(getSamples(datum), false),
-        });
-      },
-      position: function (point, params, dom, rect, size) {
-        if (!rect) return point;
-        return [
-          rect.x + rect.width / 2 - size.contentSize[0] / 2,
-          rect.y - size.contentSize[1],
-        ];
-      },
-    },
+    tooltip: { trigger: "item" },
   };
 
   /** initialize and attach chart */
   useEffect(() => {
     if (!ref) return;
-    chart.current = echarts.init(ref, undefined, { renderer: "svg" });
+    chart.current = init(ref, "compendium", { renderer: "svg" });
     sleep().then(() => chart.current?.resize());
     return () => {
       chart.current?.off("finished");
