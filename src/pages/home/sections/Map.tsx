@@ -322,15 +322,14 @@ const getPointer = (
 
   /** touch(es) */
   if ("touches" in event) {
-    if (event.touches.length === 1) {
-      screenPoint.x = event.touches[0]!.clientX;
-      screenPoint.y = event.touches[0]!.clientY;
+    const [touch1, touch2] = event.touches;
+    if (touch1) {
+      screenPoint.x = touch1.clientX;
+      screenPoint.y = touch1.clientY;
     }
-    if (event.touches.length === 2) {
-      screenPoint.x =
-        (event.touches[0]!.clientX + event.touches[1]!.clientX) / 2;
-      screenPoint.y =
-        (event.touches[0]!.clientY + event.touches[1]!.clientY) / 2;
+    if (touch1 && touch2) {
+      screenPoint.x = (touch1.clientX + touch2.clientX) / 2;
+      screenPoint.y = (touch1.clientY + touch2.clientY) / 2;
     }
   }
 

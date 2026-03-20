@@ -47,7 +47,7 @@ export const useLegend = () => {
       return (map[key] = getNeutral());
     else
       /** assign next entry in list */
-      return (map[key] = list[index++ % list.length]!);
+      return (map[key] = list[index++ % list.length] ?? getNeutral());
   };
 
   return [entry, map] as const;
