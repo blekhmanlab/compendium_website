@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router";
 import clsx from "clsx";
 import Logo from "@/assets/logo.svg?react";
 
@@ -25,13 +24,13 @@ const Header = ({ children, big = false }: Props) => {
           `,
       )}
     >
-      <Link
+      <a
         className="
           grid max-w-full flex-1 grid-cols-[min-content_auto_min-content]
           place-items-center justify-start gap-6 text-inherit no-underline
           max-md:gap-4
         "
-        to={!big ? "/" : ""}
+        href={!big ? "/" : ""}
       >
         <Logo className="min-h-full" />
         <div className="h-full w-0.5 bg-white" />
@@ -49,7 +48,7 @@ const Header = ({ children, big = false }: Props) => {
         >
           {import.meta.env.VITE_TITLE}
         </h1>
-      </Link>
+      </a>
 
       {children}
     </header>
