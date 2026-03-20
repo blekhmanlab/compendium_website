@@ -1,15 +1,14 @@
+import type { record } from "udsv";
 import { pick } from "lodash";
-import { parse } from "papaparse";
+import { inferSchema, initParser } from "udsv";
 import { request } from "@/util/async";
 
 /** parse tsv/csv file */
-export const getTable = async <Response>(url: string) => {
+export const getTable = async <Response extends record>(url: string) => {
   const content = (await request(url, "text")).trim();
-  const { data } = parse<Response>(content, {
-    dynamicTyping: true,
-    header: true,
-  });
-  return data;
+  const schema = inferSchema(content);
+  const parser = initParser(schema);
+  return parser.typedObjs<Response>(content);
 };
 
 /** convert taxon object to string for easier compare/lookup/etc */

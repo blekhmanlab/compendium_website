@@ -38,22 +38,24 @@ const Upload = () => {
   /** run parse data */
   useEffect(
     () =>
-      runData(async () =>
+      runData(async () => {
+        if (!userRawData.trim()) return;
         useData.setState({
           userData: await projectionistWorker.parseUserData(userRawData),
-        }),
-      ),
+        });
+      }),
     [userRawData, runData],
   );
 
   /** run parse meta */
   useEffect(
     () =>
-      runMeta(async () =>
+      runMeta(async () => {
+        if (!userRawMeta.trim()) return;
         useData.setState({
           userMeta: await projectionistWorker.parseUserMeta(userRawMeta),
-        }),
-      ),
+        });
+      }),
     [userRawMeta, runMeta],
   );
 

@@ -5,7 +5,7 @@
   "scripts": {
     "compile": "bun ./compile/index.ts",
     "dev": "vite --open",
-    "build": "vite build",
+    "build": "vite build --watch",
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "format": "prettier --write .",
@@ -27,13 +27,13 @@
     "gsap": "^3.14.2",
     "lodash": "^4.17.23",
     "lucide-react": "^0.577.0",
-    "papaparse": "^5.5.3",
     "poisson-disk-sampling": "^2.3.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router": "^7.13.1",
     "tailwindcss": "^4.2.2",
     "tippy.js": "^6.3.7",
+    "udsv": "^0.7.3",
     "zustand": "^5.0.12"
   },
   "devDependencies": {
@@ -44,7 +44,6 @@
     "@types/geojson": "^7946.0.16",
     "@types/lodash": "^4.17.24",
     "@types/node": "^25.5.0",
-    "@types/papaparse": "^5.5.2",
     "@types/poisson-disk-sampling": "^2.2.4",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

@@ -2,7 +2,7 @@ import type { TaxaMap } from "@/pages/projectionist/data/taxa-map";
 import type { TaxonWeights } from "@/pages/projectionist/data/taxon-weights";
 import { expose } from "comlink";
 import { groupBy, isEqual, omit, random, sum, uniqWith } from "lodash";
-import { parse } from "papaparse";
+import { inferSchema, initParser } from "udsv";
 import { stringifyTaxon } from "@/pages/projectionist/data/util";
 
 /** allow aborting from outside worker */
@@ -32,12 +32,14 @@ export const parseUserData = async (text: string) => {
   text = text.trim();
 
   /** parse data */
-  const { data } = parse<(string | number)[]>(text, { dynamicTyping: true });
+  const schema = inferSchema(text);
+  const parser = initParser(inferSchema(text));
+  const data = parser.typedArrs<(string | number)[]>(text);
 
   if (aborted) throw Error(aborted);
 
-  /** taxa (first row) */
-  const taxa = data.shift() as string[];
+  /** taxa (header row column names) */
+  const taxa = schema.cols.map((col) => col.name);
 
   /** sample names (last col on right) */
   const samples = data.map((row) => row.pop() as string);
@@ -114,7 +116,9 @@ type Meta = { sample: string; [key: string]: string | number };
 /** parse user uploaded tabular data (see example-meta.txt) */
 export const parseUserMeta = (text: string) => {
   /** parse data */
-  const { data } = parse<Meta>(text, { dynamicTyping: true, header: true });
+  const schema = inferSchema(text);
+  const parser = initParser(schema);
+  const data = parser.typedObjs<Meta>(text);
   return Object.fromEntries(data.map(({ sample, ...row }) => [sample, row]));
 };
 
