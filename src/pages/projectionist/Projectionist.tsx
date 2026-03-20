@@ -32,10 +32,12 @@ const Projectionist = () => {
       />
 
       <Header>
-        <h2>
+        <h2 className="justify-center font-light">
           <ConeIcon />
           Projectionist
         </h2>
+
+        <div className="text-right">Compare your data to ours</div>
       </Header>
 
       <main>

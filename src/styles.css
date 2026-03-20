@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
 @theme {
+  --breakpoint-sm: 30rem;
+  --breakpoint-md: 55rem;
+  --breakpoint-lg: 70rem;
+
   --color-primary: theme(colors.fuchsia.500);
   --color-secondary: theme(colors.indigo.500);
+
   --font-sans: "Mona Sans", sans-serif;
 }
 
@@ -27,27 +32,16 @@
     display: contents;
   }
 
-  header,
-  footer,
-  section {
-    @apply width-md flex flex-col items-center gap-12 px-[max(var(--pad),(100%---spacing(1)*var(--width))/2)] py-(--pad) [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
+  main {
+    @apply flex grow flex-col;
   }
 
   section {
-    @apply bg-linear-to-r odd:from-slate-500/20 odd:to-slate-500/0 even:from-slate-500/30 even:to-slate-500/10;
-  }
-
-  h1,
-  h2 {
-    @apply flex w-full scroll-mt-8 items-center gap-[0.75em] leading-normal;
-  }
-
-  h1 {
-    @apply justify-center text-center text-4xl leading-tight font-semibold;
+    @apply width-md flex flex-col items-center gap-12 bg-linear-to-r p-(--pad) px-[max(var(--pad),(100%---spacing(1)*var(--width))/2)] [--pad:--spacing(12)] last:grow odd:from-slate-500/20 odd:to-slate-500/0 even:from-slate-500/30 even:to-slate-500/10 max-md:[--pad:--spacing(8)];
   }
 
   h2 {
-    @apply justify-center text-center text-2xl font-medium tracking-wider;
+    @apply flex items-center gap-4 text-center text-2xl leading-normal font-medium tracking-wider;
   }
 
   b,

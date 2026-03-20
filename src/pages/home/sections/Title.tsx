@@ -6,7 +6,12 @@ import Viz from "@/pages/home/sections/Viz";
 const Title = () => (
   <Header big>
     <Viz />
-    <p className="max-w-140 text-xl/relaxed font-light">
+    <p
+      className="
+        max-w-140 text-lg/relaxed font-light
+        max-md:text-base
+      "
+    >
       {import.meta.env.VITE_DESCRIPTION}
     </p>
 
