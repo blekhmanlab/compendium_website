@@ -1,9 +1,7 @@
-import type { ECharts, EChartsOption } from "echarts";
-import { useEffect, useRef, useState } from "react";
-import { init } from "echarts";
+import type { EChartsOption } from "echarts";
+import { memo } from "react";
 import { max, min } from "lodash";
-import { sleep } from "@/util/async";
-import { getColor } from "@/util/colors";
+import Chart from "@/components/Chart";
 
 type Props = {
   title: string;
@@ -12,15 +10,12 @@ type Props = {
   data: {
     x: number;
     y: number;
-    type?: string;
+    color?: string;
   }[];
 };
 
 /** x/y plot of principal components */
 const PCChart = ({ title, xLabel, yLabel, data }: Props) => {
-  const [ref, setRef] = useState<HTMLDivElement | null>(null);
-  const chart = useRef<ECharts>(null);
-
   /** separate x/y values */
   const xs = data.map((datum) => datum.x);
   const ys = data.map((datum) => datum.y);
@@ -41,7 +36,7 @@ const PCChart = ({ title, xLabel, yLabel, data }: Props) => {
   const seriesData = data.map((datum) => ({
     name: "",
     value: [datum.x, datum.y],
-    itemStyle: { color: getColor(datum.type ?? "") },
+    itemStyle: { color: datum.color },
     datum,
   }));
 
@@ -51,37 +46,16 @@ const PCChart = ({ title, xLabel, yLabel, data }: Props) => {
   /** echarts options */
   const option: EChartsOption = {
     series: [{ type: "scatter", data: seriesData, symbolSize }],
-
     grid: { left: 50, right: 50, top: 50, bottom: 50 },
-
     title: [{ text: title }],
-
     xAxis: { min: xMin, max: xMax, name: xLabel },
-
     yAxis: { min: yMin, max: yMax, name: yLabel },
+    animation: false,
   };
-
-  /** initialize and attach chart */
-  useEffect(() => {
-    if (!ref) return;
-    chart.current = init(ref, "compendium", { renderer: "canvas" });
-    sleep().then(() => chart.current?.resize());
-    return () => {
-      chart.current?.off("finished");
-      chart.current?.dispose();
-      chart.current = null;
-    };
-  }, [ref]);
-
-  /** update chart options */
-  useEffect(() => {
-    if (!chart.current) return;
-    chart.current.setOption(option);
-  });
 
   if (!data) return <div className="placeholder">Loading phyla</div>;
 
-  return <div ref={setRef} className="size-full!" />;
+  return <Chart option={option} init={{ renderer: "canvas" }} />;
 };
 
-export default PCChart;
+export default memo(PCChart);

@@ -112,12 +112,11 @@ export type PC = (typeof pcs)[number];
 /** parse user uploaded tabular data (see example-meta.txt) */
 export const parseUserMeta = (text: string) => {
   /** parse data */
-  const { data } = parse<Record<string, string | number>>(text, {
-    dynamicTyping: true,
-    header: true,
-  });
-
-  return data;
+  const { data } = parse<{ sample: string; [key: string]: string | number }>(
+    text,
+    { dynamicTyping: true, header: true },
+  );
+  return Object.fromEntries(data.map(({ sample, ...row }) => [sample, row]));
 };
 
 /** project user data against compendium data */
@@ -178,7 +177,9 @@ export const projectUserData = async (
     projected.push(sampleProjected);
   });
 
-  return projected;
+  return Object.fromEntries(
+    projected.map((pcs, index) => [samples[index] ?? "", pcs]),
+  );
 };
 
 expose({

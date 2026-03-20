@@ -1,8 +1,7 @@
-import type { ECharts, EChartsOption } from "echarts";
+import type { EChartsOption } from "echarts";
 import type { ByReads } from "@/pages/home/data/project";
-import { useEffect, useRef, useState } from "react";
-import { init } from "echarts";
 import { max, min } from "lodash";
+import Chart from "@/components/Chart";
 import { tooltipTable } from "@/pages/home/sections/Map";
 import { useData } from "@/pages/home/state";
 import { getCssVariable } from "@/util/dom";
@@ -15,9 +14,6 @@ type Props = {
 /** show sample counts vs binned read counts */
 const ReadsChart = ({ data }: Props) => {
   type Datum = ByReads["histogram"][number];
-
-  const [ref, setRef] = useState<HTMLDivElement | null>(null);
-  const chart = useRef<ECharts>(null);
 
   /** colors */
   const secondary = getCssVariable("--color-secondary");
@@ -104,26 +100,9 @@ const ReadsChart = ({ data }: Props) => {
     tooltip: { trigger: "item" },
   };
 
-  /** initialize and attach chart */
-  useEffect(() => {
-    if (!ref) return;
-    chart.current = init(ref, "compendium", { renderer: "svg" });
-    chart.current?.on("finished", () => chart.current?.resize());
-    return () => {
-      chart.current?.dispose();
-      chart.current = null;
-    };
-  }, [ref]);
-
-  /** update chart options */
-  useEffect(() => {
-    if (!chart.current) return;
-    chart.current.setOption(option);
-  });
-
   if (!data) return <div className="placeholder">Loading reads</div>;
 
-  return <div ref={setRef} className="size-full!" />;
+  return <Chart option={option} />;
 };
 
 export default ReadsChart;

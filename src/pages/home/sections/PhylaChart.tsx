@@ -1,12 +1,10 @@
-import type { ECharts, EChartsOption } from "echarts";
+import type { EChartsOption } from "echarts";
 import type { ByPhylum } from "@/pages/home/data/taxa";
-import { useEffect, useRef, useState } from "react";
-import { init } from "echarts";
 import { max, min, orderBy } from "lodash";
+import Chart from "@/components/Chart";
 import { tooltipTable } from "@/pages/home/sections/Map";
 import { useData } from "@/pages/home/state";
-import { sleep } from "@/util/async";
-import { getColor } from "@/util/colors";
+import { useLegend } from "@/util/legend";
 import { formatNumber } from "@/util/string";
 
 type Props = {
@@ -16,9 +14,6 @@ type Props = {
 /** prevalence of samples at phylum level as bar chart */
 const PhylaChart = ({ data }: Props) => {
   type Datum = (typeof data)[number];
-
-  const [ref, setRef] = useState<HTMLDivElement | null>(null);
-  const chart = useRef<ECharts>(null);
 
   /** get global state */
   const selectedFeature = useData((state) => state.selectedFeature);
@@ -57,12 +52,15 @@ const PhylaChart = ({ data }: Props) => {
   /** prevent negative log values */
   if (xMin < 1) xMin = 1;
 
+  /** get color for each phylum */
+  const [entry] = useLegend();
+
   /** series data */
   const seriesData = filtered.map((datum) => ({
     name: String(datum.phylum ?? ""),
     value: getSamples(datum),
     itemStyle: {
-      color: getColor(datum.phylum),
+      color: entry(datum.phylum).color,
     },
     datum,
     tooltip: tooltipTable({
@@ -112,27 +110,9 @@ const PhylaChart = ({ data }: Props) => {
     tooltip: { trigger: "item" },
   };
 
-  /** initialize and attach chart */
-  useEffect(() => {
-    if (!ref) return;
-    chart.current = init(ref, "compendium", { renderer: "svg" });
-    sleep().then(() => chart.current?.resize());
-    return () => {
-      chart.current?.off("finished");
-      chart.current?.dispose();
-      chart.current = null;
-    };
-  }, [ref]);
-
-  /** update chart options */
-  useEffect(() => {
-    if (!chart.current) return;
-    chart.current.setOption(option);
-  });
-
   if (!data) return <div className="placeholder">Loading phyla</div>;
 
-  return <div ref={setRef} className="size-full!" />;
+  return <Chart option={option} />;
 };
 
 export default PhylaChart;

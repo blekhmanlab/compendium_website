@@ -1,5 +1,4 @@
 import { registerTheme } from "echarts";
-import { colors } from "@/util/colors";
 
 const text = {
   color: "white",
@@ -37,7 +36,6 @@ const axis = {
 };
 
 registerTheme("compendium", {
-  color: colors,
   textStyle: text,
   title: {
     top: 0,

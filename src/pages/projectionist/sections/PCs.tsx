@@ -1,18 +1,22 @@
+import type { SampleWeights } from "@/pages/projectionist/data/sample-weights";
 import type { PC } from "@/pages/projectionist/project";
 import type * as ProjectionistAPI from "@/pages/projectionist/project";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { wrap } from "comlink";
+import { mapValues } from "lodash";
 import Select from "@/components/Select";
 import { pcs } from "@/pages/projectionist/project";
 import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
 import PCChart from "@/pages/projectionist/sections/PCChart";
 import { useData } from "@/pages/projectionist/state";
+import { useLegend } from "@/util/legend";
 import { useWorker } from "@/util/worker";
 
 const projectionistWorker = wrap<typeof ProjectionistAPI>(
   new ProjectionistWorker(),
 );
 
+/** compare plots of principal components */
 const PCs = () => {
   /** selected principal components */
   const [pcA, setPcA] = useState<PC>(pcs[0]);
@@ -20,8 +24,6 @@ const PCs = () => {
 
   /** project user input data */
   const [, projectStatus, runProject] = useWorker(projectionistWorker);
-
-  console.log(projectStatus);
 
   /** get inputs for projecting */
   const taxa = useData((state) => state.userData?.taxa);
@@ -49,8 +51,45 @@ const PCs = () => {
     [taxa, reads, samples, taxaMap, taxonWeights, runProject],
   );
 
+  /** region option filter */
+  const regionOptions = Object.keys(sampleWeights || {});
+  const [region, setRegion] = useState("");
+  /** set region once options loaded */
+  const first = regionOptions[0];
+  if (!region && first) setRegion(first);
+
+  /** sample weights filtered by region */
+  const regionWeights = useMemo(
+    () => sampleWeights?.[region as keyof SampleWeights],
+    [sampleWeights, region],
+  );
+
+  /** get user meta */
+  const meta = useData((state) => state.userMeta);
+
+  /** color legend */
+  const [entry, legend] = useLegend();
+
+  /** color by */
+  const colorOptions = ["group", "batch", "sequencer"];
+  const [color, setColor] = useState("group");
+
   /** get outputs of projecting */
-  const projected = useData((state) => state.userProjected);
+  const _projected = useData((state) => state.userProjected);
+  const projected = _projected
+    ? mapValues(_projected, (pcs, sample) => ({
+        ...pcs,
+        color: entry(String(meta?.[sample]?.[color] ?? "")).color,
+      }))
+    : undefined;
+
+  const compendiumPlot = useMemo(() => {
+    if (!regionWeights) return undefined;
+    return Object.values(regionWeights).map((datum) => ({
+      x: datum[pcA],
+      y: datum[pcB],
+    }));
+  }, [regionWeights, pcA, pcB]);
 
   return (
     <section>
@@ -59,42 +98,52 @@ const PCs = () => {
       <div className="flex gap-4">
         <Select label="X-axis" options={pcs} value={pcA} onChange={setPcA} />
         <Select label="Y-axis" options={pcs} value={pcB} onChange={setPcB} />
+        <Select
+          label="Region"
+          options={regionOptions}
+          value={region ?? ""}
+          onChange={setRegion}
+        />
+        <Select
+          label="Color by"
+          options={colorOptions}
+          value={color}
+          onChange={setColor}
+        />
       </div>
 
       <div
         className="
           grid w-full grid-cols-2 place-items-start gap-4
-          *:min-h-0 *:min-w-0
+          *:aspect-square
           max-md:grid-cols-1
         "
       >
-        {sampleWeights?.full && (
+        {compendiumPlot ? (
           <PCChart
             title="Compendium"
             xLabel={pcA}
             yLabel={pcB}
-            data={Object.values(sampleWeights.full).map((datum) => ({
-              x: datum[pcA],
-              y: datum[pcB],
-            }))}
+            data={compendiumPlot}
           />
-        )}
-        {!sampleWeights?.full && (
+        ) : (
           <div className="placeholder">Loading compendium PCs</div>
         )}
 
-        {projected && (
+        {projected ? (
           <PCChart
             title="Yours"
             xLabel={pcA}
             yLabel={pcB}
-            data={Object.values(projected).map((datum) => ({
-              x: datum[pcA],
-              y: datum[pcB],
+            data={Object.values(projected).map(({ color, ...pcs }) => ({
+              x: pcs[pcA],
+              y: pcs[pcB],
+              color,
             }))}
           />
-        )}
-        {projectStatus === "" && !projected && (
+        ) : projectStatus === "loading" ? (
+          <div className="placeholder">Loading user PCs</div>
+        ) : (
           <div
             className="
               placeholder border border-dashed border-slate-500 bg-transparent
@@ -103,9 +152,17 @@ const PCs = () => {
             Load your data to compare
           </div>
         )}
-        {projectStatus === "loading" && (
-          <div className="placeholder">Loading user PCs</div>
-        )}
+      </div>
+      <div className="flex flex-wrap items-center gap-8">
+        {Object.entries(legend).map(([key, value], index) => (
+          <div key={index} className="flex items-center gap-2">
+            <div
+              className="size-4 rounded-full"
+              style={{ backgroundColor: value.color }}
+            />
+            <span>{String(key) || "-"}</span>
+          </div>
+        ))}
       </div>
     </section>
   );
