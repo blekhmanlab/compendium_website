@@ -1,6 +1,5 @@
 import "@/components/tooltip";
 import "./styles.css";
-import "@/util/charts";
 import { createBrowserRouter, Outlet, redirect } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import Home from "@/pages/home/Home";
