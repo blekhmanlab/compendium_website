@@ -8,7 +8,7 @@ import globals from "globals";
 import typescriptEslint from "typescript-eslint";
 
 export default defineConfig([
-  globalIgnores(["build", "public", "playwright-report", "test-results"]),
+  globalIgnores(["dist", "public"]),
   {
     name: "TypeScript",
     extends: typescriptEslint.configs.recommended,
