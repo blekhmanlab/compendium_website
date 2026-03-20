@@ -19,6 +19,7 @@ export type TaxaMap = Awaited<ReturnType<typeof getTaxaMap>>;
 /** map of full taxon name to split ranks */
 export const getTaxaMap = async () => {
   const data = await getTable<TaxaMapRow>(url);
+  console.debug(data);
   return Object.fromEntries(data.map(({ taxon, ...row }) => [taxon, row]));
 };
 
