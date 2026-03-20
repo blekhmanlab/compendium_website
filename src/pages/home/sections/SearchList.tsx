@@ -1,19 +1,22 @@
-import type { Remote } from "comlink";
 import type { Col } from "@/components/Table";
 import type { Data } from "@/pages/home/state";
-import type * as SearchWorkerType from "@/util/search.ts";
+import type * as SearchAPI from "@/util/search.ts";
 import type { KeysOfType } from "@/util/types";
-import { useCallback, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
+import { wrap } from "comlink";
 import { capitalize } from "lodash";
 import LoadingIcon from "@/assets/loading.svg?react";
 import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import Table from "@/components/Table";
 import Textbox from "@/components/Textbox";
-import SearchWorker from "@/util/search.ts?worker";
+import Worker from "@/util/search.ts?worker";
 import { formatNumber } from "@/util/string";
 import { useWorker } from "@/util/worker";
+
+const exactWorker = wrap<typeof SearchAPI>(new Worker());
+const fuzzyWorker = wrap<typeof SearchAPI>(new Worker());
 
 /** type options, including all */
 type TypesAll = ("All" | NonNullable<Props["types"]>[number])[];
@@ -28,6 +31,9 @@ type Props = {
   onSelect?: (selected: string[]) => void;
 };
 
+/** fields to search on each list object */
+const fields = ["name", "value"];
+
 const SearchList = ({
   list: fullList,
   cols,
@@ -35,65 +41,56 @@ const SearchList = ({
   names,
   onSelect,
 }: Props) => {
-  /** local state */
+  /** type filter */
   const [type, setType] = useState<TypesAll[number]>("All");
-  const [_search, setSearch] = useState("");
-  const search = useDebounce(_search, 300);
 
-  console.log({ _search, search });
+  /** search input */
+  const [_search, setSearch] = useState("");
+  /** debounced search input */
+  const search = useDebounce(_search, 300);
 
   /** filter full search list by type */
   const list = useMemo(() => {
-    if (!fullList) return undefined;
-
+    if (!fullList) return [];
     let list = [...fullList];
-
     /** filter by type */
     if (types?.length && type !== "All")
       list = list.filter((entry) =>
         "type" in entry ? entry.type === type : true,
       );
-
     /** filter by name */
     if (names) list = list.filter((entry) => names.includes(entry.name));
-
     return list;
   }, [fullList, types, type, names]);
 
-  /** exact search */
-  const [exactMatches = [], exactStatus] = useWorker(
-    SearchWorker,
-    useCallback(
-      (worker: Remote<typeof SearchWorkerType>) => {
-        if (!(list && search.trim())) return;
-        return worker.exactSearch(
-          list,
-          ["name", "value"],
-          search,
-        ) as Promise<List>;
-      },
-      [list, search],
-    ),
+  /** exact search results */
+  const [exactMatches = [], exactStatus, runExact] =
+    useWorker<List>(exactWorker);
+  /** fuzzy search results */
+  const [fuzzyMatches = [], fuzzyStatus, runFuzzy] =
+    useWorker<List>(fuzzyWorker);
+
+  /** run exact search */
+  useEffect(
+    () =>
+      runExact(
+        async () =>
+          exactWorker.exactSearch(list, fields, search) as Promise<List>,
+      ),
+    [list, search, runExact],
   );
 
-  /** fuzzy search */
-  const [fuzzyMatches = [], fuzzyStatus] = useWorker(
-    SearchWorker,
-    useCallback(
-      (worker: Remote<typeof SearchWorkerType>) => {
-        if (!(list && search.trim())) return;
-        return worker.fuzzySearch(
-          list,
-          ["name", "value"],
-          search,
-        ) as Promise<List>;
-      },
-      [list, search],
-    ),
+  /** run fuzzy search */
+  useEffect(
+    () =>
+      runFuzzy(
+        () => fuzzyWorker.fuzzySearch(list, fields, search) as Promise<List>,
+      ),
+    [list, search, runFuzzy],
   );
 
   /** exact match name quick lookup */
-  const exactMatchLookup = useMemo(
+  const exactLookup = useMemo(
     () => Object.fromEntries(exactMatches.map((match) => [match.name, ""])),
     [exactMatches],
   );
@@ -106,7 +103,7 @@ const SearchList = ({
     ? exactMatches.concat(
         /** de-duplicate items already in exact */
         fuzzyMatches
-          .filter((fuzzy) => !(fuzzy.name in exactMatchLookup))
+          .filter((fuzzy) => !(fuzzy.name in exactLookup))
           .map((fuzzy) => ({ ...fuzzy, fuzzy: true })),
       )
     : list;

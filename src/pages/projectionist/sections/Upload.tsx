@@ -1,6 +1,7 @@
-import type { Remote } from "comlink";
-import type * as ProjectionistWorkerType from "@/pages/projectionist/project";
-import { useCallback, useEffect, useState } from "react";
+import type * as ProjectionistAPI from "@/pages/projectionist/project";
+import { useEffect, useState } from "react";
+import { useDebounce } from "@reactuses/core";
+import { wrap } from "comlink";
 import { size } from "lodash";
 import { LightbulbIcon } from "lucide-react";
 import LoadingIcon from "@/assets/loading.svg?react";
@@ -8,46 +9,54 @@ import Button from "@/components/Button";
 import Textbox from "@/components/Textbox";
 import UploadButton from "@/components/UploadButton";
 import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
-import { useData } from "@/pages/projectionist/Projectionist";
+import { useData } from "@/pages/projectionist/state";
 import { formatNumber } from "@/util/string";
 import { useWorker } from "@/util/worker";
 import exampleData from "../data/example-data.tsv?raw";
 import exampleMeta from "../data/example-meta.tsv?raw";
 
+const projectionistWorker = wrap<typeof ProjectionistAPI>(
+  new ProjectionistWorker(),
+);
+
 const Upload = () => {
   /** raw text input */
-  const [userRawData, setUserRawData] = useState("");
-  const [userRawMeta, setUserRawMeta] = useState("");
+  const [_userRawData, setUserRawData] = useState("");
+  const [_userRawMeta, setUserRawMeta] = useState("");
+  /** debounced text input */
+  const userRawData = useDebounce(_userRawData, 300);
+  const userRawMeta = useDebounce(_userRawMeta, 300);
 
   /** parse user input */
-  const [userData, userDataStatus] = useWorker(
-    ProjectionistWorker,
-    useCallback(
-      (worker: Remote<typeof ProjectionistWorkerType>) => {
-        if (!userRawData) return;
-        return worker.parseUserData(userRawData);
-      },
-      [userRawData],
-    ),
-  );
-  const [userMeta, userMetaStatus] = useWorker(
-    ProjectionistWorker,
-    useCallback(
-      (worker: Remote<typeof ProjectionistWorkerType>) => {
-        if (!userRawMeta) return;
-        return worker.parseUserMeta(userRawMeta);
-      },
-      [userRawMeta],
-    ),
+  const [, dataStatus, runData] = useWorker(projectionistWorker);
+  /** parse user meta */
+  const [, metaStatus, runMeta] = useWorker(projectionistWorker);
+
+  /** run parse data */
+  useEffect(
+    () =>
+      runData(async () =>
+        useData.setState({
+          userData: await projectionistWorker.parseUserData(userRawData),
+        }),
+      ),
+    [userRawData, runData],
   );
 
-  /** update global state with parsed data */
-  useEffect(() => {
-    if (userData) useData.setState({ userData });
-  }, [userData]);
-  useEffect(() => {
-    if (userMeta) useData.setState({ userMeta });
-  }, [userMeta]);
+  /** run parse meta */
+  useEffect(
+    () =>
+      runMeta(async () =>
+        useData.setState({
+          userMeta: await projectionistWorker.parseUserMeta(userRawMeta),
+        }),
+      ),
+    [userRawMeta, runMeta],
+  );
+
+  /** get global state */
+  const data = useData((state) => state.userData);
+  const meta = useData((state) => state.userMeta);
 
   return (
     <section>
@@ -65,14 +74,14 @@ const Upload = () => {
 
         <Textbox
           multi
-          value={userRawData}
+          value={_userRawData}
           onChange={setUserRawData}
           placeholder="Paste data here"
         />
 
         <Textbox
           multi
-          value={userRawMeta}
+          value={_userRawMeta}
           onChange={setUserRawMeta}
           placeholder="Paste meta here"
         />
@@ -105,26 +114,26 @@ const Upload = () => {
           Upload
         </UploadButton>
 
-        {userDataStatus ? (
+        {dataStatus ? (
           <div className="flex items-center gap-4">
             <LoadingIcon />
-            {userDataStatus}
+            {dataStatus}
           </div>
         ) : (
           <div>
-            {formatNumber(size(userData?.samples))} samples
+            {formatNumber(size(data?.samples))} samples
             <br />
-            {formatNumber(size(userData?.taxa))} taxa
+            {formatNumber(size(data?.taxa))} taxa
           </div>
         )}
 
-        {userMetaStatus ? (
+        {metaStatus ? (
           <div className="flex items-center gap-4">
             <LoadingIcon />
-            {userMetaStatus}
+            {metaStatus}
           </div>
         ) : (
-          <div>{formatNumber(size(userMeta))} sample meta</div>
+          <div>{formatNumber(size(meta))} sample meta</div>
         )}
 
         <Button

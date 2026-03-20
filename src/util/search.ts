@@ -1,7 +1,9 @@
 import { expose } from "comlink";
-import { progressUtils } from "@/util/worker";
 
-export const { progress, setProgress, aborted, abort } = progressUtils();
+/** allow aborting from outside worker */
+let aborted = "";
+export const abort = (reason = "aborted") => (aborted = reason);
+export const resetAbort = () => (aborted = "");
 
 /** normalize strings for comparison */
 const normalize = (string: string) =>
@@ -71,9 +73,4 @@ const nGramSimilarity = (stringA: string, stringB: string, n = 3) => {
   return common.size / (total.size || Infinity);
 };
 
-expose({
-  exactSearch,
-  fuzzySearch,
-  setProgress,
-  abort,
-});
+expose({ exactSearch, fuzzySearch, abort, resetAbort });

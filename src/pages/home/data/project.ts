@@ -29,7 +29,7 @@ export const getProject = async () => {
   return { byProject, byReads };
 };
 
-/** derive search-friendly list (too big to pre-compile) */
+/** derive search-friendly list (too big to load pre-compiled) */
 export const getProjectSearch = async ({
   byProject,
 }: {

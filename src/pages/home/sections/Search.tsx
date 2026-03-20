@@ -17,6 +17,9 @@ export const tooltips = {
   tag: "Piece of metadata associated with an individual sample.",
 };
 
+/** ensure only one load */
+let loaded = false;
+
 const Search = () => {
   /** get global state */
   const projectSearch = useData((state) => state.projectSearch);
@@ -29,8 +32,11 @@ const Search = () => {
 
   useEffect(() => {
     /** load large data on demand */
-    if (tab === 3 && !tagSearch) loadTag();
-  }, [tab, tagSearch]);
+    if (tab === 3 && !loaded) {
+      loadTag();
+      loaded = true;
+    }
+  }, [tab]);
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 

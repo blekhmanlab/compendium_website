@@ -22,5 +22,4 @@ dist-ssr
 *.sw?
 
 compile/downloaded
-tsconfig.tsbuildinfo
-tsconfig.*.tsbuildinfo
+*.tsbuildinfo

@@ -46,8 +46,10 @@ export type Data = {
   };
 };
 
+/** home page data store */
 export const useData = create<Data>(() => ({}));
 
+/** load and set metadata */
 export const loadMeta = async () => {
   let meta = await getMeta();
   useData.setState({ meta });
@@ -55,6 +57,7 @@ export const loadMeta = async () => {
   useData.setState({ meta });
 };
 
+/** load and set project data */
 export const loadProject = async () => {
   const worker = wrap<typeof ProjectAPI>(new ProjectWorker());
   const { byProject, byReads } = await worker.getProject();
@@ -63,6 +66,7 @@ export const loadProject = async () => {
   useData.setState({ projectSearch });
 };
 
+/** load and set geo data */
 export const loadGeo = async () => {
   const worker = wrap<typeof GeoAPI>(new GeoWorker());
   const { byRegion, byCountry } = await worker.getGeoData();
@@ -71,6 +75,7 @@ export const loadGeo = async () => {
   useData.setState({ geoSearch });
 };
 
+/** load and set taxa data */
 export const loadTaxa = async () => {
   const worker = wrap<typeof TaxaAPI>(new TaxaWorker());
   const { byPhylum, byClass } = await worker.getTaxa();
@@ -79,6 +84,7 @@ export const loadTaxa = async () => {
   useData.setState({ taxaSearch });
 };
 
+/** load and set tag data */
 export const loadTag = async () => {
   const worker = wrap<typeof TagAPI>(new TagWorker());
   const { byTag, byTagValue } = await worker.getTag();

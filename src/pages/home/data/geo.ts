@@ -35,7 +35,7 @@ export const getGeoData = async () => {
   return { byRegion, byCountry };
 };
 
-/** derive search-friendly list (too big to pre-compile) */
+/** derive search-friendly list (too big to load pre-compiled) */
 export const getGeoSearch = async ({
   byRegion,
   byCountry,

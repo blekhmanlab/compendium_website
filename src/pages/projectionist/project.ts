@@ -1,65 +1,51 @@
+import type { SampleWeights } from "@/pages/projectionist/data/sample-weights";
+import type { TaxaMap } from "@/pages/projectionist/data/taxa-map";
 import { expose } from "comlink";
-import {
-  groupBy,
-  isEmpty,
-  isEqual,
-  omit,
-  pick,
-  random,
-  sum,
-  uniqWith,
-} from "lodash";
+import { groupBy, isEqual, omit, pick, random, sum, uniqWith } from "lodash";
 import { parse } from "papaparse";
-import compendiumProjectedFile from "@/pages/projectionist/data/compendium-projected-full.tsv?url";
-import compendiumWeightsFile from "@/pages/projectionist/data/compendium-weights.tsv?url";
-import taxaMapFile from "@/pages/projectionist/data/taxa-map.tsv?url";
-import { progressUtils } from "@/util/worker";
 
-export const { progress, setProgress, aborted, abort } = progressUtils();
+/** allow aborting from outside worker */
+let aborted = "";
+export const abort = (reason = "aborted") => (aborted = reason);
+export const resetAbort = () => (aborted = "");
 
-/** convert taxon object to string for easier compare/lookup/etc */
-const stringifyTaxon = (value: object | string) =>
-  typeof value === "object"
-    ? JSON.stringify(
-        pick(value, ["kingdom", "phylum", "class", "order", "family", "genus"]),
-      )
-    : value;
+/** allow setting onStatus listener from outside worker */
+type OnStatus = (status: string) => void;
+let status: OnStatus = () => {};
+export const onStatus = (onStatus: OnStatus) => (status = onStatus);
 
-/** get text file contents */
-const fetchText = async (url: string) => await (await fetch(url)).text();
+export type UserData = Awaited<ReturnType<typeof parseUserData>>;
+
+export type UserMeta = Awaited<ReturnType<typeof parseUserMeta>>;
+
+export type ProjectedUserData = Awaited<ReturnType<typeof projectUserData>>;
 
 /** max read count to rarify down to */
 const maxReads = 3000;
 
 /** parse user uploaded tabular data (see example-data.txt) */
 export const parseUserData = async (text: string) => {
-  /** get compendium data */
-  const taxaMap = await getTaxaMap();
-  const compendiumWeights = await getCompendiumWeights();
-
-  progress("Parsing");
+  status("Parsing");
 
   /** trim whitespace to not get null rows at start/end */
   text = text.trim();
 
   /** parse data */
-  const { data } = parse<[...number[], string]>(text, { dynamicTyping: true });
+  const { data } = parse<(string | number)[]>(text, { dynamicTyping: true });
 
   if (aborted) throw Error(aborted);
 
-  /** taxa row, mapped to split ranks */
-  const taxa = (data.shift() as string[]).map(
-    (taxon) => taxaMap[taxon] ?? taxon,
-  );
+  /** taxa (first row) */
+  const taxa = data.shift() as string[];
 
-  /** sample name col (last col on right) */
+  /** sample names (last col on right) */
   const samples = data.map((row) => row.pop() as string);
 
-  /** read count rows */
+  /** read counts (> rows 1) */
   const reads = data.map((row) => row as number[]);
 
   if (aborted) throw Error(aborted);
-  progress("Rarifying");
+  status("Rarifying");
 
   /** rarify reads */
   for (const counts of reads) {
@@ -84,7 +70,7 @@ export const parseUserData = async (text: string) => {
   }
 
   if (aborted) throw Error(aborted);
-  progress("rCLR transforming");
+  status("rCLR transforming");
 
   /** "robust centered log-ratio transformation" */
   for (const counts of reads) {
@@ -104,6 +90,31 @@ export const parseUserData = async (text: string) => {
       counts[index] = Math.log(count / mean);
     });
   }
+
+  return { taxa, samples, reads };
+};
+
+/** parse user uploaded tabular data (see example-meta.txt) */
+export const parseUserMeta = (text: string) => {
+  /** parse data */
+  const { data } = parse<Record<string, string | number>>(text, {
+    dynamicTyping: true,
+    header: true,
+  });
+
+  return data;
+};
+
+/** project user data against compendium data */
+export const projectUserData = async (
+  _taxa: UserData["taxa"],
+  reads: UserData["reads"],
+  samples: UserData["samples"],
+  taxaMap: TaxaMap,
+  sampleWeights: SampleWeights,
+) => {
+  /** taxa mapped to split ranks */
+  const taxa = _taxa.map((taxon) => taxaMap[taxon] ?? taxon);
 
   /** drop genus rank to consolidate at the family level */
   let consolidatedTaxa = taxa.map((taxon) =>
@@ -143,14 +154,14 @@ export const parseUserData = async (text: string) => {
     ] as const;
     for (const pc of pcs) {
       if (aborted) throw Error(aborted);
-      progress(`Projecting ${pc} ${sampleName}`);
+      status(`Projecting ${pc} ${sampleName}`);
 
       /** calculate projected principal component */
       const total = sum(
         consolidatedTaxa.map(
           (taxon, taxonIndex) =>
             (consolidatedReads[sampleIndex]?.[taxonIndex] ?? 0) *
-            (compendiumWeights[stringifyTaxon(taxon)]?.[pc] ?? 0),
+            (sampleWeights[stringifyTaxon(taxon)]?.[pc] ?? 0),
         ),
       );
 
@@ -161,138 +172,22 @@ export const parseUserData = async (text: string) => {
     projected.push(sampleProjected);
   });
 
-  return { taxa, samples, projected };
+  return projected;
 };
 
-/** parse user uploaded tabular data (see example-meta.txt) */
-export const parseUserMeta = (text: string) => {
-  /** parse data */
-  const { data } = parse<Record<string, string | number>>(text, {
-    dynamicTyping: true,
-    header: true,
-  });
-
-  return data;
-};
-
-type TaxaMap = {
-  /** full taxon name */
-  taxon: string;
-  /** explicit ranks */
-  kingdom: string;
-  phylum: string;
-  class: string;
-  order: string;
-  family: string;
-  genus: string;
-};
-
-/** map of full taxon name to split ranks */
-let taxaMap: Record<string, Omit<TaxaMap, "taxon">> = {};
-
-/** load on demand */
-const getTaxaMap = async () => {
-  progress("Loading taxa map");
-  if (isEmpty(taxaMap)) {
-    taxaMap = Object.fromEntries(
-      parse<TaxaMap>(await fetchText(taxaMapFile), {
-        header: true,
-      }).data.map(({ taxon, ...entry }) => [
-        /** convert all non-letter characters to periods */
-        /** (we're expecting user to upload in this format, from DADA2) */
-        taxon.replaceAll(/\W/g, "."),
-        entry,
-      ]),
-    );
-  }
-  return taxaMap;
-};
-
-type CompendiumWeights = {
-  /** taxon ranks */
-  kingdom: string;
-  phylum: string;
-  class: string;
-  order: string;
-  family: string;
-  /** principal component values */
-  PC1: number;
-  PC2: number;
-  PC3: number;
-  PC4: number;
-  PC5: number;
-  PC6: number;
-  PC7: number;
-  PC8: number;
-};
-
-/** map of taxon name to compendium principal component weights */
-let compendiumWeights: Record<string, CompendiumWeights> = {};
-
-/** load on demand */
-const getCompendiumWeights = async () => {
-  progress("Loading compendium weights");
-  if (isEmpty(compendiumWeights)) {
-    compendiumWeights = Object.fromEntries(
-      parse<CompendiumWeights>(await fetchText(compendiumWeightsFile), {
-        dynamicTyping: true,
-        header: true,
-      }).data.map((entry) => [stringifyTaxon(entry), entry]),
-    );
-  }
-  return compendiumWeights;
-};
-
-type CompendiumProjected = {
-  /** sample details */
-  sample: string;
-  project: string;
-  /** principal components */
-  PC1: number;
-  PC2: number;
-  PC3: number;
-  PC4: number;
-  PC5: number;
-  PC6: number;
-  PC7: number;
-  PC8: number;
-  /** ??? */
-  projection: string;
-};
-
-/** map of sample name to compendium projected principal component values */
-let compendiumProjected: Record<string, CompendiumProjected> = {};
-
-/** load on demand */
-export const getCompendiumProjected = async () => {
-  progress("Loading compendium projected");
-  if (isEmpty(compendiumProjected)) {
-    compendiumProjected = Object.fromEntries(
-      parse<CompendiumProjected>(await fetchText(compendiumProjectedFile), {
-        dynamicTyping: true,
-        header: true,
-      }).data.map((entry) => [entry.sample, entry]),
-    );
-  }
-  return compendiumProjected;
-};
-
-/** parse compendium data */
-export const parseCompendiumData = async () => {
-  const taxa = await getTaxaMap();
-  const weights = await getCompendiumWeights();
-  const projected = await getCompendiumProjected();
-  return {
-    taxa: Object.values(taxa),
-    weights: Object.values(weights),
-    projected: Object.values(projected),
-  };
-};
+/** convert taxon object to string for easier compare/lookup/etc */
+const stringifyTaxon = (value: object | string) =>
+  typeof value === "object"
+    ? JSON.stringify(
+        pick(value, ["kingdom", "phylum", "class", "order", "family", "genus"]),
+      )
+    : value;
 
 expose({
   parseUserData,
   parseUserMeta,
-  parseCompendiumData,
-  setProgress,
+  projectUserData,
   abort,
+  resetAbort,
+  onStatus,
 });

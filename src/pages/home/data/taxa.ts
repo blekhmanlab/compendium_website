@@ -27,7 +27,7 @@ export const getTaxa = async () => {
   return { byPhylum, byClass };
 };
 
-/** derive search-friendly list (too big to pre-compile) */
+/** derive search-friendly list (too big to load pre-compiled) */
 export const getTaxaSearch = async ({
   byPhylum,
   byClass,
@@ -35,7 +35,7 @@ export const getTaxaSearch = async ({
   byPhylum: ByPhylum;
   byClass: ByClass;
 }) => {
-  /** derive search-friendly list (too big to pre-compile) */
+  /** derive search-friendly list (too big to load pre-compiled) */
   const list: TaxaSearch = [];
 
   /** include phyla */

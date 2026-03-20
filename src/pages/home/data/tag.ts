@@ -10,6 +10,7 @@ export type ByTag = typeof ByTagType;
 
 // export type ByTagValue = typeof ByTagValueType;
 // json file too big for typescript to infer type structure
+
 /** tag value sample counts */
 export type ByTagValue = {
   tag: string;
@@ -42,7 +43,7 @@ export const getTag = async () => {
   return { byTag, byTagValue };
 };
 
-/** derive search-friendly list (too big to pre-compile) */
+/** derive search-friendly list (too big to load pre-compiled) */
 export const getTagSearch = ({
   byTag,
   byTagValue,

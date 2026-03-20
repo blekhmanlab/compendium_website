@@ -1,101 +1,58 @@
-import type { Remote } from "comlink";
-import { useEffect, useMemo, useState } from "react";
-import { proxy, wrap } from "comlink";
+import { useCallback, useState } from "react";
+import { proxy } from "comlink";
 
-/** minimum interface every worker must expose */
-type WorkerBase = {
-  setProgress: (func: (status: string) => Promise<void>) => void;
-  abort: (reason?: string) => void;
+type BaseWorker = {
+  resetAbort?: () => void;
+  abort?: () => void;
+  onStatus?: (onStatus: (status: string) => void) => void;
 };
 
-/** convenience function to call worker and return results and status */
-export const useWorker = <_Worker extends WorkerBase, Result>(
-  /** worker constructor, imported with import X from "./worker.ts?worker" */
-  WorkerConstructor: new () => Worker,
-  /** callback receiving wrapped worker. return type determines data. */
-  callback: (worker: Remote<_Worker>) => Result,
-) => {
-  const worker = useMemo(
-    () => wrap<_Worker>(new WorkerConstructor()),
-    [WorkerConstructor],
+/** run async operation in worker, with status, error handling, de-dupe, etc. */
+export const useWorker = <Data>(worker: BaseWorker) => {
+  /** data returned from async operation */
+  const [data, setData] = useState<Data>();
+  /** status of async operation */
+  const [status, setStatus] = useState<
+    "loading" | "error" | "" | (string & {})
+  >("");
+
+  /** run async operation */
+  const run = useCallback(
+    (start: () => Promise<Data>) => {
+      let latest = true;
+      setStatus("loading");
+      worker.resetAbort?.();
+      worker.onStatus?.(
+        proxy((status) => {
+          if (latest) setStatus(status);
+        }),
+      );
+      start()
+        .then((result) => {
+          /** success */
+          if (latest) {
+            setData(result);
+            setStatus("");
+          } else console.warn("stale");
+        })
+        .catch((error) => {
+          /** error */
+          if (String(error).match(/aborted/i)) console.warn("aborted");
+          else if (!latest) console.warn("stale");
+          else {
+            setStatus("error");
+            console.warn(error);
+          }
+        })
+        .finally(() => (latest = false));
+      /** onCleanup func (usually for useEffect) */
+      return () => {
+        latest = false;
+        worker.abort?.();
+      };
+    },
+    [worker],
   );
 
-  /** state/progress */
-  const [status, setStatus] = useState("");
-
-  /** returned data */
-  const [data, setData] = useState<Awaited<Result>>();
-
-  useEffect(() => {
-    /** controller to abort process later */
-    const abort = new AbortController();
-
-    /** reset status */
-    setStatus("loading");
-    /** reset data */
-    setData(undefined);
-
-    /** flag to indicate if processing has resolved */
-    let resolved = false;
-
-    /** set progress func */
-    worker.setProgress(
-      proxy(async (status) => {
-        /** make sure on progress message hasn't arrived after processing */
-        if (resolved) return;
-        /** update progress */
-        setStatus(status);
-      }),
-    );
-
-    /** handle abort */
-    const onAbort = () => {
-      worker.abort(abort.signal.reason);
-      console.warn(abort.signal.reason);
-    };
-    abort.signal.addEventListener("abort", onAbort);
-
-    (async () => {
-      try {
-        /** execute specified method */
-        const result = await callback(worker);
-        setData(result);
-        setStatus("");
-      } catch (error) {
-        setStatus("error");
-        console.error(error);
-      } finally {
-        /** mark that processing has resolved */
-        resolved = true;
-      }
-    })();
-
-    /** cleanup */
-    return () => {
-      abort.signal.removeEventListener("abort", onAbort);
-      abort.abort("Stale");
-    };
-  }, [worker, callback]);
-
-  return [data, status] as const;
-};
-
-/** progress and abort utils */
-export const progressUtils = () => {
-  /** progress func type */
-  type Progress = (status: string, shouldCancel?: true) => Promise<void>;
-
-  /** currently set progress func */
-  let progress: Progress = () => Promise.resolve();
-
-  /** expose method to set progress func */
-  const setProgress = (func: Progress) => (progress = func);
-
-  /** is aborted */
-  let aborted = "";
-
-  /** abort func */
-  const abort = (reason = "aborted") => (aborted = reason);
-
-  return { progress, setProgress, aborted, abort };
+  return [data, status, run] as const;
 };

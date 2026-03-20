@@ -24,8 +24,14 @@ export const waitFor = async <T>(
 };
 
 /** generic request wrapper */
-export const request = async <Type>(url: string) => {
+export async function request<Response>(
+  url: string,
+  type?: "json",
+): Promise<Response>;
+export async function request(url: string, type: "text"): Promise<string>;
+export async function request(url: string, type: "json" | "text" = "json") {
   const response = await fetch(url);
   if (!response.ok) throw Error("Response not OK");
-  return (await response.json()) as Type;
-};
+  if (type === "json") return await response.json();
+  else return (await response.text()) as string;
+}

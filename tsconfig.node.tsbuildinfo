@@ -1,1 +1,0 @@
-{"root":["./vite.config.ts","./compile/dissolve.d.ts","./compile/index.ts","./compile/types.d.ts","./compile/util.ts","./compile/zenodo-api.d.ts"],"version":"5.9.3"}
