@@ -109,13 +109,12 @@ export const pcs = [
 
 export type PC = (typeof pcs)[number];
 
+type Meta = { sample: string; [key: string]: string | number };
+
 /** parse user uploaded tabular data (see example-meta.txt) */
 export const parseUserMeta = (text: string) => {
   /** parse data */
-  const { data } = parse<{ sample: string; [key: string]: string | number }>(
-    text,
-    { dynamicTyping: true, header: true },
-  );
+  const { data } = parse<Meta>(text, { dynamicTyping: true, header: true });
   return Object.fromEntries(data.map(({ sample, ...row }) => [sample, row]));
 };
 
