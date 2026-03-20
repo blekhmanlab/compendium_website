@@ -8,7 +8,6 @@ import {
   PackageIcon,
   TableIcon,
 } from "lucide-react";
-import Placeholder from "@/components/Placeholder";
 import { useData } from "@/pages/home/state";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
 
@@ -130,7 +129,7 @@ const Overview = () => {
           ))}
         </div>
       ) : (
-        <Placeholder className="h-100">Loading meta...</Placeholder>
+        <div className="placeholder">Loading metadata</div>
       )}
 
       <p>

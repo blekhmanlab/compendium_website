@@ -1,4 +1,5 @@
 import type { ComponentProps } from "react";
+import clsx from "clsx";
 import { XIcon } from "lucide-react";
 
 type Single = { multi?: false } & Omit<ComponentProps<"input">, "onChange">;
@@ -11,8 +12,8 @@ type Base = {
 
 type Props = Base & (Single | Multi);
 
-const Textbox = ({ multi, value, onChange, ...props }: Props) => (
-  <div className="relative flex w-full">
+const Textbox = ({ multi, value, onChange, className, ...props }: Props) => (
+  <div className={clsx("relative flex", className)}>
     {multi ? (
       <textarea
         className="
@@ -22,7 +23,7 @@ const Textbox = ({ multi, value, onChange, ...props }: Props) => (
         {...(props as ComponentProps<"textarea">)}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        rows={3}
+        rows={5}
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"

@@ -1,97 +1,89 @@
 import type { ECharts, EChartsOption } from "echarts";
-import type { ByClass, ByPhylum } from "@/pages/home/data/taxa";
+import type { ByReads } from "@/pages/home/data/project";
 import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts";
-import { orderBy } from "lodash";
-import Placeholder from "@/components/Placeholder";
+import { max, min } from "lodash";
 import { tooltipTable } from "@/pages/home/sections/Map";
 import { useData } from "@/pages/home/state";
-import { sleep } from "@/util/async";
-import { getColor } from "@/util/colors";
+import { getCssVariable } from "@/util/dom";
 import { formatNumber } from "@/util/string";
 
-/** show prevalence of samples at certain taxonomic level as bar chart */
-
 type Props = {
-  id?: string;
-  title: string;
-  data: ByPhylum;
-  datumKey: keyof ByClass[number] | keyof ByPhylum[number];
+  data: ByReads;
 };
 
-const Bar = ({ title, data, datumKey }: Props) => {
+/** show sample counts vs binned read counts */
+const ReadsChart = ({ data }: Props) => {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const chart = useRef<ECharts>(null);
+
+  const secondary = getCssVariable("--color-secondary");
 
   /** get global state */
   const selectedFeature = useData((state) => state.selectedFeature);
 
-  type Sample = keyof (ByPhylum | ByClass)[number]["samples"];
-
   /** which sample count to use */
   const sampleKey = (selectedFeature?.code ||
     selectedFeature?.region ||
-    "total") as Sample;
+    "total") as keyof ByReads["histogram"][number]["samples"];
 
-  type Datum = (typeof data)[number];
-
-  /** filtered data */
-  const filtered = data
-    ? orderBy(
-        data,
-        [(d: Datum) => d.samples[sampleKey] || 0, "_class", "phylum"],
-        ["desc", "asc", "asc"],
-      )
-        .slice(0, 20)
-        .toReversed()
-    : [];
+  type Datum = ByReads["histogram"][number];
+  const histogram = data?.histogram || [];
 
   /** get appropriate sample count */
   const getSamples = (d: Datum) => d.samples[sampleKey] || 0;
 
-  /** get range of sample counts */
-  let [xMin = 0, xMax = 100] = [
-    Math.min(...filtered.map(getSamples)),
-    Math.max(...filtered.map(getSamples)),
-  ];
-
-  /** round down/up to nearest power of 10 */
-  xMin = 10 ** Math.floor(Math.log10(xMin));
-  xMax = 10 ** (Math.ceil(Math.log10(xMax) * 2) / 2);
-
-  /** prevent negative log values */
-  if (xMin < 1) xMin = 1;
+  /** axis ranges */
+  const xMin = min(histogram.map((bin) => bin.min));
+  const xMax = max(histogram.map((bin) => bin.max));
+  const yMax = max(histogram.map(getSamples));
 
   /** series data */
-  const seriesData = filtered.map((datum) => ({
-    name: String(datum[datumKey] ?? ""),
-    value: getSamples(datum),
-    itemStyle: {
-      color: getColor(datum.phylum),
-    },
+  const seriesData = histogram.map((datum) => ({
+    value: [datum.mid, getSamples(datum)],
     datum,
   }));
+
+  /** median value */
+  const median = data?.median[sampleKey] ?? 0;
 
   /** echarts options */
   const option: EChartsOption = {
     series: [
       {
         type: "bar",
-        barWidth: "90%",
+        barWidth: "100%",
         data: seriesData,
+        itemStyle: {
+          color: secondary,
+        },
+        markLine: {
+          symbol: "none",
+          silent: true,
+          lineStyle: {
+            color: "white",
+            width: 3,
+            type: "solid",
+          },
+          label: {
+            show: true,
+            formatter: `Median: ${formatNumber(median)}`,
+            position: "insideEndBottom",
+            rotate: 0,
+            distance: 10,
+            color: "white",
+            fontSize: "1rem",
+            fontFamily: "inherit",
+            fontWeight: "normal",
+          },
+          data: [{ xAxis: median }],
+        },
       },
     ],
 
-    grid: {
-      left: 150,
-      right: 20,
-      top: 50,
-      bottom: 50,
-    },
-
     title: [
       {
-        text: title,
+        text: "Reads",
         left: "center",
         top: 0,
         textStyle: {
@@ -131,7 +123,7 @@ const Bar = ({ title, data, datumKey }: Props) => {
         formatter: (value: number) => formatNumber(value),
         hideOverlap: true,
       },
-      name: "Samples",
+      name: "Reads",
       nameLocation: "middle",
       nameGap: 50,
       nameTextStyle: {
@@ -143,22 +135,28 @@ const Bar = ({ title, data, datumKey }: Props) => {
     },
 
     yAxis: {
-      type: "category",
-      data: filtered.map((datum) => String(datum[datumKey] ?? "")),
+      type: "value",
+      min: 0,
+      max: yMax,
       axisLine: { lineStyle: { color: "#fff2" } },
       axisTick: { lineStyle: { color: "#fff2" } },
       splitLine: { lineStyle: { color: "#fff2" } },
       axisLabel: {
-        interval: 0,
-        width: 100,
-        overflow: "truncate",
-        ellipsis: "...",
-        align: "right",
         color: "white",
-        fontSize: "0.75rem",
+        fontSize: "1rem",
         fontFamily: "inherit",
         fontWeight: "normal",
-        hideOverlap: false,
+        formatter: (value: number) => formatNumber(value),
+        hideOverlap: true,
+      },
+      name: "Samples",
+      nameLocation: "middle",
+      nameGap: 60,
+      nameTextStyle: {
+        color: "white",
+        fontSize: "1rem",
+        fontFamily: "inherit",
+        fontWeight: "normal",
       },
     },
 
@@ -174,11 +172,10 @@ const Bar = ({ title, data, datumKey }: Props) => {
       },
       formatter: (params) => {
         /** @ts-expect-error types wrong */
-        const datum = params.data.datum;
+        const datum = params.data.datum as Datum;
         return tooltipTable({
-          Phylum: datum.phylum,
-          Kingdom: datum.kingdom,
           Samples: formatNumber(getSamples(datum), false),
+          Reads: `${formatNumber(datum.min)} to ${formatNumber(datum.max)}`,
         });
       },
       position: function (point, params, dom, rect, size) {
@@ -195,9 +192,8 @@ const Bar = ({ title, data, datumKey }: Props) => {
   useEffect(() => {
     if (!ref) return;
     chart.current = echarts.init(ref, undefined, { renderer: "svg" });
-    sleep().then(() => chart.current?.resize());
+    chart.current?.on("finished", () => chart.current?.resize());
     return () => {
-      chart.current?.off("finished");
       chart.current?.dispose();
       chart.current = null;
     };
@@ -209,12 +205,9 @@ const Bar = ({ title, data, datumKey }: Props) => {
     chart.current.setOption(option);
   });
 
-  if (!data)
-    return (
-      <Placeholder className="h-100">Loading "{title}" chart...</Placeholder>
-    );
+  if (!data) return <div className="placeholder">Loading reads</div>;
 
   return <div ref={setRef} className="size-full!" />;
 };
 
-export default Bar;
+export default ReadsChart;

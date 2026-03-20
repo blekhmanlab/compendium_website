@@ -3,6 +3,7 @@ import { ConeIcon } from "lucide-react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Meta from "@/components/Meta";
+import PCs from "@/pages/projectionist/sections/PCs";
 import Upload from "@/pages/projectionist/sections/Upload";
 import {
   loadSampleWeights,
@@ -42,6 +43,7 @@ const Projectionist = () => {
 
       <main>
         <Upload />
+        <PCs />
       </main>
       <Footer />
     </>

@@ -20,9 +20,7 @@ type SampleWeightsRow = {
   PC8: number;
 };
 
-export type SampleWeights = Awaited<
-  ReturnType<typeof getSampleWeights>
->["full"];
+export type SampleWeights = Awaited<ReturnType<typeof getSampleWeights>>;
 
 /** compendium principal component weights per sample */
 export const getSampleWeights = async () => {

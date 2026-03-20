@@ -18,7 +18,7 @@ export type UserData = Awaited<ReturnType<typeof parseUserData>>;
 
 export type UserMeta = Awaited<ReturnType<typeof parseUserMeta>>;
 
-export type ProjectedUserData = Awaited<ReturnType<typeof projectUserData>>;
+export type UserProjected = Awaited<ReturnType<typeof projectUserData>>;
 
 /** max read count to rarify down to */
 const maxReads = 3000;
@@ -94,6 +94,20 @@ export const parseUserData = async (text: string) => {
   return { taxa, samples, reads };
 };
 
+/** all available principal components */
+export const pcs = [
+  "PC1",
+  "PC2",
+  "PC3",
+  "PC4",
+  "PC5",
+  "PC6",
+  "PC7",
+  "PC8",
+] as const;
+
+export type PC = (typeof pcs)[number];
+
 /** parse user uploaded tabular data (see example-meta.txt) */
 export const parseUserMeta = (text: string) => {
   /** parse data */
@@ -111,7 +125,7 @@ export const projectUserData = async (
   reads: UserData["reads"],
   samples: UserData["samples"],
   taxaMap: TaxaMap,
-  sampleWeights: SampleWeights,
+  sampleWeights: SampleWeights["full"],
 ) => {
   /** taxa mapped to split ranks */
   const taxa = _taxa.map((taxon) => taxaMap[taxon] ?? taxon);
@@ -142,16 +156,7 @@ export const projectUserData = async (
   samples.forEach((sampleName, sampleIndex) => {
     /** principal components for this sample */
     const sampleProjected: Record<string, number> = {};
-    const pcs = [
-      "PC1",
-      "PC2",
-      "PC3",
-      "PC4",
-      "PC5",
-      "PC6",
-      "PC7",
-      "PC8",
-    ] as const;
+
     for (const pc of pcs) {
       if (aborted) throw Error(aborted);
       status(`Projecting ${pc} ${sampleName}`);

@@ -15,7 +15,6 @@ import {
   zoomIdentity,
 } from "d3";
 import { clamp } from "lodash";
-import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import { setSelectedFeature, useData } from "@/pages/home/state";
 import { frame } from "@/util/async";
@@ -193,7 +192,7 @@ const Map = () => {
     .scaleExtent([baseScale, baseScale * 10]);
 
   if (!byCountry || !byRegion)
-    return <Placeholder className="h-100">Loading map...</Placeholder>;
+    return <div className="placeholder">Loading map</div>;
 
   return (
     <div className="flex flex-col items-center gap-4">

@@ -1,7 +1,11 @@
 import type * as CompendiumProjectedAPI from "@/pages/projectionist/data/sample-weights";
 import type * as TaxaMapAPI from "@/pages/projectionist/data/taxa-map";
 import type * as TaxonWeightsAPI from "@/pages/projectionist/data/taxon-weights";
-import type { UserData, UserMeta } from "@/pages/projectionist/project";
+import type {
+  UserData,
+  UserMeta,
+  UserProjected,
+} from "@/pages/projectionist/project";
 import { wrap } from "comlink";
 import { create } from "zustand";
 import SampleWeightsWorker from "@/pages/projectionist/data/sample-weights.ts?worker";
@@ -9,11 +13,12 @@ import TaxaMapWorker from "@/pages/projectionist/data/taxa-map.ts?worker";
 import TaxonWeightsWorker from "@/pages/projectionist/data/taxon-weights.ts?worker";
 
 export type Data = {
-  sampleWeights?: Record<string, CompendiumProjectedAPI.SampleWeights>;
+  sampleWeights?: CompendiumProjectedAPI.SampleWeights;
   taxonWeights?: TaxonWeightsAPI.TaxonWeights;
   taxaMap?: TaxaMapAPI.TaxaMap;
   userData?: UserData;
   userMeta?: UserMeta;
+  userProjected?: UserProjected;
 };
 
 export const useData = create<Data>(() => ({}));

@@ -6,8 +6,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { wrap } from "comlink";
 import { capitalize } from "lodash";
-import LoadingIcon from "@/assets/loading.svg?react";
-import Placeholder from "@/components/Placeholder";
 import Select from "@/components/Select";
 import Table from "@/components/Table";
 import Textbox from "@/components/Textbox";
@@ -51,7 +49,7 @@ const SearchList = ({
 
   /** filter full search list by type */
   const list = useMemo(() => {
-    if (!fullList) return [];
+    if (!fullList) return;
     let list = [...fullList];
     /** filter by type */
     if (types?.length && type !== "All")
@@ -75,7 +73,7 @@ const SearchList = ({
     () =>
       runExact(
         async () =>
-          exactWorker.exactSearch(list, fields, search) as Promise<List>,
+          exactWorker.exactSearch(list ?? [], fields, search) as Promise<List>,
       ),
     [list, search, runExact],
   );
@@ -84,7 +82,8 @@ const SearchList = ({
   useEffect(
     () =>
       runFuzzy(
-        () => fuzzyWorker.fuzzySearch(list, fields, search) as Promise<List>,
+        () =>
+          fuzzyWorker.fuzzySearch(list ?? [], fields, search) as Promise<List>,
       ),
     [list, search, runFuzzy],
   );
@@ -95,8 +94,7 @@ const SearchList = ({
     [exactMatches],
   );
 
-  if (!list)
-    return <Placeholder className="h-100">Loading search...</Placeholder>;
+  if (!list) return <div className="placeholder">Loading search</div>;
 
   /** full list of matches */
   const matches = search.trim()
@@ -117,21 +115,16 @@ const SearchList = ({
           flex w-full min-w-0 flex-wrap items-center justify-center gap-4
         "
       >
-        <div
-          className="
-            relative flex max-w-full grow items-center justify-center
-            [&>svg:first-child]:absolute
-            [&>svg:first-child]:right-[calc(100%+1.25rem)]
-          "
-        >
-          <LoadingIcon
-            style={{
-              opacity:
-                exactStatus === "loading" || fuzzyStatus === "loading" ? 1 : 0,
-            }}
-          />
-          <Textbox value={_search} onChange={setSearch} placeholder="Search" />
-        </div>
+        <Textbox
+          value={_search}
+          onChange={setSearch}
+          placeholder="Search"
+          className={
+            exactStatus === "loading" || fuzzyStatus === "loading"
+              ? "animate-pulse"
+              : ""
+          }
+        />
 
         {types && (
           <Select

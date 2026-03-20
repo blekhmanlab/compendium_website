@@ -1,10 +1,9 @@
 import type * as ProjectionistAPI from "@/pages/projectionist/project";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { wrap } from "comlink";
 import { size } from "lodash";
 import { LightbulbIcon } from "lucide-react";
-import LoadingIcon from "@/assets/loading.svg?react";
 import Button from "@/components/Button";
 import Textbox from "@/components/Textbox";
 import UploadButton from "@/components/UploadButton";
@@ -20,6 +19,10 @@ const projectionistWorker = wrap<typeof ProjectionistAPI>(
 );
 
 const Upload = () => {
+  /** refs for drag & drop targets */
+  const dataRef = useRef<HTMLTextAreaElement>(null);
+  const metaRef = useRef<HTMLTextAreaElement>(null);
+
   /** raw text input */
   const [_userRawData, setUserRawData] = useState("");
   const [_userRawMeta, setUserRawMeta] = useState("");
@@ -54,7 +57,7 @@ const Upload = () => {
     [userRawMeta, runMeta],
   );
 
-  /** get global state */
+  /** get outputs of parsing */
   const data = useData((state) => state.userData);
   const meta = useData((state) => state.userMeta);
 
@@ -64,77 +67,84 @@ const Upload = () => {
 
       <div
         className="
-          grid w-full grid-cols-2 place-items-start gap-4
-          *:min-h-0 *:min-w-0
+          grid w-full grid-cols-[2fr_1fr] gap-4
           max-md:grid-cols-1
         "
       >
-        <strong>Taxa Data</strong>
-        <strong>Sample Meta</strong>
+        <div className="flex flex-col gap-4">
+          <strong>Sample Data</strong>
 
-        <Textbox
-          multi
-          value={_userRawData}
-          onChange={setUserRawData}
-          placeholder="Paste data here"
-        />
+          <Textbox
+            ref={dataRef}
+            multi
+            value={_userRawData}
+            onChange={setUserRawData}
+            placeholder="Paste or drag data here"
+            className="justify-self-stretch"
+          />
 
-        <Textbox
-          multi
-          value={_userRawMeta}
-          onChange={setUserRawMeta}
-          placeholder="Paste meta here"
-        />
-
-        <UploadButton
-          accept={[
-            ".txt",
-            "text/plain",
-            ".csv",
-            "text/csv",
-            ".tsv",
-            "text/tab-separated-values",
-          ]}
-          onUpload={async (file) => setUserRawData(await file.text())}
-        >
-          Upload
-        </UploadButton>
-
-        <UploadButton
-          accept={[
-            ".txt",
-            "text/plain",
-            ".csv",
-            "text/csv",
-            ".tsv",
-            "text/tab-separated-values",
-          ]}
-          onUpload={async (file) => setUserRawMeta(await file.text())}
-        >
-          Upload
-        </UploadButton>
-
-        {dataStatus ? (
           <div className="flex items-center gap-4">
-            <LoadingIcon />
-            {dataStatus}
-          </div>
-        ) : (
-          <div>
-            {formatNumber(size(data?.samples))} samples
-            <br />
-            {formatNumber(size(data?.taxa))} taxa
-          </div>
-        )}
+            <UploadButton
+              target={dataRef}
+              accept={[
+                ".txt",
+                "text/plain",
+                ".csv",
+                "text/csv",
+                ".tsv",
+                "text/tab-separated-values",
+              ]}
+              onUpload={async (file) => setUserRawData(await file.text())}
+            >
+              Upload
+            </UploadButton>
 
-        {metaStatus ? (
-          <div className="flex items-center gap-4">
-            <LoadingIcon />
-            {metaStatus}
+            {dataStatus ? (
+              <>{dataStatus}</>
+            ) : (
+              <>
+                <div>{formatNumber(size(data?.samples))} samples</div>
+                <div>{formatNumber(size(data?.taxa))} taxa</div>
+              </>
+            )}
           </div>
-        ) : (
-          <div>{formatNumber(size(meta))} sample meta</div>
-        )}
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <strong>Sample Meta</strong>
+
+          <Textbox
+            ref={metaRef}
+            multi
+            value={_userRawMeta}
+            onChange={setUserRawMeta}
+            placeholder="Paste or drag meta here"
+            className="justify-self-stretch"
+          />
+
+          <div className="flex items-center gap-4">
+            <UploadButton
+              target={metaRef}
+              accept={[
+                ".txt",
+                "text/plain",
+                ".csv",
+                "text/csv",
+                ".tsv",
+                "text/tab-separated-values",
+              ]}
+              onUpload={async (file) => setUserRawMeta(await file.text())}
+            >
+              Upload
+            </UploadButton>
+
+            {metaStatus ? (
+              <div className="flex items-center gap-4">{metaStatus}</div>
+            ) : (
+              <div>{formatNumber(size(meta))} samples</div>
+            )}
+          </div>
+        </div>
 
         <Button
           onClick={() => {

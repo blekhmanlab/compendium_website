@@ -104,6 +104,10 @@
   --width: 300;
 }
 
+@utility placeholder {
+  @apply flex h-100 w-full items-center justify-center gap-4 rounded-md bg-slate-500/10 p-2;
+}
+
 .tippy-box {
   @apply rounded border border-slate-500 bg-slate-800 px-2 py-1;
 }

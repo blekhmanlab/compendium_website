@@ -3,9 +3,9 @@ import type { ByPhylum } from "@/pages/home/data/taxa";
 import { useState } from "react";
 import Select from "@/components/Select";
 import { useData } from "@/pages/home/state";
-import Bar from "./Bar";
-import Histogram from "./Histogram";
 import Map from "./Map";
+import PhylaChart from "./PhylaChart";
+import ReadsChart from "./ReadsChart";
 import { tooltips } from "./Search";
 
 const chartOptions = ["Phyla", "Reads"] as const;
@@ -52,16 +52,8 @@ const Prevalence = () => {
             options={chartOptions}
           />
           <div className="min-h-80 w-full grow">
-            {chart === "Phyla" && (
-              <Bar
-                title="Phyla"
-                data={byPhylum as ByPhylum}
-                datumKey="phylum"
-              />
-            )}
-            {chart === "Reads" && (
-              <Histogram title="Reads" data={byReads as ByReads} />
-            )}
+            {chart === "Phyla" && <PhylaChart data={byPhylum as ByPhylum} />}
+            {chart === "Reads" && <ReadsChart data={byReads as ByReads} />}
           </div>
         </div>
       </div>
