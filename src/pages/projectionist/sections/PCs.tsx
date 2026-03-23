@@ -33,15 +33,15 @@ const PCs = () => {
   const [pcA, setPcA] = useState<PC>(pcs[0]);
   const [pcB, setPcB] = useState<PC>(pcs[1]);
 
-  /** projection options */
-  const projectionOptions = Object.keys(sampleWeights || {});
+  /** ordination options */
+  const ordinationOptions = Object.keys(sampleWeights || {});
 
-  /** selected projection */
-  const [projection, setProjection] = useState("");
+  /** selected ordination */
+  const [ordination, setOrdination] = useState("");
 
-  /** set projection once options loaded */
-  const first = projectionOptions[0];
-  if (!projection && first) setProjection(first);
+  /** set ordination once options loaded */
+  const first = ordinationOptions[0];
+  if (!ordination && first) setOrdination(first);
 
   /** region options */
   const regionOptions = useMemo(
@@ -57,9 +57,9 @@ const PCs = () => {
     setRegions(regionOptions);
   }, [regionOptions]);
 
-  /** sample weights filtered by projection and region */
+  /** sample weights filtered by ordination and region */
   const filteredSampleWeights = useMemo(() => {
-    if (!samples || !sampleWeights || !projection) return undefined;
+    if (!samples || !sampleWeights || !ordination) return undefined;
 
     /** quick lookup region for sample (run) */
     const sampleRegion = Object.fromEntries(
@@ -67,17 +67,17 @@ const PCs = () => {
     );
     /** ("sample" in weights is actually SRR (run) instead of SRS (sample)) */
 
-    /** filter by selected projection */
-    const byProjection = sampleWeights[projection as keyof SampleWeights] ?? {};
+    /** filter by selected ordination */
+    const byOrdination = sampleWeights[ordination as keyof SampleWeights] ?? {};
 
     /** filter by selected regions */
-    const byRegion = Object.keys(byProjection).filter((sample) => {
+    const byRegion = Object.keys(byOrdination).filter((sample) => {
       const region = sampleRegion[sample];
       return region && regions.includes(region);
     });
 
-    return pick(byProjection, byRegion);
-  }, [samples, sampleWeights, projection, regions]);
+    return pick(byOrdination, byRegion);
+  }, [samples, sampleWeights, ordination, regions]);
 
   /** data for compendium plot */
   const compendiumPlot = useMemo(() => {
@@ -146,16 +146,16 @@ const PCs = () => {
         <Select label="X-axis" options={pcs} value={pcA} onChange={setPcA} />
         <Select label="Y-axis" options={pcs} value={pcB} onChange={setPcB} />
         <Select
-          label="Projection"
-          options={projectionOptions}
-          value={projection ?? ""}
-          onChange={setProjection}
+          label="Ordination"
+          options={ordinationOptions}
+          value={ordination ?? ""}
+          onChange={setOrdination}
         />
       </div>
 
       <div
         className="
-          grid w-full grid-cols-2 content-start gap-4
+          grid w-full grid-cols-2 content-start gap-8
           max-md:grid-cols-1
         "
       >
