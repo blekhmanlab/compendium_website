@@ -1,5 +1,5 @@
 import { execSync } from "child_process";
-import { createReadStream, readFileSync, writeFileSync } from "fs";
+import { createReadStream, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { readdir, stat } from "fs/promises";
 import { join } from "path";
 import readline from "readline";
@@ -71,12 +71,16 @@ export const read = <Type>(filename: string) =>
   JSON.parse(readFileSync(filename, "utf-8")) as Type;
 
 /** write local json file */
-export const write = (filename: string, data: unknown, pretty = false) =>
+export const write = (filename: string, data: unknown, pretty = false) => {
+  /** create folder if doesn't exist */
+  mkdirSync(join(filename, ".."), { recursive: true });
+  /** write file */
   writeFileSync(
     filename,
     JSON.stringify(data, null, pretty ? 2 : undefined),
     "utf8",
   );
+};
 
 /** generate n equally spaced (in log space) intervals between a and b */
 export const logSpace = (a: number, b: number, n: number) => {

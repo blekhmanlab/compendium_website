@@ -20,8 +20,8 @@ export type Reads = {
     min: number;
     max: number;
     mid: number;
-  };
-  media: {
+  }[];
+  median: {
     total: number;
     [key: string]: number;
   };
