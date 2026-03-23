@@ -22,7 +22,7 @@ export type UserMeta = Awaited<ReturnType<typeof parseUserMeta>>;
 export type UserProjected = Awaited<ReturnType<typeof projectUserData>>;
 
 /** max read count to rarify down to */
-const maxReads = 3000;
+const maxReads = Infinity;
 
 /** parse user uploaded tabular data (see example-data.txt) */
 export const parseUserData = async (text: string) => {

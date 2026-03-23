@@ -6,6 +6,7 @@ import Meta from "@/components/Meta";
 import PCs from "@/pages/projectionist/sections/PCs";
 import Upload from "@/pages/projectionist/sections/Upload";
 import {
+  loadSamples,
   loadSampleWeights,
   loadTaxaMap,
   loadTaxonWeights,
@@ -21,6 +22,7 @@ const Projectionist = () => {
       loadTaxonWeights();
       loadSampleWeights();
       loadTaxaMap();
+      loadSamples();
       loaded = true;
     }
   }, []);

@@ -1,16 +1,18 @@
 import type { ECharts, EChartsInitOpts, EChartsOption } from "echarts";
 import { useEffect, useRef, useState } from "react";
-import { useResizeObserver } from "@reactuses/core";
+import { useDebounceFn, useResizeObserver } from "@reactuses/core";
+import clsx from "clsx";
 import { init, registerTheme } from "echarts";
 import { sleep } from "@/util/async";
 
 type Props = {
   option: EChartsOption;
   init?: EChartsInitOpts;
+  className?: string;
 };
 
 /** echarts wrapper */
-const Chart = ({ option, init: initOptions = {} }: Props) => {
+const Chart = ({ option, init: initOptions = {}, className }: Props) => {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const chart = useRef<ECharts>(null);
 
@@ -29,7 +31,8 @@ const Chart = ({ option, init: initOptions = {} }: Props) => {
   }, [ref, initOptions]);
 
   /** auto-fit */
-  useResizeObserver(ref, () => chart.current?.resize());
+  const resize = useDebounceFn(() => chart.current?.resize(), 300);
+  useResizeObserver(ref, resize.run);
 
   /** update chart options */
   useEffect(() => {
@@ -37,7 +40,7 @@ const Chart = ({ option, init: initOptions = {} }: Props) => {
     chart.current.setOption(option);
   });
 
-  return <div ref={setRef} className="size-full!" />;
+  return <div ref={setRef} className={clsx("size-full", className)} />;
 };
 
 export default Chart;

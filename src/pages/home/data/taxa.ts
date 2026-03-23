@@ -18,7 +18,7 @@ export type TaxonSearch = {
   fuzzy?: boolean;
 }[];
 
-/** phyla/classes */
+/** get phyla and classes */
 export const getTaxa = async () => {
   const [phyla, classes] = await Promise.all([
     request<Phyla>(phylaUrl),

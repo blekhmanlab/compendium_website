@@ -117,6 +117,7 @@ const processData = async (
     {
       sample: string;
       project: string;
+      run: string;
       reads: number;
       code: string;
       region: string;
@@ -198,8 +199,19 @@ const processData = async (
     if (taxonomicDone && metadataDone) break;
 
     /** get sample metadata cols */
-    const [sample = "", project = "", , , , , , , , code = "", region = ""] =
-      metadataRow;
+    const [
+      sample = "",
+      project = "",
+      run = "",
+      ,
+      ,
+      ,
+      ,
+      ,
+      ,
+      code = "",
+      region = "",
+    ] = metadataRow;
 
     /** count country */
     if (countries[code]) countries[code].properties.samples++;
@@ -215,7 +227,7 @@ const processData = async (
     const classCounted: Record<string, boolean> = {};
 
     /** start counting reads for this sample */
-    samples[sample] = { sample, project, reads: 0, code, region };
+    samples[sample] = { sample, run, project, reads: 0, code, region };
 
     /** loop through taxonomic table columns */
     for (let col = 2; col < taxonomicRow.length; col++) {
@@ -469,7 +481,7 @@ const {
   tagValues,
 } = await processData(taxonomicFile, metadataFile, worldMap);
 write(`${output}/projects.json`, projects);
-write(`${output}/samples.json`, samples);
+write(`${output}/samples.json`, samples, false);
 write(`${output}/phyla.json`, phyla);
 write(`${output}/classes.json`, classes);
 write(`${output}/countries.json`, countries);

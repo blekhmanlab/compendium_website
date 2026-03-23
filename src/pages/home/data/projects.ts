@@ -1,12 +1,12 @@
-import type ReadsType from "./reads.json";
 import type ProjectsType from "./projects.json";
+import type ReadsType from "./reads.json";
 import { expose } from "comlink";
 import { request } from "@/util/async";
-import readsUrl from "./reads.json?url";
 import projectsUrl from "./projects.json?url";
+import readsUrl from "./reads.json?url";
 import { cleanSearch } from "./util";
 
-/** project and sample name details */
+/** project and sample names */
 export type Projects = typeof ProjectsType;
 
 /** sample read counts */
@@ -19,7 +19,7 @@ export type ProjectSearch = {
   fuzzy?: boolean;
 }[];
 
-/** projects */
+/** get projects and reads */
 export const getProjects = async () => {
   /** load static data */
   const [projects, reads] = await Promise.all([

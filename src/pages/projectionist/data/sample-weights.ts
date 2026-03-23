@@ -26,7 +26,10 @@ export type SampleWeights = Awaited<ReturnType<typeof getSampleWeights>>;
 export const getSampleWeights = async () => {
   /** map of sample name to weights */
   const makeMap = (table: SampleWeightsRow[]) =>
-    Object.fromEntries(table.map(({ sample, ...row }) => [sample, row]));
+    Object.fromEntries(
+      /** first col actually in format PROJECT_SRR, not sample SRS */
+      table.map(({ sample, ...row }) => [sample.split("_").pop(), row]),
+    );
   /** process files in parallel */
   const [full, asia, europe, noneurope] = await Promise.all([
     getTable<SampleWeightsRow>(fullUrl),

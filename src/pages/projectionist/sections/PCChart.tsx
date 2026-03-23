@@ -32,13 +32,18 @@ const PCChart = ({ title, xLabel, yLabel, data }: Props) => {
   yMin = Math.floor(yMin);
   yMax = Math.ceil(yMax);
 
+  /** prune points to display to maintain render performance */
+  const prune = data.length / 50000;
+
   /** series data */
-  const seriesData = data.map((datum) => ({
-    name: "",
-    value: [datum.x, datum.y],
-    itemStyle: { color: datum.color },
-    datum,
-  }));
+  const seriesData = data
+    .map((datum) => ({
+      name: "",
+      value: [datum.x, datum.y],
+      itemStyle: { color: datum.color },
+      datum,
+    }))
+    .filter((_, index) => index % prune < 1);
 
   /** scale down point size more points there are */
   const symbolSize = Math.max(1, 10 * 2 ** (-data.length / 200));
@@ -55,7 +60,13 @@ const PCChart = ({ title, xLabel, yLabel, data }: Props) => {
 
   if (!data) return <div className="placeholder">Loading phyla</div>;
 
-  return <Chart option={option} init={{ renderer: "canvas" }} />;
+  return (
+    <Chart
+      option={option}
+      init={{ renderer: "canvas" }}
+      className="aspect-square h-[unset]!"
+    />
+  );
 };
 
 export default memo(PCChart);

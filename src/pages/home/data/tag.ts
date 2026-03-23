@@ -2,17 +2,17 @@ import type TagsType from "./tags.json";
 import { expose } from "comlink";
 import { cleanSearch } from "@/pages/home/data/util";
 import { request } from "@/util/async";
-import tagsValueUrl from "./tag-values.json?url";
+import tagValuesUrl from "./tag-values.json?url";
 import tagsUrl from "./tags.json?url";
 
 /** tag project and sample counts */
 export type Tags = typeof TagsType;
 
-// export type TagsValue = typeof TagsValueType;
+// export type TagValues = typeof TagValuesType;
 // json file too big for typescript to infer type structure
 
 /** tag value sample counts */
-export type TagsValue = {
+export type TagValues = {
   tag: string;
   value: string;
   project: string;
@@ -34,22 +34,22 @@ export type TagValueSearch = {
   fuzzy?: boolean;
 }[];
 
-/** tags/tag-values */
+/** get tags and tag-values */
 export const getTags = async () => {
-  const [tags, tagsValue] = await Promise.all([
+  const [tags, tagValues] = await Promise.all([
     request<Tags>(tagsUrl),
-    request<TagsValue>(tagsValueUrl),
+    request<TagValues>(tagValuesUrl),
   ]);
-  return { tags, tagsValue };
+  return { tags, tagValues };
 };
 
 /** derive search-friendly list (too big to load pre-compiled) */
 export const getTagSearch = ({
   tags,
-  tagsValue,
+  tagValues,
 }: {
   tags: Tags;
-  tagsValue: TagsValue;
+  tagValues: TagValues;
 }) => {
   const tagList: TagSearch = [];
   const tagValueList: TagValueSearch = [];
@@ -59,7 +59,7 @@ export const getTagSearch = ({
     tagList.push({ name: tag, samples, projects });
 
   /** include tag values */
-  for (const { tag, value, samples, project } of tagsValue)
+  for (const { tag, value, samples, project } of tagValues)
     tagValueList.push({ name: tag, value, project, samples });
 
   return {

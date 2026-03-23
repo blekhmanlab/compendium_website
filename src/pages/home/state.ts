@@ -11,7 +11,7 @@ import type * as TagAPI from "@/pages/home/data/tag.ts";
 import type {
   Tags,
   TagSearch,
-  TagsValue,
+  TagValues,
   TagValueSearch,
 } from "@/pages/home/data/tag.ts";
 import type * as TaxaAPI from "@/pages/home/data/taxa.ts";
@@ -36,7 +36,7 @@ export type Data = {
   classes?: Classes;
   taxonSearch?: TaxonSearch;
   tags?: Tags;
-  tagsValue?: TagsValue;
+  tagValues?: TagValues;
   tagSearch?: TagSearch;
   tagValueSearch?: TagValueSearch;
   selectedFeature?: {
@@ -57,7 +57,7 @@ export const loadMeta = async () => {
   useData.setState({ meta });
 };
 
-/** load and set project data */
+/** load and set projects */
 export const loadProjects = async () => {
   const worker = wrap<typeof ProjectAPI>(new ProjectWorker());
   const { projects, reads } = await worker.getProjects();
@@ -75,7 +75,7 @@ export const loadGeo = async () => {
   useData.setState({ geoSearch });
 };
 
-/** load and set taxa data */
+/** load and set taxa */
 export const loadTaxa = async () => {
   const worker = wrap<typeof TaxaAPI>(new TaxaWorker());
   const { phyla, classes } = await worker.getTaxa();
@@ -84,14 +84,14 @@ export const loadTaxa = async () => {
   useData.setState({ taxonSearch });
 };
 
-/** load and set tag data */
+/** load and set tags */
 export const loadTags = async () => {
   const worker = wrap<typeof TagAPI>(new TagWorker());
-  const { tags, tagsValue } = await worker.getTags();
-  useData.setState({ tags, tagsValue });
+  const { tags, tagValues } = await worker.getTags();
+  useData.setState({ tags, tagValues });
   const { tagSearch, tagValueSearch } = await worker.getTagSearch({
     tags,
-    tagsValue,
+    tagValues,
   });
   useData.setState({ tagSearch, tagValueSearch });
 };

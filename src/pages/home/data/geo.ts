@@ -7,13 +7,13 @@ import countriesUrl from "./countries.json?url";
 import regionsUrl from "./regions.json?url";
 import { cleanSearch } from "./util";
 
-/** by region, combined with natural earth geojson feature data */
+/** regions combined with natural earth geojson feature data */
 export type Regions = FeatureCollection<
   Geometry,
   (typeof RegionsType)["features"][number]["properties"]
 >;
 
-/** by country, combined with natural earth geojson feature data */
+/** countries combined with natural earth geojson feature data */
 export type Countries = FeatureCollection<
   Geometry,
   (typeof CountriesType)["features"][number]["properties"]
@@ -26,7 +26,7 @@ export type GeoSearch = {
   fuzzy?: boolean;
 }[];
 
-/** regions/countries */
+/** get regions and countries */
 export const getGeoData = async () => {
   const [regions, countries] = await Promise.all([
     request<Regions>(regionsUrl),
