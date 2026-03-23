@@ -111,10 +111,12 @@ const processData = async (
   const phyla: Record<string, TaxLevel[number]> = {};
   /** map of unique classes */
   const classes: Record<string, TaxLevel[number]> = {};
-  /** map of unique samples for counting reads */
-  const bySample: Record<
+  /** map of unique samples */
+  const samples: Record<
     string,
     {
+      sample: string;
+      project: string;
       reads: number;
       code: string;
       region: string;
@@ -198,7 +200,6 @@ const processData = async (
     /** get sample metadata cols */
     const [sample = "", project = "", , , , , , , , code = "", region = ""] =
       metadataRow;
-    // const country = _.startCase(geoLoc.split(":").shift());
 
     /** count country */
     if (countries[code]) countries[code].properties.samples++;
@@ -214,7 +215,7 @@ const processData = async (
     const classCounted: Record<string, boolean> = {};
 
     /** start counting reads for this sample */
-    bySample[sample] = { reads: 0, code, region };
+    samples[sample] = { sample, project, reads: 0, code, region };
 
     /** loop through taxonomic table columns */
     for (let col = 2; col < taxonomicRow.length; col++) {
@@ -222,7 +223,7 @@ const processData = async (
       const reads = Number(taxonomicRow[col]);
 
       /** tally reads for this sample */
-      bySample[sample].reads += reads;
+      samples[sample].reads += reads;
 
       /** if taxon present in sample */
       if (reads > 0) {
@@ -258,7 +259,7 @@ const processData = async (
 
   /** get reads for particular feature */
   const getReads = (key: string) =>
-    Object.values(bySample)
+    Object.values(samples)
       .filter(
         ({ code, region }) => key === "total" || key === code || key === region,
       )
@@ -269,7 +270,6 @@ const processData = async (
 
   /** get global min and max reads */
   const [min = 0, max = 10000000] = extent(totalReads);
-  // const [min, max] = [100, 1000000];
 
   /** number of bins to split reads into */
   const bins = 50;
@@ -360,6 +360,7 @@ const processData = async (
       ["samples.length", "project"],
       ["desc", "asc"],
     ),
+    samples: Object.values(samples),
     phyla: _.orderBy(
       Object.values(phyla).filter(({ phylum }) => phylum),
       [(datum) => datum.samples.total, "phylum"],
@@ -456,9 +457,19 @@ console.info("Cleaning world map data");
 const worldMap = await processNaturalEarth();
 
 console.info("Processing data");
-const { projects, phyla, classes, countries, regions, reads, tags, tagValues } =
-  await processData(taxonomicFile, metadataFile, worldMap);
+const {
+  projects,
+  samples,
+  phyla,
+  classes,
+  countries,
+  regions,
+  reads,
+  tags,
+  tagValues,
+} = await processData(taxonomicFile, metadataFile, worldMap);
 write(`${output}/projects.json`, projects);
+write(`${output}/samples.json`, samples);
 write(`${output}/phyla.json`, phyla);
 write(`${output}/classes.json`, classes);
 write(`${output}/countries.json`, countries);
