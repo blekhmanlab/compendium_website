@@ -34,10 +34,10 @@ const PCs = () => {
   const [pcB, setPcB] = useState<PC>(pcs[1]);
 
   /** ordination options */
-  const ordinationOptions = Object.keys(sampleWeights || {});
+  const ordinationOptions = Object.keys(sampleWeights || {}).sort();
 
   /** selected ordination */
-  const [ordination, setOrdination] = useState("");
+  const [ordination, setOrdination] = useState("full");
 
   /** set ordination once options loaded */
   const first = ordinationOptions[0];

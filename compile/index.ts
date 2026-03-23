@@ -1,18 +1,12 @@
+import { globSync } from "fs";
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
-import type {
-  Geo,
-  Metadata,
-  Projects,
-  Tags,
-  TaxLevel,
-  WorldMap,
-} from "./types";
-import type { _Record, Zenodo } from "./zenodo-api";
+import type { FeatureCollection, Geometry } from "geojson";
+import type { _Record, Zenodo } from "./types/zenodo-api";
 import { bin, extent, median } from "d3";
 import dissolve from "geojson-dissolve";
-import _ from "lodash";
+import { cloneDeep, orderBy, startCase } from "lodash";
 import {
   dirSize,
   download,
@@ -29,37 +23,90 @@ import {
  * it down to just what the website needs (json).
  */
 
-const output = "../src/pages/home/data";
+/** set working directory to directory of this script */
+chdir(dirname(fileURLToPath(import.meta.url)));
+
+/** main data input directory */
+const mainInput = "./downloaded";
+
+/** main data output directory */
+const mainOutput = "../src/pages/home/data";
+
+/** projectionist data input directory */
+const projectionistInput = "./projectionist";
+
+/** projectionist data output directory */
+const projectionistOutput = "../src/pages/projectionist/data";
 
 /** record of downloads, version, and other info */
-export const recordUrl =
-  "https://zenodo.org/api/records?q=conceptrecid:8186993";
+export const recordUrl = process.env.VITE_RECORD ?? "";
+
+/** local record file */
+const recordFile = `${mainInput}/record.json`;
 
 /** raw taxonomic data */
-const taxonomicFile = "downloaded/taxonomic_table.csv";
+const taxonomicFile = `${mainInput}/taxonomic_table.csv`;
 
 /** raw sample metadata */
-const metadataFile = "downloaded/sample_metadata.tsv";
+const metadataFile = `${mainInput}/sample_metadata.tsv`;
 
 /** raw tag data */
-const tagsFile = "downloaded/tags.tsv";
+const tagsFile = `${mainInput}/tags.tsv`;
+
+/** (projectionist) sample weight files */
+const sampleWeightFiles = globSync(
+  `${projectionistInput}/sample-weights-*.tsv`,
+);
+
+/** (projectionist) taxon weights file */
+const taxonWeightFile = `${projectionistInput}/taxon-weights.tsv`;
+
+/** (projectionist) taxa map file */
+const taxaMapFile = `${projectionistInput}/taxa-map.tsv`;
 
 /** raw natural earth data */
-const naturalEarthFile = "natural-earth.json";
+const naturalEarthFile = "./extra/natural-earth.json";
 /** https://www.naturalearthdata.com/downloads/110m-cultural-vectors/ */
 /** https://github.com/nvkelso/natural-earth-vector/blob/master/geojson */
 /** https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson */
 
 /** country to region data */
-const countryToRegionFile = "country-to-region.json";
+const countryToRegionFile = "./extra/country-to-region.json";
 
-/** set working directory to directory of this script */
-chdir(dirname(fileURLToPath(import.meta.url)));
+/** download external input files */
+const downloadFiles = async () => {
+  console.info("DOWNLOADING FILES");
 
-/** process natural earth world map data */
-const processNaturalEarth = async (): Promise<Geo> => {
-  /** load natural earth data */
-  const worldMap = read<WorldMap>(naturalEarthFile);
+  const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
+  if (!record) throw Error("No hits");
+  write(recordFile, record);
+  console.info("Downloading raw data");
+  for (const { key, links } of record.files || [])
+    await download(links.self, `${mainInput}/${key}`);
+};
+
+/** process main data */
+const processMainData = async () => {
+  console.info("PROCESSING MAIN DATA");
+
+  /** process natural earth world map data */
+  console.info("Cleaning world map data");
+
+  /** read natural earth data */
+  const worldMap = read<
+    FeatureCollection<
+      Geometry,
+      {
+        region: string;
+        country: string;
+        code: string;
+        samples: number;
+        [key: string]: string | number;
+      }
+    >
+  >(naturalEarthFile);
+
+  type WorldMapFeature = (typeof worldMap.features)[0];
 
   /** filter out null property */
   const clean = (value: unknown) => {
@@ -73,7 +120,7 @@ const processNaturalEarth = async (): Promise<Geo> => {
 
   for (const feature of worldMap.features) {
     /** natural earth country name */
-    const country = _.startCase(clean(feature.properties.NAME));
+    const country = startCase(clean(feature.properties.NAME));
     /** natural earth country code */
     const code = (
       clean(feature.properties.ISO_A2_EH) ||
@@ -88,60 +135,10 @@ const processNaturalEarth = async (): Promise<Geo> => {
     feature.properties = { region, country, code, samples: 0 };
   }
 
-  return worldMap as Geo;
-};
-
-/** process main data */
-const processData = async (
-  taxonomicFile: string,
-  metadataFile: string,
-  worldMap: Geo,
-) => {
-  /** stream files line by line */
-  const taxonomicStream = stream(taxonomicFile);
-  const metadataStream = stream(metadataFile);
-
-  /** map of unique projects */
-  const projects: Record<string, Projects[number]> = {};
   /** map of unique countries */
-  const countries: Record<string, Geo["features"][number]> = {};
+  const countries: Record<string, WorldMapFeature> = {};
   /** map of unique regions */
-  const regions: Record<string, Geo["features"][number]> = {};
-  /** map of unique phyla */
-  const phyla: Record<string, TaxLevel[number]> = {};
-  /** map of unique classes */
-  const classes: Record<string, TaxLevel[number]> = {};
-  /** map of unique samples */
-  const samples: Record<
-    string,
-    {
-      sample: string;
-      project: string;
-      run: string;
-      reads: number;
-      code: string;
-      region: string;
-    }
-  > = {};
-  /** map of of unique tags */
-  const tags: Record<
-    string,
-    {
-      tag: string;
-      projects: Record<string, string>;
-      samples: Record<string, string>;
-    }
-  > = {};
-  /** map of of unique tag values */
-  const tagValues: Record<
-    string,
-    {
-      tag: string;
-      value: string;
-      project: string;
-      samples: number;
-    }
-  > = {};
+  const regions: Record<string, WorldMapFeature> = {};
 
   /** whether country feature has already been dissolved into region feature */
   const countryDissolved: Record<string, boolean> = {};
@@ -151,11 +148,11 @@ const processData = async (
     const { region, code } = feature.properties;
 
     /** add feature as country */
-    countries[code] = _.cloneDeep(feature);
+    countries[code] = cloneDeep(feature);
 
     if (!regions[region]) {
       /** add feature as region */
-      regions[region] = _.cloneDeep(feature);
+      regions[region] = cloneDeep(feature);
 
       /** unset country specific info */
       regions[region].properties.country = "";
@@ -169,6 +166,10 @@ const processData = async (
     }
   }
 
+  /** stream files line by line */
+  const taxonomicStream = stream(taxonomicFile);
+  const metadataStream = stream(metadataFile);
+
   /** get first/header row of files */
   const [{ value: taxonomicHeaderRaw = [] }] = await Promise.all([
     taxonomicStream.next(),
@@ -178,11 +179,51 @@ const processData = async (
   /** process headers */
   const taxonomicHeader = taxonomicHeaderRaw.map((cell) => {
     const [kingdom = "", phylum = "", _class = ""] = cell
-      .replace(/"/g, "")
       .split(".")
       .filter((taxon) => taxon !== "NA");
     return { kingdom, phylum, _class };
   });
+
+  /** map of unique projects */
+  const projects: Record<
+    string,
+    {
+      project: string;
+      samples: string[];
+    }
+  > = {};
+  /** map of unique phyla */
+  const phyla: Record<
+    string,
+    {
+      kingdom: string;
+      phylum: string;
+      _class: string;
+      samples: Record<string, number>;
+    }
+  > = {};
+  /** map of unique classes */
+  const classes: Record<
+    string,
+    {
+      kingdom: string;
+      phylum: string;
+      _class: string;
+      samples: Record<string, number>;
+    }
+  > = {};
+  /** map of unique samples */
+  const samples: Record<
+    string,
+    {
+      sample: string;
+      project: string;
+      run: string;
+      reads: number;
+      code: string;
+      region: string;
+    }
+  > = {};
 
   /** process rest of rows (with hard limit) */
   for (let row = 0; row < 1000000; row++) {
@@ -239,13 +280,14 @@ const processData = async (
 
       /** if taxon present in sample */
       if (reads > 0) {
+        const taxonomicCol = taxonomicHeader[col];
         /** get props from header row */
-        const taxon = { ...taxonomicHeader[col]!, samples: { total: 0 } };
+        const taxon = { ...taxonomicCol!, samples: { total: 0 } };
         const { phylum = "", _class = "" } = taxon;
 
         /** count sample toward phylum (if not already) */
         if (!phylumCounted[phylum]) {
-          phyla[phylum] ??= _.cloneDeep(taxon);
+          phyla[phylum] ??= cloneDeep(taxon);
           phyla[phylum]._class = "";
           phyla[phylum].samples.total!++;
           phyla[phylum].samples[code] ??= 0;
@@ -257,7 +299,7 @@ const processData = async (
 
         /** count sample toward class (if not already) */
         if (!classCounted[_class]) {
-          classes[_class] ??= _.cloneDeep(taxon);
+          classes[_class] ??= cloneDeep(taxon);
           classes[_class].samples.total!++;
           classes[_class].samples[code] ??= 0;
           classes[_class].samples[code]++;
@@ -325,6 +367,7 @@ const processData = async (
     /** reads for this feature */
     const featureReads = getReads(feature);
 
+    /** calculate median */
     reads.median[feature] = median(featureReads);
 
     /** go through bins of reads for this feature */
@@ -340,6 +383,26 @@ const processData = async (
 
   /** ignore header */
   await tagsStream.next();
+
+  /** map of of unique tags */
+  const tags: Record<
+    string,
+    {
+      tag: string;
+      projects: Record<string, string>;
+      samples: Record<string, string>;
+    }
+  > = {};
+  /** map of of unique tag values */
+  const tagValues: Record<
+    string,
+    {
+      tag: string;
+      value: string;
+      project: string;
+      samples: number;
+    }
+  > = {};
 
   /** process rest of rows (with hard limit) */
   for (let row = 0; row < 100000000; row++) {
@@ -366,141 +429,304 @@ const processData = async (
   }
 
   /** turn maps into lists, and do final sorting and such */
-  return {
-    projects: _.orderBy(
-      Object.values(projects),
-      ["samples.length", "project"],
+  const projectsOut = orderBy(
+    Object.values(projects),
+    ["samples.length", "project"],
+    ["desc", "asc"],
+  );
+  const samplesOut = Object.values(samples);
+  const phylaOut = orderBy(
+    Object.values(phyla).filter(({ phylum }) => phylum),
+    [(datum) => datum.samples.total, "phylum"],
+    ["desc", "asc"],
+  );
+  const classesOut = orderBy(
+    Object.values(classes).filter(({ _class }) => _class),
+    [(datum) => datum.samples.total, "_class"],
+    ["desc", "asc"],
+  );
+  const countriesOut = {
+    ...worldMap,
+    features: orderBy(
+      Object.values(countries),
+      [
+        (datum) => datum.properties.samples,
+        (datum) => datum.properties.country,
+      ],
       ["desc", "asc"],
-    ),
-    samples: Object.values(samples),
-    phyla: _.orderBy(
-      Object.values(phyla).filter(({ phylum }) => phylum),
-      [(datum) => datum.samples.total, "phylum"],
-      ["desc", "asc"],
-    ),
-    classes: _.orderBy(
-      Object.values(classes).filter(({ _class }) => _class),
-      [(datum) => datum.samples.total, "_class"],
-      ["desc", "asc"],
-    ),
-    countries: {
-      ...worldMap,
-      features: _.orderBy(
-        Object.values(countries),
-        [
-          (datum) => datum.properties.samples,
-          (datum) => datum.properties.country,
-        ],
-        ["desc", "asc"],
-      ),
-    },
-    regions: {
-      ...worldMap,
-      features: _.orderBy(
-        Object.values(regions),
-        [
-          (datum) => datum.properties.samples,
-          (datum) => datum.properties.region,
-        ],
-        ["desc", "asc"],
-      ),
-    },
-    reads,
-    tags: _.orderBy(
-      Object.values(tags).map((datum) => ({
-        tag: datum.tag,
-        projects: Object.keys(datum.projects).length,
-        samples: Object.keys(datum.samples).length,
-      })),
-      [(datum) => datum.samples, (datum) => datum.projects],
-      ["desc", "desc"],
-    ),
-    tagValues: _.orderBy(
-      Object.values(tagValues),
-      [(datum) => datum.samples],
-      ["desc"],
     ),
   };
+  const regionsOut = {
+    ...worldMap,
+    features: orderBy(
+      Object.values(regions),
+      [(datum) => datum.properties.samples, (datum) => datum.properties.region],
+      ["desc", "asc"],
+    ),
+  };
+  const readsOut = reads;
+  const tagsOut = orderBy(
+    Object.values(tags).map((datum) => ({
+      tag: datum.tag,
+      projects: Object.keys(datum.projects).length,
+      samples: Object.keys(datum.samples).length,
+    })),
+    [(datum) => datum.samples, (datum) => datum.projects],
+    ["desc", "desc"],
+  );
+  const tagValuesOut = orderBy(
+    Object.values(tagValues),
+    [(datum) => datum.samples],
+    ["desc"],
+  );
+
+  /** load zenodo record */
+  const record = read<_Record>(recordFile);
+
+  /** derive metadata about data */
+  const metadata = {
+    projects: projectsOut.length,
+    samples: projectsOut.reduce(
+      (total, { samples }) => total + samples.length,
+      0,
+    ),
+    phyla: phylaOut.filter((taxon) => taxon.samples).length,
+    classes: classesOut.filter((taxon) => taxon.samples).length,
+    regions: regionsOut.features.filter((feature) => feature.properties.samples)
+      .length,
+    countries: countriesOut.features.filter(
+      (feature) => feature.properties.samples,
+    ).length,
+    tags: Object.keys(tags).length,
+    version: record.metadata.version,
+    date: record.updated,
+    downloads: record.stats.unique_downloads,
+    views: record.stats.unique_views,
+    size:
+      record.files
+        ?.map((file) => file.size)
+        ?.reduce((total, value) => total + value, 0) || 0,
+    uncompressed: await dirSize("./downloaded"),
+  };
+
+  /** save results */
+  write(`${mainOutput}/projects.json`, projectsOut);
+  write(`${mainOutput}/samples.json`, samplesOut);
+  write(`${mainOutput}/phyla.json`, phylaOut);
+  write(`${mainOutput}/classes.json`, classesOut);
+  write(`${mainOutput}/countries.json`, countriesOut);
+  write(`${mainOutput}/regions.json`, regionsOut);
+  write(`${mainOutput}/reads.json`, readsOut);
+  write(`${mainOutput}/tags.json`, tagsOut);
+  write(`${mainOutput}/tag-values.json`, tagValuesOut);
+  write(`${mainOutput}/metadata.json`, metadata);
+
+  console.info("Summary");
+  console.info(metadata);
 };
 
-/** derive metadata about data */
-const deriveMetadata = async (
-  projects: Projects,
-  phyla: TaxLevel,
-  classes: TaxLevel,
-  regions: Geo,
-  countries: Geo,
-  tags: Tags,
-  record: _Record,
-): Promise<Metadata> => ({
-  projects: projects.length,
-  samples: projects.reduce((total, { samples }) => total + samples.length, 0),
-  phyla: phyla.filter((taxon) => taxon.samples).length,
-  classes: classes.filter((taxon) => taxon.samples).length,
-  regions: regions.features.filter((feature) => feature.properties.samples)
-    .length,
-  countries: countries.features.filter((feature) => feature.properties.samples)
-    .length,
-  tags: Object.keys(tags).length,
-  version: record.metadata.version,
-  date: record.updated,
-  downloads: record.stats.unique_downloads,
-  views: record.stats.unique_views,
-  size:
-    record.files
-      ?.map((file) => file.size)
-      ?.reduce((total, value) => total + value, 0) || 0,
-  uncompressed: await dirSize("./downloaded"),
-});
+/** process projectionist data */
+const processProjectionistData = async () => {
+  console.info("PROCESSING PROJECTIONIST DATA");
 
-/** main workflow */
+  /** for each loading, map of sample run to principal components */
+  const sampleWeights: Record<
+    string,
+    Record<
+      string,
+      {
+        PC1: number;
+        PC2: number;
+        PC3: number;
+        PC4: number;
+        PC5: number;
+        PC6: number;
+        PC7: number;
+        PC8: number;
+      }
+    >
+  > = {};
 
-console.info("Getting data download links and other info");
-const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
-if (!record) throw Error("No hits");
+  /** process sample weight files */
+  for (const file of sampleWeightFiles) {
+    /** get ordination name from filename */
+    const ordination = file.match(/sample-weights-(.*)\.tsv/)?.[1];
+    if (!ordination) continue;
 
-if (!process.env.SKIP_DOWNLOAD) {
-  console.info("Downloading raw data");
-  for (const { key, links } of record.files || [])
-    await download(links.self, `downloaded/${key}`);
-}
+    console.info(`Processing ordination ${ordination}`);
 
-console.info("Cleaning world map data");
-const worldMap = await processNaturalEarth();
+    /** start ordination */
+    sampleWeights[ordination] = {};
 
-console.info("Processing data");
-const {
-  projects,
-  samples,
-  phyla,
-  classes,
-  countries,
-  regions,
-  reads,
-  tags,
-  tagValues,
-} = await processData(taxonomicFile, metadataFile, worldMap);
-write(`${output}/projects.json`, projects);
-write(`${output}/samples.json`, samples, false);
-write(`${output}/phyla.json`, phyla);
-write(`${output}/classes.json`, classes);
-write(`${output}/countries.json`, countries);
-write(`${output}/regions.json`, regions);
-write(`${output}/reads.json`, reads);
-write(`${output}/tags.json`, tags);
-write(`${output}/tag-values.json`, tagValues, false);
+    /** stream file line by line */
+    const ordinationStream = stream(file);
 
-console.info("Deriving metadata");
-const metadata = await deriveMetadata(
-  projects,
-  phyla,
-  classes,
-  regions,
-  countries,
-  tags,
-  record,
-);
-write(`${output}/metadata.json`, metadata, true);
+    /** ignore header */
+    await ordinationStream.next();
 
-console.info("Summary");
-console.info(metadata);
+    /** process rest of rows (with hard limit) */
+    for (let row = 0; row < 1000000; row++) {
+      /** show progress periodically */
+      if (throttle("data")) console.info(`Processing sample weight row ${row}`);
+
+      /** read row */
+      const { value: ordinationRow = [], done: ordinationDone } =
+        await ordinationStream.next();
+
+      /** if no more data, exit */
+      if (ordinationDone) break;
+
+      /** get cols */
+      let [
+        run = "",
+        ,
+        pc1 = 0,
+        pc2 = 0,
+        pc3 = 0,
+        pc4 = 0,
+        pc5 = 0,
+        pc6 = 0,
+        pc7 = 0,
+        pc8 = 0,
+      ] = ordinationRow;
+
+      /** split PROJECT_SRR to just SRR */
+      run = run.split("_").pop() || run;
+
+      /** set sample in ordination */
+      sampleWeights[ordination]![run] = {
+        PC1: Number(pc1),
+        PC2: Number(pc2),
+        PC3: Number(pc3),
+        PC4: Number(pc4),
+        PC5: Number(pc5),
+        PC6: Number(pc6),
+        PC7: Number(pc7),
+        PC8: Number(pc8),
+      };
+    }
+  }
+
+  /** map of taxon to principal components */
+  const taxonWeights: Record<
+    string,
+    {
+      PC1: number;
+      PC2: number;
+      PC3: number;
+      PC4: number;
+      PC5: number;
+      PC6: number;
+      PC7: number;
+      PC8: number;
+    }
+  > = {};
+
+  /** stream file line by line */
+  const taxonWeightsStream = stream(taxonWeightFile);
+
+  /** ignore header */
+  await taxonWeightsStream.next();
+
+  /** process rest of rows (with hard limit) */
+  for (let row = 0; row < 1000000; row++) {
+    /** show progress periodically */
+    if (throttle("data")) console.info(`Processing taxon weight row ${row}`);
+
+    /** read row */
+    const { value: taxonWeightRow = [], done: taxonWeightDone } =
+      await taxonWeightsStream.next();
+
+    /** if no more data, exit */
+    if (taxonWeightDone) break;
+
+    /** get cols */
+    const [
+      kingdom = "",
+      phylum = "",
+      _class = "",
+      order = "",
+      family = "",
+      pc1 = 0,
+      pc2 = 0,
+      pc3 = 0,
+      pc4 = 0,
+      pc5 = 0,
+      pc6 = 0,
+      pc7 = 0,
+      pc8 = 0,
+    ] = taxonWeightRow;
+
+    /** stringify taxon info into key */
+    const taxon = [kingdom, phylum, _class, order, family].join("|");
+
+    /** set taxon in weights */
+    taxonWeights[taxon] = {
+      PC1: Number(pc1),
+      PC2: Number(pc2),
+      PC3: Number(pc3),
+      PC4: Number(pc4),
+      PC5: Number(pc5),
+      PC6: Number(pc6),
+      PC7: Number(pc7),
+      PC8: Number(pc8),
+    };
+  }
+
+  /** map of full taxon name to split ranks */
+  const taxaMap: Record<
+    string,
+    {
+      /** explicit ranks */
+      kingdom: string;
+      phylum: string;
+      _class: string;
+      order: string;
+      family: string;
+      genus: string;
+    }
+  > = {};
+
+  /** stream file line by line */
+  const taxaMapStream = stream(taxaMapFile);
+
+  /** ignore header */
+  await taxaMapStream.next();
+
+  /** process rest of rows (with hard limit) */
+  for (let row = 0; row < 1000000; row++) {
+    /** show progress periodically */
+    if (throttle("data")) console.info(`Processing taxa map row ${row}`);
+
+    /** read row */
+    const { value: taxaMapRow = [], done: taxaMapDone } =
+      await taxaMapStream.next();
+
+    /** if no more data, exit */
+    if (taxaMapDone) break;
+
+    /** get cols */
+    const [
+      full = "",
+      kingdom = "",
+      phylum = "",
+      _class = "",
+      order = "",
+      family = "",
+      genus = "",
+    ] = taxaMapRow;
+
+    /** set taxon in map */
+    taxaMap[full] = { kingdom, phylum, _class, order, family, genus };
+  }
+
+  /** save results */
+  write(`${projectionistOutput}/sample-weights.json`, sampleWeights);
+  write(`${projectionistOutput}/taxon-weights.json`, taxonWeights);
+  write(`${projectionistOutput}/taxa-map.json`, taxaMap);
+};
+
+/** run */
+if (true) await downloadFiles();
+if (true) await processMainData();
+if (true) await processProjectionistData();

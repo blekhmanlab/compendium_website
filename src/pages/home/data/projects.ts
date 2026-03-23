@@ -1,5 +1,3 @@
-import type ProjectsType from "./projects.json";
-import type ReadsType from "./reads.json";
 import { expose } from "comlink";
 import { request } from "@/util/async";
 import projectsUrl from "./projects.json?url";
@@ -7,10 +5,27 @@ import readsUrl from "./reads.json?url";
 import { cleanSearch } from "./util";
 
 /** project and sample names */
-export type Projects = typeof ProjectsType;
+export type Projects = {
+  project: string;
+  samples: string[];
+}[];
 
 /** sample read counts */
-export type Reads = typeof ReadsType;
+export type Reads = {
+  histogram: {
+    samples: {
+      total: number;
+      [key: string]: number;
+    };
+    min: number;
+    max: number;
+    mid: number;
+  };
+  media: {
+    total: number;
+    [key: string]: number;
+  };
+};
 
 export type ProjectSearch = {
   name: string;

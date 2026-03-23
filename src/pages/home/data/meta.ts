@@ -1,5 +1,5 @@
 import type MetaType from "./meta.json";
-import type { Zenodo } from "../../../../compile/zenodo-api";
+import type { Zenodo } from "../../../../compile/types/zenodo-api";
 import { request } from "@/util/async";
 import metaUrl from "./meta.json?url";
 
@@ -10,8 +10,7 @@ export type Meta = typeof MetaType;
 export const getMeta = async () => await request<Meta>(metaUrl);
 
 /** record of downloads, version, and other info */
-export const recordUrl =
-  "https://zenodo.org/api/records?q=conceptrecid:8186993";
+export const recordUrl = import.meta.env.VITE_RECORD ?? "";
 
 /** live metadata (from zenodo api) */
 export const getLiveMeta = async () => {

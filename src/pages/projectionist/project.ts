@@ -3,7 +3,6 @@ import type { TaxonWeights } from "@/pages/projectionist/data/taxon-weights";
 import { expose } from "comlink";
 import { groupBy, isEqual, omit, random, sum, uniqWith } from "lodash";
 import { inferSchema, initParser } from "udsv";
-import { stringifyTaxon } from "@/pages/projectionist/data/util";
 
 /** allow aborting from outside worker */
 let aborted = "";
@@ -22,7 +21,7 @@ export type UserMeta = Awaited<ReturnType<typeof parseUserMeta>>;
 export type UserProjected = Awaited<ReturnType<typeof projectUserData>>;
 
 /** max read count to rarify down to */
-const maxReads = Infinity;
+const maxReads = 3000;
 
 /** parse user uploaded tabular data (see example-data.txt) */
 export const parseUserData = async (text: string) => {
@@ -42,10 +41,10 @@ export const parseUserData = async (text: string) => {
   const taxa = schema.cols.map((col) => col.name);
 
   /** sample names (last col on right) */
-  const samples = data.map((row) => row.pop() as string);
+  const samples = data.map((row) => String(row.pop()));
 
   /** read counts (> rows 1) */
-  const reads = data.map((row) => row as number[]);
+  const reads = data.map((row) => row.map(Number));
 
   if (aborted) throw Error(aborted);
   status("Rarifying");
@@ -131,12 +130,12 @@ export const projectUserData = async (
   taxonWeights: TaxonWeights,
 ) => {
   /** taxa mapped to split ranks */
-  const taxa = _taxa.map((taxon) => taxaMap[taxon] ?? taxon);
+  const taxa = _taxa
+    .map((taxon) => taxaMap[taxon])
+    .filter((taxon) => taxon !== undefined);
 
   /** drop genus rank to consolidate at the family level */
-  let consolidatedTaxa = taxa.map((taxon) =>
-    typeof taxon === "object" ? omit(taxon, "genus") : taxon,
-  );
+  let consolidatedTaxa = taxa.map((taxon) => omit(taxon, "genus"));
 
   /** group together indices that are the same */
   const indices: number[][] = Object.values(
@@ -166,11 +165,13 @@ export const projectUserData = async (
 
       /** calculate projected principal component */
       const total = sum(
-        consolidatedTaxa.map(
-          (taxon, taxonIndex) =>
-            (consolidatedReads[sampleIndex]?.[taxonIndex] ?? 0) *
-            (taxonWeights[stringifyTaxon(taxon)]?.[pc] ?? 0),
-        ),
+        consolidatedTaxa.map((taxon, taxonIndex) => {
+          /** user weight */
+          const user = consolidatedReads[sampleIndex]?.[taxonIndex];
+          /** compendium weight */
+          const compendium = taxonWeights[stringifyTaxon(taxon)]?.[pc];
+          return (user ?? 0) * (compendium ?? 0);
+        }),
       );
 
       /** add principal component value */
@@ -184,6 +185,21 @@ export const projectUserData = async (
     projected.map((pcs, index) => [samples[index] ?? "", pcs]),
   );
 };
+
+/** stringify taxon into key */
+const stringifyTaxon = ({
+  kingdom,
+  phylum,
+  _class,
+  order,
+  family,
+}: {
+  kingdom: string;
+  phylum: string;
+  _class: string;
+  order: string;
+  family: string;
+}) => [kingdom, phylum, _class, order, family].join("|");
 
 expose({
   parseUserData,

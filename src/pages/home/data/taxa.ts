@@ -1,5 +1,3 @@
-import type ClassesType from "./classes.json";
-import type PhylaType from "./phyla.json";
 import { expose } from "comlink";
 import { request } from "@/util/async";
 import classesUrl from "./classes.json?url";
@@ -7,9 +5,26 @@ import phylaUrl from "./phyla.json?url";
 import { cleanSearch } from "./util";
 
 /** by class taxonomic level */
-export type Classes = typeof ClassesType;
+export type Classes = {
+  kingdom: string;
+  phylum: string;
+  _class: string;
+  samples: {
+    total: number;
+    [key: string]: number;
+  };
+}[];
+
 /** by phylum taxonomic level */
-export type Phyla = typeof PhylaType;
+export type Phyla = {
+  kingdom: string;
+  phylum: string;
+  _class: string;
+  samples: {
+    total: number;
+    [key: string]: number;
+  };
+}[];
 
 export type TaxonSearch = {
   name: string;

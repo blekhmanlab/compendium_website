@@ -1,4 +1,3 @@
-import type TagsType from "./tags.json";
 import { expose } from "comlink";
 import { cleanSearch } from "@/pages/home/data/util";
 import { request } from "@/util/async";
@@ -6,10 +5,11 @@ import tagValuesUrl from "./tag-values.json?url";
 import tagsUrl from "./tags.json?url";
 
 /** tag project and sample counts */
-export type Tags = typeof TagsType;
-
-// export type TagValues = typeof TagValuesType;
-// json file too big for typescript to infer type structure
+export type Tags = {
+  tag: string;
+  projects: number;
+  samples: number;
+}[];
 
 /** tag value sample counts */
 export type TagValues = {

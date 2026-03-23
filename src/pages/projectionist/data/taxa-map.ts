@@ -1,25 +1,21 @@
 import { expose } from "comlink";
-import { getTable } from "@/pages/projectionist/data/util";
-import url from "./taxa-map.tsv?url";
-
-type TaxaMapRow = {
-  /** full taxon name */
-  taxon: string;
-  /** explicit ranks */
-  kingdom: string;
-  phylum: string;
-  class: string;
-  order: string;
-  family: string;
-  genus: string;
-};
-
-export type TaxaMap = Awaited<ReturnType<typeof getTaxaMap>>;
+import { request } from "@/util/async";
+import taxaMapUrl from "./taxa-map.json?url";
 
 /** map of full taxon name to split ranks */
-export const getTaxaMap = async () => {
-  const data = await getTable<TaxaMapRow>(url);
-  return Object.fromEntries(data.map(({ taxon, ...row }) => [taxon, row]));
-};
+export type TaxaMap = Record<
+  string,
+  {
+    kingdom: string;
+    phylum: string;
+    _class: string;
+    order: string;
+    family: string;
+    genus: string;
+  }
+>;
+
+/** get taxa map */
+export const getTaxaMap = async () => request<TaxaMap>(taxaMapUrl);
 
 expose({ getTaxaMap });

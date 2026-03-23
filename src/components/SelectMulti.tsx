@@ -6,7 +6,7 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import clsx from "clsx";
-import { truncate } from "lodash";
+import { startCase, truncate } from "lodash";
 import { CheckIcon, ChevronDownIcon } from "lucide-react";
 
 type Props<Option extends string> = {
@@ -68,7 +68,7 @@ const SelectMulti = <Option extends string>({
                       selected ? "opacity-100" : "opacity-0",
                     )}
                   />
-                  {option}
+                  {startCase(option)}
                 </>
               )}
             </ListboxOption>

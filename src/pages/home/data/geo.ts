@@ -1,23 +1,22 @@
 import type { FeatureCollection, Geometry } from "geojson";
-import type CountriesType from "./countries.json";
-import type RegionsType from "./regions.json";
 import { expose } from "comlink";
 import { request } from "@/util/async";
 import countriesUrl from "./countries.json?url";
 import regionsUrl from "./regions.json?url";
 import { cleanSearch } from "./util";
 
+type Properties = {
+  region: string;
+  country: string;
+  code: string;
+  samples: number;
+};
+
 /** regions combined with natural earth geojson feature data */
-export type Regions = FeatureCollection<
-  Geometry,
-  (typeof RegionsType)["features"][number]["properties"]
->;
+export type Regions = FeatureCollection<Geometry, Properties>;
 
 /** countries combined with natural earth geojson feature data */
-export type Countries = FeatureCollection<
-  Geometry,
-  (typeof CountriesType)["features"][number]["properties"]
->;
+export type Countries = FeatureCollection<Geometry, Properties>;
 
 export type GeoSearch = {
   name: string;
