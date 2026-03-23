@@ -6648,7 +6648,11 @@
     "kingdom": "Bacteria",
     "phylum": "Bacillota",
     "_class": "Thermincolia",
-    "samples": { "total": 4, "US": 4, "Europe and Northern America": 4 }
+    "samples": {
+      "total": 4,
+      "US": 4,
+      "Europe and Northern America": 4
+    }
   },
   {
     "kingdom": "Bacteria",
@@ -6716,7 +6720,11 @@
     "kingdom": "Archaea",
     "phylum": "Altiarchaeota",
     "_class": "Altiarchaeia",
-    "samples": { "total": 2, "US": 2, "Europe and Northern America": 2 }
+    "samples": {
+      "total": 2,
+      "US": 2,
+      "Europe and Northern America": 2
+    }
   },
   {
     "kingdom": "Bacteria",
@@ -6734,84 +6742,135 @@
     "kingdom": "Bacteria",
     "phylum": "Chloroflexota",
     "_class": "NLS2-31",
-    "samples": { "total": 2, "US": 2, "Europe and Northern America": 2 }
+    "samples": {
+      "total": 2,
+      "US": 2,
+      "Europe and Northern America": 2
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "Elusimicrobiota",
     "_class": "Rs-M47",
-    "samples": { "total": 2, "US": 2, "Europe and Northern America": 2 }
+    "samples": {
+      "total": 2,
+      "US": 2,
+      "Europe and Northern America": 2
+    }
   },
   {
     "kingdom": "Archaea",
     "phylum": "Halobacteriota",
     "_class": "ANME-1",
-    "samples": { "total": 1, "unknown": 2 }
+    "samples": {
+      "total": 1,
+      "unknown": 2
+    }
   },
   {
     "kingdom": "Archaea",
     "phylum": "Halobacteriota",
     "_class": "Archaeoglobi",
-    "samples": { "total": 1, "unknown": 2 }
+    "samples": {
+      "total": 1,
+      "unknown": 2
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "Campylobacterota",
     "_class": "Desulfurellia",
-    "samples": { "total": 1, "CN": 1, "Eastern and South-Eastern Asia": 1 }
+    "samples": {
+      "total": 1,
+      "CN": 1,
+      "Eastern and South-Eastern Asia": 1
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "Thermodesulfobacteriota",
     "_class": "Dissulfuribacteria",
-    "samples": { "total": 1, "unknown": 2 }
+    "samples": {
+      "total": 1,
+      "unknown": 2
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "Acidobacteriota",
     "_class": "FFCH5909",
-    "samples": { "total": 1, "FI": 1, "Europe and Northern America": 1 }
+    "samples": {
+      "total": 1,
+      "FI": 1,
+      "Europe and Northern America": 1
+    }
   },
   {
     "kingdom": "Archaea",
     "phylum": "Hydrothermarchaeota",
     "_class": "Hydrothermarchaeia",
-    "samples": { "total": 1, "SE": 1, "Europe and Northern America": 1 }
+    "samples": {
+      "total": 1,
+      "SE": 1,
+      "Europe and Northern America": 1
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "Pseudomonadota",
     "_class": "Magnetococcia",
-    "samples": { "total": 1, "unknown": 2 }
+    "samples": {
+      "total": 1,
+      "unknown": 2
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "Bacillota",
     "_class": "Natranaerobiia",
-    "samples": { "total": 1, "IN": 1, "Central and Southern Asia": 1 }
+    "samples": {
+      "total": 1,
+      "IN": 1,
+      "Central and Southern Asia": 1
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "Chloroflexota",
     "_class": "TK17",
-    "samples": { "total": 1, "unknown": 2 }
+    "samples": {
+      "total": 1,
+      "unknown": 2
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "Chloroflexota",
     "_class": "TK30",
-    "samples": { "total": 1, "US": 1, "Europe and Northern America": 1 }
+    "samples": {
+      "total": 1,
+      "US": 1,
+      "Europe and Northern America": 1
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "Bacillota",
     "_class": "TTA-B61",
-    "samples": { "total": 1, "IN": 1, "Central and Southern Asia": 1 }
+    "samples": {
+      "total": 1,
+      "IN": 1,
+      "Central and Southern Asia": 1
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "Thermodesulfobiota",
     "_class": "Thermodesulfobiia",
-    "samples": { "total": 1, "US": 1, "Europe and Northern America": 1 }
+    "samples": {
+      "total": 1,
+      "US": 1,
+      "Europe and Northern America": 1
+    }
   }
 ]

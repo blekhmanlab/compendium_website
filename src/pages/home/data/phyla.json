@@ -3283,13 +3283,22 @@
     "kingdom": "Bacteria",
     "phylum": "AncK6",
     "_class": "",
-    "samples": { "total": 3, "unknown": 4, "NG": 1, "Sub-Saharan Africa": 1 }
+    "samples": {
+      "total": 3,
+      "unknown": 4,
+      "NG": 1,
+      "Sub-Saharan Africa": 1
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "BHI80-139",
     "_class": "",
-    "samples": { "total": 3, "EC": 3, "Latin America and the Caribbean": 3 }
+    "samples": {
+      "total": 3,
+      "EC": 3,
+      "Latin America and the Caribbean": 3
+    }
   },
   {
     "kingdom": "Bacteria",
@@ -3317,7 +3326,11 @@
     "kingdom": "Archaea",
     "phylum": "Altiarchaeota",
     "_class": "",
-    "samples": { "total": 2, "US": 2, "Europe and Northern America": 2 }
+    "samples": {
+      "total": 2,
+      "US": 2,
+      "Europe and Northern America": 2
+    }
   },
   {
     "kingdom": "Bacteria",
@@ -3346,24 +3359,39 @@
     "kingdom": "Bacteria",
     "phylum": "Edwardsbacteria",
     "_class": "",
-    "samples": { "total": 1, "unknown": 2 }
+    "samples": {
+      "total": 1,
+      "unknown": 2
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "Fervidibacteria",
     "_class": "",
-    "samples": { "total": 1, "US": 1, "Europe and Northern America": 1 }
+    "samples": {
+      "total": 1,
+      "US": 1,
+      "Europe and Northern America": 1
+    }
   },
   {
     "kingdom": "Archaea",
     "phylum": "Hydrothermarchaeota",
     "_class": "",
-    "samples": { "total": 1, "SE": 1, "Europe and Northern America": 1 }
+    "samples": {
+      "total": 1,
+      "SE": 1,
+      "Europe and Northern America": 1
+    }
   },
   {
     "kingdom": "Bacteria",
     "phylum": "Thermodesulfobiota",
     "_class": "",
-    "samples": { "total": 1, "US": 1, "Europe and Northern America": 1 }
+    "samples": {
+      "total": 1,
+      "US": 1,
+      "Europe and Northern America": 1
+    }
   }
 ]

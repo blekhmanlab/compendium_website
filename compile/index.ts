@@ -42,7 +42,7 @@ const taxonomicFile = "downloaded/taxonomic_table.csv";
 const metadataFile = "downloaded/sample_metadata.tsv";
 
 /** raw tag data */
-const tagsFile = "downloaded/tag.tsv";
+const tagsFile = "downloaded/tags.tsv";
 
 /** raw natural earth data */
 const naturalEarthFile = "natural-earth.json";
@@ -465,7 +465,7 @@ write(`${output}/countries.json`, countries);
 write(`${output}/regions.json`, regions);
 write(`${output}/reads.json`, reads);
 write(`${output}/tags.json`, tags);
-write(`${output}/tag-values.json`, tagValues);
+write(`${output}/tag-values.json`, tagValues, false);
 
 console.info("Deriving metadata");
 const metadata = await deriveMetadata(

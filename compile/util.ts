@@ -33,7 +33,7 @@ export const download = async (url: string, filename: string) => {
   await new Downloader({
     url,
     fileName: filename,
-    cloneFiles: false,
+    skipExistingFileName: true,
     maxAttempts: 3,
     onProgress: (percentage, _, remainingSize) => {
       if (!throttle("download")) return;
