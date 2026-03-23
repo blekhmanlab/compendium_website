@@ -67,7 +67,7 @@ export const read = <Type>(filename: string) =>
   JSON.parse(readFileSync(filename, "utf-8")) as Type;
 
 /** write local json file */
-export const write = (filename: string, data: unknown, pretty = false) =>
+export const write = (filename: string, data: unknown, pretty = true) =>
   writeFileSync(
     filename,
     JSON.stringify(data, null, pretty ? 2 : undefined),

@@ -6,7 +6,7 @@ import Prevalence from "@/pages/home/sections/Prevalence";
 import Recipes from "@/pages/home/sections/Recipes";
 import Search from "@/pages/home/sections/Search";
 import Title from "@/pages/home/sections/Title";
-import { loadGeo, loadMeta, loadProject, loadTaxa } from "@/pages/home/state";
+import { loadGeo, loadMeta, loadProjects, loadTaxa } from "@/pages/home/state";
 
 /** ensure only one load */
 let loaded = false;
@@ -16,7 +16,7 @@ const Home = () => {
   useEffect(() => {
     if (!loaded) {
       loadMeta();
-      loadProject();
+      loadProjects();
       loadGeo();
       loadTaxa();
       loaded = true;

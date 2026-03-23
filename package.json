@@ -13,7 +13,6 @@
     "test:lint": "eslint .",
     "test:types": "tsc -b",
     "test": "bun run test:format && bun run test:lint && bun run test:types",
-    "test:spelling": "bunx cspell src/**/*.{tsx,ts}",
     "clean": "rm -rf node_modules dist bun.lockb && bun pm cache rm"
   },
   "dependencies": {

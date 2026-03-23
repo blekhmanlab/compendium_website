@@ -1,16 +1,16 @@
-import type ByProjectType from "./by-project.json";
-import type ByReadsType from "./by-reads.json";
+import type ReadsType from "./reads.json";
+import type ProjectsType from "./projects.json";
 import { expose } from "comlink";
 import { request } from "@/util/async";
-import byProjectUrl from "./by-project.json?url";
-import byReadsUrl from "./by-reads.json?url";
+import readsUrl from "./reads.json?url";
+import projectsUrl from "./projects.json?url";
 import { cleanSearch } from "./util";
 
 /** project and sample name details */
-export type ByProject = typeof ByProjectType;
+export type Projects = typeof ProjectsType;
 
 /** sample read counts */
-export type ByReads = typeof ByReadsType;
+export type Reads = typeof ReadsType;
 
 export type ProjectSearch = {
   name: string;
@@ -19,26 +19,26 @@ export type ProjectSearch = {
   fuzzy?: boolean;
 }[];
 
-/** by-project/by-reads */
-export const getProject = async () => {
+/** projects */
+export const getProjects = async () => {
   /** load static data */
-  const [byProject, byReads] = await Promise.all([
-    request<ByProject>(byProjectUrl),
-    request<ByReads>(byReadsUrl),
+  const [projects, reads] = await Promise.all([
+    request<Projects>(projectsUrl),
+    request<Reads>(readsUrl),
   ]);
-  return { byProject, byReads };
+  return { projects, reads };
 };
 
 /** derive search-friendly list (too big to load pre-compiled) */
 export const getProjectSearch = async ({
-  byProject,
+  projects,
 }: {
-  byProject: ByProject;
+  projects: Projects;
 }) => {
   const projectSearch: ProjectSearch = [];
 
   /** include projects */
-  for (const { project, samples } of byProject)
+  for (const { project, samples } of projects)
     projectSearch.push({
       type: "Project",
       name: project,
@@ -46,7 +46,7 @@ export const getProjectSearch = async ({
     });
 
   /** include samples */
-  for (const { samples } of byProject)
+  for (const { samples } of projects)
     for (const sample of samples)
       projectSearch.push({
         type: "Sample",
@@ -57,4 +57,4 @@ export const getProjectSearch = async ({
   return { projectSearch: cleanSearch(projectSearch) };
 };
 
-expose({ getProject, getProjectSearch });
+expose({ getProjects, getProjectSearch });

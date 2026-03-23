@@ -1,5 +1,5 @@
-import type { ByReads } from "@/pages/home/data/project";
-import type { ByPhylum } from "@/pages/home/data/taxa";
+import type { Reads } from "@/pages/home/data/projects";
+import type { Phyla } from "@/pages/home/data/taxa";
 import { useState } from "react";
 import Select from "@/components/Select";
 import { useData } from "@/pages/home/state";
@@ -13,8 +13,8 @@ type Chart = (typeof chartOptions)[number];
 
 const Prevalence = () => {
   /** get global state */
-  const byPhylum = useData((state) => state.byPhylum);
-  const byReads = useData((state) => state.byReads);
+  const phyla = useData((state) => state.phyla);
+  const reads = useData((state) => state.reads);
   const selectedFeature = useData((state) => state.selectedFeature);
 
   /** local state */
@@ -52,8 +52,8 @@ const Prevalence = () => {
             options={chartOptions}
           />
           <div className="min-h-80 w-full grow">
-            {chart === "Phyla" && <PhylaChart data={byPhylum as ByPhylum} />}
-            {chart === "Reads" && <ReadsChart data={byReads as ByReads} />}
+            {chart === "Phyla" && <PhylaChart data={phyla as Phyla} />}
+            {chart === "Reads" && <ReadsChart data={reads as Reads} />}
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
 import type { D3ZoomEvent, GeoProjection, ZoomTransform } from "d3";
-import type { ByCountry, ByRegion } from "@/pages/home/data/geo";
+import type { Countries, Regions } from "@/pages/home/data/geo";
 import { useMemo, useRef, useState } from "react";
 import { useEventListener } from "@reactuses/core";
 import {
@@ -21,7 +21,7 @@ import { frame } from "@/util/async";
 import { getCssVariable } from "@/util/dom";
 import { formatNumber } from "@/util/string";
 
-type Feature = (ByRegion | ByCountry)["features"][number];
+type Feature = (Regions | Countries)["features"][number];
 
 /** svg dimensions */
 const width = 770;
@@ -37,8 +37,8 @@ const Map = () => {
   const featuresRef = useRef<(SVGPathElement | null)[]>([]);
 
   /** get global state */
-  const byCountry = useData((state) => state.byCountry);
-  const byRegion = useData((state) => state.byRegion);
+  const countries = useData((state) => state.countries);
+  const regions = useData((state) => state.regions);
   const selectedFeature = useData((state) => state.selectedFeature);
 
   /** local state */
@@ -57,7 +57,7 @@ const Map = () => {
   );
 
   /** data to show */
-  const data = by === "Country" ? byCountry : byRegion;
+  const data = by === "Country" ? countries : regions;
 
   /** get range of sample counts */
   const [, max = 1000] = extent(
@@ -191,7 +191,7 @@ const Map = () => {
     .on("zoom", onZoom)
     .scaleExtent([baseScale, baseScale * 10]);
 
-  if (!byCountry || !byRegion)
+  if (!countries || !regions)
     return <div className="placeholder">Loading map</div>;
 
   return (

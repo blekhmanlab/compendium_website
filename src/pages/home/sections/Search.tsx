@@ -1,6 +1,6 @@
 import { startTransition, useEffect, useState } from "react";
 import Tabs from "@/components/Tabs";
-import { loadTag, useData } from "@/pages/home/state";
+import { loadTags, useData } from "@/pages/home/state";
 import SearchList from "./SearchList";
 
 export const tooltips = {
@@ -24,7 +24,7 @@ const Search = () => {
   /** get global state */
   const projectSearch = useData((state) => state.projectSearch);
   const geoSearch = useData((state) => state.geoSearch);
-  const taxaSearch = useData((state) => state.taxaSearch);
+  const taxonSearch = useData((state) => state.taxonSearch);
   const tagSearch = useData((state) => state.tagSearch);
   const tagValueSearch = useData((state) => state.tagValueSearch);
 
@@ -33,7 +33,7 @@ const Search = () => {
   useEffect(() => {
     /** load large data on demand */
     if (tab === 3 && !loaded) {
-      loadTag();
+      loadTags();
       loaded = true;
     }
   }, [tab]);
@@ -94,7 +94,7 @@ const Search = () => {
                   many samples it's present in.
                 </p>
                 <SearchList
-                  list={taxaSearch}
+                  list={taxonSearch}
                   cols={["name", "type", "samples"]}
                   types={["Phylum", "Class"]}
                 />

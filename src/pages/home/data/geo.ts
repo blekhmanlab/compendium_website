@@ -1,22 +1,22 @@
 import type { FeatureCollection, Geometry } from "geojson";
-import type ByCountryType from "./by-country.json";
-import type ByRegionType from "./by-region.json";
+import type CountriesType from "./countries.json";
+import type RegionsType from "./regions.json";
 import { expose } from "comlink";
 import { request } from "@/util/async";
-import byCountryUrl from "./by-country.json?url";
-import byRegionUrl from "./by-region.json?url";
+import countriesUrl from "./countries.json?url";
+import regionsUrl from "./regions.json?url";
 import { cleanSearch } from "./util";
 
 /** by region, combined with natural earth geojson feature data */
-export type ByRegion = FeatureCollection<
+export type Regions = FeatureCollection<
   Geometry,
-  (typeof ByRegionType)["features"][number]["properties"]
+  (typeof RegionsType)["features"][number]["properties"]
 >;
 
 /** by country, combined with natural earth geojson feature data */
-export type ByCountry = FeatureCollection<
+export type Countries = FeatureCollection<
   Geometry,
-  (typeof ByCountryType)["features"][number]["properties"]
+  (typeof CountriesType)["features"][number]["properties"]
 >;
 
 export type GeoSearch = {
@@ -26,35 +26,35 @@ export type GeoSearch = {
   fuzzy?: boolean;
 }[];
 
-/** by-region/by-country */
+/** regions/countries */
 export const getGeoData = async () => {
-  const [byRegion, byCountry] = await Promise.all([
-    request<ByRegion>(byRegionUrl),
-    request<ByCountry>(byCountryUrl),
+  const [regions, countries] = await Promise.all([
+    request<Regions>(regionsUrl),
+    request<Countries>(countriesUrl),
   ]);
-  return { byRegion, byCountry };
+  return { regions, countries };
 };
 
 /** derive search-friendly list (too big to load pre-compiled) */
 export const getGeoSearch = async ({
-  byRegion,
-  byCountry,
+  regions,
+  countries,
 }: {
-  byRegion: ByRegion;
-  byCountry: ByCountry;
+  regions: Regions;
+  countries: Countries;
 }) => {
   const geoSearch: GeoSearch = [];
 
   /** include regions */
   for (const {
     properties: { region, samples },
-  } of byRegion.features)
+  } of regions.features)
     geoSearch.push({ type: "Region", name: region, samples });
 
   /** include countries */
   for (const {
     properties: { country, samples },
-  } of byCountry.features)
+  } of countries.features)
     geoSearch.push({ type: "Country", name: country, samples });
 
   return { geoSearch: cleanSearch(geoSearch) };

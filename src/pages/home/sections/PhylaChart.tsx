@@ -1,5 +1,5 @@
 import type { EChartsOption } from "echarts";
-import type { ByPhylum } from "@/pages/home/data/taxa";
+import type { Phyla } from "@/pages/home/data/taxa";
 import { max, min, orderBy } from "lodash";
 import Chart from "@/components/Chart";
 import { tooltipTable } from "@/pages/home/sections/Map";
@@ -8,7 +8,7 @@ import { useLegend } from "@/util/legend";
 import { formatNumber } from "@/util/string";
 
 type Props = {
-  data: ByPhylum;
+  data: Phyla;
 };
 
 /** prevalence of samples at phylum level as bar chart */
@@ -18,7 +18,7 @@ const PhylaChart = ({ data }: Props) => {
   /** get global state */
   const selectedFeature = useData((state) => state.selectedFeature);
 
-  type Sample = keyof ByPhylum[number]["samples"];
+  type Sample = keyof Phyla[number]["samples"];
 
   /** which sample count to use */
   const sampleKey = (selectedFeature?.code ||

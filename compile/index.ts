@@ -2,11 +2,11 @@ import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
 import type {
-  ByGeo,
-  ByProject,
-  ByTag,
-  ByTaxLevel,
+  Geo,
   Metadata,
+  Projects,
+  Tags,
+  TaxLevel,
   WorldMap,
 } from "./types";
 import type { _Record, Zenodo } from "./zenodo-api";
@@ -57,7 +57,7 @@ const countryToRegionFile = "country-to-region.json";
 chdir(dirname(fileURLToPath(import.meta.url)));
 
 /** process natural earth world map data */
-const processNaturalEarth = async (): Promise<ByGeo> => {
+const processNaturalEarth = async (): Promise<Geo> => {
   /** load natural earth data */
   const worldMap = read<WorldMap>(naturalEarthFile);
 
@@ -72,42 +72,45 @@ const processNaturalEarth = async (): Promise<ByGeo> => {
   const countryToRegion = read<Record<string, string>>(countryToRegionFile);
 
   for (const feature of worldMap.features) {
+    /** natural earth country name */
     const country = _.startCase(clean(feature.properties.NAME));
+    /** natural earth country code */
     const code = (
       clean(feature.properties.ISO_A2_EH) ||
       clean(feature.properties.ISO_A2) ||
       clean(feature.properties.ADM0_ISO) ||
       clean(feature.properties.ADM0_A3)
     ).toUpperCase();
+    /** our region from code */
     const region: string = countryToRegion[code] || "";
 
     /** only keep needed properties (opt-in) */
     feature.properties = { region, country, code, samples: 0 };
   }
 
-  return worldMap as ByGeo;
+  return worldMap as Geo;
 };
 
 /** process main data */
 const processData = async (
   taxonomicFile: string,
   metadataFile: string,
-  worldMap: ByGeo,
+  worldMap: Geo,
 ) => {
   /** stream files line by line */
   const taxonomicStream = stream(taxonomicFile);
   const metadataStream = stream(metadataFile);
 
   /** map of unique projects */
-  const byProject: Record<string, ByProject[number]> = {};
+  const projects: Record<string, Projects[number]> = {};
   /** map of unique countries */
-  const byCountry: Record<string, ByGeo["features"][number]> = {};
+  const countries: Record<string, Geo["features"][number]> = {};
   /** map of unique regions */
-  const byRegion: Record<string, ByGeo["features"][number]> = {};
+  const regions: Record<string, Geo["features"][number]> = {};
   /** map of unique phyla */
-  const byPhylum: Record<string, ByTaxLevel[number]> = {};
+  const phyla: Record<string, TaxLevel[number]> = {};
   /** map of unique classes */
-  const byClass: Record<string, ByTaxLevel[number]> = {};
+  const classes: Record<string, TaxLevel[number]> = {};
   /** map of unique samples for counting reads */
   const bySample: Record<
     string,
@@ -118,7 +121,7 @@ const processData = async (
     }
   > = {};
   /** map of of unique tags */
-  const byTag: Record<
+  const tags: Record<
     string,
     {
       tag: string;
@@ -127,7 +130,7 @@ const processData = async (
     }
   > = {};
   /** map of of unique tag values */
-  const byTagValue: Record<
+  const tagValues: Record<
     string,
     {
       tag: string;
@@ -145,19 +148,19 @@ const processData = async (
     const { region, code } = feature.properties;
 
     /** add feature as country */
-    byCountry[code] = _.cloneDeep(feature);
+    countries[code] = _.cloneDeep(feature);
 
-    if (!byRegion[region]) {
+    if (!regions[region]) {
       /** add feature as region */
-      byRegion[region] = _.cloneDeep(feature);
+      regions[region] = _.cloneDeep(feature);
 
       /** unset country specific info */
-      byRegion[region].properties.country = "";
-      byRegion[region].properties.code = "";
+      regions[region].properties.country = "";
+      regions[region].properties.code = "";
     } else {
       /** merge features together into region */
       if (!countryDissolved[code]) {
-        byRegion[region].geometry = dissolve([byRegion[region], feature]);
+        regions[region].geometry = dissolve([regions[region], feature]);
         countryDissolved[code] = true;
       }
     }
@@ -198,13 +201,13 @@ const processData = async (
     // const country = _.startCase(geoLoc.split(":").shift());
 
     /** count country */
-    if (byCountry[code]) byCountry[code].properties.samples++;
+    if (countries[code]) countries[code].properties.samples++;
     /** count region */
-    if (byRegion[region]) byRegion[region].properties.samples++;
+    if (regions[region]) regions[region].properties.samples++;
 
     /** count projects and samples */
-    byProject[project] ??= { project, samples: [] };
-    byProject[project].samples.push(sample);
+    projects[project] ??= { project, samples: [] };
+    projects[project].samples.push(sample);
 
     /** whether row (sample) has already been counted toward taxon */
     const phylumCounted: Record<string, boolean> = {};
@@ -229,24 +232,24 @@ const processData = async (
 
         /** count sample toward phylum (if not already) */
         if (!phylumCounted[phylum]) {
-          byPhylum[phylum] ??= _.cloneDeep(taxon);
-          byPhylum[phylum]._class = "";
-          byPhylum[phylum].samples.total!++;
-          byPhylum[phylum].samples[code] ??= 0;
-          byPhylum[phylum].samples[code]++;
-          byPhylum[phylum].samples[region] ??= 0;
-          byPhylum[phylum].samples[region]++;
+          phyla[phylum] ??= _.cloneDeep(taxon);
+          phyla[phylum]._class = "";
+          phyla[phylum].samples.total!++;
+          phyla[phylum].samples[code] ??= 0;
+          phyla[phylum].samples[code]++;
+          phyla[phylum].samples[region] ??= 0;
+          phyla[phylum].samples[region]++;
           phylumCounted[phylum] = true;
         }
 
         /** count sample toward class (if not already) */
         if (!classCounted[_class]) {
-          byClass[_class] ??= _.cloneDeep(taxon);
-          byClass[_class].samples.total!++;
-          byClass[_class].samples[code] ??= 0;
-          byClass[_class].samples[code]++;
-          byClass[_class].samples[region] ??= 0;
-          byClass[_class].samples[region]++;
+          classes[_class] ??= _.cloneDeep(taxon);
+          classes[_class].samples.total!++;
+          classes[_class].samples[code] ??= 0;
+          classes[_class].samples[code]++;
+          classes[_class].samples[region] ??= 0;
+          classes[_class].samples[region]++;
           classCounted[_class] = true;
         }
       }
@@ -283,7 +286,7 @@ const processData = async (
   >;
 
   /** reads histogram data */
-  const byReads: {
+  const reads: {
     histogram: {
       samples: WithTotal;
       min: number;
@@ -302,20 +305,20 @@ const processData = async (
   };
 
   /** record total sample counts and for each geographic feature */
-  const features = Object.keys(byCountry).concat(Object.keys(byRegion));
+  const features = Object.keys(countries).concat(Object.keys(regions));
 
   for (const feature of features) {
     console.info(`Binning read counts for ${feature}`);
 
     /** reads for this feature */
-    const reads = getReads(feature);
+    const featureReads = getReads(feature);
 
-    byReads.median[feature] = median(reads);
+    reads.median[feature] = median(featureReads);
 
     /** go through bins of reads for this feature */
-    for (const [index, bin] of Object.entries(binner(reads)))
+    for (const [index, bin] of Object.entries(binner(featureReads)))
       if (bin.length) {
-        const all = byReads.histogram[Number(index)];
+        const all = reads.histogram[Number(index)];
         if (all) all.samples[feature] = bin.length;
       }
   }
@@ -338,39 +341,39 @@ const processData = async (
     } = await tagsStream.next();
 
     /** count tags */
-    byTag[tag] ??= { tag, projects: {}, samples: {} };
-    byTag[tag].projects[project] = project;
-    byTag[tag].samples[sample] = sample;
+    tags[tag] ??= { tag, projects: {}, samples: {} };
+    tags[tag].projects[project] = project;
+    tags[tag].samples[sample] = sample;
 
     /** count tag values */
     const key = [tag, value, project].join("-");
-    byTagValue[key] ??= { tag, value, project, samples: 0 };
-    byTagValue[key].samples++;
+    tagValues[key] ??= { tag, value, project, samples: 0 };
+    tagValues[key].samples++;
 
     if (done) break;
   }
 
   /** turn maps into lists, and do final sorting and such */
   return {
-    byProject: _.orderBy(
-      Object.values(byProject),
+    projects: _.orderBy(
+      Object.values(projects),
       ["samples.length", "project"],
       ["desc", "asc"],
     ),
-    byPhylum: _.orderBy(
-      Object.values(byPhylum).filter(({ phylum }) => phylum),
+    phyla: _.orderBy(
+      Object.values(phyla).filter(({ phylum }) => phylum),
       [(datum) => datum.samples.total, "phylum"],
       ["desc", "asc"],
     ),
-    byClass: _.orderBy(
-      Object.values(byClass).filter(({ _class }) => _class),
+    classes: _.orderBy(
+      Object.values(classes).filter(({ _class }) => _class),
       [(datum) => datum.samples.total, "_class"],
       ["desc", "asc"],
     ),
-    byCountry: {
+    countries: {
       ...worldMap,
       features: _.orderBy(
-        Object.values(byCountry),
+        Object.values(countries),
         [
           (datum) => datum.properties.samples,
           (datum) => datum.properties.country,
@@ -378,10 +381,10 @@ const processData = async (
         ["desc", "asc"],
       ),
     },
-    byRegion: {
+    regions: {
       ...worldMap,
       features: _.orderBy(
-        Object.values(byRegion),
+        Object.values(regions),
         [
           (datum) => datum.properties.samples,
           (datum) => datum.properties.region,
@@ -389,9 +392,9 @@ const processData = async (
         ["desc", "asc"],
       ),
     },
-    byReads,
-    byTag: _.orderBy(
-      Object.values(byTag).map((datum) => ({
+    reads,
+    tags: _.orderBy(
+      Object.values(tags).map((datum) => ({
         tag: datum.tag,
         projects: Object.keys(datum.projects).length,
         samples: Object.keys(datum.samples).length,
@@ -399,8 +402,8 @@ const processData = async (
       [(datum) => datum.samples, (datum) => datum.projects],
       ["desc", "desc"],
     ),
-    byTagValue: _.orderBy(
-      Object.values(byTagValue),
+    tagValues: _.orderBy(
+      Object.values(tagValues),
       [(datum) => datum.samples],
       ["desc"],
     ),
@@ -409,47 +412,33 @@ const processData = async (
 
 /** derive metadata about data */
 const deriveMetadata = async (
-  byProject: ByProject,
-  byPhylum: ByTaxLevel,
-  byClass: ByTaxLevel,
-  byRegion: ByGeo,
-  byCountry: ByGeo,
-  byTag: ByTag,
+  projects: Projects,
+  phyla: TaxLevel,
+  classes: TaxLevel,
+  regions: Geo,
+  countries: Geo,
+  tags: Tags,
   record: _Record,
-): Promise<Metadata> => {
-  const projects = byProject.length;
-  const samples = byProject.reduce(
-    (total, { samples }) => total + samples.length,
-    0,
-  );
-  const phyla = byPhylum.filter((taxon) => taxon.samples).length;
-  const classes = byClass.filter((taxon) => taxon.samples).length;
-  const regions = byRegion.features.filter(
-    (feature) => feature.properties.samples,
-  ).length;
-  const countries = byCountry.features.filter(
-    (feature) => feature.properties.samples,
-  ).length;
-
-  return {
-    projects,
-    samples,
-    phyla,
-    classes,
-    regions,
-    countries,
-    tags: Object.keys(byTag).length,
-    version: record.metadata.version,
-    date: record.updated,
-    downloads: record.stats.unique_downloads,
-    views: record.stats.unique_views,
-    size:
-      record.files
-        ?.map((file) => file.size)
-        ?.reduce((total, value) => total + value, 0) || 0,
-    uncompressed: await dirSize("./downloaded"),
-  };
-};
+): Promise<Metadata> => ({
+  projects: projects.length,
+  samples: projects.reduce((total, { samples }) => total + samples.length, 0),
+  phyla: phyla.filter((taxon) => taxon.samples).length,
+  classes: classes.filter((taxon) => taxon.samples).length,
+  regions: regions.features.filter((feature) => feature.properties.samples)
+    .length,
+  countries: countries.features.filter((feature) => feature.properties.samples)
+    .length,
+  tags: Object.keys(tags).length,
+  version: record.metadata.version,
+  date: record.updated,
+  downloads: record.stats.unique_downloads,
+  views: record.stats.unique_views,
+  size:
+    record.files
+      ?.map((file) => file.size)
+      ?.reduce((total, value) => total + value, 0) || 0,
+  uncompressed: await dirSize("./downloaded"),
+});
 
 /** main workflow */
 
@@ -467,33 +456,25 @@ console.info("Cleaning world map data");
 const worldMap = await processNaturalEarth();
 
 console.info("Processing data");
-const {
-  byProject,
-  byPhylum,
-  byClass,
-  byCountry,
-  byRegion,
-  byReads,
-  byTag,
-  byTagValue,
-} = await processData(taxonomicFile, metadataFile, worldMap);
-write(`${output}/by-project.json`, byProject);
-write(`${output}/by-phylum.json`, byPhylum);
-write(`${output}/by-class.json`, byClass);
-write(`${output}/by-country.json`, byCountry);
-write(`${output}/by-region.json`, byRegion);
-write(`${output}/by-reads.json`, byReads);
-write(`${output}/by-tag.json`, byTag);
-write(`${output}/by-tag-value.json`, byTagValue);
+const { projects, phyla, classes, countries, regions, reads, tags, tagValues } =
+  await processData(taxonomicFile, metadataFile, worldMap);
+write(`${output}/projects.json`, projects);
+write(`${output}/phyla.json`, phyla);
+write(`${output}/classes.json`, classes);
+write(`${output}/countries.json`, countries);
+write(`${output}/regions.json`, regions);
+write(`${output}/reads.json`, reads);
+write(`${output}/tags.json`, tags);
+write(`${output}/tag-values.json`, tagValues);
 
 console.info("Deriving metadata");
 const metadata = await deriveMetadata(
-  byProject,
-  byPhylum,
-  byClass,
-  byRegion,
-  byCountry,
-  byTag,
+  projects,
+  phyla,
+  classes,
+  regions,
+  countries,
+  tags,
   record,
 );
 write(`${output}/metadata.json`, metadata, true);

@@ -1,18 +1,18 @@
-import type ByTagType from "./by-tag.json";
+import type TagsType from "./tags.json";
 import { expose } from "comlink";
 import { cleanSearch } from "@/pages/home/data/util";
 import { request } from "@/util/async";
-import byTagValueUrl from "./by-tag-value.json?url";
-import byTagUrl from "./by-tag.json?url";
+import tagsValueUrl from "./tag-values.json?url";
+import tagsUrl from "./tags.json?url";
 
 /** tag project and sample counts */
-export type ByTag = typeof ByTagType;
+export type Tags = typeof TagsType;
 
-// export type ByTagValue = typeof ByTagValueType;
+// export type TagsValue = typeof TagsValueType;
 // json file too big for typescript to infer type structure
 
 /** tag value sample counts */
-export type ByTagValue = {
+export type TagsValue = {
   tag: string;
   value: string;
   project: string;
@@ -34,32 +34,32 @@ export type TagValueSearch = {
   fuzzy?: boolean;
 }[];
 
-/** by-tag/by-tag-value */
-export const getTag = async () => {
-  const [byTag, byTagValue] = await Promise.all([
-    request<ByTag>(byTagUrl),
-    request<ByTagValue>(byTagValueUrl),
+/** tags/tag-values */
+export const getTags = async () => {
+  const [tags, tagsValue] = await Promise.all([
+    request<Tags>(tagsUrl),
+    request<TagsValue>(tagsValueUrl),
   ]);
-  return { byTag, byTagValue };
+  return { tags, tagsValue };
 };
 
 /** derive search-friendly list (too big to load pre-compiled) */
 export const getTagSearch = ({
-  byTag,
-  byTagValue,
+  tags,
+  tagsValue,
 }: {
-  byTag: ByTag;
-  byTagValue: ByTagValue;
+  tags: Tags;
+  tagsValue: TagsValue;
 }) => {
   const tagList: TagSearch = [];
   const tagValueList: TagValueSearch = [];
 
   /** tags */
-  for (const { tag, samples, projects } of byTag)
+  for (const { tag, samples, projects } of tags)
     tagList.push({ name: tag, samples, projects });
 
   /** include tag values */
-  for (const { tag, value, samples, project } of byTagValue)
+  for (const { tag, value, samples, project } of tagsValue)
     tagValueList.push({ name: tag, value, project, samples });
 
   return {
@@ -68,4 +68,4 @@ export const getTagSearch = ({
   };
 };
 
-expose({ getTag, getTagSearch });
+expose({ getTags, getTagSearch });

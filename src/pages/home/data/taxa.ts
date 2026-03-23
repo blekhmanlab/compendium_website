@@ -1,52 +1,52 @@
-import type ByClassType from "./by-class.json";
-import type ByPhylumType from "./by-phylum.json";
+import type ClassesType from "./classes.json";
+import type PhylaType from "./phyla.json";
 import { expose } from "comlink";
 import { request } from "@/util/async";
-import byClassUrl from "./by-class.json?url";
-import byPhylumUrl from "./by-phylum.json?url";
+import classesUrl from "./classes.json?url";
+import phylaUrl from "./phyla.json?url";
 import { cleanSearch } from "./util";
 
 /** by class taxonomic level */
-export type ByClass = typeof ByClassType;
+export type Classes = typeof ClassesType;
 /** by phylum taxonomic level */
-export type ByPhylum = typeof ByPhylumType;
+export type Phyla = typeof PhylaType;
 
-export type TaxaSearch = {
+export type TaxonSearch = {
   name: string;
   type: "Phylum" | "Class";
   samples: number;
   fuzzy?: boolean;
 }[];
 
-/** by-phylum/by-class */
+/** phyla/classes */
 export const getTaxa = async () => {
-  const [byPhylum, byClass] = await Promise.all([
-    request<ByPhylum>(byPhylumUrl),
-    request<ByClass>(byClassUrl),
+  const [phyla, classes] = await Promise.all([
+    request<Phyla>(phylaUrl),
+    request<Classes>(classesUrl),
   ]);
-  return { byPhylum, byClass };
+  return { phyla, classes };
 };
 
 /** derive search-friendly list (too big to load pre-compiled) */
-export const getTaxaSearch = async ({
-  byPhylum,
-  byClass,
+export const getTaxonSearch = async ({
+  phyla,
+  classes,
 }: {
-  byPhylum: ByPhylum;
-  byClass: ByClass;
+  phyla: Phyla;
+  classes: Classes;
 }) => {
   /** derive search-friendly list (too big to load pre-compiled) */
-  const list: TaxaSearch = [];
+  const list: TaxonSearch = [];
 
   /** include phyla */
-  for (const { phylum, samples } of byPhylum)
+  for (const { phylum, samples } of phyla)
     list.push({ type: "Phylum", name: phylum, samples: samples.total });
 
   /** include classes */
-  for (const { _class, samples } of byClass)
+  for (const { _class, samples } of classes)
     list.push({ type: "Class", name: _class, samples: samples.total });
 
-  return { taxaSearch: cleanSearch(list) };
+  return { taxonSearch: cleanSearch(list) };
 };
 
-expose({ getTaxa, getTaxaSearch });
+expose({ getTaxa, getTaxonSearch });

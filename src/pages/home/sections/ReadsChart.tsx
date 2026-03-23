@@ -1,5 +1,5 @@
 import type { EChartsOption } from "echarts";
-import type { ByReads } from "@/pages/home/data/project";
+import type { Reads } from "@/pages/home/data/projects";
 import { max, min } from "lodash";
 import Chart from "@/components/Chart";
 import { tooltipTable } from "@/pages/home/sections/Map";
@@ -8,12 +8,12 @@ import { getCssVariable } from "@/util/dom";
 import { formatNumber } from "@/util/string";
 
 type Props = {
-  data: ByReads;
+  data: Reads;
 };
 
 /** show sample counts vs binned read counts */
 const ReadsChart = ({ data }: Props) => {
-  type Datum = ByReads["histogram"][number];
+  type Datum = Reads["histogram"][number];
 
   /** colors */
   const secondary = getCssVariable("--color-secondary");
@@ -24,7 +24,7 @@ const ReadsChart = ({ data }: Props) => {
   /** which sample count to use */
   const sampleKey = (selectedFeature?.code ||
     selectedFeature?.region ||
-    "total") as keyof ByReads["histogram"][number]["samples"];
+    "total") as keyof Reads["histogram"][number]["samples"];
 
   const histogram = data?.histogram || [];
 

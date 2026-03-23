@@ -24,7 +24,7 @@ type Metadata = {
   uncompressed: number;
 };
 
-type ByTaxLevel = {
+type TaxLevel = {
   kingdom: string;
   phylum: string;
   _class: string;
@@ -33,7 +33,7 @@ type ByTaxLevel = {
 
 type WorldMap = FeatureCollection<Geometry, Record<string, string | number>>;
 
-type ByGeo = FeatureCollection<
+type Geo = FeatureCollection<
   Geometry,
   {
     region: string;
@@ -43,12 +43,12 @@ type ByGeo = FeatureCollection<
   }
 >;
 
-type ByProject = {
+type Projects = {
   project: string;
   samples: string[];
 }[];
 
-type ByTag = {
+type Tags = {
   tag: string;
   projects: number;
   samples: number;
