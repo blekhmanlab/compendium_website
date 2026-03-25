@@ -720,6 +720,6 @@ const processProjectionistData = async () => {
 };
 
 /** run */
-// await downloadFiles();
-// await processMainData();
+await downloadFiles();
+await processMainData();
 await processProjectionistData();
