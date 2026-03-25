@@ -145,6 +145,17 @@ const PCs = () => {
     }));
   }, [userProjected, pcA, pcB, color, entry, userMeta]);
 
+  /** get absolute max for both plots */
+  const max = useMemo(() => {
+    let max = 0;
+    for (const plot of [compendiumPlot, userPlot]) {
+      if (!plot) continue;
+      for (const { x, y } of plot)
+        max = Math.max(max, Math.abs(x), Math.abs(y));
+    }
+    return max;
+  }, [compendiumPlot, userPlot]);
+
   return (
     <section>
       <h2>Principal Components</h2>
@@ -173,6 +184,7 @@ const PCs = () => {
               xLabel={pcA}
               yLabel={pcB}
               data={compendiumPlot}
+              range={max}
             />
             <SelectMulti
               label="Regions"
@@ -187,7 +199,13 @@ const PCs = () => {
 
         {userPlot ? (
           <div className="flex flex-col items-center gap-4">
-            <PCChart title="Yours" xLabel={pcA} yLabel={pcB} data={userPlot} />
+            <PCChart
+              title="Yours"
+              xLabel={pcA}
+              yLabel={pcB}
+              data={userPlot}
+              range={max}
+            />
             <div className="flex flex-wrap items-center gap-8">
               {Object.entries(legend).map(([key, value], index) => (
                 <div key={index} className="flex items-center gap-2">

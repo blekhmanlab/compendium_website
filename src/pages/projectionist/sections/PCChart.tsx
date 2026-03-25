@@ -1,6 +1,5 @@
 import type { EChartsOption } from "echarts";
 import { memo } from "react";
-import { max, min } from "lodash";
 import Chart from "@/components/Chart";
 
 type Props = {
@@ -12,25 +11,12 @@ type Props = {
     y: number;
     color?: string;
   }[];
+  range: number;
 };
 
 /** x/y plot of principal components */
-const PCChart = ({ title, xLabel, yLabel, data }: Props) => {
-  /** separate x/y values */
-  const xs = data.map((datum) => datum.x);
-  const ys = data.map((datum) => datum.y);
-
-  /** range of coords */
-  let xMin = min(xs) ?? 0;
-  let xMax = max(xs) ?? 0;
-  let yMin = min(ys) ?? 0;
-  let yMax = max(ys) ?? 0;
-
-  /** round up/down */
-  xMin = Math.floor(xMin);
-  xMax = Math.ceil(xMax);
-  yMin = Math.floor(yMin);
-  yMax = Math.ceil(yMax);
+const PCChart = ({ title, xLabel, yLabel, data, range }: Props) => {
+  range = Math.ceil(range);
 
   /** prune points to display to maintain render performance */
   const prune = data.length / 50000;
@@ -53,9 +39,24 @@ const PCChart = ({ title, xLabel, yLabel, data }: Props) => {
     series: [{ type: "scatter", data: seriesData, symbolSize }],
     grid: { left: 50, right: 50, top: 50, bottom: 50 },
     title: [{ text: title }],
-    xAxis: { min: xMin, max: xMax, name: xLabel },
-    yAxis: { min: yMin, max: yMax, name: yLabel },
+    xAxis: { min: -range, max: range, name: xLabel },
+    yAxis: { min: -range, max: range, name: yLabel },
     animation: false,
+
+    dataZoom: [
+      {
+        type: "inside",
+        xAxisIndex: [0],
+        zoomOnMouseWheel: true,
+        moveOnMouseMove: true,
+      },
+      {
+        type: "inside",
+        yAxisIndex: [0],
+        zoomOnMouseWheel: true,
+        moveOnMouseMove: true,
+      },
+    ],
   };
 
   if (!data) return <div className="placeholder">Loading phyla</div>;

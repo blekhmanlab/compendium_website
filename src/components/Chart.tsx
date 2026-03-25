@@ -2,7 +2,7 @@ import type { ECharts, EChartsInitOpts, EChartsOption } from "echarts";
 import { useEffect, useRef, useState } from "react";
 import { useDebounceFn, useResizeObserver } from "@reactuses/core";
 import clsx from "clsx";
-import { init, registerTheme } from "echarts";
+import { connect, init, registerTheme } from "echarts";
 import { sleep } from "@/util/async";
 
 type Props = {
@@ -23,7 +23,11 @@ const Chart = ({ option, init: initOptions = {}, className }: Props) => {
       renderer: "svg",
       ...initOptions,
     });
+    /** initial resize */
     sleep().then(() => chart.current?.resize());
+    /** connect chart zooms together */
+    chart.current.group = "group";
+    connect("group");
     return () => {
       chart.current?.dispose();
       chart.current = null;
