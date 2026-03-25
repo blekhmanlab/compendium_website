@@ -1,5 +1,5 @@
 import type { TaxaMap } from "@/pages/projectionist/data/taxa-map";
-import type { TaxonWeights } from "@/pages/projectionist/data/taxon-weights";
+import type { TaxonPCs } from "@/pages/projectionist/data/taxon-pcs";
 import { expose } from "comlink";
 import { groupBy, isEqual, omit, random, sum, uniqWith } from "lodash";
 import { inferSchema, initParser } from "udsv";
@@ -39,6 +39,9 @@ export const parseUserData = async (text: string) => {
 
   /** taxa (header row column names) */
   const taxa = schema.cols.map((col) => col.name);
+
+  /** ignore last header row column (sample name) */
+  taxa.pop();
 
   /** sample names (last col on right) */
   const samples = data.map((row) => String(row.pop()));
@@ -127,7 +130,7 @@ export const projectUserData = async (
   reads: UserData["reads"],
   samples: UserData["samples"],
   taxaMap: TaxaMap,
-  taxonWeights: TaxonWeights,
+  taxonPCs: TaxonPCs[string],
 ) => {
   /** taxa mapped to split ranks */
   const taxa = _taxa
@@ -166,10 +169,10 @@ export const projectUserData = async (
       /** calculate projected principal component */
       const total = sum(
         consolidatedTaxa.map((taxon, taxonIndex) => {
-          /** user weight */
+          /** user pc */
           const user = consolidatedReads[sampleIndex]?.[taxonIndex];
-          /** compendium weight */
-          const compendium = taxonWeights[stringifyTaxon(taxon)]?.[pc];
+          /** compendium pc */
+          const compendium = taxonPCs[stringifyTaxon(taxon)]?.[pc];
           return (user ?? 0) * (compendium ?? 0);
         }),
       );

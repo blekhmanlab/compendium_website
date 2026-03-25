@@ -6,10 +6,10 @@ import Meta from "@/components/Meta";
 import PCs from "@/pages/projectionist/sections/PCs";
 import Upload from "@/pages/projectionist/sections/Upload";
 import {
+  loadSamplePCs,
   loadSamples,
-  loadSampleWeights,
   loadTaxaMap,
-  loadTaxonWeights,
+  loadTaxonPCs,
 } from "@/pages/projectionist/state";
 
 /** ensure only one load */
@@ -19,8 +19,8 @@ const Projectionist = () => {
   /** load data on page load */
   useEffect(() => {
     if (!loaded) {
-      loadTaxonWeights();
-      loadSampleWeights();
+      loadTaxonPCs();
+      loadSamplePCs();
       loadTaxaMap();
       loadSamples();
       loaded = true;

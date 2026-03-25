@@ -1,4 +1,5 @@
-import type { SampleWeights } from "@/pages/projectionist/data/sample-weights";
+import type { SamplePCs } from "@/pages/projectionist/data/sample-pcs";
+import type { TaxonPCs } from "@/pages/projectionist/data/taxon-pcs";
 import type { PC } from "@/pages/projectionist/project";
 import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useEffect, useMemo, useState } from "react";
@@ -24,8 +25,8 @@ const PCs = () => {
   const userSamples = useData((state) => state.userData?.samples);
   const reads = useData((state) => state.userData?.reads);
   const taxaMap = useData((state) => state.taxaMap);
-  const taxonWeights = useData((state) => state.taxonWeights);
-  const sampleWeights = useData((state) => state.sampleWeights);
+  const taxonPCs = useData((state) => state.taxonPCs);
+  const samplePCs = useData((state) => state.samplePCs);
   const samples = useData((state) => state.samples);
   const userProjected = useData((state) => state.userProjected);
 
@@ -34,7 +35,7 @@ const PCs = () => {
   const [pcB, setPcB] = useState<PC>(pcs[1]);
 
   /** ordination options */
-  const ordinationOptions = Object.keys(sampleWeights || {}).sort();
+  const ordinationOptions = Object.keys(samplePCs || {}).sort();
 
   /** selected ordination */
   const [ordination, setOrdination] = useState("full");
@@ -57,18 +58,18 @@ const PCs = () => {
     setRegions(regionOptions);
   }, [regionOptions]);
 
-  /** sample weights filtered by ordination and region */
-  const filteredSampleWeights = useMemo(() => {
-    if (!samples || !sampleWeights || !ordination) return undefined;
+  /** sample pcs filtered by ordination and region */
+  const filteredSamplePCs = useMemo(() => {
+    if (!samples || !samplePCs || !ordination) return undefined;
 
     /** quick lookup region for sample (run) */
     const sampleRegion = Object.fromEntries(
       samples.map(({ run, region }) => [run, region]) ?? [],
     );
-    /** ("sample" in weights is actually SRR (run) instead of SRS (sample)) */
+    /** ("sample" in pcs is actually SRR (run) instead of SRS (sample)) */
 
     /** filter by selected ordination */
-    const byOrdination = sampleWeights[ordination as keyof SampleWeights] ?? {};
+    const byOrdination = samplePCs[ordination as keyof SamplePCs] ?? {};
 
     /** filter by selected regions */
     const byRegion = Object.keys(byOrdination).filter((sample) => {
@@ -77,16 +78,22 @@ const PCs = () => {
     });
 
     return pick(byOrdination, byRegion);
-  }, [samples, sampleWeights, ordination, regions]);
+  }, [samples, samplePCs, ordination, regions]);
+
+  /** taxon pcs filtered by ordination */
+  const filteredTaxonPCs = useMemo(() => {
+    if (!taxonPCs || !ordination) return undefined;
+    return taxonPCs[ordination as keyof TaxonPCs] ?? {};
+  }, [taxonPCs, ordination]);
 
   /** data for compendium plot */
   const compendiumPlot = useMemo(() => {
-    if (!filteredSampleWeights) return undefined;
-    return Object.values(filteredSampleWeights).map((datum) => ({
+    if (!filteredSamplePCs) return undefined;
+    return Object.values(filteredSamplePCs).map((datum) => ({
       x: datum[pcA],
       y: datum[pcB],
     }));
-  }, [filteredSampleWeights, pcA, pcB]);
+  }, [filteredSamplePCs, pcA, pcB]);
 
   /** project user input data */
   const [, projectStatus, runProject] = useWorker(projectionistWorker);
@@ -95,7 +102,7 @@ const PCs = () => {
   useEffect(
     () =>
       runProject(async () => {
-        if (!taxa || !userSamples || !reads || !taxaMap || !taxonWeights)
+        if (!taxa || !userSamples || !reads || !taxaMap || !filteredTaxonPCs)
           return;
         useData.setState({
           userProjected: await projectionistWorker.projectUserData(
@@ -103,11 +110,11 @@ const PCs = () => {
             reads,
             userSamples,
             taxaMap,
-            taxonWeights,
+            filteredTaxonPCs,
           ),
         });
       }),
-    [taxa, reads, userSamples, taxaMap, taxonWeights, runProject],
+    [taxa, reads, userSamples, taxaMap, filteredTaxonPCs, runProject],
   );
 
   /** get user meta */

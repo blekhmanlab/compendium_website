@@ -1,4 +1,3 @@
-import { globSync } from "fs";
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
@@ -53,13 +52,11 @@ const metadataFile = `${mainInput}/sample_metadata.tsv`;
 /** raw tag data */
 const tagsFile = `${mainInput}/tags.tsv`;
 
-/** (projectionist) sample weight files */
-const sampleWeightFiles = globSync(
-  `${projectionistInput}/sample-weights-*.tsv`,
-);
+/** (projectionist) sample pcs file */
+const samplePCsFile = `${projectionistInput}/sample-pcs.tsv`;
 
-/** (projectionist) taxon weights file */
-const taxonWeightFile = `${projectionistInput}/taxon-weights.tsv`;
+/** (projectionist) taxon pcs file */
+const taxonPCsFile = `${projectionistInput}/taxon-pcs.tsv`;
 
 /** (projectionist) taxa map file */
 const taxaMapFile = `${projectionistInput}/taxa-map.tsv`;
@@ -529,8 +526,8 @@ const processMainData = async () => {
 const processProjectionistData = async () => {
   console.info("PROCESSING PROJECTIONIST DATA");
 
-  /** for each loading, map of sample run to principal components */
-  const sampleWeights: Record<
+  /** for each ordination, map of sample run to principal components */
+  const samplePCs: Record<
     string,
     Record<
       string,
@@ -547,98 +544,91 @@ const processProjectionistData = async () => {
     >
   > = {};
 
-  /** process sample weight files */
-  for (const file of sampleWeightFiles) {
-    /** get ordination name from filename */
-    const ordination = file.match(/sample-weights-(.*)\.tsv/)?.[1];
-    if (!ordination) continue;
-
-    console.info(`Processing ordination ${ordination}`);
-
-    /** start ordination */
-    sampleWeights[ordination] = {};
-
-    /** stream file line by line */
-    const ordinationStream = stream(file);
-
-    /** ignore header */
-    await ordinationStream.next();
-
-    /** process rest of rows (with hard limit) */
-    for (let row = 0; row < 1000000; row++) {
-      /** show progress periodically */
-      if (throttle("data")) console.info(`Processing sample weight row ${row}`);
-
-      /** read row */
-      const { value: ordinationRow = [], done: ordinationDone } =
-        await ordinationStream.next();
-
-      /** if no more data, exit */
-      if (ordinationDone) break;
-
-      /** get cols */
-      let [
-        run = "",
-        ,
-        pc1 = 0,
-        pc2 = 0,
-        pc3 = 0,
-        pc4 = 0,
-        pc5 = 0,
-        pc6 = 0,
-        pc7 = 0,
-        pc8 = 0,
-      ] = ordinationRow;
-
-      /** split PROJECT_SRR to just SRR */
-      run = run.split("_").pop() || run;
-
-      /** set sample in ordination */
-      sampleWeights[ordination]![run] = {
-        PC1: Number(pc1),
-        PC2: Number(pc2),
-        PC3: Number(pc3),
-        PC4: Number(pc4),
-        PC5: Number(pc5),
-        PC6: Number(pc6),
-        PC7: Number(pc7),
-        PC8: Number(pc8),
-      };
-    }
-  }
-
-  /** map of taxon to principal components */
-  const taxonWeights: Record<
-    string,
-    {
-      PC1: number;
-      PC2: number;
-      PC3: number;
-      PC4: number;
-      PC5: number;
-      PC6: number;
-      PC7: number;
-      PC8: number;
-    }
-  > = {};
-
   /** stream file line by line */
-  const taxonWeightsStream = stream(taxonWeightFile);
+  const samplePCsStream = stream(samplePCsFile);
 
   /** ignore header */
-  await taxonWeightsStream.next();
+  await samplePCsStream.next();
 
   /** process rest of rows (with hard limit) */
   for (let row = 0; row < 1000000; row++) {
     /** show progress periodically */
-    if (throttle("data")) console.info(`Processing taxon weight row ${row}`);
+    if (throttle("data")) console.info(`Processing sample PCs row ${row}`);
 
     /** read row */
-    const { value: taxonWeightRow = [], done: taxonWeightDone } =
-      await taxonWeightsStream.next();
+    const { value: sampleRow = [], done: sampleDone } =
+      await samplePCsStream.next();
 
     /** if no more data, exit */
-    if (taxonWeightDone) break;
+    if (sampleDone) break;
+
+    /** get cols */
+    let [
+      run = "",
+      ,
+      PC1 = 0,
+      PC2 = 0,
+      PC3 = 0,
+      PC4 = 0,
+      PC5 = 0,
+      PC6 = 0,
+      PC7 = 0,
+      PC8 = 0,
+      ordination = "",
+    ] = sampleRow;
+
+    /** split PROJECT_SRR to just SRR */
+    run = run.split("_").pop() || run;
+
+    /** set sample in ordination */
+    samplePCs[ordination] ??= {};
+    samplePCs[ordination][run] = {
+      PC1: Number(PC1),
+      PC2: Number(PC2),
+      PC3: Number(PC3),
+      PC4: Number(PC4),
+      PC5: Number(PC5),
+      PC6: Number(PC6),
+      PC7: Number(PC7),
+      PC8: Number(PC8),
+    };
+  }
+
+  /** for each ordination, map of taxon to principal components */
+  const taxonPCs: Record<
+    string,
+    Record<
+      string,
+      {
+        PC1: number;
+        PC2: number;
+        PC3: number;
+        PC4: number;
+        PC5: number;
+        PC6: number;
+        PC7: number;
+        PC8: number;
+      }
+    >
+  > = {};
+
+  /** stream file line by line */
+  const taxonPCsStream = stream(taxonPCsFile);
+
+  /** ignore header */
+  await taxonPCsStream.next();
+
+  /** process rest of rows (with hard limit) */
+  for (let row = 0; row < 1000000; row++) {
+    /** show progress periodically */
+    if (throttle("data")) console.info(`Processing taxon PCs row ${row}`);
+
+    /** read row */
+    const { value: taxonRow = [], done: taxonDone } =
+      await taxonPCsStream.next();
+
+    /** if no more data, exit */
+    if (taxonDone) break;
 
     /** get cols */
     const [
@@ -647,29 +637,31 @@ const processProjectionistData = async () => {
       _class = "",
       order = "",
       family = "",
-      pc1 = 0,
-      pc2 = 0,
-      pc3 = 0,
-      pc4 = 0,
-      pc5 = 0,
-      pc6 = 0,
-      pc7 = 0,
-      pc8 = 0,
-    ] = taxonWeightRow;
+      PC1 = 0,
+      PC2 = 0,
+      PC3 = 0,
+      PC4 = 0,
+      PC5 = 0,
+      PC6 = 0,
+      PC7 = 0,
+      PC8 = 0,
+      ordination = "",
+    ] = taxonRow;
 
     /** stringify taxon info into key */
     const taxon = [kingdom, phylum, _class, order, family].join("|");
 
-    /** set taxon in weights */
-    taxonWeights[taxon] = {
-      PC1: Number(pc1),
-      PC2: Number(pc2),
-      PC3: Number(pc3),
-      PC4: Number(pc4),
-      PC5: Number(pc5),
-      PC6: Number(pc6),
-      PC7: Number(pc7),
-      PC8: Number(pc8),
+    /** set taxon */
+    taxonPCs[ordination] ??= {};
+    taxonPCs[ordination][taxon] = {
+      PC1: Number(PC1),
+      PC2: Number(PC2),
+      PC3: Number(PC3),
+      PC4: Number(PC4),
+      PC5: Number(PC5),
+      PC6: Number(PC6),
+      PC7: Number(PC7),
+      PC8: Number(PC8),
     };
   }
 
@@ -716,17 +708,17 @@ const processProjectionistData = async () => {
       genus = "",
     ] = taxaMapRow;
 
-    /** set taxon in map */
+    /** set taxon */
     taxaMap[full] = { kingdom, phylum, _class, order, family, genus };
   }
 
   /** save results */
-  write(`${projectionistOutput}/sample-weights.json`, sampleWeights);
-  write(`${projectionistOutput}/taxon-weights.json`, taxonWeights);
+  write(`${projectionistOutput}/sample-pcs.json`, samplePCs);
+  write(`${projectionistOutput}/taxon-pcs.json`, taxonPCs);
   write(`${projectionistOutput}/taxa-map.json`, taxaMap);
 };
 
 /** run */
-if (true) await downloadFiles();
-if (true) await processMainData();
-if (true) await processProjectionistData();
+await downloadFiles();
+await processMainData();
+await processProjectionistData();

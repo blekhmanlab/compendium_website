@@ -1,7 +1,7 @@
 import type * as SamplesAPI from "@/pages/home/data/samples";
-import type * as CompendiumProjectedAPI from "@/pages/projectionist/data/sample-weights";
+import type * as CompendiumProjectedAPI from "@/pages/projectionist/data/sample-pcs";
 import type * as TaxaMapAPI from "@/pages/projectionist/data/taxa-map";
-import type * as TaxonWeightsAPI from "@/pages/projectionist/data/taxon-weights";
+import type * as TaxonPCsAPI from "@/pages/projectionist/data/taxon-pcs";
 import type {
   UserData,
   UserMeta,
@@ -10,13 +10,13 @@ import type {
 import { wrap } from "comlink";
 import { create } from "zustand";
 import SamplesWorker from "@/pages/home/data/samples.ts?worker";
-import SampleWeightsWorker from "@/pages/projectionist/data/sample-weights.ts?worker";
+import SamplePCsWorker from "@/pages/projectionist/data/sample-pcs.ts?worker";
 import TaxaMapWorker from "@/pages/projectionist/data/taxa-map.ts?worker";
-import TaxonWeightsWorker from "@/pages/projectionist/data/taxon-weights.ts?worker";
+import TaxonPCsWorker from "@/pages/projectionist/data/taxon-pcs.ts?worker";
 
 export type Data = {
-  sampleWeights?: CompendiumProjectedAPI.SampleWeights;
-  taxonWeights?: TaxonWeightsAPI.TaxonWeights;
+  samplePCs?: CompendiumProjectedAPI.SamplePCs;
+  taxonPCs?: TaxonPCsAPI.TaxonPCs;
   taxaMap?: TaxaMapAPI.TaxaMap;
   userData?: UserData;
   userMeta?: UserMeta;
@@ -26,18 +26,18 @@ export type Data = {
 
 export const useData = create<Data>(() => ({}));
 
-/** load and set sample weights */
-export const loadSampleWeights = async () => {
-  const worker = wrap<typeof CompendiumProjectedAPI>(new SampleWeightsWorker());
-  const sampleWeights = await worker.getSampleWeights();
-  useData.setState({ sampleWeights });
+/** load and set sample pcs */
+export const loadSamplePCs = async () => {
+  const worker = wrap<typeof CompendiumProjectedAPI>(new SamplePCsWorker());
+  const samplePCs = await worker.getSamplePCs();
+  useData.setState({ samplePCs });
 };
 
-/** load and set taxon weights */
-export const loadTaxonWeights = async () => {
-  const worker = wrap<typeof TaxonWeightsAPI>(new TaxonWeightsWorker());
-  const taxonWeights = await worker.getTaxonWeights();
-  useData.setState({ taxonWeights });
+/** load and set taxon pcs */
+export const loadTaxonPCs = async () => {
+  const worker = wrap<typeof TaxonPCsAPI>(new TaxonPCsWorker());
+  const taxonPCs = await worker.getTaxonPCs();
+  useData.setState({ taxonPCs });
 };
 
 /** load and set taxa map */
