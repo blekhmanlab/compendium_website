@@ -59,8 +59,6 @@ const PCChart = ({ title, xLabel, yLabel, data, range }: Props) => {
     ],
   };
 
-  if (!data) return <div className="placeholder">Loading phyla</div>;
-
   return (
     <Chart
       option={option}

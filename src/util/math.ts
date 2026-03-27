@@ -7,3 +7,10 @@ export const cos = (degrees: number) => Math.cos((2 * Math.PI * degrees) / 360);
 
 /** distance */
 export const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
+
+/** round to multiple */
+export const round = (
+  value: number,
+  multiple = 1,
+  method: "round" | "floor" | "ceil" = "round",
+) => Math[method](value / multiple) * multiple;

@@ -9,6 +9,7 @@ import Select from "@/components/Select";
 import SelectMulti from "@/components/SelectMulti";
 import { pcs } from "@/pages/projectionist/project";
 import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
+import HeatmapChart from "@/pages/projectionist/sections/HeatmapChart";
 import PCChart from "@/pages/projectionist/sections/PCChart";
 import { useData } from "@/pages/projectionist/state";
 import { useLegend } from "@/util/legend";
@@ -178,7 +179,13 @@ const PCs = () => {
         "
       >
         {compendiumPlot ? (
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-8">
+            <SelectMulti
+              label="Regions"
+              options={regionOptions}
+              value={regions}
+              onChange={setRegions}
+            />
             <PCChart
               title="Compendium"
               xLabel={pcA}
@@ -186,11 +193,12 @@ const PCs = () => {
               data={compendiumPlot}
               range={max}
             />
-            <SelectMulti
-              label="Regions"
-              options={regionOptions}
-              value={regions}
-              onChange={setRegions}
+            <HeatmapChart
+              title="Heatmap"
+              xLabel={pcA}
+              yLabel={pcB}
+              data={compendiumPlot}
+              range={max}
             />
           </div>
         ) : (
@@ -198,7 +206,13 @@ const PCs = () => {
         )}
 
         {userPlot ? (
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-8">
+            <Select
+              label="Color"
+              options={["", ...colorOptions]}
+              value={color}
+              onChange={setColor}
+            />
             <PCChart
               title="Yours"
               xLabel={pcA}
@@ -217,12 +231,6 @@ const PCs = () => {
                 </div>
               ))}
             </div>
-            <Select
-              label="Color"
-              options={["", ...colorOptions]}
-              value={color}
-              onChange={setColor}
-            />
           </div>
         ) : projectStatus === "loading" ? (
           <div className="placeholder">Loading user PCs</div>
