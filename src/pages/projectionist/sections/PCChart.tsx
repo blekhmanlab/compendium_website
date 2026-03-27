@@ -18,30 +18,33 @@ type Props = {
 const PCChart = ({ title, xLabel, yLabel, data, range }: Props) => {
   range = Math.ceil(range);
 
-  /** prune points to display to maintain render performance */
-  const prune = data.length / 50000;
-
   /** series data */
-  const seriesData = data
-    .map((datum) => ({
-      name: "",
-      value: [datum.x, datum.y],
-      itemStyle: { color: datum.color },
-      datum,
-    }))
-    .filter((_, index) => index % prune < 1);
+  const seriesData = data.map((datum) => ({
+    name: "",
+    value: [datum.x, datum.y],
+    itemStyle: { color: datum.color },
+    datum,
+  }));
 
   /** scale down point size more points there are */
   const symbolSize = Math.max(1, 10 * 2 ** (-data.length / 200));
 
   /** echarts options */
   const option: EChartsOption = {
-    series: [{ type: "scatter", data: seriesData, symbolSize }],
+    series: [
+      {
+        type: "scatter",
+        data: seriesData,
+        symbolSize,
+        progressive: 0,
+        large: true,
+        largeThreshold: 10000,
+      },
+    ],
     grid: { left: 50, right: 50, top: 50, bottom: 50 },
     title: [{ text: title }],
     xAxis: { min: -range, max: range, name: xLabel },
     yAxis: { min: -range, max: range, name: yLabel },
-    animation: false,
 
     dataZoom: [
       {

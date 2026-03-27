@@ -104,6 +104,8 @@ const axis = {
 };
 
 registerTheme("compendium", {
+  animation: false,
+
   textStyle: text,
   title: {
     top: 0,
