@@ -21,8 +21,8 @@ const Select = <Option extends string>({
     <span className="relative">
       <select
         className="
-          cursor-pointer appearance-none rounded-md bg-slate-500/25 p-2 pr-8
-          transition
+          min-w-20 cursor-pointer appearance-none rounded-md bg-slate-500/25 p-2
+          pr-8 transition
           hover:bg-slate-500/50
         "
         {...props}

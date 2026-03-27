@@ -8,11 +8,17 @@ import { sleep } from "@/util/async";
 type Props = {
   option: EChartsOption;
   init?: EChartsInitOpts;
+  onZoom?: (chart: ECharts, xScale: number, yScale: number) => void;
   className?: string;
 };
 
 /** echarts wrapper */
-const Chart = ({ option, init: initOptions = {}, className }: Props) => {
+const Chart = ({
+  option,
+  init: initOptions = {},
+  onZoom,
+  className,
+}: Props) => {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const chart = useRef<ECharts>(null);
 
@@ -28,11 +34,24 @@ const Chart = ({ option, init: initOptions = {}, className }: Props) => {
     /** connect chart zooms together */
     chart.current.group = "group";
     connect("group");
+    /** connect listeners */
+    if (onZoom)
+      chart.current.on("datazoom", (params) => {
+        // @ts-expect-error echarts types bad
+        if (!params.batch[0]) return;
+        // @ts-expect-error echarts types bad
+        if (!params.batch[1]) return;
+        // @ts-expect-error echarts types bad
+        const xScale = 100 / (params.batch[0].end - params.batch[0].start);
+        // @ts-expect-error echarts types bad
+        const yScale = 100 / (params.batch[1].end - params.batch[1].start);
+        if (chart.current) onZoom(chart.current, xScale, yScale);
+      });
     return () => {
       chart.current?.dispose();
       chart.current = null;
     };
-  }, [ref, initOptions]);
+  }, [ref, initOptions, onZoom]);
 
   /** auto-fit */
   const resize = useDebounceFn(() => chart.current?.resize(), 300);

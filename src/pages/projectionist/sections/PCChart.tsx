@@ -63,6 +63,12 @@ const PCChart = ({ title, xLabel, yLabel, data, range }: Props) => {
     <Chart
       option={option}
       init={{ renderer: "canvas" }}
+      onZoom={(chart, xScale, yScale) => {
+        chart.setOption({
+          /** scale points up a bit when zooming in */
+          series: [{ symbolSize: symbolSize * (xScale * yScale) ** 0.25 }],
+        });
+      }}
       className="aspect-square h-[unset]!"
     />
   );

@@ -36,8 +36,8 @@ const SelectMulti = <Option extends string>({
       <Listbox multiple value={value} onChange={onChange}>
         <ListboxButton
           className="
-            flex cursor-pointer appearance-none items-center gap-2 rounded-md
-            bg-slate-500/25 p-2 transition
+            flex min-w-20 cursor-pointer appearance-none items-center gap-2
+            rounded-md bg-slate-500/25 p-2 transition
             hover:bg-slate-500/50
           "
         >

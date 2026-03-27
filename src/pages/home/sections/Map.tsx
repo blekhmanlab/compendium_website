@@ -192,7 +192,7 @@ const Map = () => {
     .scaleExtent([baseScale, baseScale * 10]);
 
   if (!countries || !regions)
-    return <div className="placeholder">Loading map</div>;
+    return <div className="placeholder aspect-3/2">Loading map</div>;
 
   return (
     <div className="flex flex-col items-center gap-4">

@@ -94,7 +94,8 @@ const SearchList = ({
     [exactMatches],
   );
 
-  if (!list) return <div className="placeholder">Loading search</div>;
+  if (!list)
+    return <div className="placeholder aspect-3/2">Loading search</div>;
 
   /** full list of matches */
   const matches = search.trim()

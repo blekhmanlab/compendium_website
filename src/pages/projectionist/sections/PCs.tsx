@@ -3,13 +3,13 @@ import type { TaxonPCs } from "@/pages/projectionist/data/taxon-pcs";
 import type { PC } from "@/pages/projectionist/project";
 import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useEffect, useMemo, useState } from "react";
+import { useDebounce } from "@reactuses/core";
 import { wrap } from "comlink";
 import { pick, uniq } from "lodash";
 import Select from "@/components/Select";
 import SelectMulti from "@/components/SelectMulti";
 import { pcs } from "@/pages/projectionist/project";
 import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
-import HeatmapChart from "@/pages/projectionist/sections/HeatmapChart";
 import PCChart from "@/pages/projectionist/sections/PCChart";
 import { useData } from "@/pages/projectionist/state";
 import { useLegend } from "@/util/legend";
@@ -52,7 +52,13 @@ const PCs = () => {
   );
 
   /** selected regions */
-  const [regions, setRegions] = useState<string[]>([]);
+  const [_regions, setRegions] = useState<string[]>([]);
+
+  /**
+   * compendium plot has many points and lags on re-render, so debounce selected
+   * regions for responsiveness
+   */
+  const regions = useDebounce(_regions, 1000);
 
   /** set selected regions once options load */
   useEffect(() => {
@@ -178,14 +184,14 @@ const PCs = () => {
           max-md:grid-cols-1
         "
       >
-        {compendiumPlot ? (
-          <div className="flex flex-col items-center gap-8">
-            <SelectMulti
-              label="Regions"
-              options={regionOptions}
-              value={regions}
-              onChange={setRegions}
-            />
+        <div className="flex flex-col items-center gap-8">
+          <SelectMulti
+            label="Regions"
+            options={regionOptions}
+            value={_regions}
+            onChange={setRegions}
+          />
+          {compendiumPlot ? (
             <PCChart
               title="Compendium"
               xLabel={pcA}
@@ -193,56 +199,51 @@ const PCs = () => {
               data={compendiumPlot}
               range={max}
             />
-            <HeatmapChart
-              title="Heatmap"
-              xLabel={pcA}
-              yLabel={pcB}
-              data={compendiumPlot}
-              range={max}
-            />
-          </div>
-        ) : (
-          <div className="placeholder">Loading compendium PCs</div>
-        )}
+          ) : (
+            <div className="placeholder">Loading compendium PCs</div>
+          )}
+        </div>
 
-        {userPlot ? (
-          <div className="flex flex-col items-center gap-8">
-            <Select
-              label="Color"
-              options={["", ...colorOptions]}
-              value={color}
-              onChange={setColor}
-            />
-            <PCChart
-              title="Yours"
-              xLabel={pcA}
-              yLabel={pcB}
-              data={userPlot}
-              range={max}
-            />
-            <div className="flex flex-wrap items-center gap-8">
-              {Object.entries(legend).map(([key, value], index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <div
-                    className="size-4 rounded-full"
-                    style={{ backgroundColor: value.color }}
-                  />
-                  <span>{String(key) || "-"}</span>
-                </div>
-              ))}
+        <div className="flex flex-col items-center gap-8">
+          <Select
+            label="Color"
+            options={["", ...colorOptions]}
+            value={color}
+            onChange={setColor}
+          />
+          {userPlot ? (
+            <>
+              <PCChart
+                title="Yours"
+                xLabel={pcA}
+                yLabel={pcB}
+                data={userPlot}
+                range={max}
+              />
+              <div className="flex flex-wrap items-center gap-8">
+                {Object.entries(legend).map(([key, value], index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div
+                      className="size-4 rounded-full"
+                      style={{ backgroundColor: value.color }}
+                    />
+                    <span>{String(key) || "-"}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : projectStatus === "loading" ? (
+            <div className="placeholder">Loading user PCs</div>
+          ) : (
+            <div
+              className="
+                placeholder border border-dashed border-slate-500 bg-transparent
+              "
+            >
+              Load your data to compare
             </div>
-          </div>
-        ) : projectStatus === "loading" ? (
-          <div className="placeholder">Loading user PCs</div>
-        ) : (
-          <div
-            className="
-              placeholder border border-dashed border-slate-500 bg-transparent
-            "
-          >
-            Load your data to compare
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </section>
   );

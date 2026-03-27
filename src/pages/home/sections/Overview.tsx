@@ -129,7 +129,7 @@ const Overview = () => {
           ))}
         </div>
       ) : (
-        <div className="placeholder">Loading metadata</div>
+        <div className="placeholder aspect-3/2">Loading metadata</div>
       )}
 
       <p>
