@@ -18,14 +18,6 @@ type Props = {
 const PCChart = ({ title, xLabel, yLabel, data, range }: Props) => {
   range = Math.ceil(range);
 
-  /** series data */
-  const seriesData = data.map((datum) => ({
-    name: "",
-    value: [datum.x, datum.y],
-    itemStyle: { color: datum.color },
-    datum,
-  }));
-
   /** scale down point size more points there are */
   const symbolSize = Math.max(1, 10 * 2 ** (-data.length / 200));
 
@@ -34,7 +26,12 @@ const PCChart = ({ title, xLabel, yLabel, data, range }: Props) => {
     series: [
       {
         type: "scatter",
-        data: seriesData,
+        data: data.map((datum) => ({
+          name: "",
+          value: [datum.x, datum.y],
+          itemStyle: { color: datum.color },
+          datum,
+        })),
         symbolSize,
         progressive: 0,
         large: true,

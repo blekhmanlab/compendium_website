@@ -11,6 +11,7 @@ import SelectMulti from "@/components/SelectMulti";
 import { pcs } from "@/pages/projectionist/project";
 import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
 import PCChart from "@/pages/projectionist/sections/PCChart";
+import SelectOrdination from "@/pages/projectionist/sections/SelectOrdination";
 import { useData } from "@/pages/projectionist/state";
 import { useLegend } from "@/util/legend";
 import { useWorker } from "@/util/worker";
@@ -30,20 +31,11 @@ const PCs = () => {
   const samplePCs = useData((state) => state.samplePCs);
   const samples = useData((state) => state.samples);
   const userProjected = useData((state) => state.userProjected);
+  const ordination = useData((state) => state.selectedOrdination);
 
   /** selected principal components */
   const [pcA, setPcA] = useState<PC>(pcs[0]);
   const [pcB, setPcB] = useState<PC>(pcs[1]);
-
-  /** ordination options */
-  const ordinationOptions = Object.keys(samplePCs || {}).sort();
-
-  /** selected ordination */
-  const [ordination, setOrdination] = useState("full");
-
-  /** set ordination once options loaded */
-  const first = ordinationOptions[0];
-  if (!ordination && first) setOrdination(first);
 
   /** region options */
   const regionOptions = useMemo(
@@ -164,18 +156,13 @@ const PCs = () => {
   }, [compendiumPlot, userPlot]);
 
   return (
-    <section>
+    <section className="width-lg">
       <h2>Principal Components</h2>
 
       <div className="flex gap-4">
         <Select label="X-axis" options={pcs} value={pcA} onChange={setPcA} />
         <Select label="Y-axis" options={pcs} value={pcB} onChange={setPcB} />
-        <Select
-          label="Ordination"
-          options={ordinationOptions}
-          value={ordination ?? ""}
-          onChange={setOrdination}
-        />
+        <SelectOrdination />
       </div>
 
       <div

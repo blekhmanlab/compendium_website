@@ -4,10 +4,12 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Meta from "@/components/Meta";
 import PCs from "@/pages/projectionist/sections/PCs";
+import Scree from "@/pages/projectionist/sections/Scree";
 import Upload from "@/pages/projectionist/sections/Upload";
 import {
   loadSamplePCs,
   loadSamples,
+  loadScree,
   loadTaxaMap,
   loadTaxonPCs,
 } from "@/pages/projectionist/state";
@@ -23,6 +25,7 @@ const Projectionist = () => {
       loadSamplePCs();
       loadTaxaMap();
       loadSamples();
+      loadScree();
       loaded = true;
     }
   }, []);
@@ -46,6 +49,7 @@ const Projectionist = () => {
       <main>
         <Upload />
         <PCs />
+        <Scree />
       </main>
       <Footer />
     </>

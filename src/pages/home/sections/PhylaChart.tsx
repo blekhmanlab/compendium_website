@@ -55,24 +55,27 @@ const PhylaChart = ({ data }: Props) => {
   /** get color for each phylum */
   const [entry] = useLegend();
 
-  /** series data */
-  const seriesData = filtered.map((datum) => ({
-    name: String(datum.phylum ?? ""),
-    value: getSamples(datum),
-    itemStyle: {
-      color: entry(datum.phylum).color,
-    },
-    datum,
-    tooltip: tooltipTable({
-      Phylum: datum.phylum,
-      Kingdom: datum.kingdom,
-      Samples: formatNumber(getSamples(datum), false),
-    }),
-  }));
-
   /** echarts options */
   const option: EChartsOption = {
-    series: [{ type: "bar", barWidth: "90%", data: seriesData }],
+    series: [
+      {
+        type: "bar",
+        barWidth: "90%",
+        data: filtered.map((datum) => ({
+          name: String(datum.phylum ?? ""),
+          value: getSamples(datum),
+          itemStyle: {
+            color: entry(datum.phylum).color,
+          },
+          datum,
+          tooltip: tooltipTable({
+            Phylum: datum.phylum,
+            Kingdom: datum.kingdom,
+            Samples: formatNumber(getSamples(datum), false),
+          }),
+        })),
+      },
+    ],
 
     grid: { left: 150, right: 20, top: 50, bottom: 50 },
 

@@ -8,8 +8,9 @@ import Downloader from "nodejs-file-downloader";
 
 const lastCall: Record<string, number> = {};
 /** return true only if enough time has passed since last call */
-export const throttle = (key: string, interval = 500) => {
-  if (!lastCall[key] || performance.now() > lastCall[key] + interval) {
+export const throttle = (key: string, interval = 100) => {
+  const lastTime = lastCall[key] || 0;
+  if (!lastTime || performance.now() > lastTime + interval) {
     lastCall[key] = performance.now();
     return true;
   } else return false;

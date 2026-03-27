@@ -61,6 +61,9 @@ const taxonPCsFile = `${projectionistInput}/taxon-pcs.tsv`;
 /** (projectionist) taxa map file */
 const taxaMapFile = `${projectionistInput}/taxa-map.tsv`;
 
+/** (projectionist) scree file */
+const screeFile = `${projectionistInput}/scree.tsv`;
+
 /** raw natural earth data */
 const naturalEarthFile = "./extra/natural-earth.json";
 /** https://www.naturalearthdata.com/downloads/110m-cultural-vectors/ */
@@ -225,7 +228,7 @@ const processMainData = async () => {
   /** process rest of rows (with hard limit) */
   for (let row = 0; row < 1000000; row++) {
     /** show progress periodically */
-    if (throttle("data")) console.info(`Processing taxonomic row ${row}`);
+    if (throttle("tax row")) console.info(`Processing taxonomic row ${row}`);
 
     /** read rows */
     const [
@@ -404,7 +407,7 @@ const processMainData = async () => {
   /** process rest of rows (with hard limit) */
   for (let row = 0; row < 100000000; row++) {
     /** show progress periodically */
-    if (throttle("data")) console.info(`Processing tag row ${row}`);
+    if (throttle("tag row")) console.info(`Processing tag row ${row}`);
 
     /** read row */
     const {
@@ -553,7 +556,8 @@ const processProjectionistData = async () => {
   /** process rest of rows (with hard limit) */
   for (let row = 0; row < 1000000; row++) {
     /** show progress periodically */
-    if (throttle("data")) console.info(`Processing sample PCs row ${row}`);
+    if (throttle("sample pcs"))
+      console.info(`Processing sample PCs row ${row}`);
 
     /** read row */
     const { value: sampleRow = [], done: sampleDone } =
@@ -621,7 +625,7 @@ const processProjectionistData = async () => {
   /** process rest of rows (with hard limit) */
   for (let row = 0; row < 1000000; row++) {
     /** show progress periodically */
-    if (throttle("data")) console.info(`Processing taxon PCs row ${row}`);
+    if (throttle("taxon pcs")) console.info(`Processing taxon PCs row ${row}`);
 
     /** read row */
     const { value: taxonRow = [], done: taxonDone } =
@@ -689,7 +693,7 @@ const processProjectionistData = async () => {
   /** process rest of rows (with hard limit) */
   for (let row = 0; row < 1000000; row++) {
     /** show progress periodically */
-    if (throttle("data")) console.info(`Processing taxa map row ${row}`);
+    if (throttle("taxa map")) console.info(`Processing taxa map row ${row}`);
 
     /** read row */
     const { value: taxaMapRow = [], done: taxaMapDone } =
@@ -713,10 +717,48 @@ const processProjectionistData = async () => {
     taxaMap[full] = { kingdom, phylum, _class, order, family, genus };
   }
 
+  /** for each ordination, scree information */
+  const scree: Record<
+    string,
+    {
+      explained: Record<string, number>;
+      cumulative: Record<string, number>;
+    }
+  > = {};
+
+  /** stream file line by line */
+  const screeStream = stream(screeFile);
+
+  /** ignore header */
+  await screeStream.next();
+
+  /** process rest of rows (with hard limit) */
+  for (let row = 0; row < 1000000; row++) {
+    /** show progress periodically */
+    if (throttle("scree")) console.info(`Processing scree row ${row}`);
+
+    /** read row */
+    const { value: screeRow = [], done: screeDone } = await screeStream.next();
+
+    /** if no more data, exit */
+    if (screeDone) break;
+
+    /** get cols */
+    const [axis = "", explained = 0, cumulative = 0, ordination = ""] =
+      screeRow;
+    const pc = `PC${axis}`;
+
+    /** set scree info */
+    scree[ordination] ??= { explained: {}, cumulative: {} };
+    scree[ordination].explained[pc] = Number(explained);
+    scree[ordination].cumulative[pc] = Number(cumulative);
+  }
+
   /** save results */
   write(`${projectionistOutput}/sample-pcs.json`, samplePCs);
   write(`${projectionistOutput}/taxon-pcs.json`, taxonPCs);
   write(`${projectionistOutput}/taxa-map.json`, taxaMap);
+  write(`${projectionistOutput}/scree.json`, scree);
 };
 
 /** run */

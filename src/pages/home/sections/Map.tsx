@@ -197,7 +197,7 @@ const Map = () => {
   return (
     <div className="flex flex-col items-center gap-4">
       <Select
-        label="Group by:"
+        label="Group by"
         value={by}
         onChange={setBy}
         options={byOptions}

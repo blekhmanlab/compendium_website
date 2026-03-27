@@ -64,7 +64,7 @@ const Upload = () => {
   const meta = useData((state) => state.userMeta);
 
   return (
-    <section>
+    <section className="width-lg">
       <h2>Upload</h2>
 
       <div

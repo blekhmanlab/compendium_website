@@ -36,16 +36,6 @@ const ReadsChart = ({ data }: Props) => {
   const xMax = max(histogram.map((bin) => bin.max));
   const yMax = max(histogram.map(getSamples));
 
-  /** series data */
-  const seriesData = histogram.map((datum) => ({
-    value: [datum.mid, getSamples(datum)],
-    datum,
-    tooltip: tooltipTable({
-      Samples: formatNumber(getSamples(datum), false),
-      Reads: `${formatNumber(datum.min)} to ${formatNumber(datum.max)}`,
-    }),
-  }));
-
   /** median value */
   const median = data?.median[sampleKey] ?? 0;
 
@@ -55,7 +45,14 @@ const ReadsChart = ({ data }: Props) => {
       {
         type: "bar",
         barWidth: "100%",
-        data: seriesData,
+        data: histogram.map((datum) => ({
+          value: [datum.mid, getSamples(datum)],
+          datum,
+          tooltip: tooltipTable({
+            Samples: formatNumber(getSamples(datum), false),
+            Reads: `${formatNumber(datum.min)} to ${formatNumber(datum.max)}`,
+          }),
+        })),
         itemStyle: {
           color: secondary,
         },

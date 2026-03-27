@@ -46,7 +46,7 @@ const Prevalence = () => {
 
         <div className="flex flex-col items-center gap-4">
           <Select
-            label="Chart:"
+            label="Chart"
             value={chart}
             onChange={setChart}
             options={chartOptions}

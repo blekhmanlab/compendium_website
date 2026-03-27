@@ -1,5 +1,6 @@
 import type * as SamplesAPI from "@/pages/home/data/samples";
 import type * as CompendiumProjectedAPI from "@/pages/projectionist/data/sample-pcs";
+import type { Scree } from "@/pages/projectionist/data/scree";
 import type * as TaxaMapAPI from "@/pages/projectionist/data/taxa-map";
 import type * as TaxonPCsAPI from "@/pages/projectionist/data/taxon-pcs";
 import type {
@@ -11,6 +12,7 @@ import { wrap } from "comlink";
 import { create } from "zustand";
 import SamplesWorker from "@/pages/home/data/samples.ts?worker";
 import SamplePCsWorker from "@/pages/projectionist/data/sample-pcs.ts?worker";
+import { getScree } from "@/pages/projectionist/data/scree";
 import TaxaMapWorker from "@/pages/projectionist/data/taxa-map.ts?worker";
 import TaxonPCsWorker from "@/pages/projectionist/data/taxon-pcs.ts?worker";
 
@@ -22,6 +24,8 @@ export type Data = {
   userMeta?: UserMeta;
   userProjected?: UserProjected;
   samples?: SamplesAPI.Samples;
+  scree?: Scree;
+  selectedOrdination?: string;
 };
 
 export const useData = create<Data>(() => ({}));
@@ -53,3 +57,10 @@ export const loadSamples = async () => {
   const samples = await worker.getSamples();
   useData.setState({ samples });
 };
+
+/** load and set scree data */
+export const loadScree = async () => useData.setState({ scree: getScree() });
+
+/** set selected ordination */
+export const setSelectedOrdination = (ordination: string) =>
+  useData.setState({ selectedOrdination: ordination });
