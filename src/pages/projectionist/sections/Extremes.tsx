@@ -7,6 +7,10 @@ import {
   ArrowRightIcon,
   ArrowUpIcon,
 } from "lucide-react";
+import {
+  SelectOrdination,
+  SelectPCs,
+} from "@/pages/projectionist/sections/Selections";
 import { useData } from "@/pages/projectionist/state";
 
 /** top-n extreme taxa */
@@ -86,6 +90,11 @@ const Extremes = () => {
     <section className="width-lg">
       <h2>Taxon Extremes</h2>
 
+      <div className="flex flex-wrap items-center justify-center gap-8">
+        <SelectPCs />
+        <SelectOrdination />
+      </div>
+
       <div
         className="
           grid grid-cols-8 gap-8
@@ -104,11 +113,11 @@ const Extremes = () => {
             )}
           >
             <p>{label}</p>
-            <table>
+            <table className="table-fixed">
               <thead>
                 <tr>
                   <th>Taxon</th>
-                  <th>{header}</th>
+                  <th className="w-20">{header}</th>
                 </tr>
               </thead>
               <tbody>

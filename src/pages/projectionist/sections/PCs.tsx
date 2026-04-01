@@ -176,21 +176,26 @@ const PCs = () => {
     <section className="width-lg">
       <h2>Principal Components</h2>
 
-      <div className="flex flex-wrap gap-8">
+      <div className="flex flex-wrap items-center justify-center gap-8">
         <SelectPCs />
         <SelectOrdination />
+      </div>
+      <div className="flex flex-wrap items-center justify-center gap-8">
         <SelectMulti
           label="Regions"
           options={regionOptions}
           value={regions}
           onChange={setRegions}
+          className="w-30"
         />
-        <Select
-          label="Group by"
-          options={["", ...groupOptions]}
-          value={group}
-          onChange={setGroup}
-        />
+        {userPlot && (
+          <Select
+            label="Split by"
+            options={["", ...groupOptions]}
+            value={group}
+            onChange={setGroup}
+          />
+        )}
       </div>
 
       <div className="flex w-full flex-col items-center gap-8">
