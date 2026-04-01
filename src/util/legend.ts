@@ -5,7 +5,6 @@ type Entry = {
 };
 
 const getList = (): Entry[] => [
-  { color: getCssVariable("--color-fuchsia-500") },
   { color: getCssVariable("--color-red-500") },
   { color: getCssVariable("--color-orange-500") },
   { color: getCssVariable("--color-amber-500") },
@@ -20,6 +19,7 @@ const getList = (): Entry[] => [
   { color: getCssVariable("--color-indigo-500") },
   { color: getCssVariable("--color-violet-500") },
   { color: getCssVariable("--color-purple-500") },
+  { color: getCssVariable("--color-fuchsia-500") },
   { color: getCssVariable("--color-pink-500") },
   { color: getCssVariable("--color-rose-500") },
 ];
@@ -45,9 +45,11 @@ export const useLegend = () => {
     if (!key)
       /** assign neutral entry if key is falsy */
       return (map[key] = getNeutral());
-    else
+    else {
       /** assign next entry in list */
-      return (map[key] = list[index++ % list.length] ?? getNeutral());
+      return (map[key] =
+        list[(index++ * 3 + 11) % list.length] ?? getNeutral());
+    }
   };
 
   return [entry, map] as const;

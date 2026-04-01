@@ -1,5 +1,5 @@
 import ScreeChart from "@/pages/projectionist/sections/ScreeChart";
-import SelectOrdination from "@/pages/projectionist/sections/SelectOrdination";
+import { SelectOrdination } from "@/pages/projectionist/sections/Selections";
 import { useData } from "@/pages/projectionist/state";
 
 /** scree plot section */
@@ -17,7 +17,9 @@ const Scree = () => {
     <section className="width-lg">
       <h2>Scree Plots</h2>
 
-      <SelectOrdination />
+      <div className="flex flex-wrap gap-8">
+        <SelectOrdination />
+      </div>
 
       <div
         className="

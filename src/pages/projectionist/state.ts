@@ -4,6 +4,7 @@ import type { Scree } from "@/pages/projectionist/data/scree";
 import type * as TaxaMapAPI from "@/pages/projectionist/data/taxa-map";
 import type * as TaxonPCsAPI from "@/pages/projectionist/data/taxon-pcs";
 import type {
+  PC,
   UserData,
   UserMeta,
   UserProjected,
@@ -25,6 +26,8 @@ export type Data = {
   userProjected?: UserProjected;
   samples?: SamplesAPI.Samples;
   scree?: Scree;
+  selectedPcX?: PC;
+  selectedPcY?: PC;
   selectedOrdination?: string;
 };
 
@@ -60,6 +63,10 @@ export const loadSamples = async () => {
 
 /** load and set scree data */
 export const loadScree = async () => useData.setState({ scree: getScree() });
+
+/** set selected principal components */
+export const setselectedPcX = (pc: PC) => useData.setState({ selectedPcX: pc });
+export const setSelectedPcY = (pc: PC) => useData.setState({ selectedPcY: pc });
 
 /** set selected ordination */
 export const setSelectedOrdination = (ordination: string) =>

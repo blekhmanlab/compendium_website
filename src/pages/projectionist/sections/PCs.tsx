@@ -1,17 +1,17 @@
 import type { SamplePCs } from "@/pages/projectionist/data/sample-pcs";
 import type { TaxonPCs } from "@/pages/projectionist/data/taxon-pcs";
-import type { PC } from "@/pages/projectionist/project";
 import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useEffect, useMemo, useState } from "react";
-import { useDebounce } from "@reactuses/core";
 import { wrap } from "comlink";
-import { pick, uniq } from "lodash";
+import { groupBy, pick, uniq } from "lodash";
 import Select from "@/components/Select";
 import SelectMulti from "@/components/SelectMulti";
-import { pcs } from "@/pages/projectionist/project";
 import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
 import PCChart from "@/pages/projectionist/sections/PCChart";
-import SelectOrdination from "@/pages/projectionist/sections/SelectOrdination";
+import {
+  SelectOrdination,
+  SelectPCs,
+} from "@/pages/projectionist/sections/Selections";
 import { useData } from "@/pages/projectionist/state";
 import { useLegend } from "@/util/legend";
 import { useWorker } from "@/util/worker";
@@ -20,7 +20,7 @@ const projectionistWorker = wrap<typeof ProjectionistAPI>(
   new ProjectionistWorker(),
 );
 
-/** compare plots of principal components */
+/** compare series of principal components */
 const PCs = () => {
   /** get state */
   const taxa = useData((state) => state.userData?.taxa);
@@ -31,11 +31,9 @@ const PCs = () => {
   const samplePCs = useData((state) => state.samplePCs);
   const samples = useData((state) => state.samples);
   const userProjected = useData((state) => state.userProjected);
+  const pcX = useData((state) => state.selectedPcX);
+  const pcY = useData((state) => state.selectedPcY);
   const ordination = useData((state) => state.selectedOrdination);
-
-  /** selected principal components */
-  const [pcA, setPcA] = useState<PC>(pcs[0]);
-  const [pcB, setPcB] = useState<PC>(pcs[1]);
 
   /** region options */
   const regionOptions = useMemo(
@@ -44,13 +42,7 @@ const PCs = () => {
   );
 
   /** selected regions */
-  const [_regions, setRegions] = useState<string[]>([]);
-
-  /**
-   * compendium plot has many points and lags on re-render, so debounce selected
-   * regions for responsiveness
-   */
-  const regions = useDebounce(_regions, 1000);
+  const [regions, setRegions] = useState<string[]>([]);
 
   /** set selected regions once options load */
   useEffect(() => {
@@ -85,14 +77,21 @@ const PCs = () => {
     return taxonPCs[ordination as keyof TaxonPCs] ?? {};
   }, [taxonPCs, ordination]);
 
+  /** color legend */
+  const [entry, legend] = useLegend();
+
   /** data for compendium plot */
   const compendiumPlot = useMemo(() => {
-    if (!filteredSamplePCs) return undefined;
-    return Object.values(filteredSamplePCs).map((datum) => ({
-      x: datum[pcA],
-      y: datum[pcB],
-    }));
-  }, [filteredSamplePCs, pcA, pcB]);
+    if (!filteredSamplePCs || !pcX || !pcY) return undefined;
+    return {
+      color: entry("Compendium").color,
+      data: Object.entries(filteredSamplePCs).map(([sample, pcs]) => ({
+        x: pcs[pcX],
+        y: pcs[pcY],
+        datum: { sample },
+      })),
+    };
+  }, [filteredSamplePCs, pcX, pcY, entry]);
 
   /** project user input data */
   const [, projectStatus, runProject] = useWorker(projectionistWorker);
@@ -119,117 +118,107 @@ const PCs = () => {
   /** get user meta */
   const userMeta = useData((state) => state.userMeta);
 
-  /** color legend */
-  const [entry, legend] = useLegend();
-
-  /** color by */
-  const colorOptions = useMemo(
+  /** group by */
+  const groupOptions = useMemo(
     () =>
       uniq(
         Object.values(userMeta ?? {}).flatMap((sample) => Object.keys(sample)),
       ),
     [userMeta],
   );
-  const [color, setColor] = useState("");
+  const [group, setGroup] = useState("");
 
   /** data for user plot */
   const userPlot = useMemo(() => {
-    if (!userProjected) return undefined;
-    return Object.entries(userProjected).map(([sample, pcs]) => ({
-      x: pcs[pcA],
-      y: pcs[pcB],
-      color: color
-        ? entry(String(userMeta?.[sample]?.[color] ?? "")).color
-        : undefined,
-    }));
-  }, [userProjected, pcA, pcB, color, entry, userMeta]);
+    if (!userProjected || !pcX || !pcY) return undefined;
 
-  /** get absolute max for both plots */
+    /** split into groups by selected "group by" option */
+    const groups = groupBy(
+      Object.entries(userProjected).map(([sample, pcs]) => ({
+        sample,
+        ...pcs,
+      })),
+      ({ sample }) =>
+        /** get corresponding group value from user meta */
+        group ? String(userMeta?.[sample]?.[group] ?? "") : "Yours",
+    );
+
+    /** map groups into data series */
+    return Object.entries(groups).map(([group, samples]) => ({
+      color: entry(group).color,
+      data: samples.map(({ sample, ...pcs }) => ({
+        x: pcs[pcX],
+        y: pcs[pcY],
+        datum: { sample },
+      })),
+    }));
+  }, [userProjected, pcX, pcY, group, entry, userMeta]);
+
+  /** combine series */
+  const series = useMemo(
+    () =>
+      [compendiumPlot, ...(userPlot ? userPlot : [])].filter(
+        (plot) => plot !== undefined,
+      ),
+    [compendiumPlot, userPlot],
+  );
+
+  /** get absolute max for both series */
   const max = useMemo(() => {
     let max = 0;
-    for (const plot of [compendiumPlot, userPlot]) {
-      if (!plot) continue;
-      for (const { x, y } of plot)
+    for (const { data } of series)
+      for (const { x, y } of data)
         max = Math.max(max, Math.abs(x), Math.abs(y));
-    }
     return max;
-  }, [compendiumPlot, userPlot]);
+  }, [series]);
 
   return (
     <section className="width-lg">
       <h2>Principal Components</h2>
 
-      <div className="flex gap-4">
-        <Select label="X-axis" options={pcs} value={pcA} onChange={setPcA} />
-        <Select label="Y-axis" options={pcs} value={pcB} onChange={setPcB} />
+      <div className="flex flex-wrap gap-8">
+        <SelectPCs />
         <SelectOrdination />
+        <SelectMulti
+          label="Regions"
+          options={regionOptions}
+          value={regions}
+          onChange={setRegions}
+        />
+        <Select
+          label="Group by"
+          options={["", ...groupOptions]}
+          value={group}
+          onChange={setGroup}
+        />
       </div>
 
-      <div
-        className="
-          grid w-full grid-cols-2 content-start gap-8
-          max-md:grid-cols-1
-        "
-      >
-        <div className="flex flex-col items-center gap-8">
-          <SelectMulti
-            label="Regions"
-            options={regionOptions}
-            value={_regions}
-            onChange={setRegions}
-          />
-          {compendiumPlot ? (
-            <PCChart
-              title="Compendium"
-              xLabel={pcA}
-              yLabel={pcB}
-              data={compendiumPlot}
-              range={max}
-            />
-          ) : (
-            <div className="placeholder">Loading compendium PCs</div>
-          )}
-        </div>
+      <div className="flex w-full flex-col items-center gap-8">
+        <PCChart
+          title={userPlot ? "Compendium vs. Yours" : "Compendium"}
+          subtitle={
+            compendiumPlot === undefined
+              ? "Loading compendium PCs"
+              : projectStatus
+                ? "Projecting your data"
+                : ""
+          }
+          xLabel={pcX ?? ""}
+          yLabel={pcY ?? ""}
+          series={series}
+          range={max}
+        />
 
-        <div className="flex flex-col items-center gap-8">
-          <Select
-            label="Color"
-            options={["", ...colorOptions]}
-            value={color}
-            onChange={setColor}
-          />
-          {userPlot ? (
-            <>
-              <PCChart
-                title="Yours"
-                xLabel={pcA}
-                yLabel={pcB}
-                data={userPlot}
-                range={max}
+        <div className="flex flex-wrap items-center gap-8">
+          {Object.entries(legend).map(([key, value], index) => (
+            <div key={index} className="flex items-center gap-2">
+              <div
+                className="size-4 rounded-full"
+                style={{ backgroundColor: value.color }}
               />
-              <div className="flex flex-wrap items-center gap-8">
-                {Object.entries(legend).map(([key, value], index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <div
-                      className="size-4 rounded-full"
-                      style={{ backgroundColor: value.color }}
-                    />
-                    <span>{String(key) || "-"}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : projectStatus === "loading" ? (
-            <div className="placeholder">Loading user PCs</div>
-          ) : (
-            <div
-              className="
-                placeholder border border-dashed border-slate-500 bg-transparent
-              "
-            >
-              Load your data to compare
+              <span>{String(key) || "-"}</span>
             </div>
-          )}
+          ))}
         </div>
       </div>
     </section>

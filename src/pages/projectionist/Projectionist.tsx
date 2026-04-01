@@ -3,6 +3,7 @@ import { ConeIcon } from "lucide-react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Meta from "@/components/Meta";
+import Extremes from "@/pages/projectionist/sections/Extremes";
 import PCs from "@/pages/projectionist/sections/PCs";
 import Scree from "@/pages/projectionist/sections/Scree";
 import Upload from "@/pages/projectionist/sections/Upload";
@@ -50,6 +51,7 @@ const Projectionist = () => {
         <Upload />
         <PCs />
         <Scree />
+        <Extremes />
       </main>
       <Footer />
     </>

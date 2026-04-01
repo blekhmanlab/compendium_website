@@ -22,9 +22,8 @@ const SelectMulti = <Option extends string>({
   onChange,
   options,
 }: Props<Option>) => {
-  let selected = "";
-
   /** selected label */
+  let selected = "";
   if (value.length === 0) selected = "None";
   else if (value.length === options.length) selected = "All";
   else if (value.length === 1) selected = truncate(value[0]!, { length: 15 });

@@ -63,7 +63,15 @@ const Chart = ({
     chart.current.setOption(option);
   });
 
-  return <div ref={setRef} className={clsx("size-full", className)} />;
+  return (
+    <div
+      ref={setRef}
+      className={clsx(
+        "size-full max-h-screen max-w-full resize overflow-hidden",
+        className,
+      )}
+    />
+  );
 };
 
 export default Chart;
@@ -109,6 +117,7 @@ registerTheme("compendium", {
   textStyle: text,
   title: {
     top: 0,
+    itemGap: 5,
     textStyle: textBig,
     subtextStyle: textSmall,
   },

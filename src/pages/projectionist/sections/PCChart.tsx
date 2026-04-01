@@ -4,42 +4,48 @@ import Chart from "@/components/Chart";
 
 type Props = {
   title: string;
+  subtitle?: string;
   xLabel: string;
   yLabel: string;
-  data: {
-    x: number;
-    y: number;
-    color?: string;
+  series: {
+    color: string;
+    data: {
+      x: number;
+      y: number;
+    }[];
   }[];
   range: number;
 };
 
 /** x/y plot of principal components */
-const PCChart = ({ title, xLabel, yLabel, data, range }: Props) => {
+const PCChart = ({ title, subtitle, xLabel, yLabel, series, range }: Props) => {
   range = Math.ceil(range);
 
   /** scale down point size more points there are */
-  const symbolSize = Math.max(1, 10 * 2 ** (-data.length / 200));
+  const symbolSizes = series.map((data) =>
+    Math.max(1, 10 * 2 ** (-data.data.length / 200)),
+  );
 
   /** echarts options */
   const option: EChartsOption = {
-    series: [
-      {
-        type: "scatter",
-        data: data.map((datum) => ({
-          name: "",
-          value: [datum.x, datum.y],
-          itemStyle: { color: datum.color },
-          datum,
-        })),
-        symbolSize,
-        progressive: 0,
-        large: true,
-        largeThreshold: 10000,
-      },
-    ],
+    series: series.map(
+      ({ color, data }, index) =>
+        ({
+          type: "scatter",
+          data: data.map((datum) => ({
+            name: "",
+            value: [datum.x, datum.y],
+            datum,
+          })),
+          itemStyle: { color },
+          symbolSize: symbolSizes[index],
+          progressive: 0,
+          large: true,
+          largeThreshold: 10000,
+        }) satisfies EChartsOption["series"],
+    ),
     grid: { left: 50, right: 50, top: 50, bottom: 50 },
-    title: [{ text: title }],
+    title: [{ text: title, subtext: subtitle }],
     xAxis: { min: -range, max: range, name: xLabel },
     yAxis: { min: -range, max: range, name: yLabel },
 
@@ -64,12 +70,15 @@ const PCChart = ({ title, xLabel, yLabel, data, range }: Props) => {
       option={option}
       init={{ renderer: "canvas" }}
       onZoom={(chart, xScale, yScale) => {
+        /** scale points up a bit when zooming in */
+        const factor = (xScale * yScale) ** 0.25;
         chart.setOption({
-          /** scale points up a bit when zooming in */
-          series: [{ symbolSize: symbolSize * (xScale * yScale) ** 0.25 }],
+          series: series.map((_, index) => ({
+            symbolSize: (symbolSizes[index] ?? 1) * factor,
+          })),
         });
       }}
-      className="aspect-square h-[unset]!"
+      className="aspect-square w-120"
     />
   );
 };
