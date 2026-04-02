@@ -95,10 +95,6 @@ const PCs = () => {
     };
   }, [filteredSamplePCs, pcX, pcY, entry]);
 
-  useEffect(() => {
-    console.log({ entry });
-  }, [entry]);
-
   /** project user input data */
   const [, projectStatus, runProject] = useWorker(projectionistWorker);
 
