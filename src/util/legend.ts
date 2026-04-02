@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { getCssVariable } from "@/util/dom";
 
 type Entry = {
@@ -28,29 +29,30 @@ const getNeutral = (): Entry => ({
   color: getCssVariable("--color-slate-500"),
 });
 
-export const useLegend = () => {
-  /** map unique key to entry in list */
-  const map: Record<string, Entry> = {};
+export const useLegend = () =>
+  useMemo(() => {
+    /** map unique key to entry in list */
+    const map: Record<string, Entry> = {};
 
-  /** next entry to assign */
-  let index = 0;
+    /** next entry to assign */
+    let index = 0;
 
-  /** list of entries to assign */
-  const list = getList();
+    /** list of entries to assign */
+    const list = getList();
 
-  /** get entry for unique key */
-  const entry = (key: string) => {
-    /** return existing value */
-    if (key in map) return map[key]!;
-    if (!key)
-      /** assign neutral entry if key is falsy */
-      return (map[key] = getNeutral());
-    else {
-      /** assign next entry in list */
-      return (map[key] =
-        list[(index++ * 3 + 11) % list.length] ?? getNeutral());
-    }
-  };
+    /** get entry for unique key */
+    const entry = (key: string) => {
+      /** return existing value */
+      if (key in map) return map[key]!;
+      if (!key)
+        /** assign neutral entry if key is falsy */
+        return (map[key] = getNeutral());
+      else {
+        /** assign next entry in list */
+        return (map[key] =
+          list[(index++ * 3 + 11) % list.length] ?? getNeutral());
+      }
+    };
 
-  return [entry, map] as const;
-};
+    return [entry, map] as const;
+  }, []);

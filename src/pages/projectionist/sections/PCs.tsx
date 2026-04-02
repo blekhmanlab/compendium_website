@@ -2,6 +2,7 @@ import type { SamplePCs } from "@/pages/projectionist/data/sample-pcs";
 import type { TaxonPCs } from "@/pages/projectionist/data/taxon-pcs";
 import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useEffect, useMemo, useState } from "react";
+import { useDebounce } from "@reactuses/core";
 import { wrap } from "comlink";
 import { groupBy, pick, uniq } from "lodash";
 import Select from "@/components/Select";
@@ -42,7 +43,8 @@ const PCs = () => {
   );
 
   /** selected regions */
-  const [regions, setRegions] = useState<string[]>([]);
+  const [_regions, setRegions] = useState<string[]>([]);
+  const regions = useDebounce(_regions, 1000);
 
   /** set selected regions once options load */
   useEffect(() => {
@@ -88,10 +90,14 @@ const PCs = () => {
       data: Object.entries(filteredSamplePCs).map(([sample, pcs]) => ({
         x: pcs[pcX],
         y: pcs[pcY],
-        datum: { sample },
+        sample,
       })),
     };
   }, [filteredSamplePCs, pcX, pcY, entry]);
+
+  useEffect(() => {
+    console.log({ entry });
+  }, [entry]);
 
   /** project user input data */
   const [, projectStatus, runProject] = useWorker(projectionistWorker);
@@ -149,7 +155,7 @@ const PCs = () => {
       data: samples.map(({ sample, ...pcs }) => ({
         x: pcs[pcX],
         y: pcs[pcY],
-        datum: { sample },
+        sample,
       })),
     }));
   }, [userProjected, pcX, pcY, group, entry, userMeta]);
@@ -184,7 +190,7 @@ const PCs = () => {
         <SelectMulti
           label="Regions"
           options={regionOptions}
-          value={regions}
+          value={_regions}
           onChange={setRegions}
           className="w-30"
         />

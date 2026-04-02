@@ -1,6 +1,7 @@
 import type { EChartsOption } from "echarts";
 import { memo } from "react";
 import Chart from "@/components/Chart";
+import { tooltipTable } from "@/pages/home/sections/Map";
 
 type Props = {
   title: string;
@@ -12,6 +13,7 @@ type Props = {
     data: {
       x: number;
       y: number;
+      [key: string]: unknown;
     }[];
   }[];
   range: number;
@@ -32,10 +34,10 @@ const PCChart = ({ title, subtitle, xLabel, yLabel, series, range }: Props) => {
       ({ color, data }, index) =>
         ({
           type: "scatter",
-          data: data.map((datum) => ({
+          data: data.map(({ x, y, ...datum }) => ({
             name: "",
-            value: [datum.x, datum.y],
-            datum,
+            value: [x, y],
+            tooltip: tooltipTable(datum),
           })),
           itemStyle: { color },
           symbolSize: symbolSizes[index],
@@ -63,6 +65,8 @@ const PCChart = ({ title, subtitle, xLabel, yLabel, series, range }: Props) => {
         moveOnMouseMove: true,
       },
     ],
+
+    tooltip: { trigger: "item" },
   };
 
   return (

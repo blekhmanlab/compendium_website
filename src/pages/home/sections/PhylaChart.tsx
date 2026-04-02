@@ -67,7 +67,6 @@ const PhylaChart = ({ data }: Props) => {
           itemStyle: {
             color: entry(datum.phylum).color,
           },
-          datum,
           tooltip: tooltipTable({
             Phylum: datum.phylum,
             Kingdom: datum.kingdom,

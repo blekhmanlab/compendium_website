@@ -47,7 +47,6 @@ const ReadsChart = ({ data }: Props) => {
         barWidth: "100%",
         data: histogram.map((datum) => ({
           value: [datum.mid, getSamples(datum)],
-          datum,
           tooltip: tooltipTable({
             Samples: formatNumber(getSamples(datum), false),
             Reads: `${formatNumber(datum.min)} to ${formatNumber(datum.max)}`,

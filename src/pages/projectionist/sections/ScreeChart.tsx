@@ -17,13 +17,10 @@ const ScreeChart = ({ yLabel, type, data }: Props) => {
       {
         type: type,
         barWidth: "90%",
-        data: Object.values(data)
-
-          .map((datum) => ({
-            value: datum,
-            datum,
-            tooltip: formatNumber(datum, true),
-          })),
+        data: Object.values(data).map((datum) => ({
+          value: datum,
+          tooltip: formatNumber(datum, true),
+        })),
       },
     ],
     grid: { left: 50, right: 50, top: 50, bottom: 50 },
