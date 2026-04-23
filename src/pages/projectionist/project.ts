@@ -1,8 +1,15 @@
-import type { TaxaMap } from "@/pages/projectionist/data/taxa-map";
 import type { TaxonPCs } from "@/pages/projectionist/data/taxon-pcs";
 import { expose } from "comlink";
 import { groupBy, isEqual, omit, random, sum, uniqWith } from "lodash";
 import { inferSchema, initParser } from "udsv";
+
+/** max read count to rarify down to */
+const maxReads = 3000;
+
+/** max PCs to consider */
+export const maxPCs = 8;
+
+export type PC = `PC${number}`;
 
 /** allow aborting from outside worker */
 let aborted = "";
@@ -19,9 +26,6 @@ export type UserData = Awaited<ReturnType<typeof parseUserData>>;
 export type UserMeta = Awaited<ReturnType<typeof parseUserMeta>>;
 
 export type UserProjected = Awaited<ReturnType<typeof projectUserData>>;
-
-/** max read count to rarify down to */
-const maxReads = 3000;
 
 /** parse user uploaded tabular data (see example-data.txt) */
 export const parseUserData = async (text: string) => {
@@ -110,8 +114,6 @@ export const pcs = [
   "PC7",
   "PC8",
 ] as const;
-
-export type PC = (typeof pcs)[number];
 
 type Meta = { sample: string; [key: string]: string | number };
 
