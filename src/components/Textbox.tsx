@@ -17,7 +17,8 @@ const Textbox = ({ multi, value, onChange, className, ...props }: Props) => (
     {multi ? (
       <textarea
         className="
-          grow rounded-md bg-slate-500/25 px-4 py-2 pr-8 text-inherit transition
+          grow rounded-md bg-slate-500/25 px-4 py-2 pr-10 text-inherit
+          transition
           hover:bg-slate-500/50
         "
         {...(props as ComponentProps<"textarea">)}
@@ -33,7 +34,7 @@ const Textbox = ({ multi, value, onChange, className, ...props }: Props) => (
       <input
         type="text"
         className="
-          grow rounded-md bg-slate-500/25 px-4 py-2 pr-8 transition
+          grow rounded-md bg-slate-500/25 px-4 py-2 pr-10 transition
           hover:bg-slate-500/50
         "
         {...(props as ComponentProps<"input">)}

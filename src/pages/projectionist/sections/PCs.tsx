@@ -16,7 +16,7 @@ import {
   loadTaxonPCs,
   useData,
 } from "@/pages/projectionist/state";
-import { useLegend } from "@/util/legend";
+import { shapePaths, useLegend } from "@/util/legend";
 import { useWorker } from "@/util/worker";
 
 const projectionistWorker = wrap<typeof ProjectionistAPI>(
@@ -86,6 +86,7 @@ const PCs = () => {
     if (!filteredSamplePCs || !PCX || !PCY) return undefined;
     return {
       color: entry("Compendium").color,
+      shape: entry("Compendium").shape,
       data: Object.entries(filteredSamplePCs).map(([sample, PCs]) => ({
         x: PCs[PCX] ?? 0,
         y: PCs[PCY] ?? 0,
@@ -113,21 +114,21 @@ const PCs = () => {
     [userReads, userTaxa, taxonPCs, runProject],
   );
 
-  /** split by */
-  const splitOptions = useMemo(
+  /** group by */
+  const groupOptions = useMemo(
     () =>
       uniq(
         Object.values(userMeta ?? {}).flatMap((sample) => Object.keys(sample)),
       ),
     [userMeta],
   );
-  const [split, setSplit] = useState("");
+  const [group, setGroup] = useState("");
 
   /** data for user plot */
   const userPlot = useMemo(() => {
     if (!userProjected || !PCX || !PCY) return undefined;
 
-    /** split into groups by selected "split by" option */
+    /** split into groups by selected "group by" option */
     const groups = groupBy<{ sample: string } & (typeof userProjected)[string]>(
       Object.entries(userProjected).map(([sample, PCs]) => ({
         sample,
@@ -135,19 +136,20 @@ const PCs = () => {
       })),
       ({ sample }) =>
         /** get corresponding group value from user meta */
-        split ? String(userMeta?.[sample]?.[split] ?? "") : "Yours",
+        group ? String(userMeta?.[sample]?.[group] ?? "") : "Yours",
     );
 
     /** map groups into data series */
     return Object.entries(groups).map(([group, samples]) => ({
       color: entry(group).color,
+      shape: entry(group).shape,
       data: samples.map(({ sample, ...PCs }) => ({
         x: PCs[PCX] ?? 0,
         y: PCs[PCY] ?? 0,
         sample,
       })),
     }));
-  }, [userProjected, PCX, PCY, split, entry, userMeta]);
+  }, [userProjected, PCX, PCY, group, entry, userMeta]);
 
   /** combine series */
   const series = useMemo(
@@ -185,10 +187,10 @@ const PCs = () => {
         />
         {userPlot && (
           <Select
-            label="Split by"
-            options={["", ...splitOptions]}
-            value={split}
-            onChange={setSplit}
+            label="Group by"
+            options={["", ...groupOptions]}
+            value={group}
+            onChange={setGroup}
           />
         )}
       </div>
@@ -198,7 +200,7 @@ const PCs = () => {
           title={userPlot ? "Compendium vs. Yours" : "Compendium"}
           subtitle={
             compendiumPlot === undefined
-              ? "Loading compendium PCs"
+              ? "Loading compendium data"
               : projectStatus
                 ? "Projecting your data"
                 : ""
@@ -212,10 +214,12 @@ const PCs = () => {
         <div className="flex flex-wrap items-center gap-8">
           {Object.entries(legend).map(([key, value], index) => (
             <div key={index} className="flex items-center gap-2">
-              <div
-                className="size-4 rounded-full"
-                style={{ backgroundColor: value.color }}
-              />
+              <svg viewBox="-1 -1 2 2" className="size-4">
+                <path
+                  d={shapePaths[value.shape ?? ""] ?? ""}
+                  fill={value.color}
+                />
+              </svg>
               <span>{String(key) || "-"}</span>
             </div>
           ))}

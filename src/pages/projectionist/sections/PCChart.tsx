@@ -9,7 +9,8 @@ type Props = {
   xLabel: string;
   yLabel: string;
   series: {
-    color: string;
+    color?: string;
+    shape?: string;
     data: {
       x: number;
       y: number;
@@ -31,7 +32,7 @@ const PCChart = ({ title, subtitle, xLabel, yLabel, series, range }: Props) => {
   /** echarts options */
   const option: EChartsOption = {
     series: series.map(
-      ({ color, data }, index) =>
+      ({ color, shape, data }, index) =>
         ({
           type: "scatter",
           data: data.map(({ x, y, ...datum }) => ({
@@ -40,6 +41,7 @@ const PCChart = ({ title, subtitle, xLabel, yLabel, series, range }: Props) => {
             tooltip: tooltipTable(datum),
           })),
           itemStyle: { color },
+          symbol: shape,
           symbolSize: symbolSizes[index],
           progressive: 0,
           large: true,
