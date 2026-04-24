@@ -23,7 +23,7 @@ const Textbox = ({ multi, value, onChange, className, ...props }: Props) => (
         {...(props as ComponentProps<"textarea">)}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        rows={5}
+        rows={2}
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"

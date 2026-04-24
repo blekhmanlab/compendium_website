@@ -46,7 +46,7 @@ export type Data = {
   };
 };
 
-/** home page data store */
+/** home page state store */
 export const useData = create<Data>(() => ({}));
 
 /** load and set metadata */
@@ -69,7 +69,7 @@ export const loadProjects = async () => {
 /** load and set geo data */
 export const loadGeo = async () => {
   const worker = wrap<typeof GeoAPI>(new GeoWorker());
-  const { regions, countries } = await worker.getGeoData();
+  const { regions, countries } = await worker.getGeo();
   useData.setState({ regions, countries });
   const { geoSearch } = await worker.getGeoSearch({ regions, countries });
   useData.setState({ geoSearch });

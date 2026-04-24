@@ -6,7 +6,7 @@ import { useData } from "@/pages/projectionist/state";
 const Scree = () => {
   /** get state */
   const scree = useData((state) => state.scree);
-  const ordination = useData((state) => state.selectedOrdination);
+  const ordination = useData((state) => state.ordination);
 
   /** selected data */
   const data = scree?.[ordination ?? ""];

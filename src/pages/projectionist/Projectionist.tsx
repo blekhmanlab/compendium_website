@@ -7,13 +7,7 @@ import Extremes from "@/pages/projectionist/sections/Extremes";
 import PCs from "@/pages/projectionist/sections/PCs";
 import Scree from "@/pages/projectionist/sections/Scree";
 import Upload from "@/pages/projectionist/sections/Upload";
-import {
-  loadSamplePCs,
-  loadSamples,
-  loadScree,
-  loadTaxaMap,
-  loadTaxonPCs,
-} from "@/pages/projectionist/state";
+import { loadSamples, loadScree } from "@/pages/projectionist/state";
 
 /** ensure only one load */
 let loaded = false;
@@ -22,9 +16,6 @@ const Projectionist = () => {
   /** load data on page load */
   useEffect(() => {
     if (!loaded) {
-      loadTaxonPCs();
-      loadSamplePCs();
-      loadTaxaMap();
       loadSamples();
       loadScree();
       loaded = true;

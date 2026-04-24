@@ -1,4 +1,3 @@
-import type { TaxonPCs } from "@/pages/projectionist/data/taxon-pcs";
 import { useMemo } from "react";
 import clsx from "clsx";
 import {
@@ -19,25 +18,18 @@ const count = 3;
 const Extremes = () => {
   /** get state */
   const taxonPCs = useData((state) => state.taxonPCs);
-  const pcX = useData((state) => state.selectedPcX);
-  const pcY = useData((state) => state.selectedPcY);
-  const ordination = useData((state) => state.selectedOrdination);
-
-  /** taxon pcs filtered by ordination */
-  const filteredTaxonPCs = useMemo(() => {
-    if (!taxonPCs || !ordination) return undefined;
-    return taxonPCs[ordination as keyof TaxonPCs] ?? {};
-  }, [taxonPCs, ordination]);
+  const PCX = useData((state) => state.PCX);
+  const PCY = useData((state) => state.PCY);
 
   /** get extreme values of taxon pcs */
   const extremes = useMemo(() => {
-    if (!filteredTaxonPCs || !pcX || !pcY) return undefined;
-    const xs = Object.entries(filteredTaxonPCs)
-      .map(([taxon, pcs]) => ({ taxon, pc: pcs[pcX] }))
-      .sort((a, b) => a.pc - b.pc);
-    const ys = Object.entries(filteredTaxonPCs)
-      .map(([taxon, pcs]) => ({ taxon, pc: pcs[pcY] }))
-      .sort((a, b) => a.pc - b.pc);
+    if (!taxonPCs || !PCX || !PCY) return undefined;
+    const xs = Object.entries(taxonPCs)
+      .map(([taxon, PCs]) => ({ taxon, PC: PCs[PCX] ?? 0 }))
+      .sort((a, b) => a.PC - b.PC);
+    const ys = Object.entries(taxonPCs)
+      .map(([taxon, PCs]) => ({ taxon, PC: PCs[PCY] ?? 0 }))
+      .sort((a, b) => a.PC - b.PC);
     return [
       {
         className: "col-start-3",
@@ -47,7 +39,7 @@ const Extremes = () => {
             Top-most taxa
           </>
         ),
-        header: pcY,
+        header: PCY,
         data: ys.slice(-count).toReversed(),
       },
       {
@@ -58,7 +50,7 @@ const Extremes = () => {
             Left-most taxa
           </>
         ),
-        header: pcX,
+        header: PCX,
         data: xs.slice(0, count),
       },
       {
@@ -69,7 +61,7 @@ const Extremes = () => {
             <ArrowRightIcon />
           </>
         ),
-        header: pcX,
+        header: PCX,
         data: xs.slice(-count).toReversed(),
       },
       {
@@ -80,11 +72,11 @@ const Extremes = () => {
             <ArrowDownIcon />
           </>
         ),
-        header: pcY,
+        header: PCY,
         data: ys.slice(0, count),
       },
     ];
-  }, [filteredTaxonPCs, pcX, pcY]);
+  }, [taxonPCs, PCX, PCY]);
 
   return (
     <section className="width-lg">
@@ -121,10 +113,10 @@ const Extremes = () => {
                 </tr>
               </thead>
               <tbody>
-                {data.map(({ taxon, pc }, rowIndex) => (
+                {data.map(({ taxon, PC }, rowIndex) => (
                   <tr key={rowIndex}>
                     <td>{taxon.split("|").join(" | ")}</td>
-                    <td>{pc.toFixed(3)}</td>
+                    <td>{PC.toFixed(3)}</td>
                   </tr>
                 ))}
               </tbody>

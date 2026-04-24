@@ -1,60 +1,47 @@
 import { useEffect } from "react";
 import Select from "@/components/Select";
-import { pcs } from "@/pages/projectionist/project";
+import { ordinations, PCs } from "@/pages/projectionist/project";
 import {
-  setSelectedOrdination,
-  setselectedPcX,
-  setSelectedPcY,
+  setOrdination,
+  setPCX,
+  setPCY,
   useData,
 } from "@/pages/projectionist/state";
 
 /** pc selectors */
 export const SelectPCs = () => {
-  const pcX = useData((state) => state.selectedPcX);
-  const pcY = useData((state) => state.selectedPcY);
+  const PCX = useData((state) => state.PCX);
+  const PCY = useData((state) => state.PCY);
 
   useEffect(() => {
-    if (!pcX) setselectedPcX(pcs[0]);
-    if (!pcY) setSelectedPcY(pcs[1]);
-  }, [pcX, pcY]);
+    if (!PCX) setPCX(PCs[0]!);
+    if (!PCY) setPCY(PCs[1]!);
+  }, [PCX, PCY]);
 
-  if (!pcX || !pcY) return null;
+  if (!PCX || !PCY) return null;
 
   return (
     <>
-      <Select
-        label="X-axis"
-        options={pcs}
-        value={pcX}
-        onChange={setselectedPcX}
-      />
-      <Select
-        label="Y-axis"
-        options={pcs}
-        value={pcY}
-        onChange={setSelectedPcY}
-      />
+      <Select label="X-axis" options={PCs} value={PCX} onChange={setPCX} />
+      <Select label="Y-axis" options={PCs} value={PCY} onChange={setPCY} />
     </>
   );
 };
 
-/** ordination options */
-const ordinationOptions = ["full", "asia", "europe", "noneurope"];
-
 /** ordination selector */
 export const SelectOrdination = () => {
-  const ordination = useData((state) => state.selectedOrdination);
+  const ordination = useData((state) => state.ordination);
 
   useEffect(() => {
-    if (!ordination) setSelectedOrdination("full");
+    if (!ordination) setOrdination("full");
   }, [ordination]);
 
   return (
     <Select
       label="Ordination"
-      options={ordinationOptions}
+      options={ordinations}
       value={ordination ?? ""}
-      onChange={setSelectedOrdination}
+      onChange={setOrdination}
     />
   );
 };

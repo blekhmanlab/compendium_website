@@ -1,6 +1,6 @@
 import type { TaxonPCs } from "@/pages/projectionist/data/taxon-pcs";
 import { expose } from "comlink";
-import { groupBy, isEqual, omit, random, sum, uniqWith } from "lodash";
+import { groupBy, isEqual, omit, random, range, sum, uniqWith } from "lodash";
 import { inferSchema, initParser } from "udsv";
 
 /** max read count to rarify down to */
@@ -9,7 +9,15 @@ const maxReads = 3000;
 /** max PCs to consider */
 export const maxPCs = 8;
 
+/** available pc options */
+export const PCs = range(1, maxPCs + 1).map(
+  (index) => `PC${index}` satisfies PC,
+);
+
 export type PC = `PC${number}`;
+
+/** available ordinations */
+export const ordinations = ["full", "south-asia", "europe", "non-europe"];
 
 /** allow aborting from outside worker */
 let aborted = "";
@@ -21,14 +29,16 @@ type OnStatus = (status: string) => void;
 let status: OnStatus = () => {};
 export const onStatus = (onStatus: OnStatus) => (status = onStatus);
 
-export type UserData = Awaited<ReturnType<typeof parseUserData>>;
+export type UserReads = Awaited<ReturnType<typeof parseUserReads>>;
+
+export type UserTaxa = Awaited<ReturnType<typeof parseUserTaxa>>;
 
 export type UserMeta = Awaited<ReturnType<typeof parseUserMeta>>;
 
 export type UserProjected = Awaited<ReturnType<typeof projectUserData>>;
 
-/** parse user uploaded tabular data (see example-data.txt) */
-export const parseUserData = async (text: string) => {
+/** parse user uploaded reads */
+export const parseUserReads = async (text: string) => {
   status("Parsing");
 
   /** trim whitespace to not get null rows at start/end */
@@ -41,14 +51,13 @@ export const parseUserData = async (text: string) => {
 
   if (aborted) throw Error(aborted);
 
-  /** taxa (header row column names) */
+  /** sample names (first col) */
+  const samples = data.map((row) => String(row.shift()));
+
+  /** taxa ids (first row col names) */
   const taxa = schema.cols.map((col) => col.name);
-
-  /** ignore last header row column (sample name) */
-  taxa.pop();
-
-  /** sample names (last col on right) */
-  const samples = data.map((row) => String(row.pop()));
+  /** ignore first col */
+  taxa.shift();
 
   /** read counts (> rows 1) */
   const reads = data.map((row) => row.map(Number));
@@ -103,17 +112,30 @@ export const parseUserData = async (text: string) => {
   return { taxa, samples, reads };
 };
 
-/** all available principal components */
-export const pcs = [
-  "PC1",
-  "PC2",
-  "PC3",
-  "PC4",
-  "PC5",
-  "PC6",
-  "PC7",
-  "PC8",
-] as const;
+/** parse user uploaded tabular taxa data */
+export const parseUserTaxa = async (text: string) => {
+  status("Parsing");
+
+  /** trim whitespace to not get null rows at start/end */
+  text = text.trim();
+
+  /** parse data */
+  const parser = initParser(inferSchema(text));
+  const data = parser.typedArrs<string[]>(text);
+
+  if (aborted) throw Error(aborted);
+
+  return data.map(
+    ([
+      id = "",
+      kingdom = "",
+      phylum = "",
+      _class = "",
+      order = "",
+      family = "",
+    ]) => ({ id, kingdom, phylum, _class, order, family }),
+  );
+};
 
 type Meta = { sample: string; [key: string]: string | number };
 
@@ -128,16 +150,16 @@ export const parseUserMeta = (text: string) => {
 
 /** project user data against compendium data */
 export const projectUserData = async (
-  _taxa: UserData["taxa"],
-  reads: UserData["reads"],
-  samples: UserData["samples"],
-  taxaMap: TaxaMap,
-  taxonPCs: TaxonPCs[string],
+  userReads: UserReads,
+  userTaxa: UserTaxa,
+  taxonPCs: TaxonPCs,
 ) => {
-  /** taxa mapped to split ranks */
-  const taxa = _taxa
-    .map((taxon) => taxaMap[taxon])
-    .filter((taxon) => taxon !== undefined);
+  /** replace id with full taxon */
+  const taxa = userReads.taxa.map((taxon) =>
+    userTaxa.find((t) => t.id === taxon),
+  );
+  const samples = userReads.samples;
+  const reads = userReads.reads;
 
   /** drop genus rank to consolidate at the family level */
   let consolidatedTaxa = taxa.map((taxon) => omit(taxon, "genus"));
@@ -158,15 +180,15 @@ export const projectUserData = async (
   );
 
   /** projected principal components for each sample */
-  const projected: Record<PC, number>[] = [];
+  const projected: { [key: PC]: number }[] = [];
 
   samples.forEach((sampleName, sampleIndex) => {
     /** principal components for this sample */
     const sampleProjected: Record<string, number> = {};
 
-    for (const pc of pcs) {
+    for (const PC of PCs) {
       if (aborted) throw Error(aborted);
-      status(`Projecting ${pc} ${sampleName}`);
+      status(`Projecting ${PC} ${sampleName}`);
 
       /** calculate projected principal component */
       const total = sum(
@@ -174,20 +196,20 @@ export const projectUserData = async (
           /** user pc */
           const user = consolidatedReads[sampleIndex]?.[taxonIndex];
           /** compendium pc */
-          const compendium = taxonPCs[stringifyTaxon(taxon)]?.[pc];
+          const compendium = taxonPCs[stringifyTaxon(taxon)]?.[PC];
           return (user ?? 0) * (compendium ?? 0);
         }),
       );
 
       /** add principal component value */
-      sampleProjected[pc] = total;
+      sampleProjected[PC] = total;
     }
 
     projected.push(sampleProjected);
   });
 
   return Object.fromEntries(
-    projected.map((pcs, index) => [samples[index] ?? "", pcs]),
+    projected.map((PCs, index) => [samples[index] ?? "", PCs]),
   );
 };
 
@@ -207,7 +229,8 @@ const stringifyTaxon = ({
 }) => [kingdom, phylum, _class, order, family].join("|");
 
 expose({
-  parseUserData,
+  parseUserReads,
+  parseUserTaxa,
   parseUserMeta,
   projectUserData,
   abort,

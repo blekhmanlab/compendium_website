@@ -26,7 +26,7 @@ export type GeoSearch = {
 }[];
 
 /** get regions and countries */
-export const getGeoData = async () => {
+export const getGeo = async () => {
   const [regions, countries] = await Promise.all([
     request<Regions>(regionsUrl),
     request<Countries>(countriesUrl),
@@ -59,4 +59,4 @@ export const getGeoSearch = async ({
   return { geoSearch: cleanSearch(geoSearch) };
 };
 
-expose({ getGeoData, getGeoSearch });
+expose({ getGeo, getGeoSearch });

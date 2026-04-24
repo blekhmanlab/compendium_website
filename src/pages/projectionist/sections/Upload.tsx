@@ -11,8 +11,9 @@ import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
 import { useData } from "@/pages/projectionist/state";
 import { formatNumber } from "@/util/string";
 import { useWorker } from "@/util/worker";
-import exampleData from "../data/example-data.tsv?raw";
-import exampleMeta from "../data/example-meta.tsv?raw";
+import exampleMeta from "../data/example/meta.tsv?raw";
+import exampleReads from "../data/example/reads.tsv?raw";
+import exampleTaxa from "../data/example/taxa.tsv?raw";
 
 const projectionistWorker = wrap<typeof ProjectionistAPI>(
   new ProjectionistWorker(),
@@ -21,30 +22,45 @@ const projectionistWorker = wrap<typeof ProjectionistAPI>(
 const Upload = () => {
   /** refs for drag & drop targets */
   const dataRef = useRef<HTMLTextAreaElement>(null);
+  const taxaRef = useRef<HTMLTextAreaElement>(null);
   const metaRef = useRef<HTMLTextAreaElement>(null);
 
   /** raw text input */
-  const [_userRawData, setUserRawData] = useState("");
+  const [_userRawReads, setUserRawReads] = useState("");
+  const [_userRawTaxa, setUserRawTaxa] = useState("");
   const [_userRawMeta, setUserRawMeta] = useState("");
   /** debounced text input */
-  const userRawData = useDebounce(_userRawData, 300);
+  const userRawReads = useDebounce(_userRawReads, 300);
+  const userRawTaxa = useDebounce(_userRawTaxa, 300);
   const userRawMeta = useDebounce(_userRawMeta, 300);
 
-  /** parse user input */
+  /** parse user data */
   const [, dataStatus, runData] = useWorker(projectionistWorker);
-  /** parse user meta */
+  const [, taxaStatus, runTaxa] = useWorker(projectionistWorker);
   const [, metaStatus, runMeta] = useWorker(projectionistWorker);
 
-  /** run parse data */
+  /** run parse reads */
   useEffect(
     () =>
       runData(async () => {
-        if (!userRawData.trim()) return;
+        if (!userRawReads.trim()) return;
         useData.setState({
-          userData: await projectionistWorker.parseUserData(userRawData),
+          userReads: await projectionistWorker.parseUserReads(userRawReads),
         });
       }),
-    [userRawData, runData],
+    [userRawReads, runData],
+  );
+
+  /** run parse taxa */
+  useEffect(
+    () =>
+      runTaxa(async () => {
+        if (!userRawTaxa.trim()) return;
+        useData.setState({
+          userTaxa: await projectionistWorker.parseUserTaxa(userRawTaxa),
+        });
+      }),
+    [userRawTaxa, runTaxa],
   );
 
   /** run parse meta */
@@ -60,7 +76,8 @@ const Upload = () => {
   );
 
   /** get outputs of parsing */
-  const data = useData((state) => state.userData);
+  const reads = useData((state) => state.userReads);
+  const taxa = useData((state) => state.userTaxa);
   const meta = useData((state) => state.userMeta);
 
   return (
@@ -69,34 +86,33 @@ const Upload = () => {
 
       <div
         className="
-          grid w-full grid-cols-[2fr_1fr] gap-4
+          grid w-full grid-cols-4 gap-4
+          max-lg:grid-cols-2
           max-md:grid-cols-1
         "
       >
-        <div className="flex flex-col gap-4">
-          <strong>Sample Data</strong>
+        <div
+          className="
+            flex flex-col gap-4
+            md:col-span-2
+          "
+        >
+          <strong>Reads</strong>
 
           <Textbox
             ref={dataRef}
             multi
-            value={_userRawData}
-            onChange={setUserRawData}
-            placeholder="Paste or drag data here"
+            value={_userRawReads}
+            onChange={setUserRawReads}
+            placeholder="Paste or drag"
             className="justify-self-stretch"
           />
 
           <div className="flex items-center gap-4">
             <UploadButton
               target={dataRef}
-              accept={[
-                ".txt",
-                "text/plain",
-                ".csv",
-                "text/csv",
-                ".tsv",
-                "text/tab-separated-values",
-              ]}
-              onUpload={async (file) => setUserRawData(await file.text())}
+              accept={accept}
+              onUpload={async (file) => setUserRawReads(await file.text())}
             >
               Upload
             </UploadButton>
@@ -105,36 +121,58 @@ const Upload = () => {
               <>{dataStatus}</>
             ) : (
               <>
-                <div>{formatNumber(size(data?.samples))} samples</div>
-                <div>{formatNumber(size(data?.taxa))} taxa</div>
+                <div>{formatNumber(size(reads?.samples))} samples</div>
+                <div>{formatNumber(size(reads?.taxa))} taxa</div>
               </>
             )}
           </div>
         </div>
 
         <div className="flex flex-col gap-4">
-          <strong>Sample Meta</strong>
+          <strong>Taxa</strong>
+
+          <Textbox
+            ref={taxaRef}
+            multi
+            value={_userRawTaxa}
+            onChange={setUserRawTaxa}
+            placeholder="Paste or drag"
+            className="justify-self-stretch"
+          />
+
+          <div className="flex items-center gap-4">
+            <UploadButton
+              target={taxaRef}
+              accept={accept}
+              onUpload={async (file) => setUserRawTaxa(await file.text())}
+            >
+              Upload
+            </UploadButton>
+
+            {taxaStatus ? (
+              <div className="flex items-center gap-4">{taxaStatus}</div>
+            ) : (
+              <div>{formatNumber(size(taxa))} taxa</div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <strong>Meta</strong>
 
           <Textbox
             ref={metaRef}
             multi
             value={_userRawMeta}
             onChange={setUserRawMeta}
-            placeholder="Paste or drag meta here"
+            placeholder="Paste or drag"
             className="justify-self-stretch"
           />
 
           <div className="flex items-center gap-4">
             <UploadButton
               target={metaRef}
-              accept={[
-                ".txt",
-                "text/plain",
-                ".csv",
-                "text/csv",
-                ".tsv",
-                "text/tab-separated-values",
-              ]}
+              accept={accept}
               onUpload={async (file) => setUserRawMeta(await file.text())}
             >
               Upload
@@ -147,20 +185,30 @@ const Upload = () => {
             )}
           </div>
         </div>
-
-        <Button
-          onClick={() => {
-            setUserRawData(exampleData);
-            setUserRawMeta(exampleMeta);
-          }}
-          className="col-span-full justify-self-center"
-        >
-          <LightbulbIcon />
-          Example
-        </Button>
       </div>
+
+      <Button
+        onClick={() => {
+          setUserRawReads(exampleReads);
+          setUserRawTaxa(exampleTaxa);
+          setUserRawMeta(exampleMeta);
+        }}
+        className="col-span-full justify-self-center"
+      >
+        <LightbulbIcon />
+        Example
+      </Button>
     </section>
   );
 };
 
 export default Upload;
+
+const accept = [
+  ".txt",
+  "text/plain",
+  ".csv",
+  "text/csv",
+  ".tsv",
+  "text/tab-separated-values",
+];

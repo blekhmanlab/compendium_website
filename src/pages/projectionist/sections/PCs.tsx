@@ -1,5 +1,3 @@
-import type { SamplePCs } from "@/pages/projectionist/data/sample-pcs";
-import type { TaxonPCs } from "@/pages/projectionist/data/taxon-pcs";
 import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useEffect, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
@@ -13,7 +11,11 @@ import {
   SelectOrdination,
   SelectPCs,
 } from "@/pages/projectionist/sections/Selections";
-import { useData } from "@/pages/projectionist/state";
+import {
+  loadSamplePCs,
+  loadTaxonPCs,
+  useData,
+} from "@/pages/projectionist/state";
 import { useLegend } from "@/util/legend";
 import { useWorker } from "@/util/worker";
 
@@ -24,17 +26,23 @@ const projectionistWorker = wrap<typeof ProjectionistAPI>(
 /** compare series of principal components */
 const PCs = () => {
   /** get state */
-  const taxa = useData((state) => state.userData?.taxa);
-  const userSamples = useData((state) => state.userData?.samples);
-  const reads = useData((state) => state.userData?.reads);
-  const taxaMap = useData((state) => state.taxaMap);
+  const userReads = useData((state) => state.userReads);
+  const userTaxa = useData((state) => state.userTaxa);
+  const userMeta = useData((state) => state.userMeta);
+  const userProjected = useData((state) => state.userProjected);
+  const samples = useData((state) => state.samples);
   const taxonPCs = useData((state) => state.taxonPCs);
   const samplePCs = useData((state) => state.samplePCs);
-  const samples = useData((state) => state.samples);
-  const userProjected = useData((state) => state.userProjected);
-  const pcX = useData((state) => state.selectedPcX);
-  const pcY = useData((state) => state.selectedPcY);
-  const ordination = useData((state) => state.selectedOrdination);
+  const PCX = useData((state) => state.PCX);
+  const PCY = useData((state) => state.PCY);
+  const ordination = useData((state) => state.ordination);
+
+  /** load sample and taxon pc data based on selected ordination */
+  useEffect(() => {
+    if (!ordination) return;
+    loadSamplePCs(ordination);
+    loadTaxonPCs(ordination);
+  }, [ordination]);
 
   /** region options */
   const regionOptions = useMemo(
@@ -51,9 +59,9 @@ const PCs = () => {
     setRegions(regionOptions);
   }, [regionOptions]);
 
-  /** sample pcs filtered by ordination and region */
+  /** sample pcs filtered by region */
   const filteredSamplePCs = useMemo(() => {
-    if (!samples || !samplePCs || !ordination) return undefined;
+    if (!samples || !samplePCs) return undefined;
 
     /** quick lookup region for sample (run) */
     const sampleRegion = Object.fromEntries(
@@ -61,39 +69,30 @@ const PCs = () => {
     );
     /** ("sample" in pcs is actually SRR (run) instead of SRS (sample)) */
 
-    /** filter by selected ordination */
-    const byOrdination = samplePCs[ordination as keyof SamplePCs] ?? {};
-
-    /** filter by selected regions */
-    const byRegion = Object.keys(byOrdination).filter((sample) => {
+    /** get sample ids whose region is selected */
+    const byRegion = Object.keys(samplePCs).filter((sample) => {
       const region = sampleRegion[sample];
       return region && regions.includes(region);
     });
 
-    return pick(byOrdination, byRegion);
-  }, [samples, samplePCs, ordination, regions]);
-
-  /** taxon pcs filtered by ordination */
-  const filteredTaxonPCs = useMemo(() => {
-    if (!taxonPCs || !ordination) return undefined;
-    return taxonPCs[ordination as keyof TaxonPCs] ?? {};
-  }, [taxonPCs, ordination]);
+    return pick(samplePCs, byRegion);
+  }, [samples, samplePCs, regions]);
 
   /** color legend */
   const [entry, legend] = useLegend();
 
   /** data for compendium plot */
   const compendiumPlot = useMemo(() => {
-    if (!filteredSamplePCs || !pcX || !pcY) return undefined;
+    if (!filteredSamplePCs || !PCX || !PCY) return undefined;
     return {
       color: entry("Compendium").color,
-      data: Object.entries(filteredSamplePCs).map(([sample, pcs]) => ({
-        x: pcs[pcX],
-        y: pcs[pcY],
+      data: Object.entries(filteredSamplePCs).map(([sample, PCs]) => ({
+        x: PCs[PCX] ?? 0,
+        y: PCs[PCY] ?? 0,
         sample,
       })),
     };
-  }, [filteredSamplePCs, pcX, pcY, entry]);
+  }, [filteredSamplePCs, PCX, PCY, entry]);
 
   /** project user input data */
   const [, projectStatus, runProject] = useWorker(projectionistWorker);
@@ -102,59 +101,53 @@ const PCs = () => {
   useEffect(
     () =>
       runProject(async () => {
-        if (!taxa || !userSamples || !reads || !taxaMap || !filteredTaxonPCs)
-          return;
+        if (!userReads || !userTaxa || !taxonPCs) return;
         useData.setState({
           userProjected: await projectionistWorker.projectUserData(
-            taxa,
-            reads,
-            userSamples,
-            taxaMap,
-            filteredTaxonPCs,
+            userReads,
+            userTaxa,
+            taxonPCs,
           ),
         });
       }),
-    [taxa, reads, userSamples, taxaMap, filteredTaxonPCs, runProject],
+    [userReads, userTaxa, taxonPCs, runProject],
   );
 
-  /** get user meta */
-  const userMeta = useData((state) => state.userMeta);
-
-  /** group by */
-  const groupOptions = useMemo(
+  /** split by */
+  const splitOptions = useMemo(
     () =>
       uniq(
         Object.values(userMeta ?? {}).flatMap((sample) => Object.keys(sample)),
       ),
     [userMeta],
   );
-  const [group, setGroup] = useState("");
+  const [split, setSplit] = useState("");
 
   /** data for user plot */
   const userPlot = useMemo(() => {
-    if (!userProjected || !pcX || !pcY) return undefined;
+    if (!userProjected || !PCX || !PCY) return undefined;
 
-    /** split into groups by selected "group by" option */
-    const groups = groupBy(
-      Object.entries(userProjected).map(([sample, pcs]) => ({
+    /** split into groups by selected "split by" option */
+    const groups = groupBy<{ sample: string } & (typeof userProjected)[string]>(
+      Object.entries(userProjected).map(([sample, PCs]) => ({
         sample,
-        ...pcs,
+        ...PCs,
       })),
       ({ sample }) =>
         /** get corresponding group value from user meta */
-        group ? String(userMeta?.[sample]?.[group] ?? "") : "Yours",
+        split ? String(userMeta?.[sample]?.[split] ?? "") : "Yours",
     );
 
     /** map groups into data series */
     return Object.entries(groups).map(([group, samples]) => ({
       color: entry(group).color,
-      data: samples.map(({ sample, ...pcs }) => ({
-        x: pcs[pcX],
-        y: pcs[pcY],
+      data: samples.map(({ sample, ...PCs }) => ({
+        x: PCs[PCX] ?? 0,
+        y: PCs[PCY] ?? 0,
         sample,
       })),
     }));
-  }, [userProjected, pcX, pcY, group, entry, userMeta]);
+  }, [userProjected, PCX, PCY, split, entry, userMeta]);
 
   /** combine series */
   const series = useMemo(
@@ -193,9 +186,9 @@ const PCs = () => {
         {userPlot && (
           <Select
             label="Split by"
-            options={["", ...groupOptions]}
-            value={group}
-            onChange={setGroup}
+            options={["", ...splitOptions]}
+            value={split}
+            onChange={setSplit}
           />
         )}
       </div>
@@ -210,8 +203,8 @@ const PCs = () => {
                 ? "Projecting your data"
                 : ""
           }
-          xLabel={pcX ?? ""}
-          yLabel={pcY ?? ""}
+          xLabel={PCX ?? ""}
+          yLabel={PCY ?? ""}
           series={series}
           range={max}
         />
