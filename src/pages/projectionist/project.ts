@@ -70,20 +70,23 @@ export const parseUserReads = async (text: string) => {
     if (aborted) throw Error(aborted);
 
     /** total reads for sample */
-    const total = sum(counts);
+    let total = sum(counts);
     /** how many reads we need to remove */
     const reduce = total - maxReads;
     for (let remove = reduce; remove > 0; remove--) {
       /** randomly select a read to remove */
-      const randomRead = random(total);
+      const randomRead = random(total - 1);
       let cumulative = 0;
       /** find first col of reads that contains rand index */
       const index = counts.findIndex((count) => {
         cumulative += count;
         return cumulative > randomRead;
       });
+      if (counts[index] === undefined) throw Error("undefined");
       /** remove read from sample */
-      counts[index] = (counts[index] ?? 0) - 1;
+      counts[index] = counts[index] - 1;
+      /** update total */
+      total--;
     }
   }
 
@@ -133,7 +136,8 @@ export const parseUserTaxa = async (text: string) => {
       _class = "",
       order = "",
       family = "",
-    ]) => ({ id, kingdom, phylum, _class, order, family }),
+      genus = "",
+    ]) => ({ id, kingdom, phylum, _class, order, family, genus }),
   );
 };
 
@@ -171,12 +175,19 @@ export const projectUserData = async (
     ),
   ).map((group) => group.map(([index]) => Number(index)));
 
-  /** consolidate taxa by consolidatedTaxa */
+  /** consolidate taxa */
   consolidatedTaxa = uniqWith(consolidatedTaxa, isEqual);
 
-  /** consolidate reads by consolidatedTaxa */
+  /** consolidate reads */
   const consolidatedReads = reads.map((row) =>
-    indices.map((group) => sum(group.map((index) => row[index] ?? 0))),
+    indices.map((group) =>
+      sum(
+        group.map((index) => {
+          if (row[index] === undefined) throw Error("undefined");
+          return row[index];
+        }),
+      ),
+    ),
   );
 
   /** projected principal components for each sample */
@@ -195,9 +206,11 @@ export const projectUserData = async (
         consolidatedTaxa.map((taxon, taxonIndex) => {
           /** user pc */
           const user = consolidatedReads[sampleIndex]?.[taxonIndex];
+          if (user === undefined) throw Error("undefined");
           /** compendium pc */
           const compendium = taxonPCs[stringifyTaxon(taxon)]?.[PC];
-          return (user ?? 0) * (compendium ?? 0);
+          if (compendium === undefined) throw Error("undefined");
+          return user * compendium;
         }),
       );
 
@@ -209,7 +222,10 @@ export const projectUserData = async (
   });
 
   return Object.fromEntries(
-    projected.map((PCs, index) => [samples[index] ?? "", PCs]),
+    projected.map((PCs, index) => {
+      if (samples[index] === undefined) throw Error("undefined");
+      return [samples[index], PCs];
+    }),
   );
 };
 

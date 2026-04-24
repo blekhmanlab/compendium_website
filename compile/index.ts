@@ -508,11 +508,11 @@ const processMainData = async () => {
 /** maximum number of principal components */
 const maxPC = 8;
 
+type PC = `PC${number}`;
+
 /** process projectionist data */
 const processProjectionistData = async () => {
   console.info("PROCESSING PROJECTIONIST DATA");
-
-  type PC = `PC${number}`;
 
   /** collect sample pcs */
   const samplePCs: Record<
