@@ -169,8 +169,6 @@ const PCs = () => {
     return max;
   }, [series]);
 
-  // console.log(userProjected?.["1A"]);
-
   return (
     <section className="width-lg">
       <h2>Principal Components</h2>

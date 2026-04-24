@@ -1,10 +1,10 @@
 import type { TaxonPCs } from "@/pages/projectionist/data/taxon-pcs";
 import { expose } from "comlink";
-import { groupBy, isEqual, omit, random, range, sum, uniqWith } from "lodash";
+import { groupBy, random, range, sum, uniq } from "lodash";
 import { inferSchema, initParser } from "udsv";
 
 /** max read count to rarify down to */
-const maxReads = 3000;
+const maxReads = Infinity;
 
 /** max PCs to consider */
 export const maxPCs = 8;
@@ -158,33 +158,38 @@ export const projectUserData = async (
   userTaxa: UserTaxa,
   taxonPCs: TaxonPCs,
 ) => {
-  /** replace id with full taxon */
-  const taxa = userReads.taxa.map((taxon) =>
-    userTaxa.find((t) => t.id === taxon),
-  );
+  let taxa = userReads.taxa.map((taxon) => {
+    /** use id to look up full taxon ranks */
+    const full = userTaxa.find((t) => t.id === taxon);
+    if (!full) throw Error(`${taxon} not found in user taxa`);
+    /** extract ranks, drop genus to consolidate at family level */
+    const { kingdom, phylum, _class, order, family } = full;
+    /** combine ranks */
+    const ranks = [kingdom, phylum, _class, order, family];
+    if (ranks.some((rank) => rank === undefined))
+      throw Error(`Taxon ${taxon} missing rank`);
+    /** stringify taxon */
+    return ranks.join("|");
+  });
   const samples = userReads.samples;
-  const reads = userReads.reads;
+  let reads = userReads.reads;
 
-  /** drop genus rank to consolidate at the family level */
-  let consolidatedTaxa = taxa.map((taxon) => omit(taxon, "genus"));
-
-  /** group together indices that are the same */
-  const indices: number[][] = Object.values(
-    groupBy(Object.entries(consolidatedTaxa), ([, taxon]) =>
-      stringifyTaxon(taxon),
-    ),
+  /** group together col indices that are same taxon (ignoring genus) */
+  const cols: number[][] = Object.values(
+    groupBy(Object.entries(taxa), ([, taxon]) => taxon),
   ).map((group) => group.map(([index]) => Number(index)));
 
   /** consolidate taxa */
-  consolidatedTaxa = uniqWith(consolidatedTaxa, isEqual);
+  taxa = uniq(taxa);
 
   /** consolidate reads */
-  const consolidatedReads = reads.map((row) =>
-    indices.map((group) =>
+  reads = reads.map((row) =>
+    cols.map((group) =>
       sum(
-        group.map((index) => {
-          if (row[index] === undefined) throw Error("undefined");
-          return row[index];
+        group.map((col) => {
+          if (row[col] === undefined)
+            throw Error(`Col ${col} row ${row} undefined`);
+          return row[col];
         }),
       ),
     ),
@@ -203,13 +208,16 @@ export const projectUserData = async (
 
       /** calculate projected principal component */
       const total = sum(
-        consolidatedTaxa.map((taxon, taxonIndex) => {
+        taxa.map((taxon, taxonIndex) => {
           /** user pc */
-          const user = consolidatedReads[sampleIndex]?.[taxonIndex];
-          if (user === undefined) throw Error("undefined");
+          const user = reads[sampleIndex]?.[taxonIndex];
+          if (user === undefined) {
+            throw Error(`Col ${taxonIndex} row ${sampleIndex} undefined`);
+          }
           /** compendium pc */
-          const compendium = taxonPCs[stringifyTaxon(taxon)]?.[PC];
-          if (compendium === undefined) throw Error("undefined");
+          const compendium = taxonPCs[taxon]?.[PC];
+          if (compendium === undefined)
+            throw Error(`Col ${PC} row ${taxon} undefined`);
           return user * compendium;
         }),
       );
@@ -228,21 +236,6 @@ export const projectUserData = async (
     }),
   );
 };
-
-/** stringify taxon into key */
-const stringifyTaxon = ({
-  kingdom,
-  phylum,
-  _class,
-  order,
-  family,
-}: {
-  kingdom: string;
-  phylum: string;
-  _class: string;
-  order: string;
-  family: string;
-}) => [kingdom, phylum, _class, order, family].join("|");
 
 expose({
   parseUserReads,
