@@ -174,17 +174,17 @@ export const projectUserData = async (
   const samples = userReads.samples;
   let reads = userReads.reads;
 
-  /** group together col indices that are same taxon (ignoring genus) */
-  const cols: number[][] = Object.values(
+  /** group together col indices that are same taxon */
+  const groups: number[][] = Object.values(
     groupBy(Object.entries(taxa), ([, taxon]) => taxon),
-  ).map((group) => group.map(([index]) => Number(index)));
+  ).map((group) => group.map(([col]) => Number(col)));
 
   /** consolidate taxa */
   taxa = uniq(taxa);
 
   /** consolidate reads */
   reads = reads.map((row) =>
-    cols.map((group) =>
+    groups.map((group) =>
       sum(
         group.map((col) => {
           if (row[col] === undefined)
@@ -198,22 +198,21 @@ export const projectUserData = async (
   /** projected principal components for each sample */
   const projected: { [key: PC]: number }[] = [];
 
-  samples.forEach((sampleName, sampleIndex) => {
+  samples.forEach((sample, sampleIndex) => {
     /** principal components for this sample */
     const sampleProjected: Record<string, number> = {};
 
     for (const PC of PCs) {
       if (aborted) throw Error(aborted);
-      status(`Projecting ${PC} ${sampleName}`);
+      status(`Projecting ${PC} ${sample}`);
 
       /** calculate projected principal component */
       const total = sum(
         taxa.map((taxon, taxonIndex) => {
           /** user pc */
           const user = reads[sampleIndex]?.[taxonIndex];
-          if (user === undefined) {
+          if (user === undefined)
             throw Error(`Col ${taxonIndex} row ${sampleIndex} undefined`);
-          }
           /** compendium pc */
           const compendium = taxonPCs[taxon]?.[PC];
           if (compendium === undefined)

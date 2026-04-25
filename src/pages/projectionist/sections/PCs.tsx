@@ -201,9 +201,11 @@ const PCs = () => {
           subtitle={
             compendiumPlot === undefined
               ? "Loading compendium data"
-              : projectStatus
+              : projectStatus === "loading"
                 ? "Projecting your data"
-                : ""
+                : projectStatus === "error"
+                  ? "Error projecting your data"
+                  : ""
           }
           xLabel={PCX ?? ""}
           yLabel={PCY ?? ""}
