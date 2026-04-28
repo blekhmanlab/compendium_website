@@ -150,9 +150,9 @@ const Upload = () => {
             </UploadButton>
 
             {taxaStatus ? (
-              <div className="flex items-center gap-4">{taxaStatus}</div>
+              <>{taxaStatus}</>
             ) : (
-              <div>{formatNumber(size(taxa))} taxa</div>
+              <>{formatNumber(size(taxa))} taxa</>
             )}
           </div>
         </div>
@@ -179,7 +179,7 @@ const Upload = () => {
             </UploadButton>
 
             {metaStatus ? (
-              <div className="flex items-center gap-4">{metaStatus}</div>
+              <>{metaStatus}</>
             ) : (
               <div>{formatNumber(size(meta))} samples</div>
             )}
