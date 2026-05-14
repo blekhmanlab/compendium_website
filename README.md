@@ -4,12 +4,12 @@
 
 This project was scaffolded using Vite with the following options:
 
-- React 18
+- React
 - TypeScript, for type checking
 - ESLint, for code quality
 - Prettier, for code formatting
 
-Notable technologies/packages/etc. used:
+Notable technologies used:
 
 - Web Workers and Comlink, for multi-threaded background processing
 - D3, for data visualizations
@@ -17,8 +17,8 @@ Notable technologies/packages/etc. used:
 
 ## Requirements
 
-- Node `v18+`
-- Bun `v1+`
+- Node `v22+`
+- Bun `v1.3+`
 
 ## Commands
 

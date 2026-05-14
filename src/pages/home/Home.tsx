@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import Footer from "@/components/Footer";
-import Compare from "@/pages/home/sections/Compare";
 import Overview from "@/pages/home/sections/Overview";
 import Prevalence from "@/pages/home/sections/Prevalence";
 import Recipes from "@/pages/home/sections/Recipes";
@@ -30,7 +29,6 @@ const Home = () => {
         <Overview />
         <Search />
         <Prevalence />
-        <Compare />
         <Recipes />
       </main>
       <Footer />
