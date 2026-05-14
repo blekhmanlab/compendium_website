@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
+import { Fragment } from "react";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import Button from "@/components/Button";
-import classes from "./Tabs.module.css";
 
 type Props = {
   tabs: {
@@ -12,19 +12,23 @@ type Props = {
 };
 
 const Tabs = ({ tabs, onChange }: Props) => (
-  <TabGroup onChange={onChange} className="sub-section">
+  <TabGroup onChange={onChange} as={Fragment}>
     {() => (
-      <div className="sub-section">
-        <TabList className={classes.tabs}>
+      <div className="flex w-full flex-col items-center gap-8">
+        <TabList className="flex flex-wrap justify-center gap-4">
           {tabs.map((tab, index) => (
             <Tab key={index} as={Button}>
               {tab.name}
             </Tab>
           ))}
         </TabList>
-        <TabPanels className={classes.panels}>
+        <TabPanels as={Fragment}>
           {tabs.map((tab, index) => (
-            <TabPanel key={index} className="sub-section" unmount={false}>
+            <TabPanel
+              key={index}
+              unmount={false}
+              className="flex w-full flex-col items-center gap-8"
+            >
               {tab.content}
             </TabPanel>
           ))}

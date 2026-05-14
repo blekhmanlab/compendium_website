@@ -1,47 +1,46 @@
 import type { ComponentProps, ReactNode } from "react";
+import { Link } from "react-router";
 import clsx from "clsx";
-import type { SyncFunctionComponent } from "@/util/types";
-import classes from "./Button.module.css";
 
-type Anchor = ComponentProps<"a">;
+type Anchor = ComponentProps<typeof Link>;
 type Button = ComponentProps<"button">;
 
 type Props = (Anchor | Button) & {
-  icon?: SyncFunctionComponent;
-  design?: string;
+  design?: "regular" | "accent";
   children: ReactNode;
 };
 
-const Button = ({
-  icon,
-  design = "",
-  className,
-  children,
-  ...props
-}: Props) => {
-  if ("href" in props)
+const Button = ({ design = "regular", className, ...props }: Props) => {
+  className = clsx(
+    `
+      inline-flex cursor-pointer items-center justify-center gap-2 rounded-full
+      text-inherit no-underline transition
+    `,
+    design === "regular" &&
+      `
+        border border-slate-500/50 px-4 py-2
+        hover:bg-slate-500/50
+        aria-selected:bg-slate-500/50
+      `,
+    design === "accent" &&
+      `
+        bg-slate-500/25 bg-linear-to-r px-4 py-2 text-lg
+        hover:scale-105 hover:from-fuchsia-600 hover:to-indigo-600
+      `,
+    className,
+  );
+
+  if ("to" in props) {
     return (
-      <a
-        className={clsx(classes.button, className)}
-        data-design={design}
-        target="_blank"
+      <Link
+        className={className}
+        target={String(props.to).startsWith("http") ? "_blank" : undefined}
         {...(props as Anchor)}
-      >
-        {icon?.({ className: classes.icon })}
-        {children}
-      </a>
+      />
     );
+  }
   if ("onClick" in props)
-    return (
-      <button
-        className={clsx(classes.button, className)}
-        data-design={design}
-        {...(props as Button)}
-      >
-        {icon?.({ className: classes.icon })}
-        {children}
-      </button>
-    );
+    return <button className={className} {...(props as Button)} />;
   return <></>;
 };
 

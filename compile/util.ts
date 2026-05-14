@@ -1,15 +1,16 @@
 import { execSync } from "child_process";
-import { createReadStream, readFileSync, writeFileSync } from "fs";
+import { createReadStream, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { readdir, stat } from "fs/promises";
 import { join } from "path";
 import readline from "readline";
-import _ from "lodash";
+import { range, sumBy } from "lodash";
 import Downloader from "nodejs-file-downloader";
 
 const lastCall: Record<string, number> = {};
 /** return true only if enough time has passed since last call */
-export const throttle = (key: string, interval = 1000) => {
-  if (!lastCall[key] || performance.now() > lastCall[key] + interval) {
+export const throttle = (key: string, interval = 100) => {
+  const lastTime = lastCall[key] || 0;
+  if (!lastTime || performance.now() > lastTime + interval) {
     lastCall[key] = performance.now();
     return true;
   } else return false;
@@ -33,7 +34,7 @@ export const download = async (url: string, filename: string) => {
   await new Downloader({
     url,
     fileName: filename,
-    cloneFiles: false,
+    skipExistingFileName: true,
     maxAttempts: 3,
     onProgress: (percentage, _, remainingSize) => {
       if (!throttle("download")) return;
@@ -54,9 +55,13 @@ export async function* stream(
   const readInterface = readline.createInterface({
     input: createReadStream(url),
   });
+  /** row entry delimiter */
   const delimiter = url.endsWith(".tsv") ? "\t" : ",";
   for await (const line of readInterface) {
-    const row = line.split(delimiter);
+    const row = line
+      .split(delimiter)
+      /** trim leading/trailing spaces/quotes */
+      .map((value) => value.trim().replaceAll(/^"/g, "").replaceAll(/"$/g, ""));
     if (row.length) yield row;
     else return;
   }
@@ -67,25 +72,29 @@ export const read = <Type>(filename: string) =>
   JSON.parse(readFileSync(filename, "utf-8")) as Type;
 
 /** write local json file */
-export const write = (filename: string, data: unknown, pretty = false) =>
+export const write = (filename: string, data: unknown, pretty = false) => {
+  /** create folder if doesn't exist */
+  mkdirSync(join(filename, ".."), { recursive: true });
+  /** write file */
   writeFileSync(
     filename,
     JSON.stringify(data, null, pretty ? 2 : undefined),
     "utf8",
   );
+};
 
 /** generate n equally spaced (in log space) intervals between a and b */
 export const logSpace = (a: number, b: number, n: number) => {
   a = Math.log10(a);
   b = Math.log10(b);
-  return _.range(a, b, (b - a) / n)
+  return range(a, b, (b - a) / n)
     .concat([b])
     .map((value) => Math.pow(10, value));
 };
 
 /** get total folder size */
 export const dirSize = async (path: string) =>
-  _.sumBy(
+  sumBy(
     await Promise.all(
       (await readdir(path, { recursive: true })).map((file) =>
         stat(join(path, file)),

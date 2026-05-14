@@ -1,14 +1,13 @@
-import type { SelectHTMLAttributes } from "react";
+import type { ComponentProps } from "react";
 import { startCase } from "lodash";
-import AngleIcon from "@/assets/angle.svg?react";
-import classes from "./Select.module.css";
+import { ChevronDownIcon } from "lucide-react";
 
 type Props<Option extends string> = {
   label: string;
   value: Option;
   onChange: (value: Option) => void;
   options: readonly Option[];
-} & Omit<SelectHTMLAttributes<HTMLSelectElement>, "onChange">;
+} & Omit<ComponentProps<"select">, "onChange">;
 
 const Select = <Option extends string>({
   label,
@@ -17,11 +16,15 @@ const Select = <Option extends string>({
   options,
   ...props
 }: Props<Option>) => (
-  <label className={classes.label}>
-    <span>{label}</span>
-    <span className={classes.wrapper}>
+  <label className="inline-flex items-center gap-2">
+    <span className="text-right">{label}</span>
+    <span className="relative">
       <select
-        className={classes.select}
+        className="
+          min-w-20 cursor-pointer appearance-none rounded-md bg-slate-500/25 p-2
+          pr-8 transition
+          hover:bg-slate-500/50
+        "
         {...props}
         value={value}
         onChange={(event) => onChange(event.target.value as Option)}
@@ -32,7 +35,11 @@ const Select = <Option extends string>({
           </option>
         ))}
       </select>
-      <AngleIcon />
+      <ChevronDownIcon
+        className="
+          pointer-events-none absolute top-1/2 right-1 -translate-y-1/2
+        "
+      />
     </span>
   </label>
 );
