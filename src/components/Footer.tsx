@@ -33,7 +33,6 @@ const Footer = () => (
     <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
       <a
         href="https://medicine.uchicago.edu/sections/genetic-medicine/"
-        target="_blank"
         data-tooltip="University of Chicago | Section of Genetic Medicine"
       >
         <img
@@ -44,7 +43,6 @@ const Footer = () => (
       </a>
       <a
         href="https://medschool.cuanschutz.edu/dbmi"
-        target="_blank"
         data-tooltip="University of Colorado | Department of Biomedical Informatics"
       >
         <img
@@ -55,7 +53,6 @@ const Footer = () => (
       </a>
       <a
         href="https://cbs.umn.edu/gcd"
-        target="_blank"
         data-tooltip="University of Minnesota | Department of Genetics, Cell Biology, and
         Development"
       >

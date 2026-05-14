@@ -93,7 +93,7 @@
 }
 
 @utility width-md {
-  --width: 150;
+  --width: 160;
 }
 
 @utility width-lg {
@@ -106,6 +106,10 @@
 
 .tippy-box {
   @apply rounded bg-slate-200 px-2 py-1 text-slate-800;
+
+  a {
+    @apply text-indigo-800 underline transition hover:text-fuchsia-800;
+  }
 }
 
 .tippy-content {
