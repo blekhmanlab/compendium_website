@@ -2,7 +2,6 @@ import type { EChartsOption } from "echarts";
 import type { Phyla } from "@/pages/home/data/taxa";
 import { max, min, orderBy } from "lodash";
 import Chart from "@/components/Chart";
-import { tooltipTable } from "@/pages/home/sections/Map";
 import { useData } from "@/pages/home/state";
 import { useLegend } from "@/util/legend";
 import { formatNumber } from "@/util/string";
@@ -118,3 +117,15 @@ const PhylaChart = ({ data }: Props) => {
 };
 
 export default PhylaChart;
+
+/** generate tooltip table from entries */
+export const tooltipTable = (entries: Record<string, unknown>) =>
+  [
+    "<dl>",
+    ...Object.entries(entries).flatMap(([key, value]) =>
+      value === null || value === undefined || value === "" || value === false
+        ? []
+        : [`<dt>${key}</dt>`, `<dd>${value}</dd>`],
+    ),
+    "</dl>",
+  ].join("\n");

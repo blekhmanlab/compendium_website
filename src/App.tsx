@@ -1,4 +1,3 @@
-import "@/components/tooltip";
 import "./styles.css";
 import { createBrowserRouter, Outlet, redirect } from "react-router";
 import { RouterProvider } from "react-router/dom";

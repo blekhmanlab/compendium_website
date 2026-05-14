@@ -51,8 +51,8 @@ const Textbox = ({ multi, value, onChange, className, ...props }: Props) => (
         absolute top-0 right-0 flex size-10 cursor-pointer items-center
         justify-center
       "
-      data-tooltip="Clear"
       onClick={() => onChange("")}
+      aria-label="Clear"
     >
       <XIcon />
     </button>

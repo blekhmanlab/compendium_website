@@ -16,6 +16,7 @@ import {
 } from "d3";
 import { clamp } from "lodash";
 import Select from "@/components/Select";
+import Tooltip from "@/components/Tooltip";
 import { setSelectedFeature, useData } from "@/pages/home/state";
 import { frame } from "@/util/async";
 import { getCssVariable } from "@/util/dom";
@@ -236,34 +237,52 @@ const Map = () => {
         </g>
         <g>
           {data?.features.map((feature, index) => (
-            <path
-              ref={(element) => {
-                featuresRef.current[index] = element;
-              }}
+            <Tooltip
               key={index}
-              fill={
-                isSelected(feature)
-                  ? secondary
-                  : scale(feature.properties.samples || 1)
+              button={false}
+              content={
+                <dl>
+                  {feature.properties.country && (
+                    <>
+                      <dt>County</dt>
+                      <dd>
+                        {feature.properties.country} ({feature.properties.code})
+                      </dd>
+                      <dt>Region</dt>
+                      <dd>{feature.properties.region}</dd>
+                      <dt>Samples</dt>
+                      <dd>{formatNumber(feature.properties.samples, false)}</dd>
+                    </>
+                  )}
+                </dl>
               }
-              className="
-                cursor-pointer stroke-black transition
-                hover:fill-white
-                focus:fill-white
-                [:not(:focus-visible)]:outline-none
-              "
-              role="graphics-symbol"
-              tabIndex={0}
-              onClick={(event) => selectFeature(event, feature)}
-              onKeyDown={(event) => selectFeature(event, feature)}
-              data-tooltip={tooltipTable({
-                Country: feature.properties.country
-                  ? `${feature.properties.country} (${feature.properties.code})`
-                  : undefined,
-                Region: feature.properties.region,
-                Samples: formatNumber(feature.properties.samples, false),
-              })}
-            />
+            >
+              <path
+                ref={(element) => {
+                  featuresRef.current[index] = element;
+                }}
+                fill={
+                  isSelected(feature)
+                    ? secondary
+                    : scale(feature.properties.samples || 1)
+                }
+                className="
+                  cursor-pointer stroke-black transition
+                  hover:fill-white
+                  focus:fill-white
+                  [:not(:focus-visible)]:outline-none
+                "
+                tabIndex={0}
+                onClick={(event) => selectFeature(event, feature)}
+                onKeyDown={(event) => selectFeature(event, feature)}
+                aria-label={[
+                  feature.properties.region,
+                  feature.properties.country,
+                ]
+                  .filter(Boolean)
+                  .join(", ")}
+              />
+            </Tooltip>
           ))}
         </g>
       </svg>
@@ -275,7 +294,7 @@ const Map = () => {
           style={{
             background: `linear-gradient(to right, ${scale(1)}, ${scale(max)})`,
           }}
-        ></span>
+        />
         <span>More Samples</span>
       </div>
     </div>
@@ -358,15 +377,3 @@ const selectFeature = (
     event.stopPropagation();
   }
 };
-
-/** generate tooltip table from entries */
-export const tooltipTable = (entries: Record<string, unknown>) =>
-  [
-    "<dl>",
-    ...Object.entries(entries).flatMap(([key, value]) =>
-      value === null || value === undefined || value === "" || value === false
-        ? []
-        : [`<dt>${key}</dt>`, `<dd>${value}</dd>`],
-    ),
-    "</dl>",
-  ].join("\n");

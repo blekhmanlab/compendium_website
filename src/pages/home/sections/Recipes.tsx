@@ -34,7 +34,7 @@ const Recipes = () => (
 
     <p>
       Some of the things you can do with{" "}
-      <a href={import.meta.env.VITE_R_PACKAGE} target="_blank">
+      <a href={import.meta.env.VITE_R_PACKAGE}>
         <PackageIcon />
         the R package
       </a>

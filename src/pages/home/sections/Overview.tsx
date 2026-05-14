@@ -135,7 +135,7 @@ const Overview = () => {
       <p>
         This website lets you <b>search</b> and <b>explore</b> the data at a
         high level before downloading.{" "}
-        <a href={import.meta.env.VITE_R_PACKAGE} target="_blank">
+        <a href={import.meta.env.VITE_R_PACKAGE}>
           <PackageIcon />
           Use the R package
         </a>{" "}

@@ -86,10 +86,6 @@
   .lucide {
     @apply inline-block h-[1em];
   }
-
-  span[data-tooltip] {
-    @apply cursor-help underline decoration-dotted underline-offset-4;
-  }
 }
 
 @utility width-md {
@@ -102,20 +98,4 @@
 
 @utility placeholder {
   @apply flex aspect-square w-full items-center justify-center gap-4 rounded-md bg-slate-500/10 p-2;
-}
-
-.tippy-box {
-  @apply rounded bg-slate-200 px-2 py-1 text-slate-800;
-
-  a {
-    @apply text-indigo-800 underline transition hover:text-fuchsia-800;
-  }
-}
-
-.tippy-content {
-  @apply text-[1rem] leading-relaxed;
-}
-
-.tippy-arrow {
-  @apply text-slate-200;
 }

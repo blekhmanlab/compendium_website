@@ -1,6 +1,7 @@
 import { DownloadIcon, PackageIcon, ScrollIcon } from "lucide-react";
 import Button from "@/components/Button.tsx";
 import Header from "@/components/Header";
+import Tooltip from "@/components/Tooltip";
 import Viz from "@/pages/home/sections/Viz";
 
 const Title = () => (
@@ -16,29 +17,32 @@ const Title = () => (
     </p>
 
     <div className="flex flex-wrap items-center justify-center gap-4">
-      <Button
-        design="accent"
-        to={import.meta.env.VITE_PAPER}
-        data-tooltip="Learn more about the methods and significance behind this project."
+      <Tooltip
+        content="Learn more about the methods and significance behind this project."
+        button={false}
       >
-        <ScrollIcon />
-        Paper
-      </Button>
-      <Button
-        design="accent"
-        to={import.meta.env.VITE_R_PACKAGE}
-        data-tooltip="Do advanced filtering and analyses with the data."
+        <Button design="accent" to={import.meta.env.VITE_PAPER}>
+          <ScrollIcon />
+          Paper
+        </Button>
+      </Tooltip>
+      <Tooltip
+        content="Do advanced filtering and analyses with the data."
+        button={false}
       >
-        <PackageIcon />R Package
-      </Button>
-      <Button
-        design="accent"
-        to={import.meta.env.VITE_DATA}
-        data-tooltip="Download the dataset directly as CSV/TSV files."
+        <Button design="accent" to={import.meta.env.VITE_R_PACKAGE}>
+          <PackageIcon />R Package
+        </Button>
+      </Tooltip>
+      <Tooltip
+        content="Download the dataset directly as CSV/TSV files."
+        button={false}
       >
-        <DownloadIcon />
-        CSV data
-      </Button>
+        <Button design="accent" to={import.meta.env.VITE_DATA}>
+          <DownloadIcon />
+          CSV data
+        </Button>
+      </Tooltip>
     </div>
   </Header>
 );

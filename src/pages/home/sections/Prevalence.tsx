@@ -2,6 +2,7 @@ import type { Reads } from "@/pages/home/data/projects";
 import type { Phyla } from "@/pages/home/data/taxa";
 import { useState } from "react";
 import Select from "@/components/Select";
+import Tooltip from "@/components/Tooltip";
 import { useData } from "@/pages/home/state";
 import Map from "./Map";
 import PhylaChart from "./PhylaChart";
@@ -31,8 +32,8 @@ const Prevalence = () => {
         </p>
       ) : (
         <p>
-          Select a <span data-tooltip={tooltips["country"]}>country</span> or{" "}
-          <span data-tooltip={tooltips["region"]}>region</span> to filter by.
+          Select a <Tooltip content={tooltips["country"]}>country</Tooltip> or{" "}
+          <Tooltip content={tooltips["region"]}>region</Tooltip> to filter by.
         </p>
       )}
 
