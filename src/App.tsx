@@ -1,35 +1,36 @@
-import {
-  loadGeoData,
-  loadMetaData,
-  loadProjectData,
-  loadTaxaData,
-} from "@/data";
-import Footer from "@/sections/Footer";
-import Header from "@/sections/Header";
-import Overview from "@/sections/Overview";
-import Prevalence from "@/sections/Prevalence";
-import Recipes from "@/sections/Recipes";
-import Search from "@/sections/Search";
-import "@/components/tooltip";
-import "./App.css";
+import "./styles.css";
+import { createBrowserRouter, Outlet, redirect } from "react-router";
+import { RouterProvider } from "react-router/dom";
+import Home from "@/pages/home/Home";
+import { redirectPath } from "@/util/url";
 
-loadMetaData();
-loadProjectData();
-loadGeoData();
-loadTaxaData();
-/** don't load tags data because large. load on demand. */
-
-const App = () => (
-  <>
-    <Header />
-    <main>
-      <Overview />
-      <Search />
-      <Prevalence />
-      <Recipes />
-      <Footer />
-    </main>
-  </>
-);
+/** app entrypoint */
+const App = () => <RouterProvider router={router} />;
 
 export default App;
+
+/** route definitions */
+const routes = [
+  {
+    path: "/",
+    element: <Outlet />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+        loader: async () => {
+          /** handle 404 redirect */
+          if (redirectPath) {
+            console.debug("Redirecting to:", redirectPath);
+            return redirect(redirectPath);
+          } else return null;
+        },
+      },
+    ],
+  },
+];
+
+/** router */
+const router = createBrowserRouter(routes, {
+  basename: import.meta.env.BASE_URL,
+});

@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@theme {
+  --breakpoint-sm: 30rem;
+  --breakpoint-md: 55rem;
+  --breakpoint-lg: 70rem;
+
+  --color-primary: theme(colors.fuchsia.500);
+  --color-secondary: theme(colors.indigo.500);
+
+  --font-sans: "Mona Sans", sans-serif;
+}
+
+@font-face {
+  font-weight: 200 900;
+  src: url("@/assets/MonaSans.woff2") format("woff2");
+  font-stretch: 75% 125%;
+  font-family: "Mona Sans";
+  font-display: swap;
+}
+
+@layer base {
+  html {
+    @apply bg-slate-900 font-sans text-[110%] leading-normal font-light text-white underline-offset-2;
+  }
+
+  body {
+    @apply flex min-h-dvh flex-col;
+  }
+
+  #root {
+    display: contents;
+  }
+
+  main {
+    @apply flex grow flex-col;
+  }
+
+  section {
+    @apply width-md flex flex-col items-center gap-12 bg-linear-to-r p-(--pad) px-[max(var(--pad),(100%---spacing(1)*var(--width))/2)] [--pad:--spacing(12)] last:grow odd:from-slate-500/20 odd:to-slate-500/0 even:from-slate-500/30 even:to-slate-500/10 max-md:[--pad:--spacing(8)];
+  }
+
+  h2 {
+    @apply flex items-center gap-4 text-center text-2xl leading-normal font-light tracking-widest uppercase;
+  }
+
+  b,
+  strong {
+    @apply font-semibold;
+  }
+
+  p {
+    @apply text-center leading-loose text-balance;
+  }
+
+  a {
+    @apply text-indigo-200 underline transition hover:text-fuchsia-200;
+  }
+
+  table {
+    @apply w-full border-collapse text-left;
+  }
+
+  th {
+    @apply bg-slate-500/25;
+  }
+
+  th,
+  td {
+    @apply px-4 py-1 align-middle!;
+  }
+
+  tr {
+    @apply even:bg-slate-500/10;
+  }
+
+  dl {
+    @apply grid grid-cols-[auto_auto] gap-x-4 gap-y-2;
+  }
+
+  dt {
+    @apply font-medium opacity-50;
+  }
+
+  .icon,
+  .lucide {
+    @apply inline-block h-[1em];
+  }
+}
+
+@utility width-md {
+  --width: 160;
+}
+
+@utility width-lg {
+  --width: 300;
+}
+
+@utility placeholder {
+  @apply flex aspect-square w-full items-center justify-center gap-4 rounded-md bg-slate-500/10 p-2;
+}
