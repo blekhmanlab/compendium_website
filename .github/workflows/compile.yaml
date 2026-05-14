@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: SSH debug
         if: runner.debug == '1'
@@ -22,7 +22,7 @@ jobs:
         run: bun run compile
 
       - name: Commit results
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "Update compiled data"
 
