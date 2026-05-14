@@ -66,10 +66,7 @@ const Chart = ({
   return (
     <div
       ref={setRef}
-      className={clsx(
-        "size-full max-h-screen max-w-full resize overflow-hidden",
-        className,
-      )}
+      className={clsx("size-full max-h-screen max-w-full resize", className)}
     />
   );
 };
@@ -149,9 +146,9 @@ registerTheme("compendium", {
   },
 
   tooltip: {
-    borderColor: "var(--color-slate-500)",
-    backgroundColor: "var(--color-slate-800)",
-    textStyle: text,
+    borderColor: "transparent",
+    backgroundColor: "var(--color-slate-200)",
+    textStyle: { ...text, color: "var(--color-slate-800)" },
     // eslint-disable-next-line
     formatter: (params: any) => params.data.datum.tooltip,
     // eslint-disable-next-line

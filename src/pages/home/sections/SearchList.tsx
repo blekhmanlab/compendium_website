@@ -22,6 +22,7 @@ type TypesAll = ("All" | NonNullable<Props["types"]>[number])[];
 type List = NonNullable<Data[KeysOfType<Data, `${string}Search`>]>;
 
 type Props = {
+  name: string;
   list?: List;
   cols: string[];
   types?: string[];
@@ -33,6 +34,7 @@ type Props = {
 const fields = ["name", "value"];
 
 const SearchList = ({
+  name,
   list: fullList,
   cols,
   types,
@@ -95,7 +97,9 @@ const SearchList = ({
   );
 
   if (!list)
-    return <div className="placeholder aspect-3/2">Loading search</div>;
+    return (
+      <div className="placeholder aspect-3/2">Loading {name.toLowerCase()}</div>
+    );
 
   /** full list of matches */
   const matches = search.trim()

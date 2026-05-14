@@ -92,12 +92,8 @@
   }
 }
 
-@utility width-sm {
-  --width: 100;
-}
-
 @utility width-md {
-  --width: 200;
+  --width: 150;
 }
 
 @utility width-lg {
@@ -109,7 +105,7 @@
 }
 
 .tippy-box {
-  @apply rounded border border-slate-500 bg-slate-800 px-2 py-1;
+  @apply rounded bg-slate-200 px-2 py-1 text-slate-800;
 }
 
 .tippy-content {
@@ -117,5 +113,5 @@
 }
 
 .tippy-arrow {
-  @apply text-slate-800!;
+  @apply text-slate-200;
 }

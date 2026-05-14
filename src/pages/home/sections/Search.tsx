@@ -1,4 +1,5 @@
 import { startTransition, useEffect, useState } from "react";
+import clsx from "clsx";
 import Tabs from "@/components/Tabs";
 import { loadTags, useData } from "@/pages/home/state";
 import SearchList from "./SearchList";
@@ -41,7 +42,7 @@ const Search = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   return (
-    <section>
+    <section className={clsx(tab === 3 && "width-lg")}>
       <h2>Search</h2>
 
       <Tabs
@@ -58,6 +59,7 @@ const Search = () => {
                   how many samples are associated with it.
                 </p>
                 <SearchList
+                  name="Geography"
                   list={geoSearch}
                   cols={["name", "type", "samples"]}
                   types={["Country", "Region"]}
@@ -76,6 +78,7 @@ const Search = () => {
                   accession to see how many samples are associated with it.
                 </p>
                 <SearchList
+                  name="Project/Sample"
                   list={projectSearch}
                   cols={["name", "type", "samples"]}
                   types={["Project", "Sample"]}
@@ -94,6 +97,7 @@ const Search = () => {
                   many samples it's present in.
                 </p>
                 <SearchList
+                  name="Taxa"
                   list={taxonSearch}
                   cols={["name", "type", "samples"]}
                   types={["Phylum", "Class"]}
@@ -119,6 +123,7 @@ const Search = () => {
                     filter next table.
                   </p>
                   <SearchList
+                    name="Tags"
                     list={tagSearch}
                     cols={["name", "projects", "samples"]}
                     onSelect={(selected) =>
@@ -132,6 +137,7 @@ const Search = () => {
                     many samples have it.
                   </p>
                   <SearchList
+                    name="Tag Values"
                     list={tagValueSearch}
                     cols={["name", "value", "project", "samples"]}
                     names={selectedTags}
