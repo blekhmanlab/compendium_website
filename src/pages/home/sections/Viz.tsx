@@ -241,7 +241,7 @@ const getParticles = async () => {
     gsap
       .timeline()
       .to(particle, { alpha: 1, duration: duration * 0.5, delay, ease })
-      .to(particle, { alpha: 0.25, duration: duration * 0.5, ease });
+      .to(particle, { alpha: 0.35, duration: duration * 0.5, ease });
     /** animate color */
     gsap
       .timeline({ repeat: -1, yoyo: true, delay: particle.destination.x })
