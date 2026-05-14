@@ -17,9 +17,6 @@ jobs:
         with:
           ref: main
 
-      - name: Summary info
-        run: echo Commit && git rev-parse HEAD && cat ./public/metadata.json
-
       - name: SSH debug
         if: runner.debug == '1'
         uses: mxschmitt/action-tmate@v3
