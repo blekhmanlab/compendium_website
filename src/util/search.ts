@@ -1,32 +1,26 @@
 import { expose } from "comlink";
 
-/** allow aborting from outside worker */
-let aborted = "";
-export const abort = (reason = "aborted") => (aborted = reason);
-export const resetAbort = () => (aborted = "");
-
 /** normalize strings for comparison */
 const normalize = (string: string) =>
   string.replaceAll("_", " ").replaceAll(/\s/g, " ").toLowerCase();
 
 /** exact (case-insensitive) search on large list of items */
-export const exactSearch = <Entry extends Record<string, unknown>>(
+export const exactSearch = <List extends Record<string, unknown>[]>(
   /** array of objects */
-  list: Entry[],
+  list: List,
   /** object keys to search */
   keys: string[],
   /** string to search */
   search: string,
 ) =>
-  list.filter((entry) => {
-    if (aborted) throw Error(aborted);
-    return normalize(
+  list.filter((entry) =>
+    normalize(
       keys
         .map((key) => String(entry[key] ?? ""))
         .join(" ")
         .toLowerCase(),
-    ).includes(normalize(search));
-  });
+    ).includes(normalize(search)),
+  ) as List;
 
 /** fuzzy search on large list of items */
 export const fuzzySearch = <Entry extends Record<string, unknown>>(
@@ -39,15 +33,13 @@ export const fuzzySearch = <Entry extends Record<string, unknown>>(
   /** similarity threshold */
   threshold = 0.25,
 ): Entry[] =>
-  list.filter((entry) => {
-    if (aborted) throw Error(aborted);
-    return (
+  list.filter(
+    (entry) =>
       nGramSimilarity(
         normalize(keys.map((key) => String(entry[key] ?? "")).join(" ")),
         normalize(search),
-      ) > threshold
-    );
-  });
+      ) > threshold,
+  );
 
 /** split string into n-grams */
 const nGrams = (value: string, n = 3) => {
@@ -73,4 +65,4 @@ const nGramSimilarity = (stringA: string, stringB: string, n = 3) => {
   return common.size / (total.size || Infinity);
 };
 
-expose({ exactSearch, fuzzySearch, abort, resetAbort });
+expose({ exactSearch, fuzzySearch });

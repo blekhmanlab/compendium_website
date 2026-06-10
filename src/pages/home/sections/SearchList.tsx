@@ -1,20 +1,17 @@
+import type { Remote } from "comlink";
 import type { Col } from "@/components/Table";
 import type { Data } from "@/pages/home/state";
 import type * as SearchAPI from "@/util/search.ts";
 import type { KeysOfType } from "@/util/types";
 import { useEffect, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
-import { wrap } from "comlink";
 import { capitalize } from "lodash";
 import Select from "@/components/Select";
 import Table from "@/components/Table";
 import Textbox from "@/components/Textbox";
-import Worker from "@/util/search.ts?worker";
+import SearchWorker from "@/util/search.ts?worker";
 import { formatNumber } from "@/util/string";
 import { useWorker } from "@/util/worker";
-
-const exactWorker = wrap<typeof SearchAPI>(new Worker());
-const fuzzyWorker = wrap<typeof SearchAPI>(new Worker());
 
 /** type options, including all */
 type TypesAll = ("All" | NonNullable<Props["types"]>[number])[];
@@ -64,31 +61,23 @@ const SearchList = ({
   }, [fullList, types, type, names]);
 
   /** exact search results */
-  const [exactMatches = [], exactStatus, runExact] =
-    useWorker<List>(exactWorker);
+  const [exactMatches = [], exactStatus, runExact] = useWorker(
+    SearchWorker,
+    (worker: Remote<typeof SearchAPI>) =>
+      worker.exactSearch(list ?? [], fields, search) as Promise<List>,
+  );
   /** fuzzy search results */
-  const [fuzzyMatches = [], fuzzyStatus, runFuzzy] =
-    useWorker<List>(fuzzyWorker);
+  const [fuzzyMatches = [], fuzzyStatus, runFuzzy] = useWorker(
+    SearchWorker,
+    (worker: Remote<typeof SearchAPI>) =>
+      worker.fuzzySearch(list ?? [], fields, search) as Promise<List>,
+  );
 
   /** run exact search */
-  useEffect(
-    () =>
-      runExact(
-        async () =>
-          exactWorker.exactSearch(list ?? [], fields, search) as Promise<List>,
-      ),
-    [list, search, runExact],
-  );
+  useEffect(runExact, [list, search, runExact]);
 
   /** run fuzzy search */
-  useEffect(
-    () =>
-      runFuzzy(
-        () =>
-          fuzzyWorker.fuzzySearch(list ?? [], fields, search) as Promise<List>,
-      ),
-    [list, search, runFuzzy],
-  );
+  useEffect(runFuzzy, [list, search, runFuzzy]);
 
   /** exact match name quick lookup */
   const exactLookup = useMemo(
