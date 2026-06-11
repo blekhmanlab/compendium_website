@@ -9,7 +9,7 @@ const samplePCsUrls = mapKeys(
     eager: true,
     query: "url",
   }),
-  (module) => module.default.match(/sample-pcs-(.+)\.json/)?.[1] ?? "",
+  (_, path) => path.match(/sample-pcs-(.+)\.json/)?.[1] ?? "",
 );
 
 /** compendium principal component pcs per sample */

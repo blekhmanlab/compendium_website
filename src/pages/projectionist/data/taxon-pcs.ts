@@ -9,7 +9,7 @@ const taxonPCsUrls = mapKeys(
     eager: true,
     query: "url",
   }),
-  (module) => module.default.match(/taxon-pcs-(.+)\.json/)?.[1] ?? "",
+  (_, path) => path.match(/taxon-pcs-(.+)\.json/)?.[1] ?? "",
 );
 
 /** compendium principal component pcs per taxon */
