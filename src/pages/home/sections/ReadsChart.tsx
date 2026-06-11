@@ -2,10 +2,9 @@ import type { EChartsOption } from "echarts";
 import type { Reads } from "@/pages/home/data/projects";
 import { max, min } from "lodash";
 import Chart from "@/components/Chart";
-import { tooltipTable } from "@/pages/home/sections/PhylaChart";
 import { useData } from "@/pages/home/state";
 import { getCssVariable } from "@/util/dom";
-import { formatNumber } from "@/util/string";
+import { formatNumber, tooltipTable } from "@/util/string";
 
 type Props = {
   data: Reads;

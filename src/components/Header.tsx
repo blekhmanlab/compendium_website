@@ -36,7 +36,7 @@ const Header = ({ children, big = false }: Props) => {
         <div className="h-full w-0.5 bg-white" />
         <h1
           className={clsx(
-            "-my-2",
+            "-my-2 leading-tight",
             big
               ? `
                 text-3xl font-semibold

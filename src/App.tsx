@@ -2,6 +2,7 @@ import "./styles.css";
 import { createBrowserRouter, Outlet, redirect } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import Home from "@/pages/home/Home";
+import Projectionist from "@/pages/projectionist/Projectionist";
 import { redirectPath } from "@/util/url";
 
 /** app entrypoint */
@@ -25,6 +26,10 @@ const routes = [
             return redirect(redirectPath);
           } else return null;
         },
+      },
+      {
+        path: "/projectionist",
+        element: <Projectionist />,
       },
     ],
   },
