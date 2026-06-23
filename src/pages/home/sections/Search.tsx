@@ -130,14 +130,7 @@ const Search = () => {
           {
             name: "Tags",
             content: (
-              <div
-                className="
-                  grid w-full
-                  grid-cols-[repeat(auto-fit,minmax(min(400px,100%),1fr))]
-                  gap-x-14 gap-y-10
-                  *:flex *:flex-col *:items-center *:gap-8
-                "
-              >
+              <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(min(400px,100%),1fr))] gap-x-14 gap-y-10 *:flex *:flex-col *:items-center *:gap-8">
                 <div>
                   <p>
                     Search for a{" "}

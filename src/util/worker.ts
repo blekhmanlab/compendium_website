@@ -46,7 +46,7 @@ export const useWorker = <API, Data>(
       }
     })();
 
-    /** cleanup func (usually for useEffect) */
+    /** cleanup func */
     return () => {
       /** mark this run as stale */
       latest = false;

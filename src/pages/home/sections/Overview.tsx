@@ -100,13 +100,7 @@ const Overview = () => {
       </p>
 
       {meta ? (
-        <div
-          className="
-            grid grid-cols-3 gap-10
-            max-md:grid-cols-2
-            max-sm:grid-cols-1
-          "
-        >
+        <div className="grid grid-cols-3 gap-10 max-md:grid-cols-2 max-sm:grid-cols-1">
           {tiles.map(({ className, icon, text }, index) => (
             <div
               key={index}
@@ -114,11 +108,7 @@ const Overview = () => {
             >
               <span
                 className={clsx(
-                  `
-                    grid size-16 place-items-center rounded-full bg-current/25
-                    *:size-8 *:text-white
-                    **:stroke-1
-                  `,
+                  `grid size-16 place-items-center rounded-full bg-current/25 *:size-8 *:text-white **:stroke-1`,
                   className,
                 )}
               >

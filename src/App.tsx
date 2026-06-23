@@ -2,7 +2,6 @@ import "./styles.css";
 import { createBrowserRouter, Outlet, redirect } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import Home from "@/pages/home/Home";
-import { redirectPath } from "@/util/url";
 
 /** app entrypoint */
 const App = () => <RouterProvider router={router} />;
@@ -19,7 +18,15 @@ const routes = [
         index: true,
         element: <Home />,
         loader: async () => {
-          /** handle 404 redirect */
+          /** handle 404 redirect (see 404.html) */
+
+          /** load redirect details */
+          const redirectPath = window.sessionStorage.redirectPath || "";
+
+          /** remove right after consuming */
+          window.sessionStorage.removeItem("redirectPath");
+
+          /** redirect */
           if (redirectPath) {
             console.debug("Redirecting to:", redirectPath);
             return redirect(redirectPath);

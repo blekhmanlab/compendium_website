@@ -104,11 +104,7 @@ const SearchList = ({
 
   return (
     <>
-      <div
-        className="
-          flex w-full min-w-0 flex-wrap items-center justify-center gap-4
-        "
-      >
+      <div className="flex w-full min-w-0 flex-wrap items-center justify-center gap-4">
         <Textbox
           value={_search}
           onChange={setSearch}
