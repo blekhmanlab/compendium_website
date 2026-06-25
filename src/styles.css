@@ -37,7 +37,7 @@
   }
 
   section {
-    @apply width-md flex flex-col items-center gap-12 bg-linear-to-r p-(--pad) px-[max(var(--pad),(100%---spacing(1)*var(--width))/2)] [--pad:--spacing(12)] last:grow odd:from-slate-500/20 odd:to-slate-500/0 even:from-slate-500/30 even:to-slate-500/10 max-md:[--pad:--spacing(8)];
+    @apply width-md flex flex-col items-center gap-12 bg-linear-to-r p-(--pad) px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] [--pad:--spacing(12)] last:grow odd:from-slate-500/20 odd:to-slate-500/0 even:from-slate-500/30 even:to-slate-500/10 max-md:[--pad:--spacing(8)];
   }
 
   h2 {
