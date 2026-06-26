@@ -4,7 +4,7 @@
 
 This project was scaffolded using Vite with the following options:
 
-- React 18
+- React 19
 - TypeScript, for type checking
 - ESLint, for code quality
 - Prettier, for code formatting
@@ -17,8 +17,8 @@ Notable technologies/packages/etc. used:
 
 ## Requirements
 
-- Node `v18+`
-- Bun `v1+`
+- Node `v22+`
+- Bun `v1.3+`
 
 ## Commands
 

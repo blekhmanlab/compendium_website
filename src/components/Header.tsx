@@ -7,7 +7,7 @@ type Props = {
   big?: boolean;
 };
 
-const Header = ({ children, big = false }: Props) => {
+export default function Header({ children, big = false }: Props) {
   return (
     <header
       className={clsx(
@@ -53,6 +53,4 @@ const Header = ({ children, big = false }: Props) => {
       {children}
     </header>
   );
-};
-
-export default Header;
+}

@@ -15,7 +15,7 @@ import { useData } from "@/pages/projectionist/state";
 /** top-n extreme taxa */
 const count = 3;
 
-const Extremes = () => {
+export default function Extremes() {
   /** get state */
   const taxonPCs = useData((state) => state.taxonPCs);
   const PCX = useData((state) => state.PCX);
@@ -126,6 +126,4 @@ const Extremes = () => {
       </div>
     </section>
   );
-};
-
-export default Extremes;
+}

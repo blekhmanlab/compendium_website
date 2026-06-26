@@ -7,9 +7,9 @@ import Projectionist from "@/pages/projectionist/Projectionist";
 import { redirectPath } from "@/util/url";
 
 /** app entrypoint */
-const App = () => <RouterProvider router={router} />;
-
-export default App;
+export default function App() {
+  return <RouterProvider router={router} />;
+}
 
 /** route definitions */
 const routes = [

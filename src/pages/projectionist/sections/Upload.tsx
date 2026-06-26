@@ -19,7 +19,7 @@ const projectionistWorker = wrap<typeof ProjectionistAPI>(
   new ProjectionistWorker(),
 );
 
-const Upload = () => {
+export default function Upload() {
   /** refs for drag & drop targets */
   const dataRef = useRef<HTMLTextAreaElement>(null);
   const taxaRef = useRef<HTMLTextAreaElement>(null);
@@ -200,9 +200,7 @@ const Upload = () => {
       </Button>
     </section>
   );
-};
-
-export default Upload;
+}
 
 const accept = [
   ".txt",

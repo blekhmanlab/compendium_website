@@ -21,7 +21,7 @@ type Props = {
 };
 
 /** x/y plot of principal components */
-const PCChart = ({ title, subtitle, xLabel, yLabel, series, range }: Props) => {
+function PCChart({ title, subtitle, xLabel, yLabel, series, range }: Props) {
   range = Math.ceil(range);
 
   /** scale down point size more points there are */
@@ -87,6 +87,6 @@ const PCChart = ({ title, subtitle, xLabel, yLabel, series, range }: Props) => {
       className="aspect-square w-120"
     />
   );
-};
+}
 
 export default memo(PCChart);

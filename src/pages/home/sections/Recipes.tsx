@@ -28,32 +28,34 @@ const recipes = [
   },
 ];
 
-const Recipes = () => (
-  <section>
-    <h2>Recipes</h2>
+export default function Recipes() {
+  return (
+    <section>
+      <h2>Recipes</h2>
 
-    <p>
-      Some of the things you can do with{" "}
-      <a href={import.meta.env.VITE_R_PACKAGE} target="_blank">
-        <PackageIcon />
-        the R package
-      </a>
-      :
-    </p>
+      <p>
+        Some of the things you can do with{" "}
+        <a href={import.meta.env.VITE_R_PACKAGE} target="_blank">
+          <PackageIcon />
+          the R package
+        </a>
+        :
+      </p>
 
-    <div className="flex flex-col flex-wrap gap-4">
-      {recipes.map(({ link, name }, index) => (
-        <Button
-          key={index}
-          to={import.meta.env.VITE_R_PACKAGE + "articles/overview.html#" + link}
-          className="justify-start"
-        >
-          <LightbulbIcon />
-          {name}
-        </Button>
-      ))}
-    </div>
-  </section>
-);
-
-export default Recipes;
+      <div className="flex flex-col flex-wrap gap-4">
+        {recipes.map(({ link, name }, index) => (
+          <Button
+            key={index}
+            to={
+              import.meta.env.VITE_R_PACKAGE + "articles/overview.html#" + link
+            }
+            className="justify-start"
+          >
+            <LightbulbIcon />
+            {name}
+          </Button>
+        ))}
+      </div>
+    </section>
+  );
+}

@@ -3,7 +3,7 @@ import { SelectOrdination } from "@/pages/projectionist/sections/Selections";
 import { useData } from "@/pages/projectionist/state";
 
 /** scree plot section */
-const Scree = () => {
+export default function Scree() {
   /** get state */
   const scree = useData((state) => state.scree);
   const ordination = useData((state) => state.ordination);
@@ -38,6 +38,4 @@ const Scree = () => {
       </div>
     </section>
   );
-};
-
-export default Scree;
+}

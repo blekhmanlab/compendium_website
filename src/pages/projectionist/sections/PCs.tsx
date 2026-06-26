@@ -24,7 +24,7 @@ const projectionistWorker = wrap<typeof ProjectionistAPI>(
 );
 
 /** compare series of principal components */
-const PCs = () => {
+export default function PCs() {
   /** get state */
   const userReads = useData((state) => state.userReads);
   const userTaxa = useData((state) => state.userTaxa);
@@ -56,6 +56,7 @@ const PCs = () => {
 
   /** set selected regions once options load */
   useEffect(() => {
+    // eslint-disable-next-line -- https://github.com/facebook/react/issues/34045#issuecomment-3801067128
     setRegions(regionOptions);
   }, [regionOptions]);
 
@@ -229,6 +230,4 @@ const PCs = () => {
       </div>
     </section>
   );
-};
-
-export default PCs;
+}

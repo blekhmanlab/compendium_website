@@ -11,7 +11,7 @@ import { tooltips } from "./Search";
 const chartOptions = ["Phyla", "Reads"] as const;
 type Chart = (typeof chartOptions)[number];
 
-const Prevalence = () => {
+export default function Prevalence() {
   /** get global state */
   const phyla = useData((state) => state.phyla);
   const reads = useData((state) => state.reads);
@@ -59,6 +59,4 @@ const Prevalence = () => {
       </div>
     </section>
   );
-};
-
-export default Prevalence;
+}

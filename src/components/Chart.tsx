@@ -13,12 +13,12 @@ type Props = {
 };
 
 /** echarts wrapper */
-const Chart = ({
+export default function Chart({
   option,
   init: initOptions = {},
   onZoom,
   className,
-}: Props) => {
+}: Props) {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const chart = useRef<ECharts>(null);
 
@@ -72,9 +72,7 @@ const Chart = ({
       )}
     />
   );
-};
-
-export default Chart;
+}
 
 const text = {
   color: "white",

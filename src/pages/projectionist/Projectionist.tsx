@@ -12,7 +12,7 @@ import { loadSamples, loadScree } from "@/pages/projectionist/state";
 /** ensure only one load */
 let loaded = false;
 
-const Projectionist = () => {
+export default function Projectionist() {
   /** load data on page load */
   useEffect(() => {
     if (!loaded) {
@@ -47,6 +47,4 @@ const Projectionist = () => {
       <Footer />
     </>
   );
-};
-
-export default Projectionist;
+}

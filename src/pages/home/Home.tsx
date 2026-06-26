@@ -11,7 +11,7 @@ import { loadGeo, loadMeta, loadProjects, loadTaxa } from "@/pages/home/state";
 /** ensure only one load */
 let loaded = false;
 
-const Home = () => {
+export default function Home() {
   /** load (small-enough) data on page load */
   useEffect(() => {
     if (!loaded) {
@@ -36,6 +36,4 @@ const Home = () => {
       <Footer />
     </>
   );
-};
-
-export default Home;
+}

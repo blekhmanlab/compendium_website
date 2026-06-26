@@ -12,7 +12,7 @@ type Props = {
 };
 
 /** show sample counts vs binned read counts */
-const ReadsChart = ({ data }: Props) => {
+export default function ReadsChart({ data }: Props) {
   type Datum = Reads["histogram"][number];
 
   /** colors */
@@ -99,6 +99,4 @@ const ReadsChart = ({ data }: Props) => {
   if (!data) return <div className="placeholder">Loading reads</div>;
 
   return <Chart option={option} />;
-};
-
-export default ReadsChart;
+}

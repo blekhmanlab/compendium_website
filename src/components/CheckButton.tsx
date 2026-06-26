@@ -6,7 +6,7 @@ type Props = {
   onChange: (checked: boolean) => void;
 };
 
-const CheckButton = ({ label, checked, onChange }: Props) => {
+export default function CheckButton({ label, checked, onChange }: Props) {
   return (
     <button
       className="
@@ -21,6 +21,4 @@ const CheckButton = ({ label, checked, onChange }: Props) => {
       <CheckIcon className={checked ? "opacity-100" : "opacity-0"} />
     </button>
   );
-};
-
-export default CheckButton;
+}

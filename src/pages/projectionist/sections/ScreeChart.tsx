@@ -11,7 +11,7 @@ type Props = {
 const maxPcs = 8;
 
 /** scree plots of principal components */
-const ScreeChart = ({ yLabel, type, data }: Props) => {
+export default function ScreeChart({ yLabel, type, data }: Props) {
   const option: EChartsOption = {
     series: [
       {
@@ -39,6 +39,4 @@ const ScreeChart = ({ yLabel, type, data }: Props) => {
   };
 
   return <Chart option={option} className="h-100" />;
-};
-
-export default ScreeChart;
+}

@@ -11,7 +11,7 @@ import {
 import { useData } from "@/pages/home/state";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
 
-const Overview = () => {
+export default function Overview() {
   /** get global state */
   const meta = useData((state) => state.meta);
 
@@ -143,6 +143,4 @@ const Overview = () => {
       </p>
     </section>
   );
-};
-
-export default Overview;
+}
