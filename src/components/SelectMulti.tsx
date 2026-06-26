@@ -11,13 +11,13 @@ type Props<Option extends string> = {
   options: readonly Option[];
 } & Omit<ComponentProps<"select">, "value" | "onChange">;
 
-const SelectMulti = <Option extends string>({
+export default function SelectMulti<Option extends string>({
   label,
   value,
   onChange,
   options,
   className = "",
-}: Props<Option>) => {
+}: Props<Option>) {
   /** selected label */
   let selected = "";
   if (value.length === 0) selected = "None";
@@ -97,6 +97,4 @@ const SelectMulti = <Option extends string>({
       </Select.Root>
     </label>
   );
-};
-
-export default SelectMulti;
+}

@@ -1,5 +1,4 @@
 import type { EChartsOption } from "echarts";
-import { memo } from "react";
 import Chart from "@/components/Chart";
 import { tooltipTable } from "@/util/string";
 
@@ -21,7 +20,14 @@ type Props = {
 };
 
 /** x/y plot of principal components */
-const PCChart = ({ title, subtitle, xLabel, yLabel, series, range }: Props) => {
+export default function PCChart({
+  title,
+  subtitle,
+  xLabel,
+  yLabel,
+  series,
+  range,
+}: Props) {
   range = Math.ceil(range);
 
   /** scale down point size more points there are */
@@ -87,6 +93,4 @@ const PCChart = ({ title, subtitle, xLabel, yLabel, series, range }: Props) => {
       className="aspect-square w-120"
     />
   );
-};
-
-export default memo(PCChart);
+}

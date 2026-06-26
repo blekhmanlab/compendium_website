@@ -12,51 +12,57 @@ type Base = {
 
 type Props = Base & (Single | Multi);
 
-const Textbox = ({ multi, value, onChange, className, ...props }: Props) => (
-  <div className={clsx("relative flex", className)}>
-    {multi ? (
-      <textarea
+export default function Textbox({
+  multi,
+  value,
+  onChange,
+  className,
+  ...props
+}: Props) {
+  return (
+    <div className={clsx("relative flex", className)}>
+      {multi ? (
+        <textarea
+          className="
+            grow rounded-md bg-slate-500/25 px-4 py-2 pr-10 text-inherit
+            transition
+            hover:bg-slate-500/50
+          "
+          {...(props as ComponentProps<"textarea">)}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          rows={2}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
+        />
+      ) : (
+        <input
+          type="text"
+          className="
+            grow rounded-md bg-slate-500/25 px-4 py-2 pr-10 transition
+            hover:bg-slate-500/50
+          "
+          {...(props as ComponentProps<"input">)}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
+        />
+      )}
+      <button
         className="
-          grow rounded-md bg-slate-500/25 px-4 py-2 pr-10 text-inherit
-          transition
-          hover:bg-slate-500/50
+          absolute top-0 right-0 flex size-10 cursor-pointer items-center
+          justify-center
         "
-        {...(props as ComponentProps<"textarea">)}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        rows={2}
-        autoComplete="off"
-        autoCorrect="off"
-        autoCapitalize="off"
-        spellCheck="false"
-      />
-    ) : (
-      <input
-        type="text"
-        className="
-          grow rounded-md bg-slate-500/25 px-4 py-2 pr-10 transition
-          hover:bg-slate-500/50
-        "
-        {...(props as ComponentProps<"input">)}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        autoComplete="off"
-        autoCorrect="off"
-        autoCapitalize="off"
-        spellCheck="false"
-      />
-    )}
-    <button
-      className="
-        absolute top-0 right-0 flex size-10 cursor-pointer items-center
-        justify-center
-      "
-      onClick={() => onChange("")}
-      aria-label="Clear"
-    >
-      <XIcon />
-    </button>
-  </div>
-);
-
-export default Textbox;
+        onClick={() => onChange("")}
+        aria-label="Clear"
+      >
+        <XIcon />
+      </button>
+    </div>
+  );
+}

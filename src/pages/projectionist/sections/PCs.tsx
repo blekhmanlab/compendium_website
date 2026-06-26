@@ -20,7 +20,7 @@ import { shapePaths, useLegend } from "@/util/legend";
 import { useWorker } from "@/util/worker";
 
 /** compare series of principal components */
-const PCs = () => {
+export default function PCs() {
   /** get state */
   const userReads = useData((state) => state.userReads);
   const userTaxa = useData((state) => state.userTaxa);
@@ -225,6 +225,4 @@ const PCs = () => {
       </div>
     </section>
   );
-};
-
-export default PCs;
+}

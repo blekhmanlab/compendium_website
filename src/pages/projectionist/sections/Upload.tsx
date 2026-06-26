@@ -15,7 +15,7 @@ import exampleMeta from "../data/example/meta.tsv?raw";
 import exampleReads from "../data/example/reads.tsv?raw";
 import exampleTaxa from "../data/example/taxa.tsv?raw";
 
-const Upload = () => {
+export default function Upload() {
   /** refs for drag & drop targets */
   const dataRef = useRef<HTMLTextAreaElement>(null);
   const taxaRef = useRef<HTMLTextAreaElement>(null);
@@ -193,9 +193,7 @@ const Upload = () => {
       </Button>
     </section>
   );
-};
-
-export default Upload;
+}
 
 const accept = [
   ".txt",

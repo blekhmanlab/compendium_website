@@ -7,7 +7,7 @@ type Props = {
   onChange: (checked: boolean) => void;
 };
 
-const CheckButton = ({ label, checked, onChange }: Props) => {
+export default function CheckButton({ label, checked, onChange }: Props) {
   return (
     <Tooltip content={label}>
       <button
@@ -23,6 +23,4 @@ const CheckButton = ({ label, checked, onChange }: Props) => {
       </button>
     </Tooltip>
   );
-};
-
-export default CheckButton;
+}

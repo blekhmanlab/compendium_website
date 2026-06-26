@@ -30,14 +30,14 @@ type Props = {
 /** fields to search on each list object */
 const fields = ["name", "value"];
 
-const SearchList = ({
+export default function SearchList({
   name,
   list: fullList,
   cols,
   types,
   names,
   onSelect,
-}: Props) => {
+}: Props) {
   /** type filter */
   const [type, setType] = useState<TypesAll[number]>("All");
 
@@ -154,6 +154,4 @@ const SearchList = ({
       />
     </>
   );
-};
-
-export default SearchList;
+}

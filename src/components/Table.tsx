@@ -36,13 +36,13 @@ type Props<Datum extends DatumShape> = {
 export type OnSelect = NonNullable<Props<DatumShape>["onSelect"]>;
 export type SelectedRows = Parameters<OnSelect>[0];
 
-const Table = <Datum extends DatumShape>({
+export default function Table<Datum extends DatumShape>({
   cols,
   rows,
   limit = 7,
   extraRows,
   onSelect,
-}: Props<Datum>) => {
+}: Props<Datum>) {
   /** row cutoff */
   let [cutoff, setCutoff] = useState(limit);
 
@@ -187,6 +187,4 @@ const Table = <Datum extends DatumShape>({
       </div>
     </>
   );
-};
-
-export default Table;
+}

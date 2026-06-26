@@ -11,7 +11,7 @@ type Props = {
 };
 
 /** prevalence of samples at phylum level as bar chart */
-const PhylaChart = ({ data }: Props) => {
+export default function PhylaChart({ data }: Props) {
   type Datum = (typeof data)[number];
 
   /** get global state */
@@ -114,6 +114,4 @@ const PhylaChart = ({ data }: Props) => {
   if (!data) return <div className="placeholder">Loading phyla</div>;
 
   return <Chart option={option} />;
-};
-
-export default PhylaChart;
+}

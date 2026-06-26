@@ -9,7 +9,7 @@ import {
 } from "@/pages/projectionist/state";
 
 /** pc selectors */
-export const SelectPCs = () => {
+export function SelectPCs() {
   const PCX = useData((state) => state.PCX);
   const PCY = useData((state) => state.PCY);
 
@@ -26,10 +26,10 @@ export const SelectPCs = () => {
       <Select label="Y-axis" options={PCs} value={PCY} onChange={setPCY} />
     </>
   );
-};
+}
 
 /** ordination selector */
-export const SelectOrdination = () => {
+export function SelectOrdination() {
   const ordination = useData((state) => state.ordination);
 
   useEffect(() => {
@@ -44,4 +44,4 @@ export const SelectOrdination = () => {
       onChange={setOrdination}
     />
   );
-};
+}

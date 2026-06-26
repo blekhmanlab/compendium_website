@@ -1,19 +1,19 @@
 import { ConeIcon } from "lucide-react";
 import Button from "@/components/Button";
 
-const Compare = () => (
-  <section>
-    <h2>Compare</h2>
+export default function Compare() {
+  return (
+    <section>
+      <h2>Compare</h2>
 
-    <p>
-      Compare your data to ours with the <i>Projectionist</i> tool.
-    </p>
+      <p>
+        Compare your data to ours with the <i>Projectionist</i> tool.
+      </p>
 
-    <Button design="accent" to="/projectionist">
-      <ConeIcon />
-      Projectionist
-    </Button>
-  </section>
-);
-
-export default Compare;
+      <Button design="accent" to="/projectionist">
+        <ConeIcon />
+        Projectionist
+      </Button>
+    </section>
+  );
+}

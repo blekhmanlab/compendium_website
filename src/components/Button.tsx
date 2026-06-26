@@ -10,7 +10,11 @@ type Props = (Anchor | Button) & {
   children: ReactNode;
 };
 
-const Button = ({ design = "regular", className, ...props }: Props) => {
+export default function Button({
+  design = "regular",
+  className,
+  ...props
+}: Props) {
   className = clsx(
     `
       inline-flex cursor-pointer items-center justify-center gap-2 rounded-full
@@ -42,6 +46,4 @@ const Button = ({ design = "regular", className, ...props }: Props) => {
   if ("onClick" in props)
     return <button className={className} {...(props as Button)} />;
   return <></>;
-};
-
-export default Button;
+}

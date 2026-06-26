@@ -15,7 +15,12 @@ type Props = {
 };
 
 /** popup of content on hover or click */
-const Tooltip = ({ content, button = true, children, className }: Props) => {
+export default function Tooltip({
+  content,
+  button = true,
+  children,
+  className,
+}: Props) {
   /** prevent if trigger disabled */
   if (
     isValidElement(children) &&
@@ -91,6 +96,4 @@ const Tooltip = ({ content, button = true, children, className }: Props) => {
       </Popover.Portal>
     </Popover.Root>
   );
-};
-
-export default Tooltip;
+}
