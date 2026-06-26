@@ -37,12 +37,7 @@ export default function Prevalence() {
         </p>
       )}
 
-      <div
-        className="
-          grid w-full grid-cols-[2fr_1fr] gap-8
-          max-lg:grid-cols-1
-        "
-      >
+      <div className="grid w-full grid-cols-[2fr_1fr] gap-8 max-lg:grid-cols-1">
         <Map />
 
         <div className="flex flex-col items-center gap-4">

@@ -11,10 +11,7 @@ export default function CheckButton({ label, checked, onChange }: Props) {
   return (
     <Tooltip content={label}>
       <button
-        className="
-          size-6 cursor-pointer rounded-md bg-slate-500/25
-          hover:bg-slate-500/50
-        "
+        className="size-6 cursor-pointer rounded-md bg-slate-500/25 hover:bg-slate-500/50"
         role="checkbox"
         aria-checked={checked ? "true" : "false"}
         onClick={() => onChange(!checked)}

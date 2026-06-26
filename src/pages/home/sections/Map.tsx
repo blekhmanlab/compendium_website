@@ -266,12 +266,7 @@ export default function Map() {
                     ? secondary
                     : scale(feature.properties.samples || 1)
                 }
-                className="
-                  cursor-pointer stroke-black transition
-                  hover:fill-white
-                  focus:fill-white
-                  [:not(:focus-visible)]:outline-none
-                "
+                className="cursor-pointer stroke-black transition hover:fill-white focus:fill-white [:not(:focus-visible)]:outline-none"
                 tabIndex={0}
                 onClick={(event) => selectFeature(event, feature)}
                 onKeyDown={(event) => selectFeature(event, feature)}

@@ -63,31 +63,12 @@ export default function Tooltip({
         >
           <Popover.Popup
             className={clsx(
-              `
-                max-h-(--available-height) w-max
-                max-w-[min(var(--available-width),--spacing(100))]
-                overflow-y-auto rounded-md bg-slate-200 p-3 leading-relaxed
-                text-slate-800 transition
-                data-closed:opacity-0
-                data-ending-style:opacity-0
-                data-open:opacity-100
-                data-starting-style:opacity-0
-                [&_a]:text-indigo-800 [&_a]:underline
-                [&_a]:hover:text-fuchsia-800
-              `,
+              `max-h-(--available-height) w-max max-w-[min(var(--available-width),--spacing(100))] overflow-y-auto rounded-md bg-slate-200 p-3 leading-relaxed text-slate-800 transition data-closed:opacity-0 data-ending-style:opacity-0 data-open:opacity-100 data-starting-style:opacity-0 [&_a]:text-indigo-800 [&_a]:underline [&_a]:hover:text-fuchsia-800`,
 
               className,
             )}
           >
-            <Popover.Arrow
-              className="
-                [clip-path:polygon(-100%_-10%,201%_-10%,100%_100%,0_100%)]
-                data-[side=bottom]:bottom-full data-[side=bottom]:rotate-180
-                data-[side=left]:left-full data-[side=left]:-rotate-90
-                data-[side=right]:right-full data-[side=right]:rotate-90
-                data-[side=top]:top-full
-              "
-            >
+            <Popover.Arrow className="[clip-path:polygon(-100%_-10%,201%_-10%,100%_100%,0_100%)] data-[side=bottom]:bottom-full data-[side=bottom]:rotate-180 data-[side=left]:left-full data-[side=left]:-rotate-90 data-[side=right]:right-full data-[side=right]:rotate-90 data-[side=top]:top-full">
               <div className="size-2 -translate-y-1/2 rotate-45 bg-slate-200" />
             </Popover.Arrow>
             {content}
