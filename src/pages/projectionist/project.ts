@@ -31,9 +31,6 @@ export type UserProjected = Awaited<ReturnType<typeof projectUserData>>;
 export const parseUserReads = async (text: string) => {
   console.debug("Parsing");
 
-  /** trim whitespace to not get null rows at start/end */
-  text = text.trim();
-
   /** parse data */
   const schema = inferSchema(text);
   const parser = initParser(inferSchema(text));
@@ -57,12 +54,11 @@ export const parseUserReads = async (text: string) => {
 export const parseUserTaxa = async (text: string) => {
   console.debug("Parsing");
 
-  /** trim whitespace to not get null rows at start/end */
-  text = text.trim();
+  console.log({ text });
 
   /** parse data */
   const parser = initParser(inferSchema(text));
-  const data = parser.typedArrs<string[]>(text);
+  const data = parser.stringArrs(text);
 
   return data.map(
     ([
