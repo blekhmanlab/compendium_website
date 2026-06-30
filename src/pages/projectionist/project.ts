@@ -4,7 +4,7 @@ import { groupBy, random, range, sum, uniq } from "lodash";
 import { inferSchema, initParser } from "udsv";
 
 /** max read count to rarify down to */
-const maxReads = 300;
+const maxReads = 3000;
 
 /** max PCs to consider */
 export const maxPCs = 8;
