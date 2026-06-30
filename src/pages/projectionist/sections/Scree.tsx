@@ -19,16 +19,18 @@ export default function Scree() {
     <section className="width-lg">
       <h2>Scree Plots</h2>
 
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+        commodo consequat.
+      </p>
+
       <div className="flex flex-wrap items-center justify-center gap-8">
         <SelectOrdination />
       </div>
 
-      <div
-        className="
-          grid w-full grid-cols-2 gap-8
-          max-md:grid-cols-1
-        "
-      >
+      <div className="grid w-full grid-cols-2 gap-8 max-md:grid-cols-1">
         <ScreeChart yLabel="Eigenvalue" type="bar" data={explained} />
         <ScreeChart
           yLabel="Cumulative Explained Variance"

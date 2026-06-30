@@ -82,25 +82,24 @@ export default function Extremes() {
     <section className="width-lg">
       <h2>Taxon Extremes</h2>
 
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+        commodo consequat.
+      </p>
+
       <div className="flex flex-wrap items-center justify-center gap-8">
         <SelectPCs />
         <SelectOrdination />
       </div>
 
-      <div
-        className="
-          grid grid-cols-8 gap-8
-          max-lg:flex max-lg:flex-col
-        "
-      >
+      <div className="grid grid-cols-8 gap-8 max-lg:flex max-lg:flex-col">
         {extremes?.map(({ className, label, header, data }, index) => (
           <div
             key={index}
             className={clsx(
-              `
-                col-span-4 flex w-full flex-col gap-4
-                max-lg:col-span-[unset]
-              `,
+              "col-span-4 flex w-full flex-col gap-4 max-lg:col-span-[unset]",
               className,
             )}
           >

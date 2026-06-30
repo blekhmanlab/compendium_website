@@ -3,9 +3,10 @@ import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useCallback, useRef, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { size } from "lodash";
-import { LightbulbIcon } from "lucide-react";
+import { HelpCircleIcon, LightbulbIcon } from "lucide-react";
 import Button from "@/components/Button";
 import Textbox from "@/components/Textbox";
+import Tooltip from "@/components/Tooltip";
 import UploadButton from "@/components/UploadButton";
 import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
 import { useData } from "@/pages/projectionist/state";
@@ -77,20 +78,50 @@ export default function Upload() {
     <section className="width-lg">
       <h2>Upload</h2>
 
-      <div
-        className="
-          grid w-full grid-cols-4 gap-4
-          max-lg:grid-cols-2
-          max-md:grid-cols-1
-        "
-      >
-        <div
-          className="
-            flex flex-col gap-4
-            md:col-span-2
-          "
-        >
-          <strong>Reads</strong>
+      <div className="grid w-full grid-cols-4 gap-4 max-lg:grid-cols-2 max-md:grid-cols-1">
+        <div className="flex flex-col gap-4 md:col-span-2">
+          <div className="flex items-center gap-2">
+            <strong>Reads</strong>{" "}
+            <Tooltip
+              content={
+                <>
+                  Read counts, per sample (row) and taxa (column).
+                  <table className="**:border">
+                    <thead>
+                      <tr>
+                        <th>sample</th>
+                        <th>taxa1</th>
+                        <th>taxa2</th>
+                        <th>…</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>sample1</td>
+                        <td>123</td>
+                        <td>456</td>
+                        <td>…</td>
+                      </tr>
+                      <tr>
+                        <td>sample2</td>
+                        <td>789</td>
+                        <td>0</td>
+                        <td>…</td>
+                      </tr>
+                      <tr>
+                        <td>…</td>
+                        <td>…</td>
+                        <td>…</td>
+                        <td>…</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </>
+              }
+            >
+              <HelpCircleIcon />
+            </Tooltip>
+          </div>
 
           <Textbox
             ref={dataRef}
@@ -122,7 +153,48 @@ export default function Upload() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <strong>Taxa</strong>
+          <div className="flex items-center gap-2">
+            <strong>Taxa</strong>{" "}
+            <Tooltip
+              content={
+                <>
+                  Taxa ranks for each column in reads table.
+                  <table className="**:border">
+                    <thead>
+                      <tr>
+                        <th>col id</th>
+                        <th>kingdom</th>
+                        <th>phylum</th>
+                        <th>…</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>col1</td>
+                        <td>Bacteria</td>
+                        <td>Bacillota</td>
+                        <td>…</td>
+                      </tr>
+                      <tr>
+                        <td>col2</td>
+                        <td>Archaea</td>
+                        <td>Methan…</td>
+                        <td>…</td>
+                      </tr>
+                      <tr>
+                        <td>…</td>
+                        <td>…</td>
+                        <td>…</td>
+                        <td>…</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </>
+              }
+            >
+              <HelpCircleIcon />
+            </Tooltip>
+          </div>
 
           <Textbox
             ref={taxaRef}
@@ -151,7 +223,48 @@ export default function Upload() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <strong>Meta</strong>
+          <div className="flex items-center gap-2">
+            <strong>Meta</strong>{" "}
+            <Tooltip
+              content={
+                <>
+                  Arbitrary metadata for each sample in reads table.
+                  <table className="**:border">
+                    <thead>
+                      <tr>
+                        <th>sample</th>
+                        <th>color</th>
+                        <th>tag</th>
+                        <th>…</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>sample1</td>
+                        <td>red</td>
+                        <td>simple</td>
+                        <td>…</td>
+                      </tr>
+                      <tr>
+                        <td>sample2</td>
+                        <td>green</td>
+                        <td>complex</td>
+                        <td>…</td>
+                      </tr>
+                      <tr>
+                        <td>…</td>
+                        <td>…</td>
+                        <td>…</td>
+                        <td>…</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </>
+              }
+            >
+              <HelpCircleIcon />
+            </Tooltip>
+          </div>
 
           <Textbox
             ref={metaRef}

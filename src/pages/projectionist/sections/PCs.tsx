@@ -3,8 +3,10 @@ import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { groupBy, pick, uniq } from "lodash";
+import { HelpCircleIcon } from "lucide-react";
 import Select from "@/components/Select";
 import SelectMulti from "@/components/SelectMulti";
+import Tooltip from "@/components/Tooltip";
 import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
 import PCChart from "@/pages/projectionist/sections/PCChart";
 import {
@@ -169,13 +171,25 @@ export default function PCs() {
     <section className="width-lg">
       <h2>Principal Components</h2>
 
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+        commodo consequat.
+      </p>
+
       <div className="flex flex-wrap items-center justify-center gap-8">
         <SelectPCs />
         <SelectOrdination />
-      </div>
-      <div className="flex flex-wrap items-center justify-center gap-8">
         <SelectMulti
-          label="Regions"
+          label={
+            <>
+              Regions
+              <Tooltip content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. ">
+                <HelpCircleIcon />
+              </Tooltip>
+            </>
+          }
           options={regionOptions}
           value={_regions}
           onChange={setRegions}
@@ -183,7 +197,14 @@ export default function PCs() {
         />
         {userPlot && (
           <Select
-            label="Group by"
+            label={
+              <>
+                Group by
+                <Tooltip content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. ">
+                  <HelpCircleIcon />
+                </Tooltip>
+              </>
+            }
             options={["", ...groupOptions]}
             value={group}
             onChange={setGroup}

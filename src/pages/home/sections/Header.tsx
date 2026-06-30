@@ -1,19 +1,18 @@
 import { DownloadIcon, PackageIcon, ScrollIcon } from "lucide-react";
 import Button from "@/components/Button.tsx";
-import Header from "@/components/Header";
+import HeaderWrapper from "@/components/Header";
+import Title from "@/components/Title";
 import Tooltip from "@/components/Tooltip";
 import Viz from "@/pages/home/sections/Viz";
 
-export default function Title() {
+export default function Header() {
   return (
-    <Header big>
+    <HeaderWrapper>
       <Viz />
-      <p
-        className="
-          max-w-140 text-lg/relaxed font-light
-          max-md:text-base
-        "
-      >
+
+      <Title className="text-3xl max-sm:text-xl" />
+
+      <p className="max-w-140 text-lg/relaxed font-light max-md:text-base">
         {import.meta.env.VITE_DESCRIPTION}
       </p>
 
@@ -45,6 +44,6 @@ export default function Title() {
           </Button>
         </Tooltip>
       </div>
-    </Header>
+    </HeaderWrapper>
   );
 }

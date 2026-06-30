@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import Footer from "@/components/Footer";
 import Compare from "./sections/Compare";
+import Header from "./sections/Header";
 import Overview from "./sections/Overview";
 import Prevalence from "./sections/Prevalence";
 import Recipes from "./sections/Recipes";
 import Search from "./sections/Search";
-import Title from "./sections/Title";
 import { loadGeo, loadMeta, loadProjects, loadTaxa } from "./state";
 
 /** ensure only one load */
@@ -25,7 +25,7 @@ export default function Home() {
 
   return (
     <>
-      <Title />
+      <Header />
       <main>
         <Overview />
         <Search />

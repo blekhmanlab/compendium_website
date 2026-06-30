@@ -78,7 +78,7 @@ export default function Table<Datum extends DatumShape>({
               {selectEnabled && (
                 <th>
                   <CheckButton
-                    label={
+                    tooltip={
                       someSelected
                         ? `Deselect ${formatNumber(selected.size)} rows`
                         : `Select ${formatNumber(rows.length)} rows`
@@ -116,7 +116,7 @@ export default function Table<Datum extends DatumShape>({
                   {selectEnabled && (
                     <td>
                       <CheckButton
-                        label={
+                        tooltip={
                           selected.has(row.name) ? "Deselect row" : "Select row"
                         }
                         checked={selected.has(row.name)}

@@ -108,7 +108,7 @@ export default function Overview() {
             >
               <span
                 className={clsx(
-                  `grid size-16 place-items-center rounded-full bg-current/25 *:size-8 *:text-white **:stroke-1`,
+                  "grid size-16 place-items-center rounded-full bg-current/25 *:size-8 *:text-white **:stroke-1",
                   className,
                 )}
               >

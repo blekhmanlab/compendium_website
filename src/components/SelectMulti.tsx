@@ -1,11 +1,11 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { Select } from "@base-ui/react";
 import clsx from "clsx";
 import { startCase, truncate } from "lodash";
 import { CheckIcon, ChevronDownIcon } from "lucide-react";
 
 type Props<Option extends string> = {
-  label: string;
+  label: ReactNode;
   value: Option[];
   onChange: (value: Option[]) => void;
   options: readonly Option[];
@@ -31,7 +31,7 @@ export default function SelectMulti<Option extends string>({
 
   return (
     <label className="inline-flex items-center gap-2">
-      <span className="text-right">{label}</span>
+      <span className="flex items-center gap-1 text-right">{label}</span>
       <Select.Root<Option, true>
         multiple
         value={value}
@@ -56,18 +56,10 @@ export default function SelectMulti<Option extends string>({
             collisionPadding={12}
             className="z-20"
           >
-            <Select.Popup
-              className="
-                flex flex-col rounded-md border border-slate-500 bg-slate-800
-              "
-            >
+            <Select.Popup className="flex flex-col rounded-md border border-slate-500 bg-slate-800">
               <button
                 onClick={toggleSelectAll}
-                className="
-                  flex cursor-pointer items-center justify-center gap-2 p-2
-                  font-medium transition
-                  hover:bg-slate-500/25
-                "
+                className="flex cursor-pointer items-center justify-center gap-2 p-2 font-medium transition hover:bg-slate-500/25"
               >
                 {allSelected ? "Deselect All" : "Select All"}
               </button>
@@ -76,11 +68,7 @@ export default function SelectMulti<Option extends string>({
                   <Select.Item
                     key={index}
                     value={option}
-                    className="
-                      flex cursor-pointer items-center gap-2 p-2 transition
-                      hover:bg-slate-500/25
-                      data-highlighted:bg-slate-500/25
-                    "
+                    className="flex cursor-pointer items-center gap-2 p-2 transition hover:bg-slate-500/25 data-highlighted:bg-slate-500/25"
                   >
                     <span className="inline-flex size-5 items-center justify-center">
                       <Select.ItemIndicator>

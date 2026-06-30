@@ -1,5 +1,7 @@
 import { useEffect } from "react";
+import { HelpCircleIcon } from "lucide-react";
 import Select from "@/components/Select";
+import Tooltip from "@/components/Tooltip";
 import { ordinations, PCs } from "@/pages/projectionist/project";
 import {
   setOrdination,
@@ -38,7 +40,14 @@ export function SelectOrdination() {
 
   return (
     <Select
-      label="Ordination"
+      label={
+        <>
+          Ordination
+          <Tooltip content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. ">
+            <HelpCircleIcon />
+          </Tooltip>
+        </>
+      }
       options={ordinations}
       value={ordination ?? ""}
       onChange={setOrdination}

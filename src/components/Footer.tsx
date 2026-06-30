@@ -5,13 +5,7 @@ import minnesota from "../assets/minnesota.png";
 
 export default function Footer() {
   return (
-    <footer
-      className="
-        flex flex-row justify-between gap-8 bg-linear-to-r from-fuchsia-950
-        to-indigo-950 p-8
-        max-md:flex-col max-md:items-center
-      "
-    >
+    <footer className="flex flex-row justify-between gap-8 bg-linear-to-r from-fuchsia-950 to-indigo-950 p-8 max-md:flex-col max-md:items-center">
       <p>
         A project of the <a href="http://blekhmanlab.org/">Blekhman Lab</a>,{" "}
         <a href="http://greenelab.com/">Greene Lab</a>,{" "}
