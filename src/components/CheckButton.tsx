@@ -1,15 +1,16 @@
+import type { ReactNode } from "react";
 import { CheckIcon } from "lucide-react";
 import Tooltip from "@/components/Tooltip";
 
 type Props = {
-  label: string;
+  tooltip: ReactNode;
   checked: boolean;
   onChange: (checked: boolean) => void;
 };
 
-const CheckButton = ({ label, checked, onChange }: Props) => {
+export default function CheckButton({ tooltip, checked, onChange }: Props) {
   return (
-    <Tooltip content={label}>
+    <Tooltip content={tooltip}>
       <button
         className="size-6 cursor-pointer rounded-md bg-slate-500/25 hover:bg-slate-500/50"
         role="checkbox"
@@ -20,6 +21,4 @@ const CheckButton = ({ label, checked, onChange }: Props) => {
       </button>
     </Tooltip>
   );
-};
-
-export default CheckButton;
+}

@@ -1,3 +1,4 @@
+import { glob } from "fs/promises";
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
@@ -30,6 +31,12 @@ const mainInput = "./downloaded";
 
 /** main data output directory */
 const mainOutput = "../src/pages/home/data";
+
+/** projectionist data input directory */
+const projectionistInput = "./projectionist";
+
+/** projectionist data output directory */
+const projectionistOutput = "../src/pages/projectionist/data";
 
 /** record of downloads, version, and other info */
 export const recordUrl = process.env.VITE_RECORD ?? "";
@@ -498,6 +505,181 @@ const processMainData = async () => {
   console.info(metadata);
 };
 
+/** maximum number of principal components */
+const maxPC = 8;
+
+type PC = `PC${number}`;
+
+/** process projectionist data */
+const processProjectionistData = async () => {
+  console.info("PROCESSING PROJECTIONIST DATA");
+
+  /** collect sample pcs */
+  const samplePCs: Record<
+    /** ordination */
+    string,
+    Record<
+      /** run */
+      string,
+      /** PCs */
+      { region: string; [key: PC]: number }
+    >
+  > = {};
+
+  /** get all sample pc files */
+  const samplePCsFiles = glob(`${projectionistInput}/sample-pcs-*.tsv`);
+
+  for await (const samplePCsFile of samplePCsFiles) {
+    /** ordination from filename */
+    const [, ordination = ""] =
+      samplePCsFile.match(/sample-pcs-(.*).tsv/) ?? [];
+
+    console.info(`Processing sample PCs for ${ordination}`);
+
+    /** stream file line by line */
+    const samplePCsStream = stream(samplePCsFile);
+
+    /** ignore header */
+    await samplePCsStream.next();
+
+    /** process rest of rows (with hard limit) */
+    for (let row = 0; row < 1000000; row++) {
+      /** show progress periodically */
+      if (throttle("sample pcs"))
+        console.info(`Processing sample PCs row ${row}`);
+
+      /** read row */
+      const { value: sampleRow = [], done: sampleDone } =
+        await samplePCsStream.next();
+
+      /** if no more data, exit */
+      if (sampleDone) break;
+
+      /** get cols */
+      let [run = "", region = "", ...PCs] = sampleRow;
+
+      /** split PROJECT_SRR to just SRR */
+      run = run.split("_").pop() || run;
+
+      /** set ordination */
+      samplePCs[ordination] ??= {};
+      /** set run and region */
+      samplePCs[ordination][run] ??= { region };
+      /** set PCs */
+      for (let index = 1; index <= maxPC; index++)
+        samplePCs[ordination][run]![`PC${index}`] = Number(PCs[index - 1]);
+    }
+  }
+
+  /** collect taxon pcs per ordination */
+  const taxonPCs: Record<
+    /** ordination */
+    string,
+    Record<
+      /** taxon */
+      string,
+      /** PCs */
+      { [key: PC]: number }
+    >
+  > = {};
+
+  /** get all taxon pc files */
+  const taxonPCsFiles = glob(`${projectionistInput}/taxon-pcs-*.tsv`);
+
+  for await (const taxonPCsFile of taxonPCsFiles) {
+    /** ordination from filename */
+    const [, ordination = ""] = taxonPCsFile.match(/taxon-pcs-(.*).tsv/) ?? [];
+
+    console.info(`Processing taxon PCs for ${ordination}`);
+
+    /** stream file line by line */
+    const taxonPCsStream = stream(taxonPCsFile);
+
+    /** ignore header */
+    await taxonPCsStream.next();
+
+    /** process rest of rows (with hard limit) */
+    for (let row = 0; row < 1000000; row++) {
+      /** show progress periodically */
+      if (throttle("taxon pcs"))
+        console.info(`Processing taxon PCs row ${row}`);
+
+      /** read row */
+      const { value: taxonRow = [], done: taxonDone } =
+        await taxonPCsStream.next();
+
+      /** if no more data, exit */
+      if (taxonDone) break;
+
+      /** get cols */
+      const [
+        kingdom = "",
+        phylum = "",
+        _class = "",
+        order = "",
+        family = "",
+        ...PCs
+      ] = taxonRow;
+
+      /** stringify taxon info into key */
+      const taxon = [kingdom, phylum, _class, order, family].join("|");
+
+      /** set ordination */
+      taxonPCs[ordination] ??= {};
+      /** set taxon */
+      taxonPCs[ordination][taxon] ??= {};
+      /** set PCs */
+      for (let index = 1; index <= maxPC; index++)
+        taxonPCs[ordination][taxon][`PC${index}`] = Number(PCs[index - 1]);
+    }
+  }
+
+  /** for each ordination, scree information */
+  const scree: Record<
+    string,
+    {
+      explained: Record<string, number>;
+      cumulative: Record<string, number>;
+    }
+  > = {};
+
+  /** stream file line by line */
+  const screeStream = stream(`${projectionistInput}/scree.tsv`);
+
+  /** ignore header */
+  await screeStream.next();
+
+  /** process rest of rows (with hard limit) */
+  for (let row = 0; row < 1000000; row++) {
+    /** show progress periodically */
+    if (throttle("scree")) console.info(`Processing scree row ${row}`);
+
+    /** read row */
+    const { value: screeRow = [], done: screeDone } = await screeStream.next();
+
+    /** if no more data, exit */
+    if (screeDone) break;
+
+    /** get cols */
+    const [axis = "", explained = 0, cumulative = 0, ordination = ""] =
+      screeRow;
+    const pc = `PC${axis}`;
+
+    /** set scree info */
+    scree[ordination] ??= { explained: {}, cumulative: {} };
+    scree[ordination].explained[pc] = Number(explained);
+    scree[ordination].cumulative[pc] = Number(cumulative);
+  }
+
+  /** save results */
+  for (const [ordination, data] of Object.entries(samplePCs))
+    write(`${projectionistOutput}/sample-pcs-${ordination}.json`, data);
+  for (const [ordination, data] of Object.entries(taxonPCs))
+    write(`${projectionistOutput}/taxon-pcs-${ordination}.json`, data);
+  write(`${projectionistOutput}/scree.json`, scree);
+};
+
 /** run */
 await downloadFiles();
 await processMainData();
+await processProjectionistData();

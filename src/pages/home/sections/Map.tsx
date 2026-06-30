@@ -31,7 +31,7 @@ const height = 400;
 const byOptions = ["Country", "Region"] as const;
 type By = (typeof byOptions)[number];
 
-const Map = () => {
+export default function Map() {
   const ref = useRef<SVGSVGElement>(null);
   const outlineRef = useRef<SVGPathElement>(null);
   const graticulesRef = useRef<SVGPathElement>(null);
@@ -294,9 +294,7 @@ const Map = () => {
       </div>
     </div>
   );
-};
-
-export default Map;
+}
 
 /** fit projection to bbox of earth */
 const fitProjection = (projection: GeoProjection) =>

@@ -3,7 +3,7 @@ import type { Col } from "@/components/Table";
 import type { Data } from "@/pages/home/state";
 import type * as SearchAPI from "@/util/search.ts";
 import type { KeysOfType } from "@/util/types";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { capitalize } from "lodash";
 import Select from "@/components/Select";
@@ -30,14 +30,14 @@ type Props = {
 /** fields to search on each list object */
 const fields = ["name", "value"];
 
-const SearchList = ({
+export default function SearchList({
   name,
   list: fullList,
   cols,
   types,
   names,
   onSelect,
-}: Props) => {
+}: Props) {
   /** type filter */
   const [type, setType] = useState<TypesAll[number]>("All");
 
@@ -61,23 +61,23 @@ const SearchList = ({
   }, [fullList, types, type, names]);
 
   /** exact search results */
-  const [exactMatches = [], exactStatus, runExact] = useWorker(
+  const [exactMatches = [], exactStatus] = useWorker(
     SearchWorker,
-    (worker: Remote<typeof SearchAPI>) =>
-      worker.exactSearch(list ?? [], fields, search) as Promise<List>,
+    useCallback(
+      (worker: Remote<typeof SearchAPI>) =>
+        worker.exactSearch(list ?? [], fields, search) as Promise<List>,
+      [list, search],
+    ),
   );
   /** fuzzy search results */
-  const [fuzzyMatches = [], fuzzyStatus, runFuzzy] = useWorker(
+  const [fuzzyMatches = [], fuzzyStatus] = useWorker(
     SearchWorker,
-    (worker: Remote<typeof SearchAPI>) =>
-      worker.fuzzySearch(list ?? [], fields, search) as Promise<List>,
+    useCallback(
+      (worker: Remote<typeof SearchAPI>) =>
+        worker.fuzzySearch(list ?? [], fields, search) as Promise<List>,
+      [list, search],
+    ),
   );
-
-  /** run exact search */
-  useEffect(runExact, [list, search, runExact]);
-
-  /** run fuzzy search */
-  useEffect(runFuzzy, [list, search, runFuzzy]);
 
   /** exact match name quick lookup */
   const exactLookup = useMemo(
@@ -150,6 +150,4 @@ const SearchList = ({
       />
     </>
   );
-};
-
-export default SearchList;
+}

@@ -1,16 +1,17 @@
 import { useEffect } from "react";
 import Footer from "@/components/Footer";
-import Overview from "@/pages/home/sections/Overview";
-import Prevalence from "@/pages/home/sections/Prevalence";
-import Recipes from "@/pages/home/sections/Recipes";
-import Search from "@/pages/home/sections/Search";
-import Title from "@/pages/home/sections/Title";
-import { loadGeo, loadMeta, loadProjects, loadTaxa } from "@/pages/home/state";
+import Compare from "./sections/Compare";
+import Header from "./sections/Header";
+import Overview from "./sections/Overview";
+import Prevalence from "./sections/Prevalence";
+import Recipes from "./sections/Recipes";
+import Search from "./sections/Search";
+import { loadGeo, loadMeta, loadProjects, loadTaxa } from "./state";
 
 /** ensure only one load */
 let loaded = false;
 
-const Home = () => {
+export default function Home() {
   /** load (small-enough) data on page load */
   useEffect(() => {
     if (!loaded) {
@@ -24,16 +25,15 @@ const Home = () => {
 
   return (
     <>
-      <Title />
+      <Header />
       <main>
         <Overview />
         <Search />
         <Prevalence />
+        <Compare />
         <Recipes />
       </main>
       <Footer />
     </>
   );
-};
-
-export default Home;
+}

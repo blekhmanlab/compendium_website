@@ -13,7 +13,7 @@ const size = 1 / 140;
 /** desired spacing of points */
 const spacing = 1 / 30;
 
-const Viz = () => {
+export default function Viz() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const ctx = useRef<CanvasRenderingContext2D | null>(null);
 
@@ -133,12 +133,10 @@ const Viz = () => {
       onClick={() => generate(0)}
     />
   );
-};
+}
 
 /** "oversampling" of canvas */
 const oversample = 2;
-
-export default Viz;
 
 type Particle = {
   position: Point;

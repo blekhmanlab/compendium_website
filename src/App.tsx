@@ -1,18 +1,33 @@
 import "./styles.css";
-import { createBrowserRouter, Outlet, redirect } from "react-router";
+import {
+  createBrowserRouter,
+  Outlet,
+  redirect,
+  ScrollRestoration,
+} from "react-router";
 import { RouterProvider } from "react-router/dom";
 import Home from "@/pages/home/Home";
+import Projectionist from "@/pages/projectionist/Projectionist";
 
 /** app entrypoint */
-const App = () => <RouterProvider router={router} />;
+export default function App() {
+  return <RouterProvider router={router} />;
+}
 
-export default App;
+function Layout() {
+  return (
+    <>
+      <Outlet />
+      <ScrollRestoration />
+    </>
+  );
+}
 
 /** route definitions */
 const routes = [
   {
     path: "/",
-    element: <Outlet />,
+    element: <Layout />,
     children: [
       {
         index: true,
@@ -32,6 +47,10 @@ const routes = [
             return redirect(redirectPath);
           } else return null;
         },
+      },
+      {
+        path: "/projectionist",
+        element: <Projectionist />,
       },
     ],
   },

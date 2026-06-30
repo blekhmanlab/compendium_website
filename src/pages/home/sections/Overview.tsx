@@ -11,7 +11,7 @@ import {
 import { useData } from "@/pages/home/state";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
 
-const Overview = () => {
+export default function Overview() {
   /** get global state */
   const meta = useData((state) => state.meta);
 
@@ -108,7 +108,7 @@ const Overview = () => {
             >
               <span
                 className={clsx(
-                  `grid size-16 place-items-center rounded-full bg-current/25 *:size-8 *:text-white **:stroke-1`,
+                  "grid size-16 place-items-center rounded-full bg-current/25 *:size-8 *:text-white **:stroke-1",
                   className,
                 )}
               >
@@ -133,6 +133,4 @@ const Overview = () => {
       </p>
     </section>
   );
-};
-
-export default Overview;
+}

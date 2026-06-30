@@ -4,14 +4,14 @@ import { max, min, orderBy } from "lodash";
 import Chart from "@/components/Chart";
 import { useData } from "@/pages/home/state";
 import { useLegend } from "@/util/legend";
-import { formatNumber } from "@/util/string";
+import { formatNumber, tooltipTable } from "@/util/string";
 
 type Props = {
   data: Phyla;
 };
 
 /** prevalence of samples at phylum level as bar chart */
-const PhylaChart = ({ data }: Props) => {
+export default function PhylaChart({ data }: Props) {
   type Datum = (typeof data)[number];
 
   /** get global state */
@@ -114,18 +114,4 @@ const PhylaChart = ({ data }: Props) => {
   if (!data) return <div className="placeholder">Loading phyla</div>;
 
   return <Chart option={option} />;
-};
-
-export default PhylaChart;
-
-/** generate tooltip table from entries */
-export const tooltipTable = (entries: Record<string, unknown>) =>
-  [
-    "<dl>",
-    ...Object.entries(entries).flatMap(([key, value]) =>
-      value === null || value === undefined || value === "" || value === false
-        ? []
-        : [`<dt>${key}</dt>`, `<dd>${value}</dd>`],
-    ),
-    "</dl>",
-  ].join("\n");
+}

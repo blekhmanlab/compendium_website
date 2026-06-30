@@ -13,12 +13,12 @@ type Props = {
 };
 
 /** echarts wrapper */
-const Chart = ({
+export default function Chart({
   option,
   init: initOptions = {},
   onZoom,
   className,
-}: Props) => {
+}: Props) {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const chart = useRef<ECharts>(null);
 
@@ -66,12 +66,13 @@ const Chart = ({
   return (
     <div
       ref={setRef}
-      className={clsx("size-full max-h-screen max-w-full resize", className)}
+      className={clsx(
+        "size-full max-h-screen max-w-full resize overflow-hidden",
+        className,
+      )}
     />
   );
-};
-
-export default Chart;
+}
 
 const text = {
   color: "white",
@@ -146,9 +147,9 @@ registerTheme("compendium", {
   },
 
   tooltip: {
-    borderColor: "transparent",
-    backgroundColor: "var(--color-slate-200)",
-    textStyle: { ...text, color: "var(--color-slate-800)" },
+    borderColor: "var(--color-slate-500)",
+    backgroundColor: "var(--color-slate-800)",
+    textStyle: text,
     // eslint-disable-next-line
     formatter: (params: any) => params.data.datum.tooltip,
     // eslint-disable-next-line

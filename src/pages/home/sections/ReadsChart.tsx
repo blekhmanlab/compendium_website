@@ -2,17 +2,16 @@ import type { EChartsOption } from "echarts";
 import type { Reads } from "@/pages/home/data/projects";
 import { max, min } from "lodash";
 import Chart from "@/components/Chart";
-import { tooltipTable } from "@/pages/home/sections/PhylaChart";
 import { useData } from "@/pages/home/state";
 import { getCssVariable } from "@/util/dom";
-import { formatNumber } from "@/util/string";
+import { formatNumber, tooltipTable } from "@/util/string";
 
 type Props = {
   data: Reads;
 };
 
 /** show sample counts vs binned read counts */
-const ReadsChart = ({ data }: Props) => {
+export default function ReadsChart({ data }: Props) {
   type Datum = Reads["histogram"][number];
 
   /** colors */
@@ -99,6 +98,4 @@ const ReadsChart = ({ data }: Props) => {
   if (!data) return <div className="placeholder">Loading reads</div>;
 
   return <Chart option={option} />;
-};
-
-export default ReadsChart;
+}

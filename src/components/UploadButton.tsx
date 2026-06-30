@@ -18,14 +18,14 @@ type Props = {
 } & ComponentProps<typeof Button>;
 
 /** file dialog or drag & drop button */
-const UploadButton = ({
+export default function UploadButton({
   onUpload,
   target,
   accept = [],
   className,
   children,
   ...props
-}: Props) => {
+}: Props) {
   const ref = useRef<HTMLInputElement>(null);
 
   /** filename */
@@ -99,6 +99,4 @@ const UploadButton = ({
       />
     </div>
   );
-};
-
-export default UploadButton;
+}

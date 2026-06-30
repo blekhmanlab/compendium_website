@@ -1,6 +1,5 @@
 import type { Remote } from "comlink";
-import { useCallback, useState } from "react";
-import { useLatest } from "@reactuses/core";
+import { useEffect, useState } from "react";
 import { wrap } from "comlink";
 
 /** run async operation in worker, with status, error handling, de-dupe, etc. */
@@ -15,25 +14,23 @@ export const useWorker = <API, Data>(
     "loading" | "error" | "" | (string & {})
   >("");
 
-  /** stable version of func that doesn't affect react dep arrays */
-  const _func = useLatest(func);
-
   /** run async operation */
-  const run = useCallback(() => {
+  useEffect(() => {
     /** mark this run as latest */
     let latest = true;
 
     /** create new worker thread */
     const worker = new Worker();
     const wrapper = wrap<API>(worker);
+
     (async () => {
       try {
         /** set loading state */
         setStatus("loading");
 
-        /** listen for more status updates from worker */
         /** run async operation in worker thread */
-        const data = await _func.current(wrapper);
+        const data = await func(wrapper);
+
         /** if this is still the latest run */
         if (latest) {
           /** success */
@@ -53,7 +50,7 @@ export const useWorker = <API, Data>(
       /** abort any pending work */
       worker.terminate();
     };
-  }, [Worker, _func]);
+  }, [Worker, func]);
 
-  return [data, status, run] as const;
+  return [data, status] as const;
 };

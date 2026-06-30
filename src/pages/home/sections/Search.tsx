@@ -43,7 +43,7 @@ export const tooltips = {
 /** ensure only one load */
 let loaded = false;
 
-const Search = () => {
+export default function Search() {
   /** get global state */
   const projectSearch = useData((state) => state.projectSearch);
   const geoSearch = useData((state) => state.geoSearch);
@@ -166,6 +166,4 @@ const Search = () => {
       />
     </section>
   );
-};
-
-export default Search;
+}
