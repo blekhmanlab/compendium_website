@@ -63,14 +63,29 @@ export default function Tooltip({
         >
           <Popover.Popup
             className={clsx(
-              "max-h-(--available-height) w-max max-w-[min(var(--available-width),--spacing(100))] overflow-y-auto rounded-md bg-white p-3 leading-relaxed text-dark-gray transition data-closed:opacity-0 data-ending-style:opacity-0 data-open:opacity-100 data-starting-style:opacity-0 [&_a]:text-secondary [&_a]:underline [&_a]:hover:text-primary",
+              "max-h-(--available-height) w-max max-w-[min(var(--available-width),--spacing(100))] overflow-y-auto rounded-md border border-light-gray bg-gray p-4 leading-loose transition trim data-closed:opacity-0 data-ending-style:opacity-0 data-open:opacity-100 data-starting-style:opacity-0",
 
               className,
             )}
           >
-            <Popover.Arrow className="[clip-path:polygon(-100%_-10%,201%_-10%,100%_100%,0_100%)] data-[side=bottom]:bottom-full data-[side=bottom]:rotate-180 data-[side=left]:left-full data-[side=left]:-rotate-90 data-[side=right]:right-full data-[side=right]:rotate-90 data-[side=top]:top-full">
-              <div className="size-2 -translate-y-1/2 rotate-45 bg-white" />
-            </Popover.Arrow>
+            <Popover.Arrow
+              render={(props, { side }) => (
+                <div
+                  {...props}
+                  className={clsx(
+                    "size-3 border border-light-gray bg-gray [clip-path:polygon(0%_0%,100%_0%,100%_100%,0_0%)]",
+                    side === "top" &&
+                      "top-full -translate-y-[calc(50%+1px)] rotate-135",
+                    side === "bottom" &&
+                      "bottom-full translate-y-[calc(50%+1px)] rotate-315",
+                    side === "left" &&
+                      "left-full -translate-x-[calc(50%+1px)] rotate-45",
+                    side === "right" &&
+                      "right-full translate-x-[calc(50%+1px)] rotate-225",
+                  )}
+                />
+              )}
+            />
             {content}
           </Popover.Popup>
         </Popover.Positioner>

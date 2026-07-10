@@ -71,7 +71,7 @@ export default function Table<Datum extends DatumShape>({
 
   return (
     <>
-      <div className="w-full overflow-x-auto">
+      <div className="w-full table-wrapper">
         <table>
           <thead>
             <tr>

@@ -1,4 +1,3 @@
-import { ConeIcon } from "lucide-react";
 import Button from "@/components/Button";
 
 export default function Compare() {
@@ -11,7 +10,6 @@ export default function Compare() {
       </p>
 
       <Button design="accent" to="/projectionist">
-        <ConeIcon />
         Projectionist
       </Button>
     </section>

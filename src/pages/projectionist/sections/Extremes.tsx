@@ -104,22 +104,24 @@ export default function Extremes() {
             )}
           >
             <p>{label}</p>
-            <table className="table-fixed">
-              <thead>
-                <tr>
-                  <th>Taxon</th>
-                  <th className="w-20">{header}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map(({ taxon, PC }, rowIndex) => (
-                  <tr key={rowIndex}>
-                    <td>{taxon.split("|").join(" | ")}</td>
-                    <td>{PC.toFixed(3)}</td>
+            <div className="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Taxon</th>
+                    <th className="w-20">{header}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {data.map(({ taxon, PC }, rowIndex) => (
+                    <tr key={rowIndex}>
+                      <td>{taxon.split("|").join(" | ")}</td>
+                      <td>{PC.toFixed(3)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         ))}
       </div>

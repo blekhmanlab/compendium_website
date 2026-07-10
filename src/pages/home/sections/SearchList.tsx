@@ -143,7 +143,7 @@ export default function SearchList({
           exactStatus !== "loading" &&
           fuzzyStatus !== "loading" &&
           !matches.length
-            ? ["", "No results", ""]
+            ? ["No results"]
             : undefined
         }
         onSelect={onSelect}

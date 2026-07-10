@@ -48,8 +48,8 @@ export default function Map() {
   /** colors */
   const primary = getCssVariable("--color-primary");
   const secondary = getCssVariable("--color-secondary");
+  const lightGray = getCssVariable("--color-light-gray");
   const gray = getCssVariable("--color-gray");
-  const darkGray = getCssVariable("--color-dark-gray");
 
   /** unset selected feature when clicking off map */
   useEventListener(
@@ -75,7 +75,7 @@ export default function Map() {
   /** color scale */
   const scale = scaleLog<string>()
     .domain([1, max])
-    .range(selectedFeature ? [darkGray, gray] : [gray, primary])
+    .range(selectedFeature ? [gray, lightGray] : [lightGray, primary])
     .interpolate(interpolateLab);
 
   const { projection, baseScale } = useMemo(() => {
@@ -231,7 +231,7 @@ export default function Map() {
         viewBox={[0, 0, width, height].join(" ")}
         className="w-full stroke-[0.5]"
       >
-        <g className="fill-none stroke-gray/50">
+        <g className="fill-none stroke-light-gray">
           <path ref={outlineRef} />
           <path ref={graticulesRef} />
         </g>

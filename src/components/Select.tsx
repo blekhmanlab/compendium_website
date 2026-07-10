@@ -21,7 +21,7 @@ export default function Select<Option extends string>({
       <span className="flex items-center gap-1 text-right">{label}</span>
       <span className="relative">
         <select
-          className="min-w-20 cursor-pointer appearance-none rounded-md bg-gray/25 p-2 pr-8 transition hover:bg-gray/50"
+          className="min-w-20 cursor-pointer appearance-none rounded-md bg-gray p-2 pr-8 transition hover:bg-light-gray"
           {...props}
           value={value}
           onChange={(event) => onChange(event.target.value as Option)}

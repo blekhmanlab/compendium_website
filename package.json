@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
+    "@fontsource-variable/mona-sans": "^5.2.8",
     "@reactuses/core": "^6.3.2",
     "clsx": "^2.1.1",
     "comlink": "^4.4.2",
@@ -25,9 +26,9 @@
     "lodash": "^4.18.1",
     "lucide-react": "^1.17.0",
     "poisson-disk-sampling": "^2.3.1",
+    "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router": "^7.17.0",
-    "react": "^19.2.7",
     "tailwindcss": "^4.3.0",
     "tippy.js": "^6.3.7",
     "udsv": "^0.7.3",
