@@ -1,5 +1,6 @@
 import type MetaType from "./meta.json";
 import type { Zenodo } from "../../../../compile/types/zenodo-api";
+import { site } from "@/site";
 import { request } from "@/util/async";
 import metaUrl from "./meta.json?url";
 
@@ -9,12 +10,10 @@ export type Meta = typeof MetaType;
 /** metadata (pre-computed) */
 export const getMeta = async () => await request<Meta>(metaUrl);
 
-/** record of downloads, version, and other info */
-export const recordUrl = import.meta.env.VITE_RECORD ?? "";
-
 /** live metadata (from zenodo api) */
 export const getLiveMeta = async () => {
-  const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
+  const record = (await request<Zenodo>(site.humanMicrobiomeCompendium.record))
+    .hits.hits[0];
   if (!record) throw Error("No hits");
   return {
     /** recalc any line from compile script that involves "record" */

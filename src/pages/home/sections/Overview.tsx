@@ -9,6 +9,7 @@ import {
   TableIcon,
 } from "lucide-react";
 import { useData } from "@/pages/home/state";
+import { site } from "@/site";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
 
 export default function Overview() {
@@ -125,7 +126,7 @@ export default function Overview() {
       <p>
         This website lets you <b>search</b> and <b>explore</b> the data at a
         high level before downloading.{" "}
-        <a href={import.meta.env.VITE_R_PACKAGE}>
+        <a href={site.humanMicrobiomeCompendium.rPackage}>
           <PackageIcon />
           Use the R package
         </a>{" "}

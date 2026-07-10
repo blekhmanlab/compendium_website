@@ -86,6 +86,8 @@ export default function Upload() {
               content={
                 <>
                   Read counts, per sample (row) and taxa (column).
+                  <br />
+                  <br />
                   <table className="**:border">
                     <thead>
                       <tr>
@@ -159,6 +161,8 @@ export default function Upload() {
               content={
                 <>
                   Taxa ranks for each column in reads table.
+                  <br />
+                  <br />
                   <table className="**:border">
                     <thead>
                       <tr>
@@ -229,6 +233,8 @@ export default function Upload() {
               content={
                 <>
                   Arbitrary metadata for each sample in reads table.
+                  <br />
+                  <br />
                   <table className="**:border">
                     <thead>
                       <tr>

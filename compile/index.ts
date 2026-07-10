@@ -17,6 +17,7 @@ import {
   throttle,
   write,
 } from "./util";
+import { site } from "../src/site";
 
 /**
  * pre-compile step that takes the "raw" distributed data (csv/tsv), and pares
@@ -38,9 +39,6 @@ const projectionistInput = "./projectionist";
 /** projectionist data output directory */
 const projectionistOutput = "../src/pages/projectionist/data";
 
-/** record of downloads, version, and other info */
-export const recordUrl = process.env.VITE_RECORD ?? "";
-
 /** local record file */
 const recordFile = `${mainInput}/record.json`;
 
@@ -57,7 +55,8 @@ const countryToRegionFile = "./extra/country-to-region.json";
 const downloadFiles = async () => {
   console.info("DOWNLOADING FILES");
 
-  const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
+  const record = (await request<Zenodo>(site.humanMicrobiomeCompendium.record))
+    .hits.hits[0];
   if (!record) throw Error("No hits");
   write(recordFile, record);
   console.info("Downloading raw data");

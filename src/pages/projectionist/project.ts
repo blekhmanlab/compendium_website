@@ -54,8 +54,6 @@ export const parseUserReads = async (text: string) => {
 export const parseUserTaxa = async (text: string) => {
   console.debug("Parsing");
 
-  console.log({ text });
-
   /** parse data */
   const parser = initParser(inferSchema(text));
   const data = parser.stringArrs(text);

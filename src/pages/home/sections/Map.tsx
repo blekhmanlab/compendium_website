@@ -48,8 +48,8 @@ export default function Map() {
   /** colors */
   const primary = getCssVariable("--color-primary");
   const secondary = getCssVariable("--color-secondary");
-  const gray = getCssVariable("--color-slate-500");
-  const darkGray = getCssVariable("--color-slate-700");
+  const gray = getCssVariable("--color-gray");
+  const darkGray = getCssVariable("--color-dark-gray");
 
   /** unset selected feature when clicking off map */
   useEventListener(
@@ -231,7 +231,7 @@ export default function Map() {
         viewBox={[0, 0, width, height].join(" ")}
         className="w-full stroke-[0.5]"
       >
-        <g className="fill-none stroke-slate-500/50">
+        <g className="fill-none stroke-gray/50">
           <path ref={outlineRef} />
           <path ref={graticulesRef} />
         </g>

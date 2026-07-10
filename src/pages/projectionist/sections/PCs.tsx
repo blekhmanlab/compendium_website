@@ -78,7 +78,7 @@ export default function PCs() {
   }, [samples, samplePCs, regions]);
 
   /** color legend */
-  const [entry, legend] = useLegend();
+  const [entry, legend] = useLegend(2);
 
   /** data for compendium plot */
   const compendiumPlot = useMemo(() => {

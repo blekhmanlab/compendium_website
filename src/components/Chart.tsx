@@ -126,10 +126,12 @@ registerTheme("compendium", {
 
   bar: {
     itemStyle: {},
+    emphasis: { itemStyle: { opacity: 0.5 } },
   },
   scatter: {
     symbolSize: 1,
     itemStyle: {},
+    emphasis: { itemStyle: { opacity: 0.5 } },
   },
 
   markLine: {
@@ -147,8 +149,8 @@ registerTheme("compendium", {
   },
 
   tooltip: {
-    borderColor: "var(--color-slate-500)",
-    backgroundColor: "var(--color-slate-800)",
+    borderColor: "var(--color-gray)",
+    backgroundColor: "var(--color-dark-gray)",
     textStyle: text,
     // eslint-disable-next-line
     formatter: (params: any) => params.data.datum.tooltip,

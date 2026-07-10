@@ -10,9 +10,9 @@ type Props = {
 
 export default function CheckButton({ tooltip, checked, onChange }: Props) {
   return (
-    <Tooltip content={tooltip}>
+    <Tooltip content={tooltip} button>
       <button
-        className="size-6 cursor-pointer rounded-md bg-slate-500/25 hover:bg-slate-500/50"
+        className="size-6 cursor-pointer rounded-md bg-gray/25 hover:bg-gray/50"
         role="checkbox"
         aria-checked={checked ? "true" : "false"}
         onClick={() => onChange(!checked)}

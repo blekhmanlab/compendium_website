@@ -1,5 +1,6 @@
 import { LightbulbIcon, PackageIcon } from "lucide-react";
 import Button from "@/components/Button";
+import { site } from "@/site";
 
 const recipes = [
   {
@@ -35,7 +36,7 @@ export default function Recipes() {
 
       <p>
         Some of the things you can do with{" "}
-        <a href={import.meta.env.VITE_R_PACKAGE}>
+        <a href={site.humanMicrobiomeCompendium.rPackage}>
           <PackageIcon />
           the R package
         </a>
@@ -47,7 +48,9 @@ export default function Recipes() {
           <Button
             key={index}
             to={
-              import.meta.env.VITE_R_PACKAGE + "articles/overview.html#" + link
+              site.humanMicrobiomeCompendium.rPackage +
+              "articles/overview.html#" +
+              link
             }
             className="justify-start"
           >

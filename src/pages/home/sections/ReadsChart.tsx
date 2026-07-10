@@ -43,7 +43,7 @@ export default function ReadsChart({ data }: Props) {
     series: [
       {
         type: "bar",
-        barWidth: "100%",
+        barWidth: "200%",
         data: histogram.map((datum) => ({
           value: [datum.mid, getSamples(datum)],
           tooltip: tooltipTable({
