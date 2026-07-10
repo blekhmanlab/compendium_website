@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import Logo from "@/assets/logo.svg?react";
+import { site } from "@/site";
 
 export default function Title({ className = "" }) {
   return (
@@ -12,7 +13,7 @@ export default function Title({ className = "" }) {
     >
       <Logo className="min-h-full" />
       <div className="h-full w-0.5 bg-white" />
-      <h1 className="-my-2">{import.meta.env.VITE_TITLE}</h1>
+      <h1 className="-my-2">{site.humanMicrobiomeCompendium.title}</h1>
     </a>
   );
 }

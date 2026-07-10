@@ -5,7 +5,7 @@ import minnesota from "../assets/minnesota.png";
 
 export default function Footer() {
   return (
-    <footer className="flex flex-row justify-between gap-8 bg-linear-to-r from-fuchsia-950 to-indigo-950 p-8 max-md:flex-col max-md:items-center">
+    <footer className="relative isolate flex flex-row justify-between gap-8 bg-linear-to-r from-primary-dark to-secondary-dark p-8 max-md:flex-col max-md:items-center">
       <p>
         A project of the <a href="http://blekhmanlab.org/">Blekhman Lab</a>,{" "}
         <a href="http://greenelab.com/">Greene Lab</a>,{" "}
@@ -14,10 +14,7 @@ export default function Footer() {
       </p>
 
       <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-        <Tooltip
-          content="University of Chicago | Section of Genetic Medicine"
-          button={false}
-        >
+        <Tooltip content="University of Chicago | Section of Genetic Medicine">
           <a href="https://medicine.uchicago.edu/sections/genetic-medicine/">
             <img
               src={chicago}
@@ -26,10 +23,7 @@ export default function Footer() {
             />
           </a>
         </Tooltip>
-        <Tooltip
-          content="University of Colorado | Department of Biomedical Informatics"
-          button={false}
-        >
+        <Tooltip content="University of Colorado | Department of Biomedical Informatics">
           <a href="https://medschool.cuanschutz.edu/dbmi">
             <img
               src={colorado}
@@ -38,10 +32,7 @@ export default function Footer() {
             />
           </a>
         </Tooltip>
-        <Tooltip
-          content="University of Minnesota | Department of Genetics, Cell Biology, and Development"
-          button={false}
-        >
+        <Tooltip content="University of Minnesota | Department of Genetics, Cell Biology, and Development">
           <a href="https://cbs.umn.edu/gcd">
             <img
               src={minnesota}

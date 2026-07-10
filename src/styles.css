@@ -5,8 +5,23 @@
   --breakpoint-md: 55rem;
   --breakpoint-lg: 70rem;
 
-  --color-primary: theme(colors.fuchsia.500);
-  --color-secondary: theme(colors.indigo.500);
+  --color-*: initial;
+
+  --primary-hue: 340;
+  --secondary-hue: 300;
+
+  --color-primary: oklch(65% 0.3 var(--primary-hue));
+  --color-primary-light: oklch(90% 0.2 var(--primary-hue));
+  --color-primary-dark: oklch(30% 0.1 var(--primary-hue));
+  --color-secondary: oklch(50% 0.3 var(--secondary-hue));
+  --color-secondary-light: oklch(90% 0.2 var(--secondary-hue));
+  --color-secondary-dark: oklch(30% 0.1 var(--secondary-hue));
+
+  --color-black: oklch(0% 0 var(--secondary-hue));
+  --color-light-gray: oklch(85% 0.05 var(--secondary-hue));
+  --color-gray: oklch(50% 0.05 var(--secondary-hue));
+  --color-dark-gray: oklch(25% 0.05 var(--secondary-hue));
+  --color-white: oklch(100% 0 var(--secondary-hue));
 
   --font-sans: "Mona Sans", sans-serif;
 }
@@ -21,7 +36,7 @@
 
 @layer base {
   html {
-    @apply bg-slate-900 font-sans text-[110%] leading-normal font-light text-white underline-offset-2;
+    @apply bg-black font-sans text-[110%] leading-normal font-light text-white underline-offset-2;
   }
 
   body {
@@ -37,7 +52,7 @@
   }
 
   section {
-    @apply width-md flex flex-col items-center gap-12 bg-linear-to-r p-(--pad) px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] [--pad:--spacing(12)] last:grow odd:from-slate-500/20 odd:to-slate-500/0 even:from-slate-500/30 even:to-slate-500/10 max-md:[--pad:--spacing(8)];
+    @apply width-md odd:from-dark-gray odd:to-dark-gray/75 even:from-dark-gray/75 even:to-dark-gray flex flex-col items-center gap-12 bg-linear-to-r p-(--pad) px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
   }
 
   h2 {
@@ -54,7 +69,7 @@
   }
 
   a {
-    @apply text-indigo-200 underline transition hover:text-fuchsia-200;
+    @apply text-secondary-light hover:text-primary-light underline transition;
   }
 
   table {
@@ -62,7 +77,7 @@
   }
 
   th {
-    @apply bg-slate-500/25;
+    @apply bg-gray/25;
   }
 
   th,
@@ -71,7 +86,7 @@
   }
 
   tr {
-    @apply even:bg-slate-500/10;
+    @apply even:bg-gray/10;
   }
 
   dl {
@@ -97,5 +112,5 @@
 }
 
 @utility placeholder {
-  @apply flex aspect-square w-full items-center justify-center gap-4 rounded-md bg-slate-500/10 p-2;
+  @apply bg-gray/10 flex aspect-square w-full items-center justify-center gap-4 rounded-md p-2;
 }

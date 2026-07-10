@@ -18,9 +18,9 @@ export default function Button({
   className = clsx(
     "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full text-inherit no-underline transition",
     design === "regular" &&
-      "border border-slate-500/50 px-4 py-2 hover:bg-slate-500/50 aria-selected:bg-slate-500/50",
+      "border border-gray/50 px-4 py-2 hover:bg-gray/50 aria-selected:bg-gray/50",
     design === "accent" &&
-      "bg-slate-500/25 bg-linear-to-r px-4 py-2 text-lg hover:scale-105 hover:from-fuchsia-600 hover:to-indigo-600",
+      "bg-gray/25 bg-linear-to-r px-4 py-2 text-lg hover:scale-105 hover:from-primary hover:to-secondary",
     className,
   );
 

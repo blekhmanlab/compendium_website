@@ -165,7 +165,7 @@ const getParticles = async () => {
 
   const primary = getCssVariable("--color-primary");
   const secondary = getCssVariable("--color-secondary");
-  const gray = getCssVariable("--color-slate-500");
+  const gray = getCssVariable("--color-gray");
 
   /** get bounding box of svg */
   const [left = 0, top = 0, width = 100, height = 100] = (
