@@ -65,7 +65,7 @@
   }
 
   p {
-    @apply max-w-200 text-center leading-loose text-balance;
+    @apply max-w-175 text-center leading-loose text-balance;
   }
 
   a {
