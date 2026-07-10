@@ -24,8 +24,32 @@ export function SelectPCs() {
 
   return (
     <>
-      <Select label="X-axis" options={PCs} value={PCX} onChange={setPCX} />
-      <Select label="Y-axis" options={PCs} value={PCY} onChange={setPCY} />
+      <Select
+        label={
+          <>
+            X-axis
+            <Tooltip content="Which principal component to plot on the X-axis.">
+              <HelpCircleIcon />
+            </Tooltip>
+          </>
+        }
+        options={PCs}
+        value={PCX}
+        onChange={setPCX}
+      />
+      <Select
+        label={
+          <>
+            Y-axis
+            <Tooltip content="Which principal component to plot on the Y-axis.">
+              <HelpCircleIcon />
+            </Tooltip>
+          </>
+        }
+        options={PCs}
+        value={PCY}
+        onChange={setPCY}
+      />
     </>
   );
 }
@@ -43,7 +67,7 @@ export function SelectOrdination() {
       label={
         <>
           Ordination
-          <Tooltip content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. ">
+          <Tooltip content="Which subset of geographic region loadings to use in projection.">
             <HelpCircleIcon />
           </Tooltip>
         </>

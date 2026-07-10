@@ -13,9 +13,7 @@ export default function Header() {
 
       <Title className="text-3xl max-sm:text-xl" />
 
-      <p className="max-w-140 text-lg/relaxed font-light max-md:text-base">
-        {site.humanMicrobiomeCompendium.description}
-      </p>
+      <p className="text-lg">{site.humanMicrobiomeCompendium.description}</p>
 
       <div className="flex flex-wrap items-center justify-center gap-4">
         <Tooltip content="Learn more about the methods and significance behind this project.">

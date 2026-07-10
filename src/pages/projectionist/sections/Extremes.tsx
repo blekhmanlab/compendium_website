@@ -83,10 +83,8 @@ export default function Extremes() {
       <h2>Taxon Extremes</h2>
 
       <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat.
+        Which taxa contribute the most to the selected principal components and
+        ordination, corresponding to the edge-most points on the PC plot.
       </p>
 
       <div className="flex flex-wrap items-center justify-center gap-8">

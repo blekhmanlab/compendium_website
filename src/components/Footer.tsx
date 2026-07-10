@@ -6,7 +6,7 @@ import minnesota from "../assets/minnesota.png";
 export default function Footer() {
   return (
     <footer className="relative isolate flex flex-row justify-between gap-8 bg-linear-to-r from-primary-dark to-secondary-dark p-8 max-md:flex-col max-md:items-center">
-      <p>
+      <p className="max-w-[unset]">
         A project of the <a href="http://blekhmanlab.org/">Blekhman Lab</a>,{" "}
         <a href="http://greenelab.com/">Greene Lab</a>,{" "}
         <a href="https://seandavi.github.io/">Davis Lab</a>, and{" "}

@@ -172,10 +172,8 @@ export default function PCs() {
       <h2>Principal Components</h2>
 
       <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat.
+        See your and our samples projected into the same principal component
+        space.
       </p>
 
       <div className="flex flex-wrap items-center justify-center gap-8">
@@ -185,7 +183,7 @@ export default function PCs() {
           label={
             <>
               Regions
-              <Tooltip content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. ">
+              <Tooltip content="Show samples tagged as being from these geographic regions.">
                 <HelpCircleIcon />
               </Tooltip>
             </>

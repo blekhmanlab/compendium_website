@@ -232,7 +232,8 @@ export default function Upload() {
             <Tooltip
               content={
                 <>
-                  Arbitrary metadata for each sample in reads table.
+                  Arbitrary metadata for each sample in reads table, to help
+                  contextualize results.
                   <div className="mt-2 table-wrapper border-light-gray">
                     <table>
                       <thead>

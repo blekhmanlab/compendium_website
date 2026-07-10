@@ -7,14 +7,13 @@ export default function Header() {
       <div className="flex flex-wrap gap-8">
         <Title />
 
-        <h2 className="w-fit p-0 font-light">Projectionist</h2>
+        <h2>Projectionist</h2>
       </div>
 
-      <p className="max-w-2xl">
-        Compare your data to our Compendium. Lorem ipsum dolor sit amet,
-        consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-        et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-        exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      <p>
+        Compare your data to ours and discover meaningful insights. Upload your
+        16S taxonomic read and classification tables and see how they're
+        distributed relative to Compendium data.
       </p>
     </HeaderWrapper>
   );
