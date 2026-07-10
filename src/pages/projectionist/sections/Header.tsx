@@ -1,4 +1,3 @@
-import { ConeIcon } from "lucide-react";
 import HeaderWrapper from "@/components/Header";
 import Title from "@/components/Title";
 
@@ -8,10 +7,7 @@ export default function Header() {
       <div className="flex flex-wrap gap-8">
         <Title />
 
-        <h2 className="justify-end font-light">
-          <ConeIcon />
-          Projectionist
-        </h2>
+        <h2 className="w-fit p-0 font-light">Projectionist</h2>
       </div>
 
       <p className="max-w-2xl">

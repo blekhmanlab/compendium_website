@@ -86,38 +86,38 @@ export default function Upload() {
               content={
                 <>
                   Read counts, per sample (row) and taxa (column).
-                  <br />
-                  <br />
-                  <table className="**:border">
-                    <thead>
-                      <tr>
-                        <th>sample</th>
-                        <th>taxa1</th>
-                        <th>taxa2</th>
-                        <th>…</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>sample1</td>
-                        <td>123</td>
-                        <td>456</td>
-                        <td>…</td>
-                      </tr>
-                      <tr>
-                        <td>sample2</td>
-                        <td>789</td>
-                        <td>0</td>
-                        <td>…</td>
-                      </tr>
-                      <tr>
-                        <td>…</td>
-                        <td>…</td>
-                        <td>…</td>
-                        <td>…</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <div className="mt-2 table-wrapper border-light-gray">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>sample</th>
+                          <th>taxa1</th>
+                          <th>taxa2</th>
+                          <th>…</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>sample1</td>
+                          <td>123</td>
+                          <td>456</td>
+                          <td>…</td>
+                        </tr>
+                        <tr>
+                          <td>sample2</td>
+                          <td>789</td>
+                          <td>0</td>
+                          <td>…</td>
+                        </tr>
+                        <tr>
+                          <td>…</td>
+                          <td>…</td>
+                          <td>…</td>
+                          <td>…</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </>
               }
             >
@@ -161,38 +161,38 @@ export default function Upload() {
               content={
                 <>
                   Taxa ranks for each column in reads table.
-                  <br />
-                  <br />
-                  <table className="**:border">
-                    <thead>
-                      <tr>
-                        <th>col id</th>
-                        <th>kingdom</th>
-                        <th>phylum</th>
-                        <th>…</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>col1</td>
-                        <td>Bacteria</td>
-                        <td>Bacillota</td>
-                        <td>…</td>
-                      </tr>
-                      <tr>
-                        <td>col2</td>
-                        <td>Archaea</td>
-                        <td>Methan…</td>
-                        <td>…</td>
-                      </tr>
-                      <tr>
-                        <td>…</td>
-                        <td>…</td>
-                        <td>…</td>
-                        <td>…</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <div className="mt-2 table-wrapper border-light-gray">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>col id</th>
+                          <th>kingdom</th>
+                          <th>phylum</th>
+                          <th>…</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>col1</td>
+                          <td>Bacteria</td>
+                          <td>Bacillota</td>
+                          <td>…</td>
+                        </tr>
+                        <tr>
+                          <td>col2</td>
+                          <td>Archaea</td>
+                          <td>Methan…</td>
+                          <td>…</td>
+                        </tr>
+                        <tr>
+                          <td>…</td>
+                          <td>…</td>
+                          <td>…</td>
+                          <td>…</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </>
               }
             >
@@ -233,38 +233,38 @@ export default function Upload() {
               content={
                 <>
                   Arbitrary metadata for each sample in reads table.
-                  <br />
-                  <br />
-                  <table className="**:border">
-                    <thead>
-                      <tr>
-                        <th>sample</th>
-                        <th>color</th>
-                        <th>tag</th>
-                        <th>…</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>sample1</td>
-                        <td>red</td>
-                        <td>simple</td>
-                        <td>…</td>
-                      </tr>
-                      <tr>
-                        <td>sample2</td>
-                        <td>green</td>
-                        <td>complex</td>
-                        <td>…</td>
-                      </tr>
-                      <tr>
-                        <td>…</td>
-                        <td>…</td>
-                        <td>…</td>
-                        <td>…</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <div className="mt-2 table-wrapper border-light-gray">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>sample</th>
+                          <th>color</th>
+                          <th>tag</th>
+                          <th>…</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>sample1</td>
+                          <td>red</td>
+                          <td>simple</td>
+                          <td>…</td>
+                        </tr>
+                        <tr>
+                          <td>sample2</td>
+                          <td>green</td>
+                          <td>complex</td>
+                          <td>…</td>
+                        </tr>
+                        <tr>
+                          <td>…</td>
+                          <td>…</td>
+                          <td>…</td>
+                          <td>…</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </>
               }
             >

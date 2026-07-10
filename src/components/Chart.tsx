@@ -149,8 +149,8 @@ registerTheme("compendium", {
   },
 
   tooltip: {
-    borderColor: "var(--color-gray)",
-    backgroundColor: "var(--color-dark-gray)",
+    borderColor: "var(--color-light-gray)",
+    backgroundColor: "var(--color-gray)",
     textStyle: text,
     // eslint-disable-next-line
     formatter: (params: any) => params.data.datum.tooltip,

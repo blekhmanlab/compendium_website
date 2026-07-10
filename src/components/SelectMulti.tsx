@@ -40,8 +40,8 @@ export default function SelectMulti<Option extends string>({
         <Select.Trigger
           className={clsx(
             "flex min-w-20 cursor-pointer appearance-none items-center gap-2",
-            "rounded-md bg-gray/25 p-2 transition",
-            "hover:bg-gray/50",
+            "rounded-md bg-gray p-2 transition",
+            "hover:bg-light-gray",
             className,
           )}
         >
@@ -52,15 +52,14 @@ export default function SelectMulti<Option extends string>({
           <Select.Positioner
             side="bottom"
             align="start"
-            sideOffset={4}
             collisionPadding={12}
             className="z-20"
             alignItemWithTrigger={false}
           >
-            <Select.Popup className="flex flex-col rounded-md border border-gray bg-dark-gray">
+            <Select.Popup className="flex flex-col rounded-md border border-light-gray bg-gray">
               <button
                 onClick={toggleSelectAll}
-                className="flex cursor-pointer items-center justify-center gap-2 p-2 font-medium transition hover:bg-gray/25"
+                className="flex cursor-pointer items-center justify-center gap-2 p-2 font-medium transition hover:bg-light-gray"
               >
                 {allSelected ? "Deselect All" : "Select All"}
               </button>
@@ -69,7 +68,7 @@ export default function SelectMulti<Option extends string>({
                   <Select.Item
                     key={index}
                     value={option}
-                    className="flex cursor-pointer items-center gap-2 p-2 transition hover:bg-gray/25 data-highlighted:bg-gray/25"
+                    className="flex cursor-pointer items-center gap-2 p-2 transition hover:bg-light-gray data-highlighted:bg-light-gray"
                   >
                     <span className="inline-flex size-5 items-center justify-center">
                       <Select.ItemIndicator>

@@ -9,6 +9,7 @@
 
   --primary-hue: 340;
   --secondary-hue: 300;
+  --gray-hue: 280;
 
   --color-primary: oklch(65% 0.3 var(--primary-hue));
   --color-primary-light: oklch(90% 0.2 var(--primary-hue));
@@ -17,21 +18,15 @@
   --color-secondary-light: oklch(90% 0.2 var(--secondary-hue));
   --color-secondary-dark: oklch(30% 0.1 var(--secondary-hue));
 
-  --color-black: oklch(0% 0 var(--secondary-hue));
-  --color-light-gray: oklch(85% 0.05 var(--secondary-hue));
-  --color-gray: oklch(50% 0.05 var(--secondary-hue));
-  --color-dark-gray: oklch(25% 0.05 var(--secondary-hue));
-  --color-white: oklch(100% 0 var(--secondary-hue));
+  --color-black: oklch(0% 0.05 var(--gray-hue));
+  --color-dark-gray: oklch(25% 0.05 var(--gray-hue));
+  --color-gray: oklch(35% 0.05 var(--gray-hue));
+  --color-light-gray: oklch(50% 0.05 var(--gray-hue));
+  --color-white: oklch(100% 0.05 var(--gray-hue));
 
-  --font-sans: "Mona Sans", sans-serif;
-}
+  --font-sans: "Mona Sans Variable", sans-serif;
 
-@font-face {
-  font-weight: 200 900;
-  src: url("@/assets/MonaSans.woff2") format("woff2");
-  font-stretch: 75% 125%;
-  font-family: "Mona Sans";
-  font-display: swap;
+  --shadow-overlay: 0 0 0 9999px oklch(0% 0.05 var(--gray-hue) / 25%);
 }
 
 @layer base {
@@ -52,11 +47,16 @@
   }
 
   section {
-    @apply width-md odd:from-dark-gray odd:to-dark-gray/75 even:from-dark-gray/75 even:to-dark-gray flex flex-col items-center gap-12 bg-linear-to-r p-(--pad) px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
+    @apply width-md even:bg-dark-gray/90 odd:bg-dark-gray flex flex-col items-center gap-12 p-(--pad) px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
   }
 
   h2 {
-    @apply flex items-center gap-4 text-center text-2xl leading-normal font-light tracking-widest uppercase;
+    @apply flex items-center text-center text-2xl leading-normal font-light tracking-widest uppercase;
+  }
+
+  hr {
+    @apply h-4 w-full border-none opacity-10;
+    background-image: url("@/assets/squiggle.svg");
   }
 
   b,
@@ -73,20 +73,24 @@
   }
 
   table {
-    @apply w-full border-collapse text-left;
-  }
-
-  th {
-    @apply bg-gray/25;
+    @apply w-full border-collapse rounded-md text-left;
   }
 
   th,
   td {
-    @apply px-4 py-1 align-middle!;
+    @apply trim p-2;
   }
 
-  tr {
-    @apply even:bg-gray/10;
+  thead tr {
+    @apply bg-gray;
+  }
+
+  tbody tr {
+    @apply border-gray bg-dark-gray not-first:border-t;
+
+    td {
+      @apply border-gray not-first:border-l;
+    }
   }
 
   dl {
@@ -112,5 +116,13 @@
 }
 
 @utility placeholder {
-  @apply bg-gray/10 flex aspect-square w-full items-center justify-center gap-4 rounded-md p-2;
+  @apply bg-gray flex aspect-square w-full items-center justify-center gap-4 rounded-md p-2;
+}
+
+@utility table-wrapper {
+  @apply border-gray overflow-x-auto rounded-md border;
+}
+
+@utility trim {
+  text-box: trim-both text;
 }

@@ -23,7 +23,7 @@ export default function Textbox({
     <div className={clsx("relative flex", className)}>
       {multi ? (
         <textarea
-          className="grow rounded-md bg-gray/25 px-4 py-2 pr-10 text-inherit transition hover:bg-gray/50"
+          className="grow rounded-md bg-gray p-2 pr-10 text-inherit transition trim hover:bg-light-gray"
           {...(props as ComponentProps<"textarea">)}
           value={value}
           onChange={(event) => onChange(event.target.value)}
@@ -36,7 +36,7 @@ export default function Textbox({
       ) : (
         <input
           type="text"
-          className="grow rounded-md bg-gray/25 px-4 py-2 pr-10 transition hover:bg-gray/50"
+          className="grow rounded-md bg-gray p-2 pr-10 transition hover:bg-light-gray"
           {...(props as ComponentProps<"input">)}
           value={value}
           onChange={(event) => onChange(event.target.value)}

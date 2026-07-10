@@ -57,20 +57,14 @@ export default function Viz() {
     );
 
     /** draw particles */
-    for (const {
-      position,
-      size,
-      color,
-      alpha,
-      spinAngle,
-      spinRadius,
-    } of particles) {
-      ctx.current.globalAlpha = alpha;
+    for (const { position, size, color, alpha, spin, strength } of particles) {
+      const radius = size * (10 * strength);
+      ctx.current.globalAlpha = alpha + strength;
       ctx.current.fillStyle = color;
       ctx.current.beginPath();
       ctx.current.arc(
-        position.x + sin(t / 3 + spinAngle) * spinRadius,
-        position.y + cos(t / 3 + spinAngle) * spinRadius,
+        position.x + sin(t / 3 + spin) * radius,
+        position.y + cos(t / 3 + spin) * radius,
         size,
         0,
         Math.PI * 2,
@@ -122,7 +116,7 @@ export default function Viz() {
     for (const particle of particles) {
       /** strength of effect, closer -> higher */
       const strength = 1000 ** -dist(particle.position, mouse);
-      gsap.to(particle, { spinRadius: size + size * (20 * strength) });
+      gsap.to(particle, { strength });
     }
   });
 
@@ -144,8 +138,8 @@ type Particle = {
   size: number;
   alpha: number;
   color: string;
-  spinAngle: number;
-  spinRadius: number;
+  spin: number;
+  strength: number;
 };
 
 /** generate particles */
@@ -164,8 +158,6 @@ const getParticles = async () => {
   }));
 
   const primary = getCssVariable("--color-primary");
-  const secondary = getCssVariable("--color-secondary");
-  const gray = getCssVariable("--color-gray");
 
   /** get bounding box of svg */
   const [left = 0, top = 0, width = 100, height = 100] = (
@@ -181,7 +173,7 @@ const getParticles = async () => {
   const points: Point[] = new PoissonDiskSampling({
     shape: [width, height],
     minDistance: side * spacing,
-    maxDistance: side * spacing * 1.01,
+    maxDistance: side * spacing * 1.02,
     tries: 10,
   })
     .fill()
@@ -217,10 +209,10 @@ const getParticles = async () => {
     position: { x: point.x * 2, y: point.y * 2 },
     destination: point,
     size,
-    color: gray,
+    color: primary,
     alpha: 0,
-    spinAngle: random(360),
-    spinRadius: size,
+    spin: random(360),
+    strength: 0,
   }));
 
   /** animate each particle */
@@ -238,14 +230,8 @@ const getParticles = async () => {
     /** animate alpha */
     gsap
       .timeline()
-      .to(particle, { alpha: 1, duration: duration * 0.5, delay, ease })
-      .to(particle, { alpha: 0.35, duration: duration * 0.5, ease });
-    /** animate color */
-    gsap
-      .timeline({ repeat: -1, yoyo: true, delay: particle.destination.x })
-      .to(particle, { color: gray, duration: duration * 0.5, ease })
-      .to(particle, { color: primary, duration: duration * 0.5, ease })
-      .to(particle, { color: secondary, duration: duration * 0.5, ease });
+      .to(particle, { alpha: 0.5, duration: duration, delay, ease })
+      .to(particle, { alpha: 0.25, duration: duration, ease });
   }
 
   return particles;

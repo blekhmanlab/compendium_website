@@ -1,3 +1,4 @@
+import "@fontsource-variable/mona-sans/wght.css";
 import "./styles.css";
 import {
   createBrowserRouter,
