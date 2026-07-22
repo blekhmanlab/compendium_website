@@ -7,7 +7,7 @@ export default function Header() {
       <div className="flex flex-wrap gap-8">
         <Title />
 
-        <h2>Projectionist</h2>
+        <h2 className="font-medium">Projectionist</h2>
       </div>
 
       <p>

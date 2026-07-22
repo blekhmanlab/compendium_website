@@ -54,7 +54,7 @@ export default function Chart({
   }, [ref, initOptions, onZoom]);
 
   /** auto-fit */
-  const resize = useDebounceFn(() => chart.current?.resize(), 300);
+  const resize = useDebounceFn(() => chart.current?.resize(), 100);
   useResizeObserver(ref, resize.run);
 
   /** update chart options */

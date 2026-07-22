@@ -3,7 +3,12 @@ import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useCallback, useRef, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { size } from "lodash";
-import { HelpCircleIcon, LightbulbIcon } from "lucide-react";
+import {
+  CircleAlertIcon,
+  HelpCircleIcon,
+  LightbulbIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
 import Button from "@/components/Button";
 import Textbox from "@/components/Textbox";
 import Tooltip from "@/components/Tooltip";
@@ -73,6 +78,24 @@ export default function Upload() {
   const reads = useData((state) => state.userReads);
   const taxa = useData((state) => state.userTaxa);
   const meta = useData((state) => state.userMeta);
+
+  /** validate data */
+  const warn: string[] = [];
+  const error: string[] = [];
+
+  /** sample missing taxa */
+  reads?.taxa?.forEach((taxon, index) => {
+    const sample = reads?.samples?.[index] ?? index;
+    if (!taxa?.find((t) => t.id === taxon))
+      error.push(`No matching taxa for sample "${sample}"`);
+  });
+
+  /** sample missing meta */
+  reads?.samples?.forEach((sample) => {
+    if (!meta?.[sample]) warn.push(`No matching meta for sample "${sample}"`);
+  });
+
+  const messages = warn.length + error.length > 0;
 
   return (
     <section className="width-lg">
@@ -311,6 +334,29 @@ export default function Upload() {
         <LightbulbIcon />
         Example
       </Button>
+
+      {messages && (
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(--spacing(60),1fr))] gap-4 self-stretch">
+          {error.map((msg, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-2 rounded-md bg-error/10 p-2"
+            >
+              <TriangleAlertIcon className="text-error" />
+              {msg}
+            </div>
+          ))}
+          {warn.map((msg, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-2 rounded-md bg-warn/10 p-2"
+            >
+              <CircleAlertIcon className="text-warn" />
+              {msg}
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

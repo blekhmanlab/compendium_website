@@ -10,9 +10,9 @@ export const useWorker = <API, Data>(
   /** data returned from async operation */
   const [data, setData] = useState<Data>();
   /** status of async operation */
-  const [status, setStatus] = useState<
-    "loading" | "error" | "" | (string & {})
-  >("");
+  const [status, setStatus] = useState<"loading" | "error" | "">("");
+  /** status message */
+  const [message, setMessage] = useState<string>("");
 
   /** run async operation */
   useEffect(() => {
@@ -36,10 +36,14 @@ export const useWorker = <API, Data>(
           /** success */
           setData(data);
           setStatus("");
+          setMessage("");
         }
       } catch (error) {
         /** if this is still the latest run, update error status */
-        if (latest) setStatus("error");
+        if (latest) {
+          setStatus("error");
+          setMessage(String((error as Error).message));
+        }
       }
     })();
 
@@ -52,5 +56,5 @@ export const useWorker = <API, Data>(
     };
   }, [Worker, func]);
 
-  return [data, status] as const;
+  return [data, status, message] as const;
 };

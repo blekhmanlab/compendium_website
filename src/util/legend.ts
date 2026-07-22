@@ -13,7 +13,7 @@ const colors = [
   formatHex("oklch(65% 0.3 20)"),
 ];
 
-const neutral = getCssVariable("--color-gray");
+const neutral = getCssVariable("--color-light-gray");
 
 /** re-create built-in echarts shapes */
 export const shapePaths: Record<string, string> = {

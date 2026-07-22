@@ -24,6 +24,11 @@
   --color-light-gray: oklch(50% 0.05 var(--gray-hue));
   --color-white: oklch(100% 0.05 var(--gray-hue));
 
+  --color-success: oklch(75% 0.3 160);
+  --color-info: oklch(75% 0.3 240);
+  --color-warn: oklch(75% 0.3 80);
+  --color-error: oklch(75% 0.3 30);
+
   --font-sans: "Mona Sans Variable", sans-serif;
 
   --shadow-overlay: 0 0 0 9999px oklch(0% 0.05 var(--gray-hue) / 25%);
