@@ -6,6 +6,7 @@ import type { KeysOfType } from "@/util/types";
 import { useCallback, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { capitalize } from "lodash";
+import Alert from "@/components/Alert";
 import Select from "@/components/Select";
 import Table from "@/components/Table";
 import Textbox from "@/components/Textbox";
@@ -87,7 +88,9 @@ export default function SearchList({
 
   if (!list)
     return (
-      <div className="placeholder aspect-3/2">Loading {name.toLowerCase()}</div>
+      <Alert type="loading" className="aspect-3/1 w-full">
+        Loading {name.toLowerCase()}
+      </Alert>
     );
 
   /** full list of matches */

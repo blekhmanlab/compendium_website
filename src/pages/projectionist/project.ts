@@ -1,7 +1,6 @@
 import type { TaxonPCs } from "@/pages/projectionist/data/taxon-pcs";
 import { expose } from "comlink";
 import { groupBy, random, range, sum, uniq } from "lodash";
-import { inferSchema, initParser } from "udsv";
 
 /** max read count to rarify down to */
 const maxReads = 3000;
@@ -29,36 +28,36 @@ export type UserProjected = Awaited<ReturnType<typeof projectUserData>>;
 
 /** parse user uploaded reads */
 export const parseUserReads = async (text: string) => {
-  console.debug("Parsing");
+  message("Parsing");
 
-  /** parse data */
-  const schema = inferSchema(text);
-  const parser = initParser(inferSchema(text));
-  const data = parser.typedArrs<(string | number)[]>(text);
+  /** parse raw data */
+  const data = parseTsv(text);
 
-  /** sample names (first col) */
-  const samples = data.map((row) => String(row.shift()));
+  /** sample names (col = 1, row > 1) */
+  const samples = data.slice(1).map((col) => col[0] ?? "");
 
-  /** taxa ids (first row col names) */
-  const taxa = schema.cols.map((col) => col.name);
-  /** ignore first col */
-  taxa.shift();
+  /** taxa ids (row = 1, col > 1) */
+  const taxa = data[0]?.slice(1) ?? [];
 
-  /** read counts (> rows 1) */
-  const reads = data.map((row) => row.map(Number));
+  /** read counts (row > 1, col > 1) */
+  const reads = data
+    .slice(1)
+    .map((col) => col.slice(1).map((value) => Number(value) || 0));
 
   return { taxa, samples, reads };
 };
 
 /** parse user uploaded tabular taxa data */
 export const parseUserTaxa = async (text: string) => {
-  console.debug("Parsing");
+  message("Parsing");
 
-  /** parse data */
-  const parser = initParser(inferSchema(text));
-  const data = parser.stringArrs(text);
+  /** parse raw data */
+  const data = parseTsv(text);
 
-  return data.map(
+  console.log(data);
+
+  /** parse taxon ranks in order */
+  const ranks = data.map(
     ([
       id = "",
       kingdom = "",
@@ -69,17 +68,28 @@ export const parseUserTaxa = async (text: string) => {
       genus = "",
     ]) => ({ id, kingdom, phylum, _class, order, family, genus }),
   );
+
+  return ranks;
 };
 
 type Meta = { sample: string; [key: string]: string | number };
 
 /** parse user uploaded tabular data (see example-meta.txt) */
 export const parseUserMeta = (text: string) => {
-  /** parse data */
-  const schema = inferSchema(text);
-  const parser = initParser(schema);
-  const data = parser.typedObjs<Meta>(text);
-  return Object.fromEntries(data.map(({ sample, ...row }) => [sample, row]));
+  message("Parsing");
+
+  /** parse raw data */
+  const data = parseTsv(text);
+
+  /** convert to objects */
+  const objects = toObjects<Meta>(data);
+
+  /** map of sample to meta */
+  const map = Object.fromEntries(
+    objects.rows.map(({ sample, ...row }) => [sample, row]),
+  );
+
+  return map;
 };
 
 /** project user data against compendium data */
@@ -88,25 +98,21 @@ export const projectUserData = async (
   userTaxa: UserTaxa,
   taxonPCs: TaxonPCs,
 ) => {
-  console.debug("Loading taxa");
+  message("Loading taxa");
 
   let taxa = userReads.taxa.map((taxon) => {
     /** use id to look up full taxon ranks */
     const full = userTaxa.find((t) => t.id === taxon);
-    if (!full) throw Error(`${taxon} not found in user taxa`);
+    if (!full) throw Error(`Full taxon "${taxon}" not found in user taxa`);
     /** extract ranks, drop genus to consolidate at family level */
     const { kingdom, phylum, _class, order, family } = full;
-    /** combine ranks */
-    const ranks = [kingdom, phylum, _class, order, family];
-    if (ranks.some((rank) => rank === undefined))
-      throw Error(`Taxon ${taxon} missing rank`);
     /** stringify taxon */
-    return ranks.join("|");
+    return [kingdom, phylum, _class, order, family].join("|");
   });
   const samples = userReads.samples;
   let reads = userReads.reads;
 
-  console.debug("Consolidating taxa");
+  message("Consolidating taxa");
 
   /** group together col indices that are same taxon */
   const groups: number[][] = Object.values(
@@ -116,7 +122,7 @@ export const projectUserData = async (
   /** consolidate taxa */
   taxa = uniq(taxa);
 
-  console.debug("Consolidating reads");
+  message("Consolidating reads");
 
   /** consolidate reads */
   reads = reads.map((row) =>
@@ -131,7 +137,7 @@ export const projectUserData = async (
     ),
   );
 
-  console.debug("Rarifying reads");
+  message("Rarifying reads");
 
   /** rarify reads */
   for (const counts of reads) {
@@ -148,7 +154,8 @@ export const projectUserData = async (
         cumulative += count;
         return cumulative > randomRead;
       });
-      if (counts[index] === undefined) throw Error("undefined");
+      if (counts[index] === undefined)
+        throw Error("Read remove index out of bounds");
       /** remove read from sample */
       counts[index] = counts[index] - 1;
       /** update total */
@@ -156,7 +163,7 @@ export const projectUserData = async (
     }
   }
 
-  console.debug("rCLR transforming reads");
+  message("rCLR transforming reads");
 
   /** "robust centered log-ratio transformation" */
   for (const counts of reads) {
@@ -178,7 +185,7 @@ export const projectUserData = async (
   /** projected principal components for each sample */
   const projected: { [key: PC]: number }[] = [];
 
-  console.debug("Projecting samples");
+  message("Projecting samples");
 
   samples.forEach((sample, sampleIndex) => {
     /** principal components for this sample */
@@ -209,15 +216,47 @@ export const projectUserData = async (
 
   return Object.fromEntries(
     projected.map((PCs, index) => {
-      if (samples[index] === undefined) throw Error("undefined");
+      if (samples[index] === undefined)
+        throw Error("Sample index out of bounds");
       return [samples[index], PCs];
     }),
   );
 };
+
+/** simple csv/tsv parser */
+const parseTsv = (text: string) => {
+  const delimiter = text.includes("\t") ? "\t" : ",";
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.split(delimiter))
+    .filter((row) => row.length > 1 && row.some((cell) => cell.trim()));
+};
+
+/** convert parsed csv/tsv to objects */
+const toObjects = <Type>(data: string[][]) => {
+  const [cols = [], ...rows] = data;
+  return {
+    cols,
+    rows: rows.map(
+      (row) =>
+        Object.fromEntries(
+          row.map((cell, index) => [cols[index] ?? "", cell]),
+        ) as Type & Record<string, string>,
+    ),
+  };
+};
+
+/** send message to main thread */
+const message = (message: string) => onMessage?.(message);
+/** callback to send messages to main thread */
+let onMessage: (message: string) => void;
+/** receive proxy callback from main thread */
+const setOnMessage = (callback: typeof onMessage) => (onMessage = callback);
 
 expose({
   parseUserReads,
   parseUserTaxa,
   parseUserMeta,
   projectUserData,
+  setOnMessage,
 });

@@ -3,12 +3,8 @@ import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useCallback, useRef, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { size } from "lodash";
-import {
-  CircleAlertIcon,
-  HelpCircleIcon,
-  LightbulbIcon,
-  TriangleAlertIcon,
-} from "lucide-react";
+import { HelpCircleIcon, LightbulbIcon } from "lucide-react";
+import { Alerts } from "@/components/Alert";
 import Button from "@/components/Button";
 import Textbox from "@/components/Textbox";
 import Tooltip from "@/components/Tooltip";
@@ -75,27 +71,29 @@ export default function Upload() {
   );
 
   /** get outputs of parsing */
-  const reads = useData((state) => state.userReads);
-  const taxa = useData((state) => state.userTaxa);
-  const meta = useData((state) => state.userMeta);
+  const userReads = useData((state) => state.userReads);
+  const userTaxa = useData((state) => state.userTaxa);
+  const userMeta = useData((state) => state.userMeta);
+
+  /** get compendium data */
+  const taxonPCs = useData((state) => state.taxonPCs);
 
   /** validate data */
   const warn: string[] = [];
   const error: string[] = [];
 
   /** sample missing taxa */
-  reads?.taxa?.forEach((taxon, index) => {
-    const sample = reads?.samples?.[index] ?? index;
-    if (!taxa?.find((t) => t.id === taxon))
+  userReads?.taxa?.forEach((taxon, index) => {
+    const sample = userReads?.samples?.[index] ?? index;
+    if (!userTaxa?.find((t) => t.id === taxon))
       error.push(`No matching taxa for sample "${sample}"`);
   });
 
   /** sample missing meta */
-  reads?.samples?.forEach((sample) => {
-    if (!meta?.[sample]) warn.push(`No matching meta for sample "${sample}"`);
+  userReads?.samples?.forEach((sample) => {
+    if (!userMeta?.[sample])
+      warn.push(`No matching meta for sample "${sample}"`);
   });
-
-  const messages = warn.length + error.length > 0;
 
   return (
     <section className="width-lg">
@@ -170,8 +168,8 @@ export default function Upload() {
               <>{dataStatus}</>
             ) : (
               <>
-                <div>{formatNumber(size(reads?.samples))} samples</div>
-                <div>{formatNumber(size(reads?.taxa))} taxa</div>
+                <div>{formatNumber(size(userReads?.samples))} samples</div>
+                <div>{formatNumber(size(userReads?.taxa))} taxa</div>
               </>
             )}
           </div>
@@ -244,7 +242,7 @@ export default function Upload() {
             {taxaStatus ? (
               <>{taxaStatus}</>
             ) : (
-              <>{formatNumber(size(taxa))} taxa</>
+              <>{formatNumber(size(userTaxa))} taxa</>
             )}
           </div>
         </div>
@@ -317,7 +315,7 @@ export default function Upload() {
             {metaStatus ? (
               <>{metaStatus}</>
             ) : (
-              <div>{formatNumber(size(meta))} samples</div>
+              <div>{formatNumber(size(userMeta))} samples</div>
             )}
           </div>
         </div>
@@ -335,28 +333,7 @@ export default function Upload() {
         Example
       </Button>
 
-      {messages && (
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(--spacing(60),1fr))] gap-4 self-stretch">
-          {error.map((msg, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-2 rounded-md bg-error/10 p-2"
-            >
-              <TriangleAlertIcon className="text-error" />
-              {msg}
-            </div>
-          ))}
-          {warn.map((msg, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-2 rounded-md bg-warn/10 p-2"
-            >
-              <CircleAlertIcon className="text-warn" />
-              {msg}
-            </div>
-          ))}
-        </div>
-      )}
+      <Alerts warn={warn} error={error} />
     </section>
   );
 }

@@ -15,6 +15,7 @@ import {
   zoomIdentity,
 } from "d3";
 import { clamp } from "lodash";
+import Alert from "@/components/Alert";
 import Select from "@/components/Select";
 import Tooltip from "@/components/Tooltip";
 import { setSelectedFeature, useData } from "@/pages/home/state";
@@ -193,7 +194,11 @@ export default function Map() {
     .scaleExtent([baseScale, baseScale * 10]);
 
   if (!countries || !regions)
-    return <div className="placeholder aspect-3/2">Loading map</div>;
+    return (
+      <Alert type="loading" className="aspect-3/2 w-full">
+        Loading map
+      </Alert>
+    );
 
   return (
     <div className="flex flex-col items-center gap-4">

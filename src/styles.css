@@ -120,10 +120,6 @@
   --width: 300;
 }
 
-@utility placeholder {
-  @apply bg-gray flex aspect-square w-full items-center justify-center gap-4 rounded-md p-2;
-}
-
 @utility table-wrapper {
   @apply border-gray overflow-x-auto rounded-md border;
 }

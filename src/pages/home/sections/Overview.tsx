@@ -8,6 +8,7 @@ import {
   PackageIcon,
   TableIcon,
 } from "lucide-react";
+import Alert from "@/components/Alert";
 import { useData } from "@/pages/home/state";
 import { site } from "@/site";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
@@ -100,7 +101,13 @@ export default function Overview() {
         processed using the same pipeline and reference database.
       </p>
 
-      {meta ? (
+      {!meta && (
+        <Alert type="loading" className="aspect-3/1 w-full">
+          Loading metadata
+        </Alert>
+      )}
+
+      {!!meta && (
         <div className="grid grid-cols-3 gap-10 max-md:grid-cols-2 max-sm:grid-cols-1">
           {tiles.map(({ className, icon, text }, index) => (
             <div
@@ -119,8 +126,6 @@ export default function Overview() {
             </div>
           ))}
         </div>
-      ) : (
-        <div className="placeholder aspect-3/2">Loading metadata</div>
       )}
 
       <p>

@@ -1,9 +1,13 @@
 import type { Remote } from "comlink";
 import { useEffect, useState } from "react";
-import { wrap } from "comlink";
+import { proxy, wrap } from "comlink";
+
+type APIShape = Record<PropertyKey, unknown> & {
+  setOnMessage?: (func: (message: string) => void) => void;
+};
 
 /** run async operation in worker, with status, error handling, de-dupe, etc. */
-export const useWorker = <API, Data>(
+export const useWorker = <API extends APIShape, Data>(
   Worker: new () => Worker,
   func: (worker: Remote<API>) => Promise<Data>,
 ) => {
@@ -28,11 +32,20 @@ export const useWorker = <API, Data>(
         /** set loading state */
         setStatus("loading");
 
+        /** set message from worker */
+        if (typeof wrapper.setOnMessage === "function")
+          await wrapper.setOnMessage(
+            proxy((message) => {
+              if (latest) setMessage(message);
+            }),
+          );
+
         /** run async operation in worker thread */
         const data = await func(wrapper);
 
         /** if this is still the latest run */
         if (latest) {
+          latest = false;
           /** success */
           setData(data);
           setStatus("");
@@ -41,6 +54,7 @@ export const useWorker = <API, Data>(
       } catch (error) {
         /** if this is still the latest run, update error status */
         if (latest) {
+          latest = false;
           setStatus("error");
           setMessage(String((error as Error).message));
         }

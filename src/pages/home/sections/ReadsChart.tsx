@@ -1,6 +1,7 @@
 import type { EChartsOption } from "echarts";
 import type { Reads } from "@/pages/home/data/projects";
 import { max, min } from "lodash";
+import Alert from "@/components/Alert";
 import Chart from "@/components/Chart";
 import { useData } from "@/pages/home/state";
 import { getCssVariable } from "@/util/dom";
@@ -95,7 +96,12 @@ export default function ReadsChart({ data }: Props) {
     tooltip: { trigger: "item" },
   };
 
-  if (!data) return <div className="placeholder">Loading reads</div>;
+  if (!data)
+    return (
+      <Alert type="loading" className="size-full">
+        Loading reads
+      </Alert>
+    );
 
   return <Chart option={option} />;
 }

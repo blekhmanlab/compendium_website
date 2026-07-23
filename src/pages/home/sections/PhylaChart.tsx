@@ -1,6 +1,7 @@
 import type { EChartsOption } from "echarts";
 import type { Phyla } from "@/pages/home/data/taxa";
 import { max, min, orderBy } from "lodash";
+import Alert from "@/components/Alert";
 import Chart from "@/components/Chart";
 import { useData } from "@/pages/home/state";
 import { useLegend } from "@/util/legend";
@@ -111,7 +112,12 @@ export default function PhylaChart({ data }: Props) {
     tooltip: { trigger: "item" },
   };
 
-  if (!data) return <div className="placeholder">Loading phyla</div>;
+  if (!data)
+    return (
+      <Alert type="loading" className="size-full">
+        Loading phyla
+      </Alert>
+    );
 
   return <Chart option={option} />;
 }

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { groupBy, pick, uniq } from "lodash";
 import { HelpCircleIcon } from "lucide-react";
+import { Alerts } from "@/components/Alert";
 import Select from "@/components/Select";
 import SelectMulti from "@/components/SelectMulti";
 import Tooltip from "@/components/Tooltip";
@@ -95,7 +96,7 @@ export default function PCs() {
   }, [filteredSamplePCs, PCX, PCY, entry]);
 
   /** project user input data */
-  const [, projectStatus] = useWorker(
+  const [, projectStatus, projectMessage] = useWorker(
     ProjectionistWorker,
     useCallback(
       async (worker: Remote<typeof ProjectionistAPI>) => {
@@ -210,18 +211,21 @@ export default function PCs() {
         )}
       </div>
 
+      <Alerts
+        loading={[
+          compendiumPlot === undefined && "Loading compendium data",
+          projectStatus === "loading" &&
+            (projectMessage || "Projecting your data"),
+        ]}
+        error={[
+          projectStatus === "error" &&
+            (projectMessage || "Error projecting your data"),
+        ]}
+      />
+
       <div className="flex w-full flex-col items-center gap-8">
         <PCChart
           title={userPlot ? "Compendium vs. Yours" : "Compendium"}
-          subtitle={
-            compendiumPlot === undefined
-              ? "Loading compendium data"
-              : projectStatus === "loading"
-                ? "Projecting your data"
-                : projectStatus === "error"
-                  ? "Error projecting your data"
-                  : ""
-          }
           xLabel={PCX ?? ""}
           yLabel={PCY ?? ""}
           series={series}
