@@ -55,16 +55,20 @@ export const parseUserTaxa = async (text: string) => {
   const data = parseTsv(text);
 
   /** parse taxon ranks in order */
-  const ranks = data.map(
-    ([
-      id = "",
-      kingdom = "",
-      phylum = "",
-      _class = "",
-      order = "",
-      family = "",
-      genus = "",
-    ]) => ({ id, kingdom, phylum, _class, order, family, genus }),
+  const ranks = Object.fromEntries(
+    data
+      .slice(1)
+      .map(
+        ([
+          id = "",
+          kingdom = "",
+          phylum = "",
+          _class = "",
+          order = "",
+          family = "",
+          genus = "",
+        ]) => [id, { kingdom, phylum, _class, order, family, genus }],
+      ),
   );
 
   return ranks;
@@ -98,15 +102,18 @@ export const projectUserData = async (
 ) => {
   message("Loading taxa");
 
-  let taxa = userReads.taxa.map((taxon) => {
-    /** use id to look up full taxon ranks */
-    const full = userTaxa.find((t) => t.id === taxon);
-    if (!full) throw Error(`Full taxon not found in user taxa: ${taxon}`);
-    /** extract ranks, drop genus to consolidate at family level */
-    const { kingdom, phylum, _class, order, family } = full;
-    /** stringify taxon */
-    return [kingdom, phylum, _class, order, family].join("|");
-  });
+  let taxa = userReads.taxa
+    .map((taxon) => {
+      /** use id to look up full taxon ranks */
+      const full = userTaxa[taxon];
+      if (!full) throw Error(`Full taxon not found in user taxa: ${taxon}`);
+      /** extract ranks, drop genus to consolidate at family level */
+      const { kingdom, phylum, _class, order, family } = full;
+      /** stringify taxon */
+      return [kingdom, phylum, _class, order, family].join("|");
+    })
+    /** remove taxa not in compendium */
+    .filter((taxon) => taxonPCs[taxon] !== undefined);
   const samples = userReads.samples;
   let reads = userReads.reads;
 
@@ -199,10 +206,8 @@ export const projectUserData = async (
           if (user === undefined) throw Error(`User PC undefined: ${debug}`);
           /** compendium pc */
           const compendium = taxonPCs[taxon]?.[PC];
-          if (compendium === undefined) {
-            console.warn(`Compendium PC undefined: ${debug}`);
-            return 0;
-          }
+          if (compendium === undefined)
+            throw Error(`Compendium PC undefined: ${debug}`);
           return user * compendium;
         }),
       );

@@ -2,9 +2,10 @@ import type { Remote } from "comlink";
 import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useCallback, useRef, useState } from "react";
 import { useDebounce } from "@reactuses/core";
+import clsx from "clsx";
 import { size } from "lodash";
 import { HelpCircleIcon, LightbulbIcon } from "lucide-react";
-import { Alerts } from "@/components/Alert";
+import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import Textbox from "@/components/Textbox";
 import Tooltip from "@/components/Tooltip";
@@ -75,22 +76,37 @@ export default function Upload() {
   const userTaxa = useData((state) => state.userTaxa);
   const userMeta = useData((state) => state.userMeta);
 
-  /** validate user's data for consistency with itself */
-  const warn: string[] = [];
-  const error: string[] = [];
+  /** get compendium data */
+  const taxonPCs = useData((state) => state.taxonPCs);
 
-  /** sample missing taxa */
-  userReads?.taxa?.forEach((taxon, index) => {
-    const sample = userReads?.samples?.[index] ?? index;
-    if (!userTaxa?.find((t) => t.id === taxon))
-      error.push(`No matching taxa for sample "${sample}"`);
-  });
+  /** find taxa in user reads that have no match in user taxa */
+  const missingInTaxa = userReads?.taxa
+    ?.map((taxon, index) => {
+      const sample = userReads?.samples?.[index] ?? index;
+      if (!userTaxa?.[taxon]) return String(sample);
+    })
+    .filter((taxon) => taxon !== undefined);
 
-  /** sample missing meta */
-  userReads?.samples?.forEach((sample) => {
-    if (!userMeta?.[sample])
-      warn.push(`No matching meta for sample "${sample}"`);
-  });
+  /** find samples in user reads that have no match in user meta */
+  const missingInMeta = userReads?.samples
+    ?.map((sample) => {
+      if (!userMeta?.[sample]) return sample;
+    })
+    .filter((sample) => sample !== undefined);
+
+  /** find user taxa that have no match in compendium taxa */
+  const missingInCompendium = Object.entries(userTaxa ?? {})
+    .map(([taxon, { kingdom, phylum, _class, order, family }]) => {
+      const full = [kingdom, phylum, _class, order, family].join("|");
+      if (!taxonPCs?.[full]) return taxon;
+    })
+    .filter((taxon) => taxon !== undefined);
+
+  /** are there any alerts to show */
+  const alerts =
+    (missingInTaxa?.length ? 1 : 0) +
+    (missingInMeta?.length ? 1 : 0) +
+    (missingInCompendium?.length ? 1 : 0);
 
   return (
     <section className="width-lg">
@@ -330,7 +346,43 @@ export default function Upload() {
         Example
       </Button>
 
-      <Alerts warn={warn} error={error} />
+      {!!alerts && (
+        <div
+          className={clsx(
+            "grid gap-4",
+            alerts === 3 && "grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1",
+            alerts === 2 && "grid-cols-2 max-sm:grid-cols-1",
+            alerts === 1 && "grid-cols-1",
+          )}
+        >
+          {!!missingInTaxa?.length && (
+            <Alert type="error">
+              {formatNumber(missingInTaxa?.length)} taxa in reads have no match
+              in taxa:
+              <br />
+              {missingInTaxa?.join(", ")}
+            </Alert>
+          )}
+
+          {!!missingInMeta?.length && (
+            <Alert type="warn">
+              {formatNumber(missingInMeta?.length)} sample(s) in reads have no
+              match in meta:
+              <br />
+              {missingInMeta?.join(", ")}
+            </Alert>
+          )}
+
+          {!!missingInCompendium?.length && (
+            <Alert type="error">
+              {formatNumber(missingInCompendium?.length)} taxa have no match in
+              compendium:
+              <br />
+              {missingInCompendium?.join(", ")}
+            </Alert>
+          )}
+        </div>
+      )}
     </section>
   );
 }

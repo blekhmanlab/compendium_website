@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { groupBy, pick, uniq } from "lodash";
 import { HelpCircleIcon } from "lucide-react";
-import { Alerts } from "@/components/Alert";
+import Alert from "@/components/Alert";
 import Select from "@/components/Select";
 import SelectMulti from "@/components/SelectMulti";
 import Tooltip from "@/components/Tooltip";
@@ -168,10 +168,6 @@ export default function PCs() {
     return max;
   }, [series]);
 
-  /** validate user data against compendium data */
-  const warn: string[] = [];
-  const error: string[] = [];
-
   return (
     <section className="width-lg">
       <h2>Principal Components</h2>
@@ -215,17 +211,15 @@ export default function PCs() {
         )}
       </div>
 
-      <Alerts
-        loading={[
-          compendiumPlot === undefined && "Loading compendium data",
-          projectStatus === "loading" &&
-            (projectMessage || "Projecting your data"),
-        ]}
-        error={[
-          projectStatus === "error" &&
-            (projectMessage || "Error projecting your data"),
-        ]}
-      />
+      {compendiumPlot === undefined ? (
+        <Alert type="loading">Loading compendium data</Alert>
+      ) : projectStatus === "loading" ? (
+        <Alert type="loading">{projectMessage || "Projecting your data"}</Alert>
+      ) : projectStatus === "error" ? (
+        <Alert type="error">
+          {projectMessage || "Error projecting your data"}
+        </Alert>
+      ) : null}
 
       <div className="flex w-full flex-col items-center gap-8">
         <PCChart

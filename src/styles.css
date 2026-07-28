@@ -36,7 +36,7 @@
 
 @layer base {
   html {
-    @apply bg-black font-sans text-[110%] leading-normal font-light text-white underline-offset-2;
+    @apply bg-black font-sans text-[110%] leading-relaxed font-light text-white underline-offset-2;
   }
 
   body {
@@ -56,7 +56,7 @@
   }
 
   h2 {
-    @apply flex items-center text-center text-2xl leading-normal font-light tracking-widest uppercase;
+    @apply flex items-center text-center text-2xl leading-relaxed font-light tracking-widest uppercase;
   }
 
   hr {
