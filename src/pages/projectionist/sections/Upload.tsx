@@ -75,10 +75,7 @@ export default function Upload() {
   const userTaxa = useData((state) => state.userTaxa);
   const userMeta = useData((state) => state.userMeta);
 
-  /** get compendium data */
-  const taxonPCs = useData((state) => state.taxonPCs);
-
-  /** validate data */
+  /** validate user's data for consistency with itself */
   const warn: string[] = [];
   const error: string[] = [];
 

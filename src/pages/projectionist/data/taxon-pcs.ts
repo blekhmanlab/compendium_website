@@ -13,7 +13,7 @@ const taxonPCsUrls = mapKeys(
 );
 
 /** compendium principal component pcs per taxon */
-export type TaxonPCs = Record<string, { [key: PC]: number }>;
+export type TaxonPCs = Record<string, Record<PC, number>>;
 
 /** get taxon pcs */
 export const getTaxonPCs = (ordination: string) =>

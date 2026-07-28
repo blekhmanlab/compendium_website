@@ -13,7 +13,7 @@ const samplePCsUrls = mapKeys(
 );
 
 /** compendium principal component pcs per sample */
-export type SamplePCs = Record<string, { region: string; [key: PC]: number }>;
+export type SamplePCs = Record<string, { region: string } & Record<PC, number>>;
 
 /** get sample pcs */
 export const getSamplePCs = (ordination: string) =>

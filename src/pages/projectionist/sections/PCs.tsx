@@ -168,6 +168,10 @@ export default function PCs() {
     return max;
   }, [series]);
 
+  /** validate user data against compendium data */
+  const warn: string[] = [];
+  const error: string[] = [];
+
   return (
     <section className="width-lg">
       <h2>Principal Components</h2>

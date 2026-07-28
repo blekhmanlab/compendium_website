@@ -54,8 +54,6 @@ export const parseUserTaxa = async (text: string) => {
   /** parse raw data */
   const data = parseTsv(text);
 
-  console.log(data);
-
   /** parse taxon ranks in order */
   const ranks = data.map(
     ([
@@ -72,7 +70,7 @@ export const parseUserTaxa = async (text: string) => {
   return ranks;
 };
 
-type Meta = { sample: string; [key: string]: string | number };
+type Meta = { sample: string } & Record<string, string | number>;
 
 /** parse user uploaded tabular data (see example-meta.txt) */
 export const parseUserMeta = (text: string) => {
@@ -103,7 +101,7 @@ export const projectUserData = async (
   let taxa = userReads.taxa.map((taxon) => {
     /** use id to look up full taxon ranks */
     const full = userTaxa.find((t) => t.id === taxon);
-    if (!full) throw Error(`Full taxon "${taxon}" not found in user taxa`);
+    if (!full) throw Error(`Full taxon not found in user taxa: ${taxon}`);
     /** extract ranks, drop genus to consolidate at family level */
     const { kingdom, phylum, _class, order, family } = full;
     /** stringify taxon */
@@ -130,7 +128,7 @@ export const projectUserData = async (
       sum(
         group.map((col) => {
           if (row[col] === undefined)
-            throw Error(`Col ${col} row ${row} undefined`);
+            throw Error(`Read undefined: col ${col}, row ${row}`);
           return row[col];
         }),
       ),
@@ -155,7 +153,7 @@ export const projectUserData = async (
         return cumulative > randomRead;
       });
       if (counts[index] === undefined)
-        throw Error("Read remove index out of bounds");
+        throw Error(`Read remove index out of bounds: ${index}`);
       /** remove read from sample */
       counts[index] = counts[index] - 1;
       /** update total */
@@ -183,7 +181,7 @@ export const projectUserData = async (
   }
 
   /** projected principal components for each sample */
-  const projected: { [key: PC]: number }[] = [];
+  const projected: Record<PC, number>[] = [];
 
   message("Projecting samples");
 
@@ -195,14 +193,16 @@ export const projectUserData = async (
       /** calculate projected principal component */
       const total = sum(
         taxa.map((taxon, taxonIndex) => {
+          const debug = `sample ${sample}, taxon ${taxon}, row ${sampleIndex}, col ${taxonIndex}`;
           /** user pc */
           const user = reads[sampleIndex]?.[taxonIndex];
-          if (user === undefined)
-            throw Error(`Col ${taxonIndex} row ${sampleIndex} undefined`);
+          if (user === undefined) throw Error(`User PC undefined: ${debug}`);
           /** compendium pc */
           const compendium = taxonPCs[taxon]?.[PC];
-          if (compendium === undefined)
-            throw Error(`Col ${PC} row ${taxon} undefined`);
+          if (compendium === undefined) {
+            console.warn(`Compendium PC undefined: ${debug}`);
+            return 0;
+          }
           return user * compendium;
         }),
       );
@@ -217,7 +217,7 @@ export const projectUserData = async (
   return Object.fromEntries(
     projected.map((PCs, index) => {
       if (samples[index] === undefined)
-        throw Error("Sample index out of bounds");
+        throw Error(`Sample index out of bounds: ${index}`);
       return [samples[index], PCs];
     }),
   );

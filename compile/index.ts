@@ -80,8 +80,7 @@ const processMainData = async () => {
         country: string;
         code: string;
         samples: number;
-        [key: string]: string | number;
-      }
+      } & Record<string, string | number>
     >
   >(naturalEarthFile);
 
@@ -521,7 +520,7 @@ const processProjectionistData = async () => {
       /** run */
       string,
       /** PCs */
-      { region: string; [key: PC]: number }
+      { region: string } & Record<PC, number>
     >
   > = {};
 
@@ -578,7 +577,7 @@ const processProjectionistData = async () => {
       /** taxon */
       string,
       /** PCs */
-      { [key: PC]: number }
+      Record<PC, number>
     >
   > = {};
 
