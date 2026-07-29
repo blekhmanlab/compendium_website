@@ -7,25 +7,25 @@ import PCs from "./sections/PCs";
 import Scree from "./sections/Scree";
 import Upload from "./sections/Upload";
 import { loadSamples, loadScree } from "./state";
-
-/** ensure only one load */
-let loaded = false;
+import { useData } from "../home/state";
 
 export default function Projectionist() {
+  /** which compendium is selected */
+  const compendium = useData((state) => state.compendium);
+
   /** load data on page load */
   useEffect(() => {
-    if (!loaded) {
-      loadSamples();
-      loadScree();
-      loaded = true;
-    }
-  }, []);
+    const abort = new AbortController();
+    loadSamples(compendium, abort);
+    loadScree(compendium, abort);
+    return () => abort.abort();
+  }, [compendium]);
 
   return (
     <>
       <Meta
         title="Projectionist"
-        description="Compare your data with data from the Human Microbiome Compendium"
+        description="Compare your data with data from the compendium"
       />
 
       <Header />

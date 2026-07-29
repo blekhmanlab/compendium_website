@@ -1,4 +1,5 @@
 import type * as SamplesAPI from "@/pages/home/data/samples";
+import type { Compendium } from "@/pages/home/state";
 import type * as SamplePCsAPI from "@/pages/projectionist/data/sample-pcs";
 import type { Scree } from "@/pages/projectionist/data/scree";
 import type * as TaxonPCsAPI from "@/pages/projectionist/data/taxon-pcs";
@@ -48,14 +49,25 @@ export const loadTaxonPCs = async (ordination: string) => {
 };
 
 /** load and set samples */
-export const loadSamples = async () => {
+export const loadSamples = async (
+  compendium: Compendium,
+  abort: AbortController,
+) => {
   const worker = wrap<typeof SamplesAPI>(new SamplesWorker());
-  const samples = await worker.getSamples();
+  const samples = await worker.getSamples(compendium);
+  if (abort.signal.aborted) return;
   useData.setState({ samples });
 };
 
 /** load and set scree data */
-export const loadScree = async () => useData.setState({ scree: getScree() });
+export const loadScree = async (
+  compendium: Compendium,
+  abort: AbortController,
+) => {
+  const scree = await getScree(compendium);
+  if (abort.signal.aborted) return;
+  useData.setState({ scree });
+};
 
 /** set selected principal components */
 export const setPCX = (PCX: PC) => useData.setState({ PCX });

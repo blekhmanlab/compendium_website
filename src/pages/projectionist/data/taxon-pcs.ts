@@ -5,9 +5,10 @@ import { request } from "@/util/async";
 
 /** get all taxon PC urls */
 const taxonPCsUrls = mapKeys(
-  import.meta.glob<{ default: string }>("./taxon-pcs-*.json", {
+  import.meta.glob<string>("./human-microbiome-compendium/taxon-pcs-*.json", {
     eager: true,
     query: "url",
+    import: "default",
   }),
   (_, path) => path.match(/taxon-pcs-(.+)\.json/)?.[1] ?? "",
 );
@@ -17,6 +18,6 @@ export type TaxonPCs = Record<string, Record<PC, number>>;
 
 /** get taxon pcs */
 export const getTaxonPCs = (ordination: string) =>
-  request<TaxonPCs>(taxonPCsUrls[ordination]?.default ?? "");
+  request<TaxonPCs>(taxonPCsUrls[ordination] ?? "");
 
 expose({ getTaxonPCs });

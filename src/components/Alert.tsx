@@ -19,23 +19,23 @@ type Type = keyof typeof types;
 const types = {
   loading: {
     className: "bg-white/10",
-    icon: <LoaderCircleIcon className="animate-spin text-white" />,
+    icon: <LoaderCircleIcon className="shrink-0 animate-spin text-white" />,
   },
   success: {
     className: "bg-success/10",
-    icon: <CircleCheckIcon className="text-success" />,
+    icon: <CircleCheckIcon className="shrink-0 text-success" />,
   },
   info: {
     className: "bg-info/10",
-    icon: <InfoIcon className="text-info" />,
+    icon: <InfoIcon className="shrink-0 text-info" />,
   },
   warn: {
     className: "bg-warn/10",
-    icon: <CircleAlertIcon className="text-warn" />,
+    icon: <CircleAlertIcon className="shrink-0 text-warn" />,
   },
   error: {
     className: "bg-error/10",
-    icon: <TriangleAlertIcon className="text-error" />,
+    icon: <TriangleAlertIcon className="shrink-0 text-error" />,
   },
 };
 

@@ -7,6 +7,8 @@ import type { _Record, Zenodo } from "./types/zenodo-api";
 import { bin, extent, median } from "d3";
 import dissolve from "geojson-dissolve";
 import { cloneDeep, orderBy, startCase } from "lodash";
+import countryToRegion from "./extra/country-to-region.json";
+import naturalEarth from "./extra/natural-earth.json";
 import {
   dirSize,
   download,
@@ -24,65 +26,46 @@ import { site } from "../src/site";
  * it down to just what the website needs (json).
  */
 
-/** set working directory to directory of this script */
+/** set working folder to folder of this script */
 chdir(dirname(fileURLToPath(import.meta.url)));
 
-/** main data input directory */
-const mainInput = "./downloaded";
-
-/** main data output directory */
-const mainOutput = "../src/pages/home/data";
-
-/** projectionist data input directory */
-const projectionistInput = "./projectionist";
-
-/** projectionist data output directory */
-const projectionistOutput = "../src/pages/projectionist/data";
-
-/** local record file */
-const recordFile = `${mainInput}/record.json`;
-
-/** raw natural earth data */
-const naturalEarthFile = "./extra/natural-earth.json";
-/** https://www.naturalearthdata.com/downloads/110m-cultural-vectors/ */
-/** https://github.com/nvkelso/natural-earth-vector/blob/master/geojson */
-/** https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson */
-
-/** country to region data */
-const countryToRegionFile = "./extra/country-to-region.json";
-
-/** download external input files */
-const downloadFiles = async () => {
+/** download external inputPath files */
+const downloadFiles = async (recordUrl: string, outputPath: string) => {
   console.info("DOWNLOADING FILES");
 
-  const record = (await request<Zenodo>(site.humanMicrobiomeCompendium.record))
-    .hits.hits[0];
+  const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
   if (!record) throw Error("No hits");
-  write(recordFile, record);
+  write(`${outputPath}/record.json`, record);
   console.info("Downloading raw data");
   for (const { key, links } of record.files || [])
-    await download(links.self, `${mainInput}/${key}`);
+    await download(links.self, `${outputPath}/${key}`);
 };
 
 /** process main data */
-const processMainData = async () => {
+const processMainData = async (
+  recordPath: string,
+  inputPath: string,
+  outputPath: string,
+) => {
   console.info("PROCESSING MAIN DATA");
 
   /** process natural earth world map data */
   console.info("Cleaning world map data");
 
-  /** read natural earth data */
-  const worldMap = read<
-    FeatureCollection<
-      Geometry,
-      {
-        region: string;
-        country: string;
-        code: string;
-        samples: number;
-      } & Record<string, string | number>
-    >
-  >(naturalEarthFile);
+  /**
+   * https://www.naturalearthdata.com/downloads/110m-cultural-vectors/
+   * https://github.com/nvkelso/natural-earth-vector/blob/master/geojson
+   * https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson
+   */
+  const worldMap = naturalEarth as unknown as FeatureCollection<
+    Geometry,
+    {
+      region: string;
+      country: string;
+      code: string;
+      samples: number;
+    } & Record<string, string | number>
+  >;
 
   type WorldMapFeature = (typeof worldMap.features)[0];
 
@@ -92,9 +75,6 @@ const processMainData = async () => {
     if (["-99"].includes(value)) return "";
     return value;
   };
-
-  /** map of all countries to their regions */
-  const countryToRegion = read<Record<string, string>>(countryToRegionFile);
 
   for (const feature of worldMap.features) {
     /** natural earth country name */
@@ -107,7 +87,8 @@ const processMainData = async () => {
       clean(feature.properties.ADM0_A3)
     ).toUpperCase();
     /** our region from code */
-    const region: string = countryToRegion[code] || "";
+    const region: string =
+      countryToRegion[code as keyof typeof countryToRegion] || "";
 
     /** only keep needed properties (opt-in) */
     feature.properties = { region, country, code, samples: 0 };
@@ -145,8 +126,8 @@ const processMainData = async () => {
   }
 
   /** stream files line by line */
-  const taxonomicStream = stream(`${mainInput}/taxonomic_table.csv`);
-  const metadataStream = stream(`${mainInput}/sample_metadata.tsv`);
+  const taxonomicStream = stream(`${inputPath}/taxonomic_table.csv`);
+  const metadataStream = stream(`${inputPath}/sample_metadata.tsv`);
 
   /** get first/header row of files */
   const [{ value: taxonomicHeaderRaw = [] }] = await Promise.all([
@@ -357,7 +338,7 @@ const processMainData = async () => {
   }
 
   /** parse tag counts */
-  const tagsStream = stream(`${mainInput}/tags.tsv`);
+  const tagsStream = stream(`${inputPath}/tags.tsv`);
 
   /** ignore header */
   await tagsStream.next();
@@ -459,10 +440,10 @@ const processMainData = async () => {
   );
 
   /** load zenodo record */
-  const record = read<_Record>(recordFile);
+  const record = read<_Record>(recordPath);
 
   /** derive metadata about data */
-  const metadata = {
+  const meta = {
     projects: projectsOut.length,
     samples: projectsOut.reduce(
       (total, { samples }) => total + samples.length,
@@ -488,19 +469,19 @@ const processMainData = async () => {
   };
 
   /** save results */
-  write(`${mainOutput}/projects.json`, projectsOut);
-  write(`${mainOutput}/samples.json`, samplesOut);
-  write(`${mainOutput}/phyla.json`, phylaOut);
-  write(`${mainOutput}/classes.json`, classesOut);
-  write(`${mainOutput}/countries.json`, countriesOut);
-  write(`${mainOutput}/regions.json`, regionsOut);
-  write(`${mainOutput}/reads.json`, readsOut);
-  write(`${mainOutput}/tags.json`, tagsOut);
-  write(`${mainOutput}/tag-values.json`, tagValuesOut);
-  write(`${mainOutput}/metadata.json`, metadata);
+  write(`${outputPath}/projects.json`, projectsOut);
+  write(`${outputPath}/samples.json`, samplesOut);
+  write(`${outputPath}/phyla.json`, phylaOut);
+  write(`${outputPath}/classes.json`, classesOut);
+  write(`${outputPath}/countries.json`, countriesOut);
+  write(`${outputPath}/regions.json`, regionsOut);
+  write(`${outputPath}/reads.json`, readsOut);
+  write(`${outputPath}/tags.json`, tagsOut);
+  write(`${outputPath}/tag-values.json`, tagValuesOut);
+  write(`${outputPath}/meta.json`, meta);
 
   console.info("Summary");
-  console.info(metadata);
+  console.info(meta);
 };
 
 /** maximum number of principal components */
@@ -509,7 +490,10 @@ const maxPC = 8;
 type PC = `PC${number}`;
 
 /** process projectionist data */
-const processProjectionistData = async () => {
+const processProjectionistData = async (
+  inputPath: string,
+  outputPath: string,
+) => {
   console.info("PROCESSING PROJECTIONIST DATA");
 
   /** collect sample pcs */
@@ -525,7 +509,7 @@ const processProjectionistData = async () => {
   > = {};
 
   /** get all sample pc files */
-  const samplePCsFiles = glob(`${projectionistInput}/sample-pcs-*.tsv`);
+  const samplePCsFiles = glob(`${inputPath}/sample-pcs-*.tsv`);
 
   for await (const samplePCsFile of samplePCsFiles) {
     /** ordination from filename */
@@ -582,7 +566,7 @@ const processProjectionistData = async () => {
   > = {};
 
   /** get all taxon pc files */
-  const taxonPCsFiles = glob(`${projectionistInput}/taxon-pcs-*.tsv`);
+  const taxonPCsFiles = glob(`${inputPath}/taxon-pcs-*.tsv`);
 
   for await (const taxonPCsFile of taxonPCsFiles) {
     /** ordination from filename */
@@ -642,7 +626,7 @@ const processProjectionistData = async () => {
   > = {};
 
   /** stream file line by line */
-  const screeStream = stream(`${projectionistInput}/scree.tsv`);
+  const screeStream = stream(`${inputPath}/scree.tsv`);
 
   /** ignore header */
   await screeStream.next();
@@ -671,13 +655,32 @@ const processProjectionistData = async () => {
 
   /** save results */
   for (const [ordination, data] of Object.entries(samplePCs))
-    write(`${projectionistOutput}/sample-pcs-${ordination}.json`, data);
+    write(`${outputPath}/sample-pcs-${ordination}.json`, data);
   for (const [ordination, data] of Object.entries(taxonPCs))
-    write(`${projectionistOutput}/taxon-pcs-${ordination}.json`, data);
-  write(`${projectionistOutput}/scree.json`, scree);
+    write(`${outputPath}/taxon-pcs-${ordination}.json`, data);
+  write(`${outputPath}/scree.json`, scree);
 };
 
 /** run */
-await downloadFiles();
-await processMainData();
-await processProjectionistData();
+await downloadFiles(
+  site["human-microbiome-compendium"].record,
+  "downloaded/human-microbiome-compendium",
+);
+await downloadFiles(
+  site["meta-g-compendium"].record,
+  "downloaded/meta-g-compendium",
+);
+await processMainData(
+  "downloaded/human-microbiome-compendium/record.json",
+  "downloaded/human-microbiome-compendium",
+  "../src/pages/home/data/human-microbiome-compendium",
+);
+await processMainData(
+  "downloaded/meta-g-compendium/record.json",
+  "downloaded/meta-g-compendium",
+  "../src/pages/home/data/meta-g-compendium",
+);
+await processProjectionistData(
+  "downloaded/human-microbiome-compendium",
+  "../src/pages/projectionist/data/human-microbiome-compendium",
+);

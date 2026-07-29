@@ -5,7 +5,7 @@ import clsx from "clsx";
 
 type Props = {
   /** tooltip content */
-  content: ReactNode;
+  content?: ReactNode;
   /** whether trigger renders button element */
   button?: boolean;
   /** class on popup box */
@@ -21,6 +21,8 @@ export default function Tooltip({
   children,
   className,
 }: Props) {
+  if (!content) return children;
+
   /** prevent if trigger disabled */
   if (
     isValidElement(children) &&

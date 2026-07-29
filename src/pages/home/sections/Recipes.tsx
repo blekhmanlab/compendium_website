@@ -1,5 +1,6 @@
 import { LightbulbIcon, PackageIcon } from "lucide-react";
 import Button from "@/components/Button";
+import { useData } from "@/pages/home/state";
 import { site } from "@/site";
 
 const recipes = [
@@ -30,13 +31,16 @@ const recipes = [
 ];
 
 export default function Recipes() {
+  /** which compendium is selected */
+  const compendium = useData((state) => state.compendium);
+
   return (
     <section>
       <h2>Recipes</h2>
 
       <p>
         Some of the things you can do with{" "}
-        <a href={site.humanMicrobiomeCompendium.rPackage}>
+        <a href={site[compendium].rPackage}>
           <PackageIcon />
           the R package
         </a>
@@ -47,11 +51,7 @@ export default function Recipes() {
         {recipes.map(({ link, name }, index) => (
           <Button
             key={index}
-            to={
-              site.humanMicrobiomeCompendium.rPackage +
-              "articles/overview.html#" +
-              link
-            }
+            to={site[compendium].rPackage + "articles/overview.html#" + link}
             className="justify-start"
           >
             <LightbulbIcon />

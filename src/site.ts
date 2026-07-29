@@ -1,5 +1,5 @@
 export const site = {
-  humanMicrobiomeCompendium: {
+  "human-microbiome-compendium": {
     title: "Human Microbiome Compendium",
     description:
       "An ongoing project to build a dataset of the human microbiome at an unprecedented scale.",
@@ -9,13 +9,14 @@ export const site = {
     data: "https://doi.org/10.5281/zenodo.8186993",
     record: "https://zenodo.org/api/records?q=conceptrecid:8186993",
   },
-  metaG: {
-    title: "MetaG",
-    description: "Lorem ipsum.",
+  "meta-g-compendium": {
+    title: "Meta G Compendium",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     url: "https://microbiomap.org",
-    paper: "",
-    rPackage: "",
-    data: "",
+    paper: "https://fake-link.com",
+    rPackage: "https://fake-link.com",
+    data: "https://doi.org/12345",
     record: "https://zenodo.org/api/records?q=conceptrecid:21275720",
   },
 };

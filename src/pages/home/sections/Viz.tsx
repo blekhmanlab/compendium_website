@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 import { random } from "lodash";
 import PoissonDiskSampling from "poisson-disk-sampling";
 import { sleep, waitFor } from "@/util/async";
-import { getCssVariable, getMatrix } from "@/util/dom";
+import { getMatrix } from "@/util/dom";
 import { cos, dist, sin } from "@/util/math";
 
 /** particle size */
@@ -57,10 +57,10 @@ export default function Viz() {
     );
 
     /** draw particles */
-    for (const { position, size, color, alpha, spin, strength } of particles) {
+    for (const { position, size, alpha, spin, strength } of particles) {
       const radius = size * (10 * strength);
       ctx.current.globalAlpha = alpha + strength;
-      ctx.current.fillStyle = color;
+      ctx.current.fillStyle = "white";
       ctx.current.beginPath();
       ctx.current.arc(
         position.x + sin(t / 3 + spin) * radius,
@@ -123,7 +123,7 @@ export default function Viz() {
   return (
     <canvas
       ref={canvas}
-      className="absolute inset-0 -z-10 size-full"
+      className="absolute inset-0 -z-10 size-full mix-blend-overlay"
       onClick={() => generate(0)}
     />
   );
@@ -137,7 +137,6 @@ type Particle = {
   destination: Point;
   size: number;
   alpha: number;
-  color: string;
   spin: number;
   strength: number;
 };
@@ -156,8 +155,6 @@ const getParticles = async () => {
     stroke: window.getComputedStyle(path).stroke !== "none",
     transform: getMatrix(svg, path),
   }));
-
-  const primary = getCssVariable("--color-primary");
 
   /** get bounding box of svg */
   const [left = 0, top = 0, width = 100, height = 100] = (
@@ -209,7 +206,6 @@ const getParticles = async () => {
     position: { x: point.x * 2, y: point.y * 2 },
     destination: point,
     size,
-    color: primary,
     alpha: 0,
     spin: random(360),
     strength: 0,

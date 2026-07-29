@@ -14,7 +14,9 @@ import { site } from "@/site";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
 
 export default function Overview() {
-  /** get global state */
+  /** which compendium is selected */
+  const compendium = useData((state) => state.compendium);
+  /** metadata for compendium */
   const meta = useData((state) => state.meta);
 
   /** round down to nearest large amount */
@@ -131,7 +133,7 @@ export default function Overview() {
       <p>
         This website lets you <b>search</b> and <b>explore</b> the data at a
         high level before downloading.{" "}
-        <a href={site.humanMicrobiomeCompendium.rPackage}>
+        <a href={site[compendium].rPackage}>
           <PackageIcon />
           Use the R package
         </a>{" "}

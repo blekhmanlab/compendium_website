@@ -45,6 +45,7 @@ let loaded = false;
 
 export default function Search() {
   /** get global state */
+  const compendium = useData((state) => state.compendium);
   const projectSearch = useData((state) => state.projectSearch);
   const geoSearch = useData((state) => state.geoSearch);
   const taxonSearch = useData((state) => state.taxonSearch);
@@ -54,12 +55,14 @@ export default function Search() {
   const [tab, setTab] = useState(0);
 
   useEffect(() => {
+    const abort = new AbortController();
     /** load large data on demand */
     if (tab === 3 && !loaded) {
-      loadTags();
+      loadTags(compendium, abort);
       loaded = true;
     }
-  }, [tab]);
+    return () => abort.abort();
+  }, [tab, compendium]);
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
