@@ -121,14 +121,15 @@ export default function Upload() {
         <Tooltip
           content={
             <>
-              Read counts, per sample (row) and taxa (column).
+              Provide a CSV/TSV of your read counts, per sample (row) and taxa
+              (column), like so:
               <div className="mt-2 table-wrapper border-light-gray">
                 <table>
                   <thead>
                     <tr>
                       <th>sample</th>
-                      <th>taxa1</th>
-                      <th>taxa2</th>
+                      <th>taxon1</th>
+                      <th>taxon2</th>
                       <th>…</th>
                     </tr>
                   </thead>
@@ -177,12 +178,13 @@ export default function Upload() {
         <Tooltip
           content={
             <>
-              Taxa ranks for each column in reads table.
+              Provide a CSV/TSV of taxa ranks for each column in your reads
+              table, like so:
               <div className="mt-2 table-wrapper border-light-gray">
                 <table>
                   <thead>
                     <tr>
-                      <th>col id</th>
+                      <th>taxon</th>
                       <th>kingdom</th>
                       <th>phylum</th>
                       <th>…</th>
@@ -190,13 +192,13 @@ export default function Upload() {
                   </thead>
                   <tbody>
                     <tr>
-                      <td>col1</td>
+                      <td>taxon1</td>
                       <td>Bacteria</td>
                       <td>Bacillota</td>
                       <td>…</td>
                     </tr>
                     <tr>
-                      <td>col2</td>
+                      <td>taxon2</td>
                       <td>Archaea</td>
                       <td>Methan…</td>
                       <td>…</td>
@@ -232,8 +234,8 @@ export default function Upload() {
         <Tooltip
           content={
             <>
-              Arbitrary metadata for each sample in reads table, to help
-              contextualize results.
+              To help contextualize results, provide a CSV/TSV of arbitrary
+              metadata for each sample in your reads table, like so:
               <div className="mt-2 table-wrapper border-light-gray">
                 <table>
                   <thead>

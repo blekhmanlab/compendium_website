@@ -76,6 +76,7 @@ const updateCompendium = () => {
   /** update selected compendium */
   if (compendium && compendium in site)
     setSelectedCompendium(compendium as keyof typeof site);
+  else setSelectedCompendium("human-microbiome-compendium");
   compendium = getSelectedCompendium();
 
   /** update theme colors based on selected compendium */

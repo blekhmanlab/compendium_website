@@ -17,6 +17,7 @@ export default function ScreeChart({ yLabel, type, data }: Props) {
       {
         type: type,
         barWidth: "90%",
+        color: "var(--color-primary)",
         data: Object.values(data).map((datum) => ({
           value: datum,
           tooltip: formatNumber(datum, true),
