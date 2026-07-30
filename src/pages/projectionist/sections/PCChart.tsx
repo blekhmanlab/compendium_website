@@ -1,4 +1,5 @@
 import type { EChartsOption } from "echarts";
+import { debounce } from "lodash";
 import Chart from "@/components/Chart";
 import { tooltipTable } from "@/util/string";
 
@@ -8,13 +9,14 @@ type Props = {
   xLabel: string;
   yLabel: string;
   series: {
-    color?: string;
-    shape?: string;
     data: {
       x: number;
       y: number;
       [key: string]: unknown;
     }[];
+    color?: string;
+    shape?: string;
+    size?: number;
   }[];
   range: number;
 };
@@ -30,15 +32,10 @@ export default function PCChart({
 }: Props) {
   range = Math.ceil(range);
 
-  /** scale down point size more points there are */
-  const symbolSizes = series.map((data) =>
-    Math.max(1, 10 * 2 ** (-data.data.length / 200)),
-  );
-
   /** echarts options */
   const option: EChartsOption = {
     series: series.map(
-      ({ color, shape, data }, index) =>
+      ({ data, color = "white", shape = "rect", size = 2 }) =>
         ({
           type: "scatter",
           data: data.map(({ x, y, ...datum }) => ({
@@ -48,7 +45,7 @@ export default function PCChart({
           })),
           itemStyle: { color },
           symbol: shape,
-          symbolSize: symbolSizes[index],
+          symbolSize: size,
           progressive: 0,
           large: true,
           largeThreshold: 10000,
@@ -81,15 +78,15 @@ export default function PCChart({
     <Chart
       option={option}
       init={{ renderer: "canvas" }}
-      onZoom={(chart, xScale, yScale) => {
+      onZoom={debounce((chart, xScale, yScale) => {
         /** scale points up a bit when zooming in */
-        const factor = (xScale * yScale) ** 0.25;
+        const factor = (xScale * yScale) ** 0.15;
         chart.setOption({
           series: series.map((_, index) => ({
-            symbolSize: (symbolSizes[index] ?? 1) * factor,
+            symbolSize: (series[index]?.size ?? 2) * factor,
           })),
         });
-      }}
+      }, 100)}
       className="aspect-square w-120"
     />
   );

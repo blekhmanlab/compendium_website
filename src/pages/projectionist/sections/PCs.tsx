@@ -57,45 +57,32 @@ export default function PCs() {
 
   /** set selected regions once options load */
   useEffect(() => {
-    // eslint-disable-next-line -- causes extra render, but working around is more effort than it's worth
+    // eslint-disable-next-line -- https://github.com/react/react/issues/34045#issuecomment-3801067128
     setRegions(regionOptions);
   }, [regionOptions]);
 
+  /** map of sample (run) to region */
+  /** ("sample" in pcs is actually SRR (run) instead of SRS (sample)) */
+  const sampleRegions = useMemo(
+    () =>
+      samples
+        ? Object.fromEntries(samples.map(({ run, region }) => [run, region]))
+        : undefined,
+    [samples],
+  );
+
   /** sample pcs filtered by region */
   const filteredSamplePCs = useMemo(() => {
-    if (!samples || !samplePCs) return undefined;
-
-    /** quick lookup region for sample (run) */
-    const sampleRegion = Object.fromEntries(
-      samples.map(({ run, region }) => [run, region]) ?? [],
-    );
-    /** ("sample" in pcs is actually SRR (run) instead of SRS (sample)) */
+    if (!sampleRegions || !samplePCs) return undefined;
 
     /** get sample ids whose region is selected */
-    const byRegion = Object.keys(samplePCs).filter((sample) => {
-      const region = sampleRegion[sample];
+    const selected = Object.keys(samplePCs).filter((sample) => {
+      const region = sampleRegions[sample];
       return region && regions.includes(region);
     });
 
-    return pick(samplePCs, byRegion);
-  }, [samples, samplePCs, regions]);
-
-  /** color legend */
-  const [entry, legend] = useLegend(2);
-
-  /** data for compendium plot */
-  const compendiumPlot = useMemo(() => {
-    if (!filteredSamplePCs || !PCX || !PCY) return undefined;
-    return {
-      color: entry("Compendium").color,
-      shape: entry("Compendium").shape,
-      data: Object.entries(filteredSamplePCs).map(([sample, PCs]) => ({
-        x: PCs[PCX] ?? 0,
-        y: PCs[PCY] ?? 0,
-        sample,
-      })),
-    };
-  }, [filteredSamplePCs, PCX, PCY, entry]);
+    return pick(samplePCs, selected);
+  }, [sampleRegions, samplePCs, regions]);
 
   /** project user input data */
   const [, projectStatus, projectMessage] = useWorker(
@@ -125,39 +112,68 @@ export default function PCs() {
   );
   const [group, setGroup] = useState("");
 
+  /** color legend */
+  const [entry, legend] = useLegend(2);
+
+  /** data for compendium plot */
+  const compendiumPlot = useMemo(() => {
+    if (!filteredSamplePCs || !PCX || !PCY) return undefined;
+
+    /** compendium data to plot points */
+    const data = Object.entries(filteredSamplePCs).map(([sample, PCs]) => ({
+      x: PCs[PCX] ?? 0,
+      y: PCs[PCY] ?? 0,
+      sample,
+    }));
+
+    return {
+      data,
+      color: entry("Compendium").color,
+      shape: entry("Compendium").shape,
+    };
+
+    /** split into groups by region */
+    const groups = groupBy(
+      data,
+      ({ sample }) => sampleRegions?.[sample] ?? "Unknown",
+    );
+
+    return Object.entries(groups).map(([group, data]) => ({
+      data,
+      color: entry(group).color,
+      shape: entry(group).shape,
+    }));
+  }, [sampleRegions, filteredSamplePCs, PCX, PCY, entry]);
+
   /** data for user plot */
   const userPlot = useMemo(() => {
     if (!userProjected || !PCX || !PCY) return undefined;
 
+    /** user data to plot points */
+    const data = Object.entries(userProjected).map(([sample, PCs]) => ({
+      x: PCs[PCX] ?? 0,
+      y: PCs[PCY] ?? 0,
+      sample,
+    }));
+
     /** split into groups by selected "group by" option */
-    const groups = groupBy<{ sample: string } & (typeof userProjected)[string]>(
-      Object.entries(userProjected).map(([sample, PCs]) => ({
-        sample,
-        ...PCs,
-      })),
-      ({ sample }) =>
-        /** get corresponding group value from user meta */
-        group ? String(userMeta?.[sample]?.[group] ?? "") : "Yours",
+    const groups = groupBy(data, ({ sample }) =>
+      group ? String(userMeta?.[sample]?.[group] ?? "") : "Yours",
     );
 
     /** map groups into data series */
-    return Object.entries(groups).map(([group, samples]) => ({
+    return Object.entries(groups).map(([group, data]) => ({
+      data,
       color: entry(group).color,
       shape: entry(group).shape,
-      data: samples.map(({ sample, ...PCs }) => ({
-        x: PCs[PCX] ?? 0,
-        y: PCs[PCY] ?? 0,
-        sample,
-      })),
+      size: 5,
     }));
   }, [userProjected, PCX, PCY, group, entry, userMeta]);
 
   /** combine series */
   const series = useMemo(
     () =>
-      [compendiumPlot, ...(userPlot ? userPlot : [])].filter(
-        (plot) => plot !== undefined,
-      ),
+      [compendiumPlot, userPlot].flat().filter((plot) => plot !== undefined),
     [compendiumPlot, userPlot],
   );
 
@@ -232,7 +248,7 @@ export default function PCs() {
           range={max}
         />
 
-        <div className="flex flex-wrap items-center gap-8">
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
           {Object.entries(legend).map(([key, value], index) => (
             <div key={index} className="flex items-center gap-2">
               <svg viewBox="-1 -1 2 2" className="size-4">
