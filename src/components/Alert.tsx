@@ -49,7 +49,7 @@ export default function Alert({ type, children, className }: Props) {
       )}
     >
       {types[type]?.icon}
-      {children}
+      <div className="flex flex-col gap-2">{children}</div>
     </div>
   );
 }

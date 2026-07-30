@@ -10,12 +10,12 @@ export default function Title({ className = "" }) {
   return (
     <a
       className={clsx(
-        "flex flex-1 items-center gap-[1em] text-inherit no-underline",
+        "flex flex-1 items-center justify-center gap-[1em] text-inherit no-underline",
         className,
       )}
       href="/"
     >
-      <Logo className="h-20" />
+      <Logo className="h-[3em]" />
       <div className="w-0.5 self-stretch bg-white" />
       <h1 className="max-w-min leading-tight">{site[compendium].title}</h1>
     </a>

@@ -35,16 +35,22 @@ export type Data = {
 export const useData = create<Data>(() => ({}));
 
 /** load and set sample pcs */
-export const loadSamplePCs = async (ordination: string) => {
+export const loadSamplePCs = async (
+  compendium: Compendium,
+  ordination: string,
+) => {
   const worker = wrap<typeof SamplePCsAPI>(new SamplePCsWorker());
-  const samplePCs = await worker.getSamplePCs(ordination);
+  const samplePCs = await worker.getSamplePCs(compendium, ordination);
   useData.setState({ samplePCs });
 };
 
 /** load and set taxon pcs */
-export const loadTaxonPCs = async (ordination: string) => {
+export const loadTaxonPCs = async (
+  compendium: Compendium,
+  ordination: string,
+) => {
   const worker = wrap<typeof TaxonPCsAPI>(new TaxonPCsWorker());
-  const taxonPCs = await worker.getTaxonPCs(ordination);
+  const taxonPCs = await worker.getTaxonPCs(compendium, ordination);
   useData.setState({ taxonPCs });
 };
 

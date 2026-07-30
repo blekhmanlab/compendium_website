@@ -116,6 +116,7 @@ export default function Table<Datum extends DatumShape>({
                   {selectEnabled && (
                     <td>
                       <CheckButton
+                        className="border border-light-gray"
                         tooltip={
                           selected.has(row.name) ? "Deselect row" : "Select row"
                         }

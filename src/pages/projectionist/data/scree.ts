@@ -3,12 +3,12 @@ import { request } from "@/util/async";
 
 /** get all scree urls */
 const screeUrls = mapKeys(
-  import.meta.glob<string>("./human-microbiome-compendium/scree-*.json", {
+  import.meta.glob<string>("./*/scree.json", {
     eager: true,
     query: "url",
     import: "default",
   }),
-  (_, path) => path.match(/scree\.json/)?.[1] ?? "",
+  (_, path) => path.match(/([^/]+)\/scree\.json/)?.[1] ?? "",
 );
 
 export type Scree = Record<
@@ -16,7 +16,5 @@ export type Scree = Record<
   { explained: Record<string, number>; cumulative: Record<string, number> }
 >;
 
-export const getScree = (compendium: string) => {
-  console.log(compendium);
-  return request<Scree>(screeUrls[compendium] ?? "");
-};
+export const getScree = (compendium: string) =>
+  request<Scree>(screeUrls[compendium] ?? "");

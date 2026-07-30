@@ -8,6 +8,7 @@ import Alert from "@/components/Alert";
 import Select from "@/components/Select";
 import SelectMulti from "@/components/SelectMulti";
 import Tooltip from "@/components/Tooltip";
+import { useData as useHomeData } from "@/pages/home/state";
 import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
 import PCChart from "@/pages/projectionist/sections/PCChart";
 import {
@@ -17,7 +18,7 @@ import {
 import {
   loadSamplePCs,
   loadTaxonPCs,
-  useData,
+  useData as useProjectionistData,
 } from "@/pages/projectionist/state";
 import { shapePaths, useLegend } from "@/util/legend";
 import { useWorker } from "@/util/worker";
@@ -25,23 +26,24 @@ import { useWorker } from "@/util/worker";
 /** compare series of principal components */
 export default function PCs() {
   /** get state */
-  const userReads = useData((state) => state.userReads);
-  const userTaxa = useData((state) => state.userTaxa);
-  const userMeta = useData((state) => state.userMeta);
-  const userProjected = useData((state) => state.userProjected);
-  const samples = useData((state) => state.samples);
-  const taxonPCs = useData((state) => state.taxonPCs);
-  const samplePCs = useData((state) => state.samplePCs);
-  const PCX = useData((state) => state.PCX);
-  const PCY = useData((state) => state.PCY);
-  const ordination = useData((state) => state.ordination);
+  const compendium = useHomeData((state) => state.compendium);
+  const userReads = useProjectionistData((state) => state.userReads);
+  const userTaxa = useProjectionistData((state) => state.userTaxa);
+  const userMeta = useProjectionistData((state) => state.userMeta);
+  const userProjected = useProjectionistData((state) => state.userProjected);
+  const samples = useProjectionistData((state) => state.samples);
+  const taxonPCs = useProjectionistData((state) => state.taxonPCs);
+  const samplePCs = useProjectionistData((state) => state.samplePCs);
+  const PCX = useProjectionistData((state) => state.PCX);
+  const PCY = useProjectionistData((state) => state.PCY);
+  const ordination = useProjectionistData((state) => state.ordination);
 
   /** load sample and taxon pc data based on selected ordination */
   useEffect(() => {
-    if (!ordination) return;
-    loadSamplePCs(ordination);
-    loadTaxonPCs(ordination);
-  }, [ordination]);
+    if (!ordination || !compendium) return;
+    loadSamplePCs(compendium, ordination);
+    loadTaxonPCs(compendium, ordination);
+  }, [compendium, ordination]);
 
   /** region options */
   const regionOptions = useMemo(
@@ -101,7 +103,7 @@ export default function PCs() {
     useCallback(
       async (worker: Remote<typeof ProjectionistAPI>) => {
         if (!userReads || !userTaxa || !taxonPCs) return;
-        useData.setState({
+        useProjectionistData.setState({
           userProjected: await worker.projectUserData(
             userReads,
             userTaxa,

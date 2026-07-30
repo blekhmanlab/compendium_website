@@ -52,7 +52,7 @@ export default function Textbox({
         />
       )}
       <button
-        className="absolute top-0 right-0 flex size-10 cursor-pointer items-center justify-center"
+        className="absolute top-px right-px size-10"
         onClick={() => onChange("")}
         aria-label="Clear"
       >

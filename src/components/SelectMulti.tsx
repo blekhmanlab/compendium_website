@@ -59,7 +59,7 @@ export default function SelectMulti<Option extends string>({
             <Select.Popup className="flex flex-col rounded-md border border-light-gray bg-gray">
               <button
                 onClick={toggleSelectAll}
-                className="flex cursor-pointer items-center justify-center gap-2 p-2 font-medium transition hover:bg-light-gray"
+                className="gap-2 p-2 font-medium transition hover:bg-light-gray"
               >
                 {allSelected ? "Deselect All" : "Select All"}
               </button>

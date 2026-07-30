@@ -12,10 +12,10 @@
   --gray-hue: 0;
 
   --color-primary: oklch(65% 0.3 var(--primary-hue));
-  --color-primary-light: oklch(90% 0.2 var(--primary-hue));
-  --color-primary-dark: oklch(30% 0.1 var(--primary-hue));
   --color-secondary: oklch(50% 0.3 var(--secondary-hue));
-  --color-secondary-light: oklch(90% 0.2 var(--secondary-hue));
+  --color-primary-light: oklch(90% 0.15 var(--primary-hue));
+  --color-secondary-light: oklch(90% 0.15 var(--secondary-hue));
+  --color-primary-dark: oklch(30% 0.1 var(--primary-hue));
   --color-secondary-dark: oklch(30% 0.1 var(--secondary-hue));
 
   --color-black: oklch(0% 0.025 var(--gray-hue));
@@ -74,7 +74,11 @@
   }
 
   a {
-    @apply text-secondary-light hover:text-primary-light underline transition;
+    @apply underline transition hover:opacity-50;
+  }
+
+  button {
+    @apply flex cursor-pointer items-center justify-center;
   }
 
   table {
@@ -82,7 +86,7 @@
   }
 
   thead {
-    @apply bg-white/5;
+    @apply bg-gray;
   }
 
   tr {

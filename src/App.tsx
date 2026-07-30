@@ -8,7 +8,12 @@ import {
 } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import Home from "@/pages/home/Home";
+import {
+  getSelectedCompendium,
+  setSelectedCompendium,
+} from "@/pages/home/state";
 import Projectionist from "@/pages/projectionist/Projectionist";
+import { site } from "@/site";
 
 /** app entrypoint */
 export default function App() {
@@ -61,3 +66,31 @@ const routes = [
 export const router = createBrowserRouter(routes, {
   basename: import.meta.env.BASE_URL,
 });
+
+/** update selected compendium */
+const updateCompendium = () => {
+  /** get selected compendium in url */
+  const url = new URL(window.location.href);
+  let compendium = url.searchParams.get("compendium");
+
+  /** update selected compendium */
+  if (compendium && compendium in site)
+    setSelectedCompendium(compendium as keyof typeof site);
+  compendium = getSelectedCompendium();
+
+  /** update theme colors based on selected compendium */
+  if (compendium === "human-microbiome-compendium") {
+    document.documentElement.style.setProperty("--primary-hue", "340");
+    document.documentElement.style.setProperty("--secondary-hue", "300");
+    document.documentElement.style.setProperty("--gray-hue", "280");
+  } else if (compendium === "meta-g-compendium") {
+    document.documentElement.style.setProperty("--primary-hue", "220");
+    document.documentElement.style.setProperty("--secondary-hue", "180");
+    document.documentElement.style.setProperty("--gray-hue", "240");
+  }
+};
+
+/** update on load */
+window.addEventListener("load", updateCompendium);
+/** update on route change */
+router.subscribe(updateCompendium);

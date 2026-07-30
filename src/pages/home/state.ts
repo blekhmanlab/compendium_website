@@ -16,15 +16,14 @@ import type {
 } from "@/pages/home/data/tag.ts";
 import type * as TaxaAPI from "@/pages/home/data/taxa.ts";
 import type { Classes, Phyla, TaxonSearch } from "@/pages/home/data/taxa.ts";
+import type { site } from "@/site";
 import { wrap } from "comlink";
 import { create } from "zustand";
-import { router } from "@/App";
 import GeoWorker from "@/pages/home/data/geo.ts?worker";
 import { getLiveMeta, getMeta } from "@/pages/home/data/meta.ts";
 import ProjectWorker from "@/pages/home/data/projects.ts?worker";
 import TagWorker from "@/pages/home/data/tag.ts?worker";
 import TaxaWorker from "@/pages/home/data/taxa.ts?worker";
-import { site } from "@/site";
 
 export type Compendium = keyof typeof site;
 
@@ -56,35 +55,12 @@ export const useData = create<Data>(() => ({
   compendium: "human-microbiome-compendium",
 }));
 
-/** update selected compendium */
-const updateCompendium = () => {
-  /** get selected compendium in url */
-  const url = new URL(window.location.href);
-  let compendium = url.searchParams.get("compendium");
+/** set selected compendium */
+export const setSelectedCompendium = (compendium: Compendium) =>
+  useData.setState({ compendium });
 
-  /** update selected compendium */
-  if (compendium && compendium in site)
-    useData.setState({ compendium: compendium as keyof typeof site });
-  compendium = useData.getState().compendium;
-
-  /** update theme colors based on selected compendium */
-  if (compendium === "human-microbiome-compendium") {
-    document.documentElement.style.setProperty("--primary-hue", "340");
-    document.documentElement.style.setProperty("--secondary-hue", "300");
-    document.documentElement.style.setProperty("--gray-hue", "280");
-  } else if (compendium === "meta-g-compendium") {
-    document.documentElement.style.setProperty("--primary-hue", "220");
-    document.documentElement.style.setProperty("--secondary-hue", "200");
-    document.documentElement.style.setProperty("--gray-hue", "240");
-  }
-};
-
-window.addEventListener("load", () => {
-  /** update on load */
-  updateCompendium();
-  /** update on route change */
-  router.subscribe(() => updateCompendium());
-});
+/** get selected compendium */
+export const getSelectedCompendium = () => useData.getState().compendium;
 
 /** load and set metadata */
 export const loadMeta = async (

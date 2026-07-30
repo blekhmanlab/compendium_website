@@ -3,7 +3,7 @@ import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useCallback, useRef, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import clsx from "clsx";
-import { size } from "lodash";
+import { isEmpty, size } from "lodash";
 import { HelpCircleIcon, LightbulbIcon } from "lucide-react";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
@@ -38,9 +38,10 @@ export default function Upload() {
     ProjectionistWorker,
     useCallback(
       async (worker: Remote<typeof ProjectionistAPI>) => {
-        if (!userRawReads.trim()) return;
         useData.setState({
-          userReads: await worker.parseUserReads(userRawReads),
+          userReads: userRawReads.trim()
+            ? await worker.parseUserReads(userRawReads)
+            : { reads: [], taxa: [], samples: [] },
         });
       },
       [userRawReads],
@@ -50,9 +51,10 @@ export default function Upload() {
     ProjectionistWorker,
     useCallback(
       async (worker: Remote<typeof ProjectionistAPI>) => {
-        if (!userRawTaxa.trim()) return;
         useData.setState({
-          userTaxa: await worker.parseUserTaxa(userRawTaxa),
+          userTaxa: userRawTaxa.trim()
+            ? await worker.parseUserTaxa(userRawTaxa)
+            : {},
         });
       },
       [userRawTaxa],
@@ -62,9 +64,10 @@ export default function Upload() {
     ProjectionistWorker,
     useCallback(
       async (worker: Remote<typeof ProjectionistAPI>) => {
-        if (!userRawMeta.trim()) return;
         useData.setState({
-          userMeta: await worker.parseUserMeta(userRawMeta),
+          userMeta: userRawMeta.trim()
+            ? await worker.parseUserMeta(userRawMeta)
+            : {},
         });
       },
       [userRawMeta],
@@ -80,27 +83,33 @@ export default function Upload() {
   const taxonPCs = useData((state) => state.taxonPCs);
 
   /** find taxa in user reads that have no match in user taxa */
-  const missingInTaxa = userReads?.taxa
-    ?.map((taxon, index) => {
-      const sample = userReads?.samples?.[index] ?? index;
-      if (!userTaxa?.[taxon]) return String(sample);
-    })
-    .filter((taxon) => taxon !== undefined);
+  const missingInTaxa = !isEmpty(userTaxa)
+    ? userReads?.taxa
+        ?.map((taxon, index) => {
+          const sample = userReads?.samples?.[index] ?? index;
+          if (!userTaxa?.[taxon]) return String(sample);
+        })
+        .filter((taxon) => taxon !== undefined)
+    : [];
 
   /** find samples in user reads that have no match in user meta */
-  const missingInMeta = userReads?.samples
-    ?.map((sample) => {
-      if (!userMeta?.[sample]) return sample;
-    })
-    .filter((sample) => sample !== undefined);
+  const missingInMeta = !isEmpty(userMeta)
+    ? userReads?.samples
+        ?.map((sample) => {
+          if (!userMeta?.[sample]) return sample;
+        })
+        .filter((sample) => sample !== undefined)
+    : [];
 
   /** find user taxa that have no match in compendium taxa */
-  const missingInCompendium = Object.entries(userTaxa ?? {})
-    .map(([taxon, { kingdom, phylum, _class, order, family }]) => {
-      const full = [kingdom, phylum, _class, order, family].join("|");
-      if (!taxonPCs?.[full]) return taxon;
-    })
-    .filter((taxon) => taxon !== undefined);
+  const missingInCompendium = !isEmpty(userTaxa)
+    ? Object.entries(userTaxa ?? {})
+        .map(([taxon, { kingdom, phylum, _class, order, family }]) => {
+          const full = [kingdom, phylum, _class, order, family].join("|");
+          if (!taxonPCs?.[full]) return taxon;
+        })
+        .filter((taxon) => taxon !== undefined)
+    : [];
 
   /** are there any alerts to show */
   const alerts =
@@ -357,28 +366,33 @@ export default function Upload() {
         >
           {!!missingInTaxa?.length && (
             <Alert type="error">
-              {formatNumber(missingInTaxa?.length)} taxa in reads have no match
-              in taxa:
-              <br />
-              {missingInTaxa?.join(", ")}
+              <div>
+                {formatNumber(missingInTaxa?.length)} taxa in reads have no
+                match in taxa:
+              </div>
+              <div className="line-clamp-2">{missingInTaxa?.join(", ")}</div>
             </Alert>
           )}
 
           {!!missingInMeta?.length && (
             <Alert type="warn">
-              {formatNumber(missingInMeta?.length)} sample(s) in reads have no
-              match in meta:
-              <br />
-              {missingInMeta?.join(", ")}
+              <div>
+                {formatNumber(missingInMeta?.length)} sample(s) in reads have no
+                match in meta:
+              </div>
+              <div className="line-clamp-2">{missingInMeta?.join(", ")}</div>
             </Alert>
           )}
 
           {!!missingInCompendium?.length && (
             <Alert type="error">
-              {formatNumber(missingInCompendium?.length)} taxa have no match in
-              compendium:
-              <br />
-              {missingInCompendium?.join(", ")}
+              <div>
+                {formatNumber(missingInCompendium?.length)} taxa have no match
+                in compendium:
+              </div>
+              <div className="line-clamp-2">
+                {missingInCompendium?.join(", ")}
+              </div>
             </Alert>
           )}
         </div>

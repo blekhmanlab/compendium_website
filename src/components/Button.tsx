@@ -16,11 +16,11 @@ export default function Button({
   ...props
 }: Props) {
   className = clsx(
-    "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full leading-none text-inherit no-underline transition",
+    "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full text-center text-inherit no-underline transition hover:opacity-100",
     design === "regular" &&
-      "border border-light-gray p-3 hover:bg-light-gray aria-selected:bg-light-gray",
+      "border border-light-gray px-4 py-2 hover:bg-light-gray aria-selected:bg-light-gray",
     design === "accent" &&
-      "bg-white/5 bg-linear-to-r p-3 text-lg hover:scale-105 hover:from-primary hover:to-secondary",
+      "bg-white/10 bg-linear-to-r px-4 py-2 text-lg hover:scale-103 hover:from-primary hover:to-secondary",
     className,
   );
 
