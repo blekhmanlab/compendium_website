@@ -1,4 +1,4 @@
-import type { ComponentProps, RefObject } from "react";
+import type { ComponentProps } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useEventListener } from "@reactuses/core";
 import clsx from "clsx";
@@ -13,20 +13,17 @@ type Props = {
   accept?: string[];
   /** callback with file */
   onUpload: (file: File, name: string, ext: string) => void;
-  /** drag target ref */
-  target?: RefObject<HTMLElement | null>;
 } & ComponentProps<typeof Button>;
 
 /** file dialog or drag & drop button */
 export default function UploadButton({
   onUpload,
-  target,
   accept = [],
   className,
   children,
-  ...props
 }: Props) {
-  const ref = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   /** filename */
   const [name, setName] = useState("");
@@ -48,16 +45,16 @@ export default function UploadButton({
     onUpload(file, name, ext);
 
     /** reset file input */
-    if (ref.current) ref.current.value = "";
+    if (inputRef.current) inputRef.current.value = "";
   };
 
   /** is dragging */
   const [drag, setDrag] = useState(false);
 
   /** attach handlers to target */
-  useEventListener("dragenter", () => setDrag(true), target);
-  useEventListener("dragleave", () => setDrag(false), target);
-  useEventListener("dragover", (event) => event.preventDefault(), target);
+  useEventListener("dragenter", () => setDrag(true), buttonRef);
+  useEventListener("dragleave", () => setDrag(false), buttonRef);
+  useEventListener("dragover", (event) => event.preventDefault(), buttonRef);
   useEventListener(
     "drop",
     (event) => {
@@ -66,7 +63,7 @@ export default function UploadButton({
       setDrag(false);
       upload(event.dataTransfer);
     },
-    target,
+    buttonRef,
   );
 
   /** visual feedback for drag state */
@@ -74,29 +71,29 @@ export default function UploadButton({
     "outline-2 outline-offset-2 outline-white outline-dashed";
 
   useEffect(() => {
-    if (!target?.current) return;
-    if (drag) target.current.classList.add(...dragClassName.split(" "));
-    else target.current.classList.remove(...dragClassName.split(" "));
-  }, [drag, target]);
+    if (!buttonRef.current) return;
+    if (drag) buttonRef.current.classList.add(...dragClassName.split(" "));
+    else buttonRef.current.classList.remove(...dragClassName.split(" "));
+  }, [drag]);
 
   return (
-    <div className="flex items-center justify-center gap-4">
+    <>
       <Button
+        ref={buttonRef}
         className={clsx(drag && dragClassName, className)}
-        onClick={() => ref.current?.click()}
-        {...props}
+        onClick={() => buttonRef.current?.click()}
       >
         <UploadIcon />
         {children}
       </Button>
       {[name, ext].filter(Boolean).join(".")}
       <input
-        ref={ref}
+        ref={inputRef}
         type="file"
         accept={accept.join(",")}
         style={{ display: "none" }}
         onChange={(event) => upload(event.target)}
       />
-    </div>
+    </>
   );
 }
