@@ -28,7 +28,7 @@ export default function Select<Option extends string>({
         >
           {options.map((option, index) => (
             <option key={index} value={option}>
-              {startCase(option)}
+              {startCase(option) || "None"}
             </option>
           ))}
         </select>

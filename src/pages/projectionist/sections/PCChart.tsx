@@ -35,7 +35,7 @@ export default function PCChart({
   /** echarts options */
   const option: EChartsOption = {
     series: series.map(
-      ({ data, color = "white", shape = "rect", size = 2 }) =>
+      ({ data, color = "white", shape = "circle", size = 1 }) =>
         ({
           type: "scatter",
           data: data.map(({ x, y, ...datum }) => ({
@@ -83,7 +83,7 @@ export default function PCChart({
         const factor = (xScale * yScale) ** 0.15;
         chart.setOption({
           series: series.map((_, index) => ({
-            symbolSize: (series[index]?.size ?? 2) * factor,
+            symbolSize: (series[index]?.size ?? 1) * factor,
           })),
         });
       }, 100)}

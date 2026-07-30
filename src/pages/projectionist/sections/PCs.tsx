@@ -126,24 +126,25 @@ export default function PCs() {
       sample,
     }));
 
-    return {
-      data,
-      color: entry("Compendium").color,
-      shape: entry("Compendium").shape,
-    };
+    /** no grouping */
+    if (group !== "Region")
+      return {
+        data,
+        color: entry("Compendium").color,
+        shape: entry("Compendium").shape,
+        size: 3,
+      };
 
     /** split into groups by region */
-    const groups = groupBy(
-      data,
-      ({ sample }) => sampleRegions?.[sample] ?? "Unknown",
-    );
+    const groups = groupBy(data, ({ sample }) => sampleRegions?.[sample] ?? "");
 
     return Object.entries(groups).map(([group, data]) => ({
       data,
       color: entry(group).color,
       shape: entry(group).shape,
+      size: 3,
     }));
-  }, [sampleRegions, filteredSamplePCs, PCX, PCY, entry]);
+  }, [sampleRegions, filteredSamplePCs, PCX, PCY, entry, group]);
 
   /** data for user plot */
   const userPlot = useMemo(() => {
@@ -158,7 +159,9 @@ export default function PCs() {
 
     /** split into groups by selected "group by" option */
     const groups = groupBy(data, ({ sample }) =>
-      group ? String(userMeta?.[sample]?.[group] ?? "") : "Yours",
+      group && group !== "Region"
+        ? String(userMeta?.[sample]?.[group] ?? "")
+        : "Yours",
     );
 
     /** map groups into data series */
@@ -212,21 +215,19 @@ export default function PCs() {
           onChange={setRegions}
           className="w-30"
         />
-        {userPlot && (
-          <Select
-            label={
-              <>
-                Group by
-                <Tooltip content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. ">
-                  <HelpCircleIcon />
-                </Tooltip>
-              </>
-            }
-            options={["", ...groupOptions]}
-            value={group}
-            onChange={setGroup}
-          />
-        )}
+        <Select
+          label={
+            <>
+              Group by
+              <Tooltip content="Color points by this property.">
+                <HelpCircleIcon />
+              </Tooltip>
+            </>
+          }
+          options={["", "Region", ...groupOptions]}
+          value={group}
+          onChange={setGroup}
+        />
       </div>
 
       {compendiumPlot === undefined ? (
