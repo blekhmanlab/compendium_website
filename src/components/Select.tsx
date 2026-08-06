@@ -27,7 +27,7 @@ export default function Select<Option extends string>({
           onChange={(event) => onChange(event.target.value as Option)}
         >
           {options.map((option, index) => (
-            <option key={index} value={option}>
+            <option key={index} value={option} className="bg-gray text-white">
               {startCase(option) || "None"}
             </option>
           ))}

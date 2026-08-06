@@ -253,12 +253,12 @@ export default function Map() {
                       <dd>
                         {feature.properties.country} ({feature.properties.code})
                       </dd>
-                      <dt>Region</dt>
-                      <dd>{feature.properties.region}</dd>
-                      <dt>Samples</dt>
-                      <dd>{formatNumber(feature.properties.samples, false)}</dd>
                     </>
                   )}
+                  <dt>Region</dt>
+                  <dd>{feature.properties.region}</dd>
+                  <dt>Samples</dt>
+                  <dd>{formatNumber(feature.properties.samples, false)}</dd>
                 </dl>
               }
             >

@@ -7,7 +7,6 @@ import type { _Record, Zenodo } from "./types/zenodo-api";
 import { bin, extent, median } from "d3";
 import dissolve from "geojson-dissolve";
 import { cloneDeep, orderBy, startCase } from "lodash";
-import countryToRegion from "./extra/country-to-region.json";
 import naturalEarth from "./extra/natural-earth.json";
 import {
   dirSize,
@@ -57,7 +56,7 @@ const processMainData = async (
    * https://github.com/nvkelso/natural-earth-vector/blob/master/geojson
    * https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson
    */
-  const worldMap = naturalEarth as unknown as FeatureCollection<
+  const worldMap = cloneDeep(naturalEarth) as unknown as FeatureCollection<
     Geometry,
     {
       region: string;
@@ -68,6 +67,20 @@ const processMainData = async (
   >;
 
   type WorldMapFeature = (typeof worldMap.features)[0];
+
+  /** make map of country code to region */
+  const countryToRegion: Record<string, string> = {};
+  /** stream file line by line */
+  const regionsStream = stream(`${inputPath}/regions.tsv`);
+  /** ignore header */
+  await regionsStream.next();
+  /** process rest of rows (with hard limit) */
+  for (let row = 0; row < 1000000; row++) {
+    const { value: row = [], done } = await regionsStream.next();
+    if (done) break;
+    const [code = "", region = ""] = row;
+    countryToRegion[code] = region;
+  }
 
   /** filter out null property */
   const clean = (value: unknown) => {
@@ -337,7 +350,7 @@ const processMainData = async (
       }
   }
 
-  /** parse tag counts */
+  /** stream file line by line */
   const tagsStream = stream(`${inputPath}/tags.tsv`);
 
   /** ignore header */
@@ -374,6 +387,8 @@ const processMainData = async (
       done,
     } = await tagsStream.next();
 
+    if (done) break;
+
     /** count tags */
     tags[tag] ??= { tag, projects: {}, samples: {} };
     tags[tag].projects[project] = project;
@@ -383,8 +398,6 @@ const processMainData = async (
     const key = [tag, value, project].join("-");
     tagValues[key] ??= { tag, value, project, samples: 0 };
     tagValues[key].samples++;
-
-    if (done) break;
   }
 
   /** turn maps into lists, and do final sorting and such */
