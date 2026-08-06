@@ -1,46 +1,34 @@
 import Tooltip from "@/components/Tooltip";
-import chicago from "../assets/chicago.png";
-import colorado from "../assets/colorado.png";
-import minnesota from "../assets/minnesota.png";
+import { useSite } from "@/pages/home/state";
 
 export default function Footer() {
+  const site = useSite();
+
   return (
-    <footer className="relative isolate flex flex-row justify-between gap-8 bg-linear-to-r from-primary-dark to-secondary-dark p-8 max-md:flex-col max-md:items-center">
+    <footer className="relative isolate flex flex-row items-center justify-between gap-8 bg-linear-to-r from-primary-dark to-secondary-dark p-8 max-md:flex-col">
       <p className="max-w-[unset]">
-        A project of the <a href="http://blekhmanlab.org/">Blekhman Lab</a>,{" "}
-        <a href="http://greenelab.com/">Greene Lab</a>,{" "}
-        <a href="https://seandavi.github.io/">Davis Lab</a>, and{" "}
-        <a href="https://albert-lab.org/">Albert Lab</a>, in affiliation with...
+        A project of the{" "}
+        {site.labs.map((lab, index, array) => (
+          <span key={index}>
+            <a href={lab.url}>{lab.text}</a>
+            {index < array.length - 1 && " "}
+          </span>
+        ))}
+        , in affiliation with...
       </p>
 
       <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-        <Tooltip content="University of Chicago | Section of Genetic Medicine">
-          <a href="https://medicine.uchicago.edu/sections/genetic-medicine/">
-            <img
-              src={chicago}
-              alt="University of Chicago logo"
-              style={{ maxHeight: "25px" }}
-            />
-          </a>
-        </Tooltip>
-        <Tooltip content="University of Colorado | Department of Biomedical Informatics">
-          <a href="https://medschool.cuanschutz.edu/dbmi">
-            <img
-              src={colorado}
-              alt="University of Colorado logo"
-              style={{ maxHeight: "40px" }}
-            />
-          </a>
-        </Tooltip>
-        <Tooltip content="University of Minnesota | Department of Genetics, Cell Biology, and Development">
-          <a href="https://cbs.umn.edu/gcd">
-            <img
-              src={minnesota}
-              alt="University of Minnesota logo"
-              style={{ maxHeight: "15px" }}
-            />
-          </a>
-        </Tooltip>
+        {site.groups.map((group, index) => (
+          <Tooltip key={index} content={group.text}>
+            <a href={group.url}>
+              <img
+                src={group.image}
+                alt={group.text}
+                style={{ maxHeight: "40px" }}
+              />
+            </a>
+          </Tooltip>
+        ))}
       </div>
     </footer>
   );

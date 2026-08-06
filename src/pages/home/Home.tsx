@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Footer from "@/components/Footer";
 import Meta from "@/components/Meta";
-import { site } from "@/site";
+import { useSite } from "@/pages/home/state";
 import Compare from "./sections/Compare";
 import Header from "./sections/Header";
 import Overview from "./sections/Overview";
@@ -13,6 +13,7 @@ import { loadGeo, loadMeta, loadProjects, loadTaxa, useData } from "./state";
 export default function Home() {
   /** which compendium is selected */
   const compendium = useData((state) => state.compendium);
+  const site = useSite();
 
   /** load (small-enough) data on page load */
   useEffect(() => {
@@ -26,10 +27,7 @@ export default function Home() {
 
   return (
     <>
-      <Meta
-        title={site[compendium].title}
-        description={site[compendium].description}
-      />
+      <Meta title={site.title} description={site.description} />
 
       <Header />
       <main>

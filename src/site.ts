@@ -1,4 +1,4 @@
-export const site = {
+export default {
   "human-microbiome-compendium": {
     title: "Human Microbiome Compendium",
     description:
@@ -8,6 +8,29 @@ export const site = {
     rPackage: "https://blekhmanlab.github.io/MicroBioMap/",
     data: "https://doi.org/10.5281/zenodo.8186993",
     record: "https://zenodo.org/api/records?q=conceptrecid:8186993",
+    labs: [
+      { text: "Blekhman Lab", url: "http://blekhmanlab.org/" },
+      { text: "Greene Lab", url: "http://greenelab.com/" },
+      { text: "Davis Lab", url: "https://seandavi.github.io/" },
+      { text: "Albert Lab", url: "https://albert-lab.org/" },
+    ],
+    groups: [
+      {
+        image: "chicago.png",
+        text: "University of Chicago | Section of Genetic Medicine",
+        url: "https://medicine.uchicago.edu/sections/genetic-medicine/",
+      },
+      {
+        image: "colorado.png",
+        text: "University of Colorado | Department of Biomedical Informatics",
+        url: "https://medschool.cuanschutz.edu/dbmi",
+      },
+      {
+        image: "minnesota.png",
+        text: "University of Minnesota | Department of Genetics, Cell Biology, and Development",
+        url: "https://cbs.umn.edu/gcd",
+      },
+    ],
   },
   "meta-g-compendium": {
     title: "Meta G Compendium",
@@ -18,5 +41,38 @@ export const site = {
     rPackage: "https://fake-link.com",
     data: "https://doi.org/12345",
     record: "https://zenodo.org/api/records?q=conceptrecid:21275720",
+    labs: [{ text: "Poyet & Groussin Labs", url: "http://blekhmanlab.org/" }],
+    groups: [
+      {
+        image: "pmi.png",
+        text: "Precision Medicine in Chronic Inflammation",
+        url: "https://www.precisionmedicine.de/",
+      },
+      {
+        image: "cau.png",
+        text: "Kiel University (Christian-Albrechts-Universität zu Kiel) | Kiel Metaorganism Center",
+        url: "https://www.uni-kiel.de/en/centres/kmc",
+      },
+      {
+        image: "iem.png",
+        text: "Institute of Experimental Medicine",
+        url: "",
+      },
+      {
+        image: "gmbc.png",
+        text: "Global Microbiome Conservancy",
+        url: "https://microbiomeconservancy.org/",
+      },
+      {
+        image: "mi-target.png",
+        text: "The Microbiome as a Therapeutic Target in Inflammatory Bowel Diseases",
+        url: "https://www.mitarget.org/",
+      },
+      {
+        image: "ikmb.png",
+        text: "Institute of Clinical Molecular Biology",
+        url: "https://www.ikmb.uni-kiel.de/",
+      },
+    ],
   },
 };

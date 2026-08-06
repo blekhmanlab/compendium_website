@@ -1,7 +1,7 @@
 import type { Compendium } from "@/pages/home/state";
 import type { Zenodo } from "../../../../compile/types/zenodo-api";
 import { mapKeys } from "lodash";
-import { site } from "@/site";
+import site from "@/site";
 import { request } from "@/util/async";
 import metaUrl from "./human-microbiome-compendium/meta.json?url";
 

@@ -19,7 +19,7 @@ import {
   throttle,
   write,
 } from "./util";
-import { site } from "../src/site";
+import site from "../src/site";
 
 /**
  * pre-compile step that takes the "raw" distributed data (csv/tsv), and pares

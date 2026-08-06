@@ -16,7 +16,7 @@ import type {
 } from "@/pages/home/data/tag.ts";
 import type * as TaxaAPI from "@/pages/home/data/taxa.ts";
 import type { Classes, Phyla, TaxonSearch } from "@/pages/home/data/taxa.ts";
-import type { site } from "@/site";
+import type meta from "@/site";
 import { wrap } from "comlink";
 import { create } from "zustand";
 import GeoWorker from "@/pages/home/data/geo.ts?worker";
@@ -24,8 +24,9 @@ import { getLiveMeta, getMeta } from "@/pages/home/data/meta.ts";
 import ProjectWorker from "@/pages/home/data/projects.ts?worker";
 import TagWorker from "@/pages/home/data/tag.ts?worker";
 import TaxaWorker from "@/pages/home/data/taxa.ts?worker";
+import site from "@/site";
 
-export type Compendium = keyof typeof site;
+export type Compendium = keyof typeof meta;
 
 export type Data = {
   compendium: Compendium;
@@ -61,6 +62,12 @@ export const setSelectedCompendium = (compendium: Compendium) =>
 
 /** get selected compendium */
 export const getSelectedCompendium = () => useData.getState().compendium;
+
+/** get selected compendium meta for site/page */
+export const useSite = () => {
+  const compendium = useData((state) => state.compendium);
+  return site[compendium];
+};
 
 /** load and set metadata */
 export const loadMeta = async (

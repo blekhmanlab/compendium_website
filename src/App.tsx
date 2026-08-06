@@ -13,7 +13,7 @@ import {
   setSelectedCompendium,
 } from "@/pages/home/state";
 import Projectionist from "@/pages/projectionist/Projectionist";
-import { site } from "@/site";
+import meta from "@/site";
 
 /** app entrypoint */
 export default function App() {
@@ -74,8 +74,8 @@ const updateCompendium = () => {
   let compendium = url.searchParams.get("compendium");
 
   /** update selected compendium */
-  if (compendium && compendium in site)
-    setSelectedCompendium(compendium as keyof typeof site);
+  if (compendium && compendium in meta)
+    setSelectedCompendium(compendium as keyof typeof meta);
   else setSelectedCompendium("human-microbiome-compendium");
   compendium = getSelectedCompendium();
 

@@ -9,13 +9,11 @@ import {
   TableIcon,
 } from "lucide-react";
 import Alert from "@/components/Alert";
-import { useData } from "@/pages/home/state";
-import { site } from "@/site";
+import { useData, useSite } from "@/pages/home/state";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
 
 export default function Overview() {
-  /** which compendium is selected */
-  const compendium = useData((state) => state.compendium);
+  const site = useSite();
   /** metadata for compendium */
   const meta = useData((state) => state.meta);
 
@@ -133,7 +131,7 @@ export default function Overview() {
       <p>
         This website lets you <b>search</b> and <b>explore</b> the data at a
         high level before downloading.{" "}
-        <a href={site[compendium].rPackage}>
+        <a href={site.rPackage}>
           <PackageIcon />
           Use the R package
         </a>{" "}
