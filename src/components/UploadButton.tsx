@@ -81,7 +81,7 @@ export default function UploadButton({
       <Button
         ref={buttonRef}
         className={clsx(drag && dragClassName, className)}
-        onClick={() => buttonRef.current?.click()}
+        onClick={() => inputRef.current?.click()}
       >
         <UploadIcon />
         {children}
