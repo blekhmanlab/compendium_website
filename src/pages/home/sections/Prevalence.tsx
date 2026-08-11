@@ -14,6 +14,7 @@ type Chart = (typeof chartOptions)[number];
 
 export default function Prevalence() {
   /** get global state */
+  const compendium = useData((state) => state.compendium);
   const phyla = useData((state) => state.phyla);
   const reads = useData((state) => state.reads);
   const selectedFeature = useData((state) => state.selectedFeature);
@@ -41,12 +42,14 @@ export default function Prevalence() {
         <Map />
 
         <div className="flex flex-col items-center gap-4">
-          <Select
-            label="Chart"
-            value={chart}
-            onChange={setChart}
-            options={chartOptions}
-          />
+          {compendium !== "meta-g-compendium" && (
+            <Select
+              label="Chart"
+              value={chart}
+              onChange={setChart}
+              options={chartOptions}
+            />
+          )}
           <div className="min-h-80 w-full grow">
             {chart === "Phyla" && <PhylaChart data={phyla as Phyla} />}
             {chart === "Reads" && <ReadsChart data={reads as Reads} />}
