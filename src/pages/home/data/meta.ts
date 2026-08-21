@@ -38,7 +38,7 @@ export const getMeta = async (compendium: Compendium) =>
 
 /** live metadata (from zenodo api) */
 export const getLiveMeta = async (compendium: Compendium) => {
-  const record = (await request<Zenodo>(site[compendium].record)).hits.hits[0];
+  const record = await request<Zenodo>(site[compendium].record);
   if (!record) {
     console.warn(`No hits for ${site[compendium].record}`);
     return {};

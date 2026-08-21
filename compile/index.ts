@@ -3,7 +3,7 @@ import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
 import type { FeatureCollection, Geometry } from "geojson";
-import type { _Record, Zenodo } from "./types/zenodo-api";
+import type { Zenodo } from "./types/zenodo-api";
 import { bin, extent, median } from "d3";
 import dissolve from "geojson-dissolve";
 import { cloneDeep, orderBy, startCase } from "lodash";
@@ -32,8 +32,7 @@ chdir(dirname(fileURLToPath(import.meta.url)));
 const downloadFiles = async (recordUrl: string, outputPath: string) => {
   console.info("DOWNLOADING FILES");
 
-  const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
-  if (!record) throw Error("No hits");
+  const record = await request<Zenodo>(recordUrl);
   write(`${outputPath}/record.json`, record);
   console.info("Downloading raw data");
   for (const { key, links } of record.files || [])
@@ -453,7 +452,7 @@ const processMainData = async (
   );
 
   /** load zenodo record */
-  const record = read<_Record>(recordPath);
+  const record = read<Zenodo>(recordPath);
 
   /** derive metadata about data */
   const meta = {
@@ -680,6 +679,10 @@ await downloadFiles(
   "downloaded/human-microbiome-compendium",
 );
 await downloadFiles(
+  site["human-microbiome-compendium"].projectionistRecord,
+  "downloaded/projectionist",
+);
+await downloadFiles(
   site["meta-g-compendium"].record,
   "downloaded/meta-g-compendium",
 );
@@ -694,6 +697,6 @@ await processMainData(
   "../src/pages/home/data/meta-g-compendium",
 );
 await processProjectionistData(
-  "downloaded/human-microbiome-compendium",
+  "downloaded/projectionist",
   "../src/pages/projectionist/data/human-microbiome-compendium",
 );
