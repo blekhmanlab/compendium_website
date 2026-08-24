@@ -103,5 +103,5 @@ export default function ReadsChart({ data }: Props) {
       </Alert>
     );
 
-  return <Chart option={option} />;
+  return <Chart option={option} download="reads-chart" />;
 }

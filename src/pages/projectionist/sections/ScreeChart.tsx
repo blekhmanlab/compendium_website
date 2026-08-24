@@ -1,5 +1,6 @@
 import type { EChartsOption } from "echarts";
 import Chart from "@/components/Chart";
+import { getCssVariable } from "@/util/dom";
 import { formatNumber } from "@/util/string";
 
 type Props = {
@@ -17,14 +18,13 @@ export default function ScreeChart({ yLabel, type, data }: Props) {
       {
         type: type,
         barWidth: "90%",
-        color: "var(--color-primary)",
+        color: getCssVariable("--color-primary"),
         data: Object.values(data).map((datum) => ({
           value: datum,
           tooltip: formatNumber(datum, true),
         })),
       },
     ],
-    grid: { left: 50, right: 50, top: 50, bottom: 50 },
     xAxis: {
       name: "PC",
       type: "category",
@@ -39,5 +39,5 @@ export default function ScreeChart({ yLabel, type, data }: Props) {
     tooltip: { trigger: "item" },
   };
 
-  return <Chart option={option} className="h-100" />;
+  return <Chart option={option} className="h-100" download="scree-chart" />;
 }

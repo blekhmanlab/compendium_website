@@ -76,7 +76,7 @@ export default function PhylaChart({ data }: Props) {
       },
     ],
 
-    grid: { left: 150, right: 20, top: 50, bottom: 50 },
+    grid: { left: 150 },
 
     title: [
       {
@@ -119,5 +119,5 @@ export default function PhylaChart({ data }: Props) {
       </Alert>
     );
 
-  return <Chart option={option} />;
+  return <Chart option={option} download="phyla-chart" />;
 }

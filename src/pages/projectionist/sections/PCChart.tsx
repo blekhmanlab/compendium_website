@@ -46,12 +46,9 @@ export default function PCChart({
           itemStyle: { color },
           symbol: shape,
           symbolSize: size,
-          progressive: 0,
-          large: true,
-          largeThreshold: 10000,
+          progressive: 1000,
         }) satisfies EChartsOption["series"],
     ),
-    grid: { left: 50, right: 50, top: 50, bottom: 50 },
     title: [{ text: title, subtext: subtitle }],
     xAxis: { min: -range, max: range, name: xLabel },
     yAxis: { min: -range, max: range, name: yLabel },
@@ -77,7 +74,6 @@ export default function PCChart({
   return (
     <Chart
       option={option}
-      init={{ renderer: "canvas" }}
       onZoom={debounce((chart, xScale, yScale) => {
         /** scale points up a bit when zooming in */
         const factor = (xScale * yScale) ** 0.15;
@@ -88,6 +84,7 @@ export default function PCChart({
         });
       }, 100)}
       className="aspect-square w-120"
+      download="pc-chart"
     />
   );
 }

@@ -69,6 +69,10 @@
     @apply font-semibold;
   }
 
+  svg {
+    @apply overflow-visible;
+  }
+
   p {
     @apply max-w-175 text-center leading-loose text-balance;
   }
@@ -78,7 +82,7 @@
   }
 
   button {
-    @apply flex cursor-pointer items-center justify-center;
+    @apply flex cursor-pointer items-center justify-center transition;
   }
 
   table {
