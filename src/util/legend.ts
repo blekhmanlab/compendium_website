@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { formatHex } from "culori";
 import { getCssVariable } from "@/util/dom";
 
@@ -13,7 +14,7 @@ const colors = [
   formatHex("oklch(65% 0.3 20)"),
 ];
 
-const neutral = getCssVariable("--color-light-gray");
+const gray = getCssVariable("--color-light-gray");
 
 /** re-create built-in echarts shapes */
 export const shapePaths: Record<string, string> = {
@@ -25,29 +26,71 @@ export const shapePaths: Record<string, string> = {
 
 const shapes = Object.keys(shapePaths);
 
-export const useLegend = (stagger = 1) => {
-  /** map unique key to entry in list */
-  const map: Record<string, { color: string; shape: string }> = {};
+type Entry = { key: string; color: string; shape: string };
+type Legend = Entry[];
+const neutral: Entry = { key: "", color: gray, shape: "circle" };
 
-  /** next entry to assign */
-  let color = 0;
-  let shape = 0;
+export const useLegend = () => {
+  /** reserved map of key to entry */
+  const reserved = useRef<Legend>([]);
+  /** visible map of key to entry */
+  const visible: Legend = [];
 
-  /** get entry for unique key */
-  const entry = (key: string) => {
-    /** return existing value */
-    if (key in map) return map[key]!;
-    if (!key)
-      /** assign neutral entry if key is falsy */
-      return (map[key] = { color: neutral, shape: "circle" });
-    else {
-      /** assign next entry in list */
-      return (map[key] = {
-        color: colors[(color++ * stagger) % colors.length] ?? neutral,
-        shape: shapes[shape++ % shapes.length] ?? "circle",
-      });
+  /** next entry to reserve */
+  const color = useRef(0);
+  const shape = useRef(0);
+
+  /** find entry by key */
+  const find = (legend: Legend, key: string) => {
+    const index = legend.findIndex((entry) => entry.key === key);
+    if (index !== -1) return { index, entry: legend[index]! };
+  };
+
+  /** keep neutral entry at end */
+  const sort = () => {
+    const match = find(visible, neutral.key);
+    if (match) {
+      visible.splice(match.index, 1);
+      visible.push(neutral);
     }
   };
 
-  return [entry, map] as const;
+  /** get entry for unique key */
+  const entry = (key: string) => {
+    /** return existing entry */
+    const existing = find(reserved.current, key);
+    if (existing) {
+      if (!find(visible, key)) {
+        visible.push(existing.entry);
+        sort();
+      }
+      return existing.entry;
+    }
+
+    const newEntry = !key
+      ? /** assign neutral entry if key is falsy */
+        neutral
+      : /** assign next entry in list */
+        {
+          key,
+          color: colors[color.current++ % colors.length] ?? neutral.color,
+          shape: shapes[shape.current++ % shapes.length] ?? "circle",
+        };
+
+    /** set entry */
+    visible.push(newEntry);
+    sort();
+    reserved.current.push(newEntry);
+
+    return newEntry;
+  };
+
+  /** reset reserved map */
+  const reset = () => {
+    reserved.current = [];
+    color.current = 0;
+    shape.current = 0;
+  };
+
+  return [entry, visible, reset] as const;
 };

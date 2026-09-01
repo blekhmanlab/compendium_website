@@ -113,7 +113,7 @@ export default function PCs() {
   const [group, setGroup] = useState("");
 
   /** color legend */
-  const [entry, legend] = useLegend(2);
+  const [entry, legend, reset] = useLegend();
 
   /** data for compendium plot */
   const compendiumPlot = useMemo(() => {
@@ -136,7 +136,10 @@ export default function PCs() {
       };
 
     /** split into groups by region */
-    const groups = groupBy(data, ({ sample }) => sampleRegions?.[sample] ?? "");
+    const groups = groupBy(data, ({ sample }) => {
+      const region = sampleRegions?.[sample] ?? "";
+      return !region || region === "unknown" ? "" : region;
+    });
 
     return Object.entries(groups).map(([group, data]) => ({
       data,
@@ -160,7 +163,7 @@ export default function PCs() {
     /** split into groups by selected "group by" option */
     const groups = groupBy(data, ({ sample }) =>
       group && group !== "Region"
-        ? String(userMeta?.[sample]?.[group] ?? "")
+        ? String(userMeta?.[sample]?.[group] || "")
         : "Yours",
     );
 
@@ -226,7 +229,10 @@ export default function PCs() {
           }
           options={["", "Region", ...groupOptions]}
           value={group}
-          onChange={setGroup}
+          onChange={(value) => {
+            setGroup(value);
+            reset();
+          }}
         />
       </div>
 
@@ -250,13 +256,10 @@ export default function PCs() {
         />
 
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-          {Object.entries(legend).map(([key, value], index) => (
+          {legend.map(({ key, color, shape }, index) => (
             <div key={index} className="flex items-center gap-2">
               <svg viewBox="-1 -1 2 2" className="size-4">
-                <path
-                  d={shapePaths[value.shape ?? ""] ?? ""}
-                  fill={value.color}
-                />
+                <path d={shapePaths[shape ?? ""] ?? ""} fill={color} />
               </svg>
               <span>{String(key) || "-"}</span>
             </div>

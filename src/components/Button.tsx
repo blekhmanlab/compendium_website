@@ -16,7 +16,7 @@ export default function Button({
   ...props
 }: Props) {
   className = clsx(
-    "cursor-pointer items-center justify-center gap-2 rounded-full text-center text-inherit no-underline hover:opacity-100",
+    "flex cursor-pointer items-center justify-center gap-2 rounded-full text-center text-inherit no-underline hover:opacity-100",
     design === "regular" &&
       "border border-light-gray px-4 py-2 hover:bg-light-gray aria-selected:bg-light-gray",
     design === "accent" &&
