@@ -19,6 +19,7 @@ type Props = {
     size?: number;
   }[];
   range: number;
+  chunk?: number;
 };
 
 /** x/y plot of principal components */
@@ -29,6 +30,7 @@ export default function PCChart({
   yLabel,
   series,
   range,
+  chunk = 1000,
 }: Props) {
   range = Math.ceil(range);
 
@@ -46,7 +48,8 @@ export default function PCChart({
           itemStyle: { color },
           symbol: shape,
           symbolSize: size,
-          progressive: 10000,
+          progressive: chunk,
+          progressiveChunkMode: "mod",
         }) satisfies EChartsOption["series"],
     ),
     title: [{ text: title, subtext: subtitle }],

@@ -44,7 +44,7 @@ export default function SelectMulti<Option extends string>({
   else selected = `${value.length} selected`;
 
   /** are all options selected */
-  const allSelected = value.length === options.length;
+  const allSelected = _value.length === options.length;
 
   return (
     <label className="inline-flex items-center gap-2">

@@ -260,6 +260,8 @@ export default function PCs() {
           yLabel={PCY ?? ""}
           series={series}
           range={max}
+          /** more distinct colors = more render time = smaller chunks needed */
+          chunk={1000 * 10 ** (-(Object.entries(legend).length - 1) / 7)}
         />
 
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
