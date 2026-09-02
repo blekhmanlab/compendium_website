@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import clsx from "clsx";
 import {
   ArrowDownIcon,
@@ -22,7 +21,7 @@ export default function Extremes() {
   const PCY = useData((state) => state.PCY);
 
   /** get extreme values of taxon pcs */
-  const extremes = useMemo(() => {
+  const extremes = (() => {
     if (!taxonPCs || !PCX || !PCY) return undefined;
     const xs = Object.entries(taxonPCs)
       .map(([taxon, PCs]) => ({ taxon, PC: PCs[PCX] ?? 0 }))
@@ -76,7 +75,7 @@ export default function Extremes() {
         data: ys.slice(0, count),
       },
     ];
-  }, [taxonPCs, PCX, PCY]);
+  })();
 
   return (
     <section className="width-lg">

@@ -1,7 +1,7 @@
 import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
 import type { D3ZoomEvent, GeoProjection, ZoomTransform } from "d3";
 import type { Countries, Regions } from "@/pages/home/data/geo";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useEventListener } from "@reactuses/core";
 import {
   extent,
@@ -79,17 +79,13 @@ export default function Map() {
     .range(selectedFeature ? [gray, lightGray] : [lightGray, primary])
     .interpolate(interpolateLab);
 
-  const { projection, baseScale } = useMemo(() => {
-    /** create projection */
-    const projection = geoNaturalEarth1();
+  /** create projection */
+  const projection = geoNaturalEarth1();
 
-    fitProjection(projection);
+  fitProjection(projection);
 
-    /** get scale when projection fit to earth bbox */
-    const baseScale = projection.scale();
-
-    return { projection, baseScale };
-  }, []);
+  /** get scale when projection fit to earth bbox */
+  const baseScale = projection.scale();
 
   /** reset projection */
   const resetProjection = () => {
@@ -234,7 +230,7 @@ export default function Map() {
             });
         }}
         viewBox={[0, 0, width, height].join(" ")}
-        className="w-full stroke-[0.5]"
+        className="w-full overflow-hidden stroke-[0.5]"
       >
         <g className="fill-none stroke-light-gray">
           <path ref={outlineRef} />
