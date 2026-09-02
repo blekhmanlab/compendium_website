@@ -2,7 +2,7 @@ import type { Remote } from "comlink";
 import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
-import { groupBy, pick, uniq } from "lodash";
+import { groupBy, isEmpty, pick, uniq } from "lodash";
 import { HelpCircleIcon } from "lucide-react";
 import Alert from "@/components/Alert";
 import Select from "@/components/Select";
@@ -47,7 +47,12 @@ export default function PCs() {
 
   /** region options */
   const regionOptions = useMemo(
-    () => uniq(samples?.map((sample) => sample.region) ?? []).sort(),
+    () =>
+      uniq(
+        samples
+          ?.map((sample) => sample.region)
+          .filter((region) => region && region !== "unknown") ?? [],
+      ).sort(),
     [samples],
   );
 
@@ -112,8 +117,18 @@ export default function PCs() {
   );
   const [group, setGroup] = useState("");
 
-  /** color legend */
-  const [entry, legend, reset] = useLegend();
+  /** order of legend entries */
+  const entries: string[] = [
+    ...(group !== "Region" ? ["Compendium"] : []),
+    "Yours",
+    ...(group === "Region" ? regionOptions : []),
+    ...(userMeta
+      ? Object.values(userMeta).map((meta) => meta[group] ?? "")
+      : []),
+  ];
+
+  /** legend colors/shapes */
+  const [entry, legend] = useLegend(entries);
 
   /** data for compendium plot */
   const compendiumPlot = useMemo(() => {
@@ -136,10 +151,7 @@ export default function PCs() {
       };
 
     /** split into groups by region */
-    const groups = groupBy(data, ({ sample }) => {
-      const region = sampleRegions?.[sample] ?? "";
-      return !region || region === "unknown" ? "" : region;
-    });
+    const groups = groupBy(data, ({ sample }) => sampleRegions?.[sample] ?? "");
 
     return Object.entries(groups).map(([group, data]) => ({
       data,
@@ -151,7 +163,7 @@ export default function PCs() {
 
   /** data for user plot */
   const userPlot = useMemo(() => {
-    if (!userProjected || !PCX || !PCY) return undefined;
+    if (isEmpty(userProjected) || !PCX || !PCY) return undefined;
 
     /** user data to plot points */
     const data = Object.entries(userProjected).map(([sample, PCs]) => ({
@@ -163,7 +175,7 @@ export default function PCs() {
     /** split into groups by selected "group by" option */
     const groups = groupBy(data, ({ sample }) =>
       group && group !== "Region"
-        ? String(userMeta?.[sample]?.[group] || "")
+        ? String(userMeta?.[sample]?.[group] ?? "")
         : "Yours",
     );
 
@@ -229,10 +241,7 @@ export default function PCs() {
           }
           options={["", "Region", ...groupOptions]}
           value={group}
-          onChange={(value) => {
-            setGroup(value);
-            reset();
-          }}
+          onChange={setGroup}
         />
       </div>
 
@@ -248,7 +257,7 @@ export default function PCs() {
 
       <div className="flex w-full flex-col items-center gap-8">
         <PCChart
-          title={userPlot ? "Compendium vs. Yours" : "Compendium"}
+          title="Compendium vs. Yours"
           xLabel={PCX ?? ""}
           yLabel={PCY ?? ""}
           series={series}
@@ -256,7 +265,7 @@ export default function PCs() {
         />
 
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-          {legend.map(({ key, color, shape }, index) => (
+          {Object.entries(legend).map(([key, { color, shape }], index) => (
             <div key={index} className="flex items-center gap-2">
               <svg viewBox="-1 -1 2 2" className="size-4">
                 <path d={shapePaths[shape ?? ""] ?? ""} fill={color} />

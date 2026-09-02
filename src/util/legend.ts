@@ -26,71 +26,42 @@ export const shapePaths: Record<string, string> = {
 
 const shapes = Object.keys(shapePaths);
 
-type Entry = { key: string; color: string; shape: string };
-type Legend = Entry[];
-const neutral: Entry = { key: "", color: gray, shape: "circle" };
+type Entry = { color: string; shape: string };
+type Legend = Record<string, Entry>;
+const neutral: Entry = { color: gray, shape: "circle" };
 
-export const useLegend = () => {
-  /** reserved map of key to entry */
-  const reserved = useRef<Legend>([]);
-  /** visible map of key to entry */
-  const visible: Legend = [];
+export const useLegend = (keys: string[]) => {
+  /** map of key to entry */
+  const map: Legend = {};
+  const used: Legend = {};
 
   /** next entry to reserve */
-  const color = useRef(0);
-  const shape = useRef(0);
+  let color = 0;
+  let shape = 0;
 
-  /** find entry by key */
-  const find = (legend: Legend, key: string) => {
-    const index = legend.findIndex((entry) => entry.key === key);
-    if (index !== -1) return { index, entry: legend[index]! };
-  };
+  /** reserve entry for each key */
+  for (const key of keys)
+    if (!map[key])
+      map[key] = {
+        color: colors[color++ % colors.length]!,
+        shape: shapes[shape++ % shapes.length]!,
+      };
 
-  /** keep neutral entry at end */
-  const sort = () => {
-    const match = find(visible, neutral.key);
-    if (match) {
-      visible.splice(match.index, 1);
-      visible.push(neutral);
-    }
-  };
-
-  /** get entry for unique key */
+  /** get entry for key */
   const entry = (key: string) => {
-    /** return existing entry */
-    const existing = find(reserved.current, key);
-    if (existing) {
-      if (!find(visible, key)) {
-        visible.push(existing.entry);
-        sort();
-      }
-      return existing.entry;
+    /** get entry */
+    const entry = map[key] ?? neutral;
+    /** mark as used */
+    used[key] = entry;
+    /** sort used by key order, in place */
+    for (const key of keys) {
+      if (!used[key]) continue;
+      const value = used[key]!;
+      delete used[key];
+      used[key] = value;
     }
-
-    const newEntry = !key
-      ? /** assign neutral entry if key is falsy */
-        neutral
-      : /** assign next entry in list */
-        {
-          key,
-          color: colors[color.current++ % colors.length] ?? neutral.color,
-          shape: shapes[shape.current++ % shapes.length] ?? "circle",
-        };
-
-    /** set entry */
-    visible.push(newEntry);
-    sort();
-    reserved.current.push(newEntry);
-
-    return newEntry;
+    return entry;
   };
 
-  /** reset reserved map */
-  const reset = () => {
-    reserved.current = [];
-    color.current = 0;
-    shape.current = 0;
-  };
-
-  return [entry, visible, reset] as const;
+  return [entry, used] as const;
 };
