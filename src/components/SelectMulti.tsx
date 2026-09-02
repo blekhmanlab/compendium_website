@@ -1,8 +1,11 @@
 import type { ComponentProps, ReactNode } from "react";
+import { useState } from "react";
 import { Select } from "@base-ui/react";
+import { useDebounceFn } from "@reactuses/core";
 import clsx from "clsx";
 import { startCase, truncate } from "lodash";
 import { CheckIcon, ChevronDownIcon } from "lucide-react";
+import { useChanged } from "@/util/hooks";
 
 type Props<Option extends string> = {
   label: ReactNode;
@@ -13,11 +16,26 @@ type Props<Option extends string> = {
 
 export default function SelectMulti<Option extends string>({
   label,
-  value,
+  value = [],
   onChange,
   options,
   className = "",
 }: Props<Option>) {
+  /** local state */
+  const [_value, _setValue] = useState<Option[]>(value);
+
+  /** update local state */
+  if (useChanged(value)) _setValue(value);
+
+  /** debounce change */
+  const _onChange = useDebounceFn(onChange, 1000);
+
+  /** set local and notify */
+  const set = (value: Option[]) => {
+    _setValue(value);
+    _onChange.run(value);
+  };
+
   /** selected label */
   let selected = "";
   if (value.length === 0) selected = "None";
@@ -25,17 +43,16 @@ export default function SelectMulti<Option extends string>({
   else if (value.length === 1) selected = truncate(value[0]!, { length: 15 });
   else selected = `${value.length} selected`;
 
+  /** are all options selected */
   const allSelected = value.length === options.length;
-
-  const toggleSelectAll = () => onChange(allSelected ? [] : [...options]);
 
   return (
     <label className="inline-flex items-center gap-2">
       <span className="flex items-center gap-1 text-right">{label}</span>
       <Select.Root<Option, true>
         multiple
-        value={value}
-        onValueChange={(next) => onChange(next as Option[])}
+        value={_value}
+        onValueChange={(value) => set(value as Option[])}
       >
         <Select.Trigger
           className={clsx(
@@ -58,7 +75,7 @@ export default function SelectMulti<Option extends string>({
           >
             <Select.Popup className="flex flex-col rounded-md border border-light-gray bg-gray">
               <button
-                onClick={toggleSelectAll}
+                onClick={() => set(allSelected ? [] : [...options])}
                 className="gap-2 p-2 font-medium hover:bg-light-gray"
               >
                 {allSelected ? "Deselect All" : "Select All"}

@@ -1,7 +1,6 @@
 import type { Remote } from "comlink";
 import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDebounce } from "@reactuses/core";
 import { groupBy, isEmpty, pick, uniq } from "lodash";
 import { HelpCircleIcon } from "lucide-react";
 import Alert from "@/components/Alert";
@@ -57,8 +56,7 @@ export default function PCs() {
   );
 
   /** selected regions */
-  const [_regions, setRegions] = useState<string[]>([]);
-  const regions = useDebounce(_regions, 1000);
+  const [regions, setRegions] = useState<string[]>([]);
 
   /** set selected regions once options load */
   useEffect(() => {
@@ -226,7 +224,7 @@ export default function PCs() {
             </>
           }
           options={regionOptions}
-          value={_regions}
+          value={regions}
           onChange={setRegions}
           className="w-30"
         />
