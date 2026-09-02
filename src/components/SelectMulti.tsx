@@ -85,7 +85,7 @@ export default function SelectMulti<Option extends string>({
                   <Select.Item
                     key={index}
                     value={option}
-                    className="flex cursor-pointer items-center gap-2 p-2 transition hover:bg-light-gray data-highlighted:bg-light-gray"
+                    className="flex cursor-pointer items-center gap-2 p-2 hover:bg-light-gray data-highlighted:bg-light-gray"
                   >
                     <span className="inline-flex size-5 items-center justify-center">
                       <Select.ItemIndicator>

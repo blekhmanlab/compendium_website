@@ -46,7 +46,7 @@ export default function PCChart({
           itemStyle: { color },
           symbol: shape,
           symbolSize: size,
-          progressive: 1000,
+          progressive: 10000,
         }) satisfies EChartsOption["series"],
     ),
     title: [{ text: title, subtext: subtitle }],
