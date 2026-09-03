@@ -19,9 +19,10 @@ export default function ScreeChart({ yLabel, type, data }: Props) {
         type: type,
         barWidth: "90%",
         color: getCssVariable("--color-primary"),
-        data: Object.values(data).map((datum) => ({
-          value: datum,
-          tooltip: formatNumber(datum, true),
+        data: Object.entries(data).map(([key, value]) => ({
+          id: key,
+          value,
+          tooltip: formatNumber(value, true),
         })),
       },
     ],

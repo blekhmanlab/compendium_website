@@ -53,7 +53,7 @@ export default function PhylaChart({ data }: Props) {
   if (xMin < 1) xMin = 1;
 
   /** get color for each phylum */
-  const [entry] = useLegend(filtered.map((datum) => datum.phylum));
+  const [entry] = useLegend(data.map((datum) => datum.phylum));
 
   /** echarts options */
   const option: EChartsOption = {
@@ -62,6 +62,7 @@ export default function PhylaChart({ data }: Props) {
         type: "bar",
         barWidth: "90%",
         data: filtered.map((datum) => ({
+          id: datum.phylum,
           name: String(datum.phylum ?? ""),
           value: getSamples(datum),
           itemStyle: {

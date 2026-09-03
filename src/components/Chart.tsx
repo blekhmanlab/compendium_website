@@ -1,5 +1,5 @@
 import type { ECharts, EChartsInitOpts, EChartsOption } from "echarts";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
 import { useDebounceFn, useResizeObserver } from "@reactuses/core";
 import clsx from "clsx";
 import { toPng } from "dom-to-image-more";
@@ -30,13 +30,20 @@ export default function Chart({
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const chart = useRef<ECharts>(null);
 
+  /** get latest values without re-running effect */
+  const getInitOptions = useEffectEvent(() => initOptions);
+  const getOnZoom = useEffectEvent(
+    (chart: ECharts, xScale: number, yScale: number) =>
+      onZoom?.(chart, xScale, yScale),
+  );
+
   /** initialize and attach chart */
   useEffect(() => {
     if (!ref) return;
     chart.current = init(ref, "compendium", {
       renderer: "canvas",
       devicePixelRatio: 4,
-      ...initOptions,
+      ...getInitOptions(),
     });
     /** initial resize */
     sleep().then(() => chart.current?.resize());
@@ -44,24 +51,23 @@ export default function Chart({
     chart.current.group = "group";
     connect("group");
     /** connect listeners */
-    if (onZoom)
-      chart.current.on("datazoom", (params) => {
-        // @ts-expect-error echarts types bad
-        if (!params.batch[0]) return;
-        // @ts-expect-error echarts types bad
-        if (!params.batch[1]) return;
-        // @ts-expect-error echarts types bad
-        const xScale = 100 / (params.batch[0].end - params.batch[0].start);
-        // @ts-expect-error echarts types bad
-        const yScale = 100 / (params.batch[1].end - params.batch[1].start);
-        if (chart.current) onZoom(chart.current, xScale, yScale);
-      });
+    chart.current.on("datazoom", (params) => {
+      // @ts-expect-error echarts types bad
+      if (!params.batch[0]) return;
+      // @ts-expect-error echarts types bad
+      if (!params.batch[1]) return;
+      // @ts-expect-error echarts types bad
+      const xScale = 100 / (params.batch[0].end - params.batch[0].start);
+      // @ts-expect-error echarts types bad
+      const yScale = 100 / (params.batch[1].end - params.batch[1].start);
+      if (chart.current) getOnZoom(chart.current, xScale, yScale);
+    });
 
     return () => {
       chart.current?.dispose();
       chart.current = null;
     };
-  }, [ref, initOptions, onZoom]);
+  }, [ref]);
 
   /** auto-fit */
   const resize = useDebounceFn(() => chart.current?.resize(), 100);
@@ -142,7 +148,7 @@ const setTheme = () => {
   };
 
   registerTheme("compendium", {
-    animation: false,
+    animation: true,
 
     grid: { left: 50, right: 50, top: 50, bottom: 50 },
 
@@ -186,6 +192,7 @@ const setTheme = () => {
       borderColor: getCssVariable("--color-light-gray"),
       backgroundColor: getCssVariable("--color-gray"),
       textStyle: text,
+      appendTo: "body",
       // eslint-disable-next-line
       formatter: (params: any) => params.data.datum.tooltip,
       // eslint-disable-next-line

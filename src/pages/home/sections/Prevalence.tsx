@@ -1,5 +1,3 @@
-import type { Reads } from "@/pages/home/data/projects";
-import type { Phyla } from "@/pages/home/data/taxa";
 import { useState } from "react";
 import Select from "@/components/Select";
 import Tooltip from "@/components/Tooltip";
@@ -51,8 +49,8 @@ export default function Prevalence() {
             />
           )}
           <div className="min-h-80 w-full grow">
-            {chart === "Phyla" && <PhylaChart data={phyla as Phyla} />}
-            {chart === "Reads" && <ReadsChart data={reads as Reads} />}
+            {chart === "Phyla" && phyla && <PhylaChart data={phyla} />}
+            {chart === "Reads" && reads && <ReadsChart data={reads} />}
           </div>
         </div>
       </div>
