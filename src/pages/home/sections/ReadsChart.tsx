@@ -1,18 +1,18 @@
 import type { EChartsOption } from "echarts";
 import type { Reads } from "@/pages/home/data/projects";
 import { max, min } from "lodash";
+import Alert from "@/components/Alert";
 import Chart from "@/components/Chart";
-import { tooltipTable } from "@/pages/home/sections/PhylaChart";
 import { useData } from "@/pages/home/state";
 import { getCssVariable } from "@/util/dom";
-import { formatNumber } from "@/util/string";
+import { formatNumber, tooltipTable } from "@/util/string";
 
 type Props = {
   data: Reads;
 };
 
 /** show sample counts vs binned read counts */
-const ReadsChart = ({ data }: Props) => {
+export default function ReadsChart({ data }: Props) {
   type Datum = Reads["histogram"][number];
 
   /** colors */
@@ -44,7 +44,7 @@ const ReadsChart = ({ data }: Props) => {
     series: [
       {
         type: "bar",
-        barWidth: "100%",
+        barWidth: "200%",
         data: histogram.map((datum) => ({
           value: [datum.mid, getSamples(datum)],
           tooltip: tooltipTable({
@@ -96,9 +96,12 @@ const ReadsChart = ({ data }: Props) => {
     tooltip: { trigger: "item" },
   };
 
-  if (!data) return <div className="placeholder">Loading reads</div>;
+  if (!data)
+    return (
+      <Alert type="loading" className="size-full">
+        Loading reads
+      </Alert>
+    );
 
-  return <Chart option={option} />;
-};
-
-export default ReadsChart;
+  return <Chart option={option} download="reads-chart" />;
+}

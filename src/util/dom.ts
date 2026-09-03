@@ -63,7 +63,7 @@ export const preserveScroll = async (element?: Element | null) => {
   await sleep(0);
   const newY = element.getBoundingClientRect().top;
   if (!element.isConnected) return;
-  window.scrollBy({ top: newY - oldY, behavior: "smooth" });
+  window.scrollBy({ top: newY - oldY });
 };
 
 /** fit svg view box to contents */

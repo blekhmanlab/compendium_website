@@ -1,9 +1,29 @@
 import type { FeatureCollection, Geometry } from "geojson";
+import type { Compendium } from "@/pages/home/state";
 import { expose } from "comlink";
+import { mapKeys } from "lodash";
 import { request } from "@/util/async";
-import countriesUrl from "./countries.json?url";
-import regionsUrl from "./regions.json?url";
 import { cleanSearch } from "./util";
+
+/** get all regions urls */
+const regionsUrls = mapKeys(
+  import.meta.glob<string>("./*/regions.json", {
+    eager: true,
+    query: "url",
+    import: "default",
+  }),
+  (_, path) => path.match(/([^/]+)\/regions\.json$/)?.[1] ?? "",
+);
+
+/** get all countries urls */
+const countriesUrls = mapKeys(
+  import.meta.glob<string>("./*/countries.json", {
+    eager: true,
+    query: "url",
+    import: "default",
+  }),
+  (_, path) => path.match(/([^/]+)\/countries\.json$/)?.[1] ?? "",
+);
 
 type Properties = {
   region: string;
@@ -26,10 +46,10 @@ export type GeoSearch = {
 }[];
 
 /** get regions and countries */
-export const getGeo = async () => {
+export const getGeo = async (compendium: Compendium) => {
   const [regions, countries] = await Promise.all([
-    request<Regions>(regionsUrl),
-    request<Countries>(countriesUrl),
+    request<Regions>(regionsUrls[compendium] ?? ""),
+    request<Countries>(countriesUrls[compendium] ?? ""),
   ]);
   return { regions, countries };
 };

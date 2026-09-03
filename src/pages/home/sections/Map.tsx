@@ -1,7 +1,7 @@
 import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
 import type { D3ZoomEvent, GeoProjection, ZoomTransform } from "d3";
 import type { Countries, Regions } from "@/pages/home/data/geo";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useEventListener } from "@reactuses/core";
 import {
   extent,
@@ -15,6 +15,7 @@ import {
   zoomIdentity,
 } from "d3";
 import { clamp } from "lodash";
+import Alert from "@/components/Alert";
 import Select from "@/components/Select";
 import Tooltip from "@/components/Tooltip";
 import { setSelectedFeature, useData } from "@/pages/home/state";
@@ -31,7 +32,7 @@ const height = 400;
 const byOptions = ["Country", "Region"] as const;
 type By = (typeof byOptions)[number];
 
-const Map = () => {
+export default function Map() {
   const ref = useRef<SVGSVGElement>(null);
   const outlineRef = useRef<SVGPathElement>(null);
   const graticulesRef = useRef<SVGPathElement>(null);
@@ -48,8 +49,8 @@ const Map = () => {
   /** colors */
   const primary = getCssVariable("--color-primary");
   const secondary = getCssVariable("--color-secondary");
-  const gray = getCssVariable("--color-slate-500");
-  const darkGray = getCssVariable("--color-slate-700");
+  const lightGray = getCssVariable("--color-light-gray");
+  const gray = getCssVariable("--color-gray");
 
   /** unset selected feature when clicking off map */
   useEventListener(
@@ -75,20 +76,16 @@ const Map = () => {
   /** color scale */
   const scale = scaleLog<string>()
     .domain([1, max])
-    .range(selectedFeature ? [darkGray, gray] : [gray, primary])
+    .range(selectedFeature ? [gray, lightGray] : [lightGray, primary])
     .interpolate(interpolateLab);
 
-  const { projection, baseScale } = useMemo(() => {
-    /** create projection */
-    const projection = geoNaturalEarth1();
+  /** create projection */
+  const projection = geoNaturalEarth1();
 
-    fitProjection(projection);
+  fitProjection(projection);
 
-    /** get scale when projection fit to earth bbox */
-    const baseScale = projection.scale();
-
-    return { projection, baseScale };
-  }, []);
+  /** get scale when projection fit to earth bbox */
+  const baseScale = projection.scale();
 
   /** reset projection */
   const resetProjection = () => {
@@ -193,7 +190,11 @@ const Map = () => {
     .scaleExtent([baseScale, baseScale * 10]);
 
   if (!countries || !regions)
-    return <div className="placeholder aspect-3/2">Loading map</div>;
+    return (
+      <Alert type="loading" className="aspect-3/2 w-full">
+        Loading map
+      </Alert>
+    );
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -229,9 +230,9 @@ const Map = () => {
             });
         }}
         viewBox={[0, 0, width, height].join(" ")}
-        className="w-full stroke-[0.5]"
+        className="w-full overflow-hidden stroke-[0.5]"
       >
-        <g className="fill-none stroke-slate-500/50">
+        <g className="fill-none stroke-light-gray">
           <path ref={outlineRef} />
           <path ref={graticulesRef} />
         </g>
@@ -248,12 +249,12 @@ const Map = () => {
                       <dd>
                         {feature.properties.country} ({feature.properties.code})
                       </dd>
-                      <dt>Region</dt>
-                      <dd>{feature.properties.region}</dd>
-                      <dt>Samples</dt>
-                      <dd>{formatNumber(feature.properties.samples, false)}</dd>
                     </>
                   )}
+                  <dt>Region</dt>
+                  <dd>{feature.properties.region}</dd>
+                  <dt>Samples</dt>
+                  <dd>{formatNumber(feature.properties.samples, false)}</dd>
                 </dl>
               }
             >
@@ -266,7 +267,7 @@ const Map = () => {
                     ? secondary
                     : scale(feature.properties.samples || 1)
                 }
-                className="cursor-pointer stroke-black transition hover:fill-white focus:fill-white [:not(:focus-visible)]:outline-none"
+                className="cursor-pointer stroke-black transition hover:fill-white"
                 tabIndex={0}
                 onClick={(event) => selectFeature(event, feature)}
                 onKeyDown={(event) => selectFeature(event, feature)}
@@ -294,9 +295,7 @@ const Map = () => {
       </div>
     </div>
   );
-};
-
-export default Map;
+}
 
 /** fit projection to bbox of earth */
 const fitProjection = (projection: GeoProjection) =>

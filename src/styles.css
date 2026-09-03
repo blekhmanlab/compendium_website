@@ -5,23 +5,38 @@
   --breakpoint-md: 55rem;
   --breakpoint-lg: 70rem;
 
-  --color-primary: theme(colors.fuchsia.500);
-  --color-secondary: theme(colors.indigo.500);
+  --color-*: initial;
 
-  --font-sans: "Mona Sans", sans-serif;
-}
+  --primary-hue: 0;
+  --secondary-hue: 0;
+  --gray-hue: 0;
 
-@font-face {
-  font-weight: 200 900;
-  src: url("@/assets/MonaSans.woff2") format("woff2");
-  font-stretch: 75% 125%;
-  font-family: "Mona Sans";
-  font-display: swap;
+  --color-primary: oklch(65% 0.3 var(--primary-hue));
+  --color-secondary: oklch(50% 0.3 var(--secondary-hue));
+  --color-primary-light: oklch(90% 0.15 var(--primary-hue));
+  --color-secondary-light: oklch(90% 0.15 var(--secondary-hue));
+  --color-primary-dark: oklch(30% 0.1 var(--primary-hue));
+  --color-secondary-dark: oklch(30% 0.1 var(--secondary-hue));
+
+  --color-black: oklch(0% 0.025 var(--gray-hue));
+  --color-dark-gray: oklch(25% 0.025 var(--gray-hue));
+  --color-gray: oklch(35% 0.025 var(--gray-hue));
+  --color-light-gray: oklch(50% 0.025 var(--gray-hue));
+  --color-white: oklch(100% 0.025 var(--gray-hue));
+
+  --color-success: oklch(75% 0.3 160);
+  --color-info: oklch(75% 0.3 240);
+  --color-warn: oklch(75% 0.3 80);
+  --color-error: oklch(75% 0.3 30);
+
+  --font-sans: "Mona Sans Variable", sans-serif;
+
+  --shadow-overlay: 0 0 0 9999px oklch(0% 0.05 var(--gray-hue) / 25%);
 }
 
 @layer base {
   html {
-    @apply bg-slate-900 font-sans text-[110%] leading-normal font-light text-white underline-offset-2;
+    @apply bg-black font-sans text-[110%] leading-relaxed font-light text-white underline-offset-2;
   }
 
   body {
@@ -37,11 +52,16 @@
   }
 
   section {
-    @apply width-md flex flex-col items-center gap-12 bg-linear-to-r p-(--pad) px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] [--pad:--spacing(12)] last:grow odd:from-slate-500/20 odd:to-slate-500/0 even:from-slate-500/30 even:to-slate-500/10 max-md:[--pad:--spacing(8)];
+    @apply width-md even:bg-dark-gray/75 odd:bg-dark-gray flex flex-col items-center gap-12 p-(--pad) px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
   }
 
   h2 {
-    @apply flex items-center gap-4 text-center text-2xl leading-normal font-light tracking-widest uppercase;
+    @apply flex items-center text-center text-2xl leading-relaxed font-light tracking-widest uppercase;
+  }
+
+  hr {
+    @apply h-4 w-full border-none opacity-10;
+    background-image: url("@/assets/squiggle.svg");
   }
 
   b,
@@ -49,29 +69,37 @@
     @apply font-semibold;
   }
 
+  svg {
+    @apply overflow-visible;
+  }
+
   p {
-    @apply text-center leading-loose text-balance;
+    @apply max-w-175 text-center leading-loose text-balance;
   }
 
   a {
-    @apply text-indigo-200 underline transition hover:text-fuchsia-200;
+    @apply underline transition hover:opacity-50;
+  }
+
+  button {
+    @apply flex cursor-pointer items-center justify-center transition;
   }
 
   table {
-    @apply w-full border-collapse text-left;
+    @apply bg-dark-gray w-full border-collapse rounded-md text-left;
   }
 
-  th {
-    @apply bg-slate-500/25;
+  thead {
+    @apply bg-gray;
+  }
+
+  tr {
+    @apply border-gray not-last:border-b only:border-b;
   }
 
   th,
   td {
-    @apply px-4 py-1 align-middle!;
-  }
-
-  tr {
-    @apply even:bg-slate-500/10;
+    @apply trim border-gray p-2 not-last:border-r;
   }
 
   dl {
@@ -82,6 +110,10 @@
     @apply font-medium opacity-50;
   }
 
+  pre:has(> code) {
+    @apply bg-dark-gray overflow-x-auto rounded-md p-2 leading-normal whitespace-pre text-white;
+  }
+
   .icon,
   .lucide {
     @apply inline-block h-[1em];
@@ -89,13 +121,17 @@
 }
 
 @utility width-md {
-  --width: 160;
+  --width: 200;
 }
 
 @utility width-lg {
   --width: 300;
 }
 
-@utility placeholder {
-  @apply flex aspect-square w-full items-center justify-center gap-4 rounded-md bg-slate-500/10 p-2;
+@utility table-wrapper {
+  @apply border-gray overflow-x-auto rounded-md border;
+}
+
+@utility trim {
+  text-box: trim-both text;
 }

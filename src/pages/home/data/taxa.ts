@@ -1,8 +1,28 @@
+import type { Compendium } from "@/pages/home/state";
 import { expose } from "comlink";
+import { mapKeys } from "lodash";
 import { request } from "@/util/async";
-import classesUrl from "./classes.json?url";
-import phylaUrl from "./phyla.json?url";
 import { cleanSearch } from "./util";
+
+/** import all classes urls */
+const classesUrls = mapKeys(
+  import.meta.glob<string>("./*/classes.json", {
+    eager: true,
+    query: "url",
+    import: "default",
+  }),
+  (_, path) => path.match(/([^/]+)\/classes\.json$/)?.[1] ?? "",
+);
+
+/** import all phyla urls */
+const phylaUrls = mapKeys(
+  import.meta.glob<string>("./*/phyla.json", {
+    eager: true,
+    query: "url",
+    import: "default",
+  }),
+  (_, path) => path.match(/([^/]+)\/phyla\.json$/)?.[1] ?? "",
+);
 
 /** by class taxonomic level */
 export type Classes = {
@@ -33,11 +53,10 @@ export type TaxonSearch = {
   fuzzy?: boolean;
 }[];
 
-/** get phyla and classes */
-export const getTaxa = async () => {
+export const getTaxa = async (compendium: Compendium) => {
   const [phyla, classes] = await Promise.all([
-    request<Phyla>(phylaUrl),
-    request<Classes>(classesUrl),
+    request<Phyla>(phylaUrls[compendium] ?? ""),
+    request<Classes>(classesUrls[compendium] ?? ""),
   ]);
   return { phyla, classes };
 };

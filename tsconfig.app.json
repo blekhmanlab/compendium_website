@@ -26,5 +26,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "fixtures"]
+  "include": ["src"]
 }

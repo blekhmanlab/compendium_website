@@ -1,69 +1,104 @@
+import { formatHex } from "culori";
 import { getCssVariable } from "@/util/dom";
+import { cos, sin } from "@/util/math";
 
-type Entry = {
-  /** symbol color */
-  color?: string;
-  /** symbol (echarts) shape */
-  shape?: string;
-};
-
-/** list of legend entries */
-const getList = (): Entry[] => [
-  { color: getCssVariable("--color-red-500"), shape: "triangle" },
-  { color: getCssVariable("--color-orange-500"), shape: "diamond" },
-  { color: getCssVariable("--color-amber-500"), shape: "circle" },
-  { color: getCssVariable("--color-yellow-500"), shape: "rect" },
-  { color: getCssVariable("--color-lime-500"), shape: "triangle" },
-  { color: getCssVariable("--color-green-500"), shape: "diamond" },
-  { color: getCssVariable("--color-emerald-500"), shape: "circle" },
-  { color: getCssVariable("--color-teal-500"), shape: "rect" },
-  { color: getCssVariable("--color-cyan-500"), shape: "triangle" },
-  { color: getCssVariable("--color-sky-500"), shape: "diamond" },
-  { color: getCssVariable("--color-blue-500"), shape: "circle" },
-  { color: getCssVariable("--color-indigo-500"), shape: "circle" },
-  { color: getCssVariable("--color-violet-500"), shape: "rect" },
-  { color: getCssVariable("--color-purple-500"), shape: "triangle" },
-  { color: getCssVariable("--color-fuchsia-500"), shape: "diamond" },
-  { color: getCssVariable("--color-pink-500"), shape: "circle" },
-  { color: getCssVariable("--color-rose-500"), shape: "rect" },
+/** color options */
+const colors = [
+  formatHex("oklch(65% 0.3 340)"),
+  formatHex("oklch(65% 0.3 300)"),
+  formatHex("oklch(65% 0.3 260)"),
+  formatHex("oklch(65% 0.3 220)"),
+  formatHex("oklch(65% 0.3 180)"),
+  formatHex("oklch(70% 0.3 140)"),
+  formatHex("oklch(80% 0.3 100)"),
+  formatHex("oklch(70% 0.3 60)"),
+  formatHex("oklch(65% 0.3 20)"),
 ];
 
-/** re-create built-in echarts shapes */
-export const shapePaths: Record<string, string> = {
-  circle: "M -1 0 A 1 1 0 1 0 1 0 A 1 1 0 1 0 -1 0 Z",
-  rect: "M -1 -1 L 1 -1 L 1 1 L -1 1 Z",
-  triangle: "M 0 -1 L 1 1 L -1 1 Z",
-  diamond: "M 0 -1 L 1 0 L 0 1 L -1 0 Z",
-};
+/** neutral color */
+const gray = getCssVariable("--color-light-gray");
 
-const getNeutral = (): Entry => ({
-  color: getCssVariable("--color-slate-500"),
-  shape: "circle",
-});
+export type Point = { x: number; y: number };
 
-export const useLegend = () => {
-  /** map unique key to entry in list */
-  const map: Record<string, Entry> = {};
+/** make regular polygon or star */
+const makePolygon = (sides: number, starInset = 1, radius = 1, rotate = 0) =>
+  Array(sides)
+    .fill(null)
+    .map((_, index) => {
+      const angle = -90 + 360 * (index / sides) + rotate;
+      /** https://www.jdawiseman.com/papers/easymath/surds_star_inner_radius.html */
+      const scale = index % 2 === 0 ? 1 : starInset;
+      return { x: cos(angle) * radius * scale, y: sin(angle) * radius * scale };
+    })
+    .flat();
 
-  /** next entry to assign */
-  let index = 0;
+/** shape options */
+const shapes = [
+  /** circle */
+  makePolygon(50),
+  /** square */
+  makePolygon(4, 1, 1.1, 45),
+  /** diamond */
+  makePolygon(4),
+  /** triangle */
+  makePolygon(3, 1, 1.1),
+  /** pentagon */
+  makePolygon(5),
+  /** hexagon */
+  makePolygon(6, 1, 1, 30),
+  /** four point star */
+  makePolygon(8, 0.35, 1.1),
+  /** five point star */
+  makePolygon(10, 0.382, 1.1),
+  /** rhombus */
+  [
+    { x: -0.5, y: -0.75 },
+    { x: 1, y: -0.75 },
+    { x: 0.5, y: 0.75 },
+    { x: -1, y: 0.75 },
+  ],
+].map((points) =>
+  points
+    .map(({ x, y }, index) => [index === 0 ? "M" : "L", x, y].join(" "))
+    .join(" "),
+);
 
-  /** list of entries to assign */
-  const list = getList();
+type Entry = { color: string; shape: string };
+type Legend = Record<string, Entry>;
+const neutral: Entry = { color: gray, shape: "circle" };
 
-  /** get entry for unique key */
+export const useLegend = (keys: string[], stagger = 1) => {
+  /** map of key to entry */
+  const map: Legend = {};
+  const used: Legend = {};
+
+  /** next entry to reserve */
+  let color = 0;
+  let shape = 0;
+
+  /** reserve entry for each key */
+  for (const key of keys)
+    if (!map[key])
+      map[key] = {
+        color: colors[(color++ * stagger) % colors.length]!,
+        shape: shapes[shape++ % shapes.length]!,
+      };
+
+  /** get entry for key */
   const entry = (key: string) => {
-    /** return existing value */
-    if (key in map) return map[key]!;
-    if (!key)
-      /** assign neutral entry if key is falsy */
-      return (map[key] = getNeutral());
-    else {
-      /** assign next entry in list */
-      return (map[key] =
-        list[(index++ * 3 + 11) % list.length] ?? getNeutral());
+    /** get entry */
+    const entry = map[key] ?? neutral;
+    /** mark as used */
+    used[key] = entry;
+    /** sort used by key order, in place */
+    for (const key of keys) {
+      if (!used[key]) continue;
+      const value = used[key]!;
+      delete used[key];
+      used[key] = value;
     }
+    return entry;
   };
 
-  return [entry, map] as const;
+  return [entry, used] as const;
 };

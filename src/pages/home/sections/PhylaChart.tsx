@@ -1,17 +1,18 @@
 import type { EChartsOption } from "echarts";
 import type { Phyla } from "@/pages/home/data/taxa";
 import { max, min, orderBy } from "lodash";
+import Alert from "@/components/Alert";
 import Chart from "@/components/Chart";
 import { useData } from "@/pages/home/state";
 import { useLegend } from "@/util/legend";
-import { formatNumber } from "@/util/string";
+import { formatNumber, tooltipTable } from "@/util/string";
 
 type Props = {
   data: Phyla;
 };
 
 /** prevalence of samples at phylum level as bar chart */
-const PhylaChart = ({ data }: Props) => {
+export default function PhylaChart({ data }: Props) {
   type Datum = (typeof data)[number];
 
   /** get global state */
@@ -52,7 +53,7 @@ const PhylaChart = ({ data }: Props) => {
   if (xMin < 1) xMin = 1;
 
   /** get color for each phylum */
-  const [entry] = useLegend();
+  const [entry] = useLegend(data.map((datum) => datum.phylum));
 
   /** echarts options */
   const option: EChartsOption = {
@@ -61,6 +62,7 @@ const PhylaChart = ({ data }: Props) => {
         type: "bar",
         barWidth: "90%",
         data: filtered.map((datum) => ({
+          id: datum.phylum,
           name: String(datum.phylum ?? ""),
           value: getSamples(datum),
           itemStyle: {
@@ -75,7 +77,7 @@ const PhylaChart = ({ data }: Props) => {
       },
     ],
 
-    grid: { left: 150, right: 20, top: 50, bottom: 50 },
+    grid: { left: 150 },
 
     title: [
       {
@@ -111,21 +113,12 @@ const PhylaChart = ({ data }: Props) => {
     tooltip: { trigger: "item" },
   };
 
-  if (!data) return <div className="placeholder">Loading phyla</div>;
+  if (!data)
+    return (
+      <Alert type="loading" className="size-full">
+        Loading phyla
+      </Alert>
+    );
 
-  return <Chart option={option} />;
-};
-
-export default PhylaChart;
-
-/** generate tooltip table from entries */
-export const tooltipTable = (entries: Record<string, unknown>) =>
-  [
-    "<dl>",
-    ...Object.entries(entries).flatMap(([key, value]) =>
-      value === null || value === undefined || value === "" || value === false
-        ? []
-        : [`<dt>${key}</dt>`, `<dd>${value}</dd>`],
-    ),
-    "</dl>",
-  ].join("\n");
+  return <Chart option={option} download="phyla-chart" />;
+}

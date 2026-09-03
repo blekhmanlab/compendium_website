@@ -8,11 +8,13 @@ import {
   PackageIcon,
   TableIcon,
 } from "lucide-react";
-import { useData } from "@/pages/home/state";
+import Alert from "@/components/Alert";
+import { useData, useSite } from "@/pages/home/state";
 import { formatBytes, formatDate, formatNumber } from "@/util/string";
 
-const Overview = () => {
-  /** get global state */
+export default function Overview() {
+  const site = useSite();
+  /** metadata for compendium */
   const meta = useData((state) => state.meta);
 
   /** round down to nearest large amount */
@@ -99,7 +101,13 @@ const Overview = () => {
         processed using the same pipeline and reference database.
       </p>
 
-      {meta ? (
+      {!meta && (
+        <Alert type="loading" className="aspect-3/1 w-full">
+          Loading metadata
+        </Alert>
+      )}
+
+      {!!meta && (
         <div className="grid grid-cols-3 gap-10 max-md:grid-cols-2 max-sm:grid-cols-1">
           {tiles.map(({ className, icon, text }, index) => (
             <div
@@ -108,7 +116,7 @@ const Overview = () => {
             >
               <span
                 className={clsx(
-                  `grid size-16 place-items-center rounded-full bg-current/25 *:size-8 *:text-white **:stroke-1`,
+                  "grid size-16 place-items-center rounded-full bg-current/50 *:size-8 *:text-white **:stroke-1",
                   className,
                 )}
               >
@@ -118,14 +126,12 @@ const Overview = () => {
             </div>
           ))}
         </div>
-      ) : (
-        <div className="placeholder aspect-3/2">Loading metadata</div>
       )}
 
       <p>
         This website lets you <b>search</b> and <b>explore</b> the data at a
         high level before downloading.{" "}
-        <a href={import.meta.env.VITE_R_PACKAGE}>
+        <a href={site.rPackage}>
           <PackageIcon />
           Use the R package
         </a>{" "}
@@ -133,6 +139,4 @@ const Overview = () => {
       </p>
     </section>
   );
-};
-
-export default Overview;
+}
