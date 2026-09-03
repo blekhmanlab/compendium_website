@@ -35,6 +35,7 @@ export default function Chart({
     if (!ref) return;
     chart.current = init(ref, "compendium", {
       renderer: "canvas",
+      devicePixelRatio: 4,
       ...initOptions,
     });
     /** initial resize */

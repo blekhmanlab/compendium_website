@@ -45,7 +45,7 @@ export default function PCChart({
             value: [x, y],
             tooltip: tooltipTable(datum),
           })),
-          itemStyle: { color },
+          itemStyle: { color, opacity: 1 },
           symbol: `path://${shape}`,
           symbolSize: size,
           progressive: chunk,

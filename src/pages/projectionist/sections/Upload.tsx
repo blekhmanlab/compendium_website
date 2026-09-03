@@ -1,7 +1,7 @@
 import type { Remote } from "comlink";
+import type { Handle as UploadHandle } from "@/components/UploadButton";
 import type * as ProjectionistAPI from "@/pages/projectionist/project";
-import { useCallback, useState } from "react";
-import { useDebounce } from "@reactuses/core";
+import { useCallback, useRef, useState } from "react";
 import clsx from "clsx";
 import { isEmpty, size, truncate } from "lodash";
 import { HelpCircleIcon, LightbulbIcon } from "lucide-react";
@@ -13,19 +13,19 @@ import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
 import { useData } from "@/pages/projectionist/state";
 import { formatNumber } from "@/util/string";
 import { useWorker } from "@/util/worker";
-import exampleMeta from "../data/example/meta.tsv?raw";
-import exampleReads from "../data/example/reads.tsv?raw";
-import exampleTaxa from "../data/example/taxa.tsv?raw";
+import exampleMeta from "../data/example/meta.tsv?url";
+import exampleReads from "../data/example/reads.tsv?url";
+import exampleTaxa from "../data/example/taxa.tsv?url";
 
 export default function Upload() {
+  /** input upload controls */
+  const rawReadsUploader = useRef<UploadHandle>(null);
+  const rawTaxaUploader = useRef<UploadHandle>(null);
+  const rawMetaUploader = useRef<UploadHandle>(null);
   /** raw text input */
-  const [_userRawReads, setUserRawReads] = useState("");
-  const [_userRawTaxa, setUserRawTaxa] = useState("");
-  const [_userRawMeta, setUserRawMeta] = useState("");
-  /** debounced text input */
-  const userRawReads = useDebounce(_userRawReads, 300);
-  const userRawTaxa = useDebounce(_userRawTaxa, 300);
-  const userRawMeta = useDebounce(_userRawMeta, 300);
+  const [userRawReads, setUserRawReads] = useState("");
+  const [userRawTaxa, setUserRawTaxa] = useState("");
+  const [userRawMeta, setUserRawMeta] = useState("");
 
   /** parse user data */
   const [, readsStatus] = useWorker(
@@ -176,6 +176,7 @@ export default function Upload() {
           <HelpCircleIcon />
         </Tooltip>
         <UploadButton
+          ref={rawReadsUploader}
           accept={accept}
           onUpload={async (file) => setUserRawReads(await file.text())}
         >
@@ -231,6 +232,7 @@ export default function Upload() {
           <HelpCircleIcon />
         </Tooltip>
         <UploadButton
+          ref={rawTaxaUploader}
           accept={accept}
           onUpload={async (file) => setUserRawTaxa(await file.text())}
         >
@@ -285,6 +287,7 @@ export default function Upload() {
           <HelpCircleIcon />
         </Tooltip>
         <UploadButton
+          ref={rawMetaUploader}
           accept={accept}
           onUpload={async (file) => setUserRawMeta(await file.text())}
         >
@@ -297,9 +300,9 @@ export default function Upload() {
 
       <Button
         onClick={() => {
-          setUserRawReads(exampleReads);
-          setUserRawTaxa(exampleTaxa);
-          setUserRawMeta(exampleMeta);
+          rawReadsUploader.current?.setUpload(exampleReads);
+          rawTaxaUploader.current?.setUpload(exampleTaxa);
+          rawMetaUploader.current?.setUpload(exampleMeta);
         }}
       >
         <LightbulbIcon />

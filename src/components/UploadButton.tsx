@@ -1,11 +1,18 @@
-import type { ComponentProps } from "react";
-import { useEffect, useRef, useState } from "react";
+import type { ComponentProps, Ref } from "react";
+import {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { useEventListener } from "@reactuses/core";
 import clsx from "clsx";
 import { UploadIcon } from "lucide-react";
 import Button from "@/components/Button";
 
 type Props = {
+  ref?: Ref<Handle>;
   /**
    * formats to accept. array of mime types or extensions w/ dot.
    * https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept
@@ -13,10 +20,13 @@ type Props = {
   accept?: string[];
   /** callback with file */
   onUpload: (file: File, name: string, ext: string) => void;
-} & ComponentProps<typeof Button>;
+} & Omit<ComponentProps<typeof Button>, "ref">;
+
+export type Handle = { setUpload: (url: string) => void };
 
 /** file dialog or drag & drop button */
 export default function UploadButton({
+  ref,
   onUpload,
   accept = [],
   className,
@@ -31,22 +41,35 @@ export default function UploadButton({
   const [ext, setExt] = useState("");
 
   /** upload file */
-  const upload = async (target: HTMLInputElement | DataTransfer | null) => {
-    const file = (target?.files || [])[0];
-    if (!file) return;
+  const upload = useCallback(
+    async (file: File) => {
+      /** extract filename parts */
+      const [, name = "", ext = ""] = file.name.match(/(.+)\.(.+)/) || [];
 
-    /** extract filename parts */
-    const [, name = "", ext = ""] = file.name.match(/(.+)\.(.+)/) || [];
+      setName(name);
+      setExt(ext);
 
-    setName(name);
-    setExt(ext);
+      /** pass upload to parent */
+      onUpload(file, name, ext);
 
-    /** pass upload to parent */
-    onUpload(file, name, ext);
+      /** reset file input */
+      if (inputRef.current) inputRef.current.value = "";
+    },
+    [onUpload],
+  );
 
-    /** reset file input */
-    if (inputRef.current) inputRef.current.value = "";
-  };
+  /** programmatically set upload from outside component */
+  const setUpload = useCallback(
+    async (url: string) => {
+      const blob = await (await fetch(url)).blob();
+      console.log(blob);
+      const name = url.split("/").pop() || "";
+      const file = new File([blob], name, { type: blob.type });
+      upload(file);
+    },
+    [upload],
+  );
+  useImperativeHandle(ref, () => ({ setUpload }), [setUpload]);
 
   /** is dragging */
   const [drag, setDrag] = useState(false);
@@ -61,7 +84,9 @@ export default function UploadButton({
       event.preventDefault();
       event.stopPropagation();
       setDrag(false);
-      upload(event.dataTransfer);
+      const file = event.dataTransfer.files?.[0];
+      if (!file) return;
+      upload(file);
     },
     buttonRef,
   );
@@ -69,7 +94,6 @@ export default function UploadButton({
   /** visual feedback for drag state */
   const dragClassName =
     "outline-2 outline-offset-2 outline-white outline-dashed";
-
   useEffect(() => {
     if (!buttonRef.current) return;
     if (drag) buttonRef.current.classList.add(...dragClassName.split(" "));
@@ -84,15 +108,18 @@ export default function UploadButton({
         onClick={() => inputRef.current?.click()}
       >
         <UploadIcon />
-        {children}
+        {[name, ext].filter(Boolean).join(".") || children}
       </Button>
-      {[name, ext].filter(Boolean).join(".")}
       <input
         ref={inputRef}
         type="file"
         accept={accept.join(",")}
         style={{ display: "none" }}
-        onChange={(event) => upload(event.target)}
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          if (!file) return;
+          upload(file);
+        }}
       />
     </>
   );
