@@ -3,7 +3,7 @@ import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useCallback, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import clsx from "clsx";
-import { isEmpty, size } from "lodash";
+import { isEmpty, size, truncate } from "lodash";
 import { HelpCircleIcon, LightbulbIcon } from "lucide-react";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
@@ -111,6 +111,21 @@ export default function Upload() {
     (missingInMeta?.length ? 1 : 0) +
     (missingInCompendium?.length ? 1 : 0);
 
+  /** make tooltip preview of raw input */
+  const preview = (text: string) => {
+    if (!text.trim()) return "";
+    let lines = text.split("\n");
+    if (lines.length > 10)
+      lines = lines.slice(0, 5).concat("...").concat(lines.slice(-5));
+    lines = lines.map((line) => truncate(line, { length: 100 }));
+    text = lines.join("\n");
+    return (
+      <pre>
+        <code>{text}</code>
+      </pre>
+    );
+  };
+
   return (
     <section className="width-lg">
       <h2>Upload</h2>
@@ -166,12 +181,10 @@ export default function Upload() {
         >
           Upload
         </UploadButton>
-        {readsStatus || (
-          <div className="flex gap-2">
-            <div>{formatNumber(size(userReads?.samples))} samples</div>
-            <div>{formatNumber(size(userReads?.taxa))} taxa</div>
-          </div>
-        )}
+        <Tooltip content={preview(userRawReads)}>
+          {readsStatus ||
+            `${formatNumber(size(userReads?.samples))} samples, ${formatNumber(size(userReads?.taxa))} taxa`}
+        </Tooltip>
 
         {/* taxa table */}
         <strong>Taxa</strong>
@@ -223,11 +236,9 @@ export default function Upload() {
         >
           Upload
         </UploadButton>
-        {taxaStatus ? (
-          <>{taxaStatus}</>
-        ) : (
-          <>{formatNumber(size(userTaxa))} taxa</>
-        )}
+        <Tooltip content={preview(userRawTaxa)}>
+          {taxaStatus || `${formatNumber(size(userTaxa))} taxa`}
+        </Tooltip>
 
         {/* meta table */}
         <strong>Meta</strong>
@@ -279,11 +290,9 @@ export default function Upload() {
         >
           Upload
         </UploadButton>
-        {metaStatus ? (
-          <>{metaStatus}</>
-        ) : (
-          <div>{formatNumber(size(userMeta))} samples</div>
-        )}
+        <Tooltip content={preview(userRawMeta)}>
+          {metaStatus || `${formatNumber(size(userMeta))} samples`}
+        </Tooltip>
       </div>
 
       <Button

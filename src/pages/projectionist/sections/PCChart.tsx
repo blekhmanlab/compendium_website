@@ -46,7 +46,7 @@ export default function PCChart({
             tooltip: tooltipTable(datum),
           })),
           itemStyle: { color },
-          symbol: shape,
+          symbol: `path://${shape}`,
           symbolSize: size,
           progressive: chunk,
           progressiveChunkMode: "mod",
@@ -88,6 +88,7 @@ export default function PCChart({
       }, 100)}
       className="aspect-square w-120"
       download="pc-chart"
+      downloadElement={(element) => element.parentElement ?? element}
     />
   );
 }

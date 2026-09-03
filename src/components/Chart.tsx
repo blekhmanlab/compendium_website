@@ -2,6 +2,7 @@ import type { ECharts, EChartsInitOpts, EChartsOption } from "echarts";
 import { useEffect, useId, useRef, useState } from "react";
 import { useDebounceFn, useResizeObserver } from "@reactuses/core";
 import clsx from "clsx";
+import { toPng } from "dom-to-image-more";
 import { connect, init, registerTheme } from "echarts";
 import { DownloadIcon } from "lucide-react";
 import { sleep } from "@/util/async";
@@ -13,6 +14,7 @@ type Props = {
   onZoom?: (chart: ECharts, xScale: number, yScale: number) => void;
   className?: string;
   download?: string;
+  downloadElement?: (element: HTMLElement) => HTMLElement;
 };
 
 /** echarts wrapper */
@@ -21,7 +23,8 @@ export default function Chart({
   init: initOptions = {},
   onZoom,
   className,
-  download,
+  download = "chart",
+  downloadElement = (element) => element,
 }: Props) {
   const id = useId();
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
@@ -83,12 +86,13 @@ export default function Chart({
       <button
         className="absolute top-[anchor(top)] right-[anchor(right)] z-10 size-8 rounded-md hover:bg-gray"
         style={{ positionAnchor: `--${id}` }}
-        onClick={() => {
-          const src = chart.current?.getDataURL({ type: "png", pixelRatio: 4 });
-          if (!src) return;
+        onClick={async () => {
+          if (!ref) return;
+          const element = downloadElement(ref);
+          const url = await toPng(element, { scale: 4 });
           const a = document.createElement("a");
-          a.href = src;
-          a.download = `${download}.png`;
+          a.href = url;
+          a.download = download;
           a.click();
         }}
         aria-label="Download chart"

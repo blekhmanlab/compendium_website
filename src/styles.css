@@ -110,6 +110,10 @@
     @apply font-medium opacity-50;
   }
 
+  pre:has(> code) {
+    @apply bg-dark-gray overflow-x-auto rounded-md p-2 leading-normal whitespace-pre text-white;
+  }
+
   .icon,
   .lucide {
     @apply inline-block h-[1em];

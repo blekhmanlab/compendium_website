@@ -19,7 +19,7 @@ import {
   loadTaxonPCs,
   useData as useProjectionistData,
 } from "@/pages/projectionist/state";
-import { shapePaths, useLegend } from "@/util/legend";
+import { useLegend } from "@/util/legend";
 import { useWorker } from "@/util/worker";
 
 /** compare series of principal components */
@@ -126,7 +126,7 @@ export default function PCs() {
   ];
 
   /** legend colors/shapes */
-  const [entry, legend] = useLegend(entries);
+  const [entry, legend] = useLegend(entries, 2);
 
   /** data for compendium plot */
   const compendiumPlot = useMemo(() => {
@@ -264,11 +264,11 @@ export default function PCs() {
           chunk={1000 * 10 ** (-(Object.entries(legend).length - 1) / 7)}
         />
 
-        <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
           {Object.entries(legend).map(([key, { color, shape }], index) => (
             <div key={index} className="flex items-center gap-2">
               <svg viewBox="-1 -1 2 2" className="size-4">
-                <path d={shapePaths[shape ?? ""] ?? ""} fill={color} />
+                <path d={shape} fill={color} />
               </svg>
               <span>{String(key) || "-"}</span>
             </div>
