@@ -81,9 +81,7 @@ export default function PCChart({
         /** scale points up a bit when zooming in */
         const factor = (xScale * yScale) ** 0.15;
         chart.setOption({
-          series: series.map((_, index) => ({
-            symbolSize: (series[index]?.size ?? 1) * factor,
-          })),
+          series: series.map(({ size = 1 }) => ({ symbolSize: size * factor })),
         });
       }, 100)}
       className="aspect-square w-120"

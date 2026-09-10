@@ -62,7 +62,6 @@ export default function UploadButton({
   const setUpload = useCallback(
     async (url: string) => {
       const blob = await (await fetch(url)).blob();
-      console.log(blob);
       const name = url.split("/").pop() || "";
       const file = new File([blob], name, { type: blob.type });
       upload(file);

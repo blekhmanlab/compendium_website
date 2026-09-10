@@ -132,15 +132,13 @@ export default function SearchList({
       </div>
 
       <Table
-        cols={cols.map(
-          (col): Col<Datum, keyof Datum> => ({
-            key: col as keyof (typeof matches)[number],
-            name: capitalize(col),
-            style: (_, row) => ({
-              opacity: row?.fuzzy ? 0.5 : 1,
-            }),
+        cols={cols.map((col): Col<Datum, keyof Datum> => ({
+          key: col as keyof (typeof matches)[number],
+          name: capitalize(col),
+          style: (_, row) => ({
+            opacity: row?.fuzzy ? 0.5 : 1,
           }),
-        )}
+        }))}
         rows={matches}
         extraRows={
           exactStatus !== "loading" &&

@@ -76,7 +76,7 @@ export default function Chart({
   /** update chart options */
   useEffect(() => {
     if (!chart.current) return;
-    chart.current.setOption(option);
+    chart.current.setOption(option, true, true);
   });
 
   return (
@@ -84,7 +84,7 @@ export default function Chart({
       <div
         ref={setRef}
         className={clsx(
-          "relative size-full max-h-screen max-w-full resize overflow-hidden [anchor-name:--chart] [&+button]:opacity-0 [&+button:focus]:opacity-100 [&+button:hover]:opacity-100 [&:hover+button]:opacity-100",
+          "relative size-full max-h-screen max-w-full resize overflow-hidden [&+button]:opacity-0 [&+button:focus]:opacity-100 [&+button:hover]:opacity-100 [&:hover+button]:opacity-100",
           className,
         )}
         style={{ anchorName: `--${id}` }}
