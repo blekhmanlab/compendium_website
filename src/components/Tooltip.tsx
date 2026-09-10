@@ -23,16 +23,6 @@ export default function Tooltip({
 }: Props) {
   if (!content) return children;
 
-  /** prevent if trigger disabled */
-  if (
-    isValidElement(children) &&
-    typeof children.props === "object" &&
-    children.props !== null &&
-    "aria-disabled" in children.props &&
-    children.props["aria-disabled"]
-  )
-    return children;
-
   return (
     <Popover.Root>
       <Popover.Trigger

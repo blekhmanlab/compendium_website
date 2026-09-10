@@ -92,89 +92,100 @@ export default function Chart({
         style={{ anchorName: `--${id}` }}
         onDoubleClick={() => chart.current?.dispatchAction({ type: "restore" })}
       />
-      <button
-        className="absolute top-[anchor(top)] right-[anchor(right)] z-10 size-8 rounded-md hover:bg-gray"
-        style={{ positionAnchor: `--${id}` }}
-        disabled={downloading}
-        onClick={async () => {
-          if (!ref) return;
+      {!downloading && (
+        <button
+          className="absolute top-[anchor(top)] right-[anchor(right)] z-10 size-8 rounded-md hover:bg-gray"
+          style={{ positionAnchor: `--${id}` }}
+          onClick={async () => {
+            if (!ref) return;
 
-          setDownloading(true);
+            setDownloading(true);
 
-          /** options */
-          const scale = 4;
-          const padding = 16 * scale;
+            /** options */
+            const scale = 4;
+            const padding = 16 * scale;
 
-          /** render */
-          const element = downloadElement(ref);
-          // eslint-disable-next-line
-          ref.style.resize = "none";
-          const canvas = await toCanvas(element, { scale });
-          ref.style.resize = "";
+            /** render */
+            const element = downloadElement(ref);
+            // eslint-disable-next-line
+            ref.style.resize = "none";
+            const canvas = await toCanvas(element, { scale });
+            ref.style.resize = "";
 
-          /** hide resize handle */
+            /** hide resize handle */
 
-          /** access pixel data */
-          let ctx = canvas.getContext("2d")!;
-          const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const getPixel = (x: number, y: number) =>
-            pixels.data[(y * canvas.width + x) * 4 + 3];
+            /** access pixel data */
+            let ctx = canvas.getContext("2d")!;
+            const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const getPixel = (x: number, y: number) =>
+              pixels.data[(y * canvas.width + x) * 4 + 3];
 
-          /** find crop edge */
-          const getEdge = (ys: number[], xs: number[], swap = false) => {
-            for (const y of ys)
-              for (const x of xs)
-                if (swap ? getPixel(y, x) : getPixel(x, y)) return y;
-            return 0;
-          };
+            /** find crop edge */
+            const getEdge = (ys: number[], xs: number[], swap = false) => {
+              for (const y of ys)
+                for (const x of xs)
+                  if (swap ? getPixel(y, x) : getPixel(x, y)) return y;
+              return 0;
+            };
 
-          /** coords */
-          const ys = range(0, canvas.height);
-          const xs = range(0, canvas.width);
+            /** coords */
+            const ys = range(0, canvas.height);
+            const xs = range(0, canvas.width);
 
-          /** find all crop edges */
-          let top = getEdge(ys, xs);
-          let bottom = getEdge(ys.toReversed(), xs);
-          let left = getEdge(xs, ys, true);
-          let right = getEdge(xs.toReversed(), ys, true);
+            /** find all crop edges */
+            let top = getEdge(ys, xs);
+            let bottom = getEdge(ys.toReversed(), xs);
+            let left = getEdge(xs, ys, true);
+            let right = getEdge(xs.toReversed(), ys, true);
 
-          /** add padding */
-          top -= padding;
-          bottom += padding;
-          left -= padding;
-          right += padding;
+            /** add padding */
+            top -= padding;
+            bottom += padding;
+            left -= padding;
+            right += padding;
 
-          /** clamp */
-          top = clamp(top, 0, canvas.height / 2);
-          bottom = clamp(bottom, canvas.height / 2, canvas.height);
-          left = clamp(left, 0, canvas.width / 2);
-          right = clamp(right, canvas.width / 2, canvas.width);
+            /** clamp */
+            top = clamp(top, 0, canvas.height / 2);
+            bottom = clamp(bottom, canvas.height / 2, canvas.height);
+            left = clamp(left, 0, canvas.width / 2);
+            right = clamp(right, canvas.width / 2, canvas.width);
 
-          /** calc size */
-          const width = right - left + 1;
-          const height = bottom - top + 1;
+            /** calc size */
+            const width = right - left + 1;
+            const height = bottom - top + 1;
 
-          /** create new cropped canvas */
-          const cropped = document.createElement("canvas");
-          cropped.width = width;
-          cropped.height = height;
-          ctx = cropped.getContext("2d")!;
+            /** create new cropped canvas */
+            const cropped = document.createElement("canvas");
+            cropped.width = width;
+            cropped.height = height;
+            ctx = cropped.getContext("2d")!;
 
-          /** draw cropped image onto new canvas */
-          ctx.drawImage(canvas, left, top, width, height, 0, 0, width, height);
+            /** draw cropped image onto new canvas */
+            ctx.drawImage(
+              canvas,
+              left,
+              top,
+              width,
+              height,
+              0,
+              0,
+              width,
+              height,
+            );
 
-          /** download */
-          const link = document.createElement("a");
-          link.download = download;
-          link.href = cropped.toDataURL("image/png");
-          link.click();
+            /** download */
+            const link = document.createElement("a");
+            link.download = download;
+            link.href = cropped.toDataURL("image/png");
+            link.click();
 
-          setDownloading(false);
-        }}
-        aria-label="Download chart"
-      >
-        <DownloadIcon />
-      </button>
+            setDownloading(false);
+          }}
+          aria-label="Download chart"
+        >
+          <DownloadIcon />
+        </button>
+      )}
     </>
   );
 }
