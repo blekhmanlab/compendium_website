@@ -4,15 +4,15 @@ import { cos, sin } from "@/util/math";
 
 /** color options */
 const colors = [
-  formatHex("oklch(65% 0.3 340)"),
-  formatHex("oklch(65% 0.3 300)"),
-  formatHex("oklch(65% 0.3 260)"),
-  formatHex("oklch(65% 0.3 220)"),
-  formatHex("oklch(65% 0.3 180)"),
-  formatHex("oklch(70% 0.3 140)"),
-  formatHex("oklch(80% 0.3 100)"),
-  formatHex("oklch(70% 0.3 60)"),
-  formatHex("oklch(65% 0.3 20)"),
+  formatHex("oklch(65% 0.25 340)"),
+  formatHex("oklch(65% 0.25 300)"),
+  formatHex("oklch(65% 0.25 260)"),
+  formatHex("oklch(65% 0.25 220)"),
+  formatHex("oklch(65% 0.25 180)"),
+  formatHex("oklch(70% 0.25 140)"),
+  formatHex("oklch(80% 0.25 100)"),
+  formatHex("oklch(70% 0.25 60)"),
+  formatHex("oklch(65% 0.25 20)"),
 ];
 
 /** neutral color */
