@@ -97,8 +97,11 @@ export default function Chart({
         onClick={async (event) => {
           if (!ref) return;
 
+          /** button */
+          const button = event.currentTarget;
+
           /** disable button */
-          event.currentTarget.setAttribute("disabled", "true");
+          button.setAttribute("disabled", "true");
 
           /** options */
           const scale = 4;
@@ -110,8 +113,6 @@ export default function Chart({
           ref.style.resize = "none";
           const canvas = await toCanvas(element, { scale });
           ref.style.resize = "";
-
-          /** hide resize handle */
 
           /** access pixel data */
           let ctx = canvas.getContext("2d")!;
@@ -169,7 +170,7 @@ export default function Chart({
           link.click();
 
           /** re-enable button */
-          event.currentTarget.removeAttribute("disabled");
+          button.removeAttribute("disabled");
         }}
         aria-label="Download chart"
       >
