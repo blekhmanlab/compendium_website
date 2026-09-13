@@ -1,5 +1,6 @@
 import type { Point } from "@/util/math";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { clamp } from "lodash";
 import { useElementSize, useEventListener } from "@reactuses/core";
 import { gsap } from "gsap";
 import { random } from "lodash";
@@ -59,7 +60,7 @@ export default function Viz() {
     /** draw particles */
     for (const { position, size, alpha, spin, strength } of particles) {
       const radius = size * (10 * strength);
-      ctx.current.globalAlpha = alpha + strength;
+      ctx.current.globalAlpha = clamp(alpha + strength, 0, 1);
       ctx.current.fillStyle = "white";
       ctx.current.beginPath();
       ctx.current.arc(
@@ -226,8 +227,8 @@ const getParticles = async () => {
     /** animate alpha */
     gsap
       .timeline()
-      .to(particle, { alpha: 0.5, duration: duration, delay, ease })
-      .to(particle, { alpha: 0.25, duration: duration, ease });
+      .to(particle, { alpha: 1, duration: duration, delay, ease })
+      .to(particle, { alpha: 0.5, duration: duration, ease });
   }
 
   return particles;
