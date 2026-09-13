@@ -10,11 +10,7 @@ export default function Header() {
         <h2 className="font-medium">Projectionist</h2>
       </div>
 
-      <p>
-        Compare your data to ours and discover meaningful insights. Upload your
-        16S taxonomic read and classification tables and see how they're
-        distributed relative to Compendium data.
-      </p>
+      <p>Compare your data to ours and discover meaningful insights.</p>
     </HeaderWrapper>
   );
 }

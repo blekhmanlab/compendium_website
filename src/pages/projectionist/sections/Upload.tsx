@@ -120,15 +120,20 @@ export default function Upload() {
     lines = lines.map((line) => truncate(line, { length: 100 }));
     text = lines.join("\n");
     return (
-      <pre>
-        <code>{text}</code>
-      </pre>
+      <>
+        <div>Preview</div>
+        <pre>
+          <code>{text}</code>
+        </pre>
+      </>
     );
   };
 
   return (
     <section className="width-lg">
       <h2>Upload</h2>
+
+      <p>Upload your 16S taxonomic read and classification tables.</p>
 
       <div className="grid grid-cols-[repeat(4,auto)] items-center gap-4">
         {/* reads table */}

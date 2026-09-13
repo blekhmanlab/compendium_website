@@ -207,8 +207,8 @@ export default function PCs() {
       <h2>Principal Components</h2>
 
       <p>
-        See your and our samples projected into the same principal component
-        space.
+        How your samples are distributed relative to ours, projected into the
+        same principal component space.
       </p>
 
       <div className="flex flex-wrap items-center justify-center gap-8">
