@@ -36,13 +36,13 @@ type Props<Datum extends DatumShape> = {
 export type OnSelect = NonNullable<Props<DatumShape>["onSelect"]>;
 export type SelectedRows = Parameters<OnSelect>[0];
 
-const Table = <Datum extends DatumShape>({
+export default function Table<Datum extends DatumShape>({
   cols,
   rows,
   limit = 7,
   extraRows,
   onSelect,
-}: Props<Datum>) => {
+}: Props<Datum>) {
   /** row cutoff */
   let [cutoff, setCutoff] = useState(limit);
 
@@ -71,14 +71,14 @@ const Table = <Datum extends DatumShape>({
 
   return (
     <>
-      <div className="w-full overflow-x-auto">
+      <div className="w-full table-wrapper">
         <table>
           <thead>
             <tr>
               {selectEnabled && (
                 <th>
                   <CheckButton
-                    label={
+                    tooltip={
                       someSelected
                         ? `Deselect ${formatNumber(selected.size)} rows`
                         : `Select ${formatNumber(rows.length)} rows`
@@ -116,7 +116,8 @@ const Table = <Datum extends DatumShape>({
                   {selectEnabled && (
                     <td>
                       <CheckButton
-                        label={
+                        className="border border-light-gray"
+                        tooltip={
                           selected.has(row.name) ? "Deselect row" : "Select row"
                         }
                         checked={selected.has(row.name)}
@@ -187,6 +188,4 @@ const Table = <Datum extends DatumShape>({
       </div>
     </>
   );
-};
-
-export default Table;
+}

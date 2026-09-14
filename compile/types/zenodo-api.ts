@@ -2,14 +2,6 @@
 
 /** https://jvilk.com/MakeTypes/ */
 export interface Zenodo {
-  hits: Hits;
-  aggregations: Aggregations;
-}
-export interface Hits {
-  hits: _Record[];
-  total: number;
-}
-export interface _Record {
   created: string;
   modified: string;
   id: number;
