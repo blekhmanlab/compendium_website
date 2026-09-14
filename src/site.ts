@@ -36,7 +36,7 @@ export default {
   "meta-g-compendium": {
     title: "Meta G Compendium",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "An ongoing initiative bringing together human gut metagenomes from around the world into the largest atlas of its kind to date.",
     url: "https://microbiomap.org",
     paper: "https://fake-link.com",
     rPackage: "https://fake-link.com",
@@ -57,7 +57,7 @@ export default {
       {
         image: "iem.png",
         text: "Institute of Experimental Medicine",
-        url: "",
+        url: "https://www.iem.uni-kiel.de/",
       },
       {
         image: "gmbc.png",
