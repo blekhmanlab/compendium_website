@@ -15,8 +15,16 @@ export const PCs = range(1, maxPCs + 1).map(
 
 export type PC = `PC${number}`;
 
-/** available ordinations */
-export const ordinations = ["full", "south-asia", "europe", "non-europe"];
+/** available ordination options */
+export const ordinations = Object.keys(
+  import.meta.glob("./data/human-microbiome-compendium/sample-pcs-*.json", {
+    eager: true,
+  }),
+).map((path) => {
+  const [, , ordination = ""] =
+    path.match(/([^/]+)\/sample-pcs-(.+)\.json/) ?? [];
+  return ordination;
+});
 
 export type UserReads = Awaited<ReturnType<typeof parseUserReads>>;
 
