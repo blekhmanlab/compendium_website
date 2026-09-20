@@ -52,7 +52,7 @@
   }
 
   section {
-    @apply width-md even:bg-dark-gray/75 odd:bg-dark-gray flex flex-col items-center gap-12 p-(--pad) px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
+    @apply flex flex-col items-center gap-12 p-(--pad) px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] [--pad:--spacing(12)] width-md last:grow odd:bg-dark-gray even:bg-dark-gray/75 max-md:[--pad:--spacing(8)];
   }
 
   h2 {
@@ -86,7 +86,7 @@
   }
 
   table {
-    @apply bg-dark-gray w-full border-collapse rounded-md text-left;
+    @apply w-full border-collapse rounded-md bg-dark-gray text-left;
   }
 
   thead {
@@ -99,7 +99,7 @@
 
   th,
   td {
-    @apply trim border-gray p-2 not-last:border-r;
+    @apply border-gray p-2 trim not-last:border-r;
   }
 
   dl {
@@ -111,7 +111,7 @@
   }
 
   pre:has(> code) {
-    @apply bg-dark-gray overflow-x-auto rounded-md p-2 leading-normal whitespace-pre text-white;
+    @apply overflow-x-auto rounded-md bg-dark-gray p-2 leading-normal whitespace-pre text-white;
   }
 
   .icon,
@@ -129,7 +129,7 @@
 }
 
 @utility table-wrapper {
-  @apply border-gray overflow-x-auto rounded-md border;
+  @apply overflow-x-auto rounded-md border border-gray;
 }
 
 @utility trim {
