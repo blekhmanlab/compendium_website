@@ -41,16 +41,16 @@ export const parseUserReads = async (text: string) => {
   /** parse raw data */
   const data = parseTsv(text);
 
-  /** sample names (col = 1, row > 1) */
-  const samples = data.slice(1).map((col) => col[0] ?? "");
+  /** sample names (column = 1, row > 1) */
+  const samples = data.slice(1).map((column) => column[0] ?? "");
 
-  /** taxa ids (row = 1, col > 1) */
+  /** taxa ids (row = 1, column > 1) */
   const taxa = data[0]?.slice(1) ?? [];
 
-  /** read counts (row > 1, col > 1) */
+  /** read counts (row > 1, column > 1) */
   const reads = data
     .slice(1)
-    .map((col) => col.slice(1).map((value) => Number(value) || 0));
+    .map((column) => column.slice(1).map((value) => Number(value) || 0));
 
   return { taxa, samples, reads };
 };
@@ -127,10 +127,10 @@ export const projectUserData = async (
 
   message("Consolidating taxa");
 
-  /** group together col indices that are same taxon */
+  /** group together column indices that are same taxon */
   const groups: number[][] = Object.values(
     groupBy(Object.entries(taxa), ([, taxon]) => taxon),
-  ).map((group) => group.map(([col]) => Number(col)));
+  ).map((group) => group.map(([column]) => Number(column)));
 
   /** consolidate taxa */
   taxa = uniq(taxa);
@@ -141,10 +141,10 @@ export const projectUserData = async (
   reads = reads.map((row) =>
     groups.map((group) =>
       sum(
-        group.map((col) => {
-          if (row[col] === undefined)
-            throw Error(`Read undefined: col ${col}, row ${row}`);
-          return row[col];
+        group.map((column) => {
+          if (row[column] === undefined)
+            throw Error(`Read undefined: column ${column}, row ${row}`);
+          return row[column];
         }),
       ),
     ),
@@ -162,7 +162,7 @@ export const projectUserData = async (
       /** randomly select a read to remove */
       const randomRead = random(total - 1);
       let cumulative = 0;
-      /** find first col of reads that contains rand index */
+      /** find first column of reads that contains rand index */
       const index = counts.findIndex((count) => {
         cumulative += count;
         return cumulative > randomRead;
@@ -208,7 +208,7 @@ export const projectUserData = async (
       /** calculate projected principal component */
       const total = sum(
         taxa.map((taxon, taxonIndex) => {
-          const debug = `sample ${sample}, taxon ${taxon}, row ${sampleIndex}, col ${taxonIndex}`;
+          const debug = `sample ${sample}, taxon ${taxon}, row ${sampleIndex}, column ${taxonIndex}`;
           /** user pc */
           const user = reads[sampleIndex]?.[taxonIndex];
           if (user === undefined) throw Error(`User PC undefined: ${debug}`);

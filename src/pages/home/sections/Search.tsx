@@ -86,7 +86,7 @@ export default function Search() {
                 <SearchList
                   name="Geography"
                   list={geoSearch}
-                  cols={["name", "type", "samples"]}
+                  columns={["name", "type", "samples"]}
                   types={["Country", "Region"]}
                 />
               </>
@@ -105,7 +105,7 @@ export default function Search() {
                 <SearchList
                   name="Project/Sample"
                   list={projectSearch}
-                  cols={["name", "type", "samples"]}
+                  columns={["name", "type", "samples"]}
                   types={["Project", "Sample"]}
                 />
               </>
@@ -124,7 +124,7 @@ export default function Search() {
                 <SearchList
                   name="Taxa"
                   list={taxonSearch}
-                  cols={["name", "type", "samples"]}
+                  columns={["name", "type", "samples"]}
                   types={["Phylum", "Class"]}
                 />
               </>
@@ -144,7 +144,7 @@ export default function Search() {
                   <SearchList
                     name="Tags"
                     list={tagSearch}
-                    cols={["name", "projects", "samples"]}
+                    columns={["name", "projects", "samples"]}
                     onSelect={(selected) =>
                       startTransition(() => setSelectedTags(selected))
                     }
@@ -158,7 +158,7 @@ export default function Search() {
                   <SearchList
                     name="Tag Values"
                     list={tagValueSearch}
-                    cols={["name", "value", "project", "samples"]}
+                    columns={["name", "value", "project", "samples"]}
                     names={selectedTags}
                   />
                 </div>

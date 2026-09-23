@@ -210,7 +210,7 @@ const processMainData = async (
     /** if no more data, exit */
     if (taxonomicDone && metadataDone) break;
 
-    /** get sample metadata cols */
+    /** get sample metadata columns */
     const [
       sample = "",
       project = "",
@@ -242,18 +242,18 @@ const processMainData = async (
     samples[sample] = { sample, run, project, reads: 0, code, region };
 
     /** loop through taxonomic table columns */
-    for (let col = 2; col < taxonomicRow.length; col++) {
+    for (let column = 2; column < taxonomicRow.length; column++) {
       /** number of sequence reads */
-      const reads = Number(taxonomicRow[col]);
+      const reads = Number(taxonomicRow[column]);
 
       /** tally reads for this sample */
       samples[sample].reads += reads;
 
       /** if taxon present in sample */
       if (reads > 0) {
-        const taxonomicCol = taxonomicHeader[col];
+        const taxonomicColumn = taxonomicHeader[column];
         /** get props from header row */
-        const taxon = { ...taxonomicCol!, samples: { total: 0 } };
+        const taxon = { ...taxonomicColumn!, samples: { total: 0 } };
         const { phylum = "", _class = "" } = taxon;
 
         /** count sample toward phylum (if not already) */
@@ -549,7 +549,7 @@ const processProjectionistData = async (
       /** if no more data, exit */
       if (sampleDone) break;
 
-      /** get cols */
+      /** get columns */
       let [run = "", region = "", ...PCs] = sampleRow;
 
       /** split PROJECT_SRR to just SRR */
@@ -605,7 +605,7 @@ const processProjectionistData = async (
       /** if no more data, exit */
       if (taxonDone) break;
 
-      /** get cols */
+      /** get columns */
       const [
         kingdom = "",
         phylum = "",
@@ -654,7 +654,7 @@ const processProjectionistData = async (
     /** if no more data, exit */
     if (screeDone) break;
 
-    /** get cols */
+    /** get columns */
     const [axis = "", explained = 0, cumulative = 0, ordination = ""] =
       screeRow;
     const pc = `PC${axis}`;

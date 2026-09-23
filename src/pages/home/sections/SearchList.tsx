@@ -1,5 +1,5 @@
 import type { Remote } from "comlink";
-import type { Col } from "@/components/Table";
+import type { Column } from "@/components/Table";
 import type { Data } from "@/pages/home/state";
 import type * as SearchAPI from "@/util/search.ts";
 import type { KeysOfType } from "@/util/types";
@@ -22,7 +22,7 @@ type List = NonNullable<Data[KeysOfType<Data, `${string}Search`>]>;
 type Props = {
   name: string;
   list?: List;
-  cols: string[];
+  columns: string[];
   types?: string[];
   names?: string[];
   onSelect?: (selected: string[]) => void;
@@ -34,7 +34,7 @@ const fields = ["name", "value"];
 export default function SearchList({
   name,
   list: fullList,
-  cols,
+  columns,
   types,
   names,
   onSelect,
@@ -132,9 +132,9 @@ export default function SearchList({
       </div>
 
       <Table
-        cols={cols.map((col): Col<Datum, keyof Datum> => ({
-          key: col as keyof (typeof matches)[number],
-          name: capitalize(col),
+        columns={columns.map((column): Column<Datum, keyof Datum> => ({
+          key: column as keyof (typeof matches)[number],
+          name: capitalize(column),
           style: (_, row) => ({
             opacity: row?.fuzzy ? 0.5 : 1,
           }),

@@ -9,7 +9,7 @@ import { formatNumber } from "@/util/string";
 
 type DatumShape = object & { name: string };
 
-export type Col<Datum extends DatumShape, Key extends keyof Datum> = {
+export type Column<Datum extends DatumShape, Key extends keyof Datum> = {
   /** key of row object to access as cell value */
   key: Key;
   /** label for header */
@@ -20,9 +20,17 @@ export type Col<Datum extends DatumShape, Key extends keyof Datum> = {
   style?: (cell?: NoInfer<Datum[Key]>, row?: Datum) => CSSProperties;
 };
 
+/**
+ * https://stackoverflow.com/questions/68274805/typescript-reference-type-of-property-by-other-property-of-same-object
+ * https://github.com/vuejs/core/discussions/8851
+ */
+type _Column<Datum extends DatumShape> = {
+  [Key in keyof Datum]: Column<Datum, Key extends keyof Datum ? Key : never>;
+}[keyof Datum];
+
 type Props<Datum extends DatumShape> = {
-  /** col definitions https://github.com/orgs/vuejs/discussions/8851 */
-  cols: { [Key in keyof Datum]: Col<Datum, Key> }[keyof Datum][];
+  /** column definitions */
+  columns: _Column<Datum>[];
   /** data */
   rows: Datum[];
   /** max rows to show at a time */
@@ -37,7 +45,7 @@ export type OnSelect = NonNullable<Props<DatumShape>["onSelect"]>;
 export type SelectedRows = Parameters<OnSelect>[0];
 
 export default function Table<Datum extends DatumShape>({
-  cols,
+  columns,
   rows,
   limit = 7,
   extraRows,
@@ -94,9 +102,9 @@ export default function Table<Datum extends DatumShape>({
                   />
                 </th>
               )}
-              {cols.map((col, index) => (
-                <th key={index} style={col.style ? col.style() : {}}>
-                  {col.name}
+              {columns.map((column, index) => (
+                <th key={index} style={column.style ? column.style() : {}}>
+                  {column.name}
                 </th>
               ))}
             </tr>
@@ -130,15 +138,15 @@ export default function Table<Datum extends DatumShape>({
                       />
                     </td>
                   )}
-                  {cols.map((col, colIndex) => {
-                    const cell = row[col.key];
+                  {columns.map((column, columnIndex) => {
+                    const cell = row[column.key];
                     return (
                       <td
-                        key={colIndex}
-                        style={col.style ? col.style(cell, row) : {}}
+                        key={columnIndex}
+                        style={column.style ? column.style(cell, row) : {}}
                       >
-                        {col.render
-                          ? col.render(cell, row)
+                        {column.render
+                          ? column.render(cell, row)
                           : typeof cell === "number"
                             ? formatNumber(cell, false)
                             : String(cell)}
@@ -151,7 +159,7 @@ export default function Table<Datum extends DatumShape>({
             {!!extraRows?.length &&
               extraRows.map((row, index) => (
                 <tr key={index} style={{ opacity: 0.5 }}>
-                  <td colSpan={cols.length}>{row}</td>
+                  <td colSpan={columns.length}>{row}</td>
                 </tr>
               ))}
           </tbody>
