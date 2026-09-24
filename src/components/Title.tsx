@@ -1,7 +1,7 @@
+import { useLocation } from "react-router";
 import clsx from "clsx";
 import Logo from "@/assets/logo.svg?react";
 import { useSite } from "@/pages/home/state";
-import { useLocation } from "react-router";
 
 export default function Title({ className = "" }) {
   const site = useSite();

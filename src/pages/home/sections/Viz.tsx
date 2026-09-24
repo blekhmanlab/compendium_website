@@ -1,9 +1,8 @@
 import type { Point } from "@/util/math";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { clamp } from "lodash";
 import { useElementSize, useEventListener } from "@reactuses/core";
 import { gsap } from "gsap";
-import { random } from "lodash";
+import { clamp, random } from "lodash";
 import PoissonDiskSampling from "poisson-disk-sampling";
 import { sleep, waitFor } from "@/util/async";
 import { getMatrix } from "@/util/dom";

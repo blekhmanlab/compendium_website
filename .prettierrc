@@ -30,7 +30,6 @@
           "^../"
         ],
         "importOrderParserPlugins": ["typescript", "jsx", "importAssertions"],
-        "jsdocCapitalizeDescription": false,
         "htmlWhitespaceSensitivity": "strict"
       }
     }

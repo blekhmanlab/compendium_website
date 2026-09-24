@@ -4,10 +4,10 @@ import { useDebounceFn, useResizeObserver } from "@reactuses/core";
 import clsx from "clsx";
 import { toCanvas } from "dom-to-image-more";
 import { connect, init, registerTheme } from "echarts";
+import { clamp, range } from "lodash";
 import { DownloadIcon } from "lucide-react";
 import { sleep } from "@/util/async";
 import { getCssVariable } from "@/util/dom";
-import { range, clamp } from "lodash";
 
 type Props = {
   option: EChartsOption;
