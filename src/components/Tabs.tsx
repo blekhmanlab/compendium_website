@@ -12,34 +12,37 @@ type Props = {
   onChange: ComponentProps<typeof _Tabs.Root>["onValueChange"];
 };
 
-const Tabs = ({ tabs, onChange }: Props) => (
-  <_Tabs.Root
-    defaultValue={0}
-    onValueChange={onChange}
-    className="flex w-full flex-col items-center gap-8"
-  >
-    <_Tabs.List className="flex flex-wrap justify-center gap-4" activateOnFocus>
+export default function Tabs({ tabs, onChange }: Props) {
+  return (
+    <_Tabs.Root
+      defaultValue={0}
+      onValueChange={onChange}
+      className="flex w-full flex-col items-center gap-8"
+    >
+      <_Tabs.List
+        className="flex flex-wrap justify-center gap-4"
+        activateOnFocus
+      >
+        {tabs.map((tab, index) => (
+          <_Tabs.Tab
+            key={index}
+            value={index}
+            render={(props) => <Button {...(props as ButtonProps)} />}
+          >
+            {tab.name}
+          </_Tabs.Tab>
+        ))}
+      </_Tabs.List>
       {tabs.map((tab, index) => (
-        <_Tabs.Tab
+        <_Tabs.Panel
           key={index}
           value={index}
-          render={(props) => <Button {...(props as ButtonProps)} />}
+          keepMounted
+          className="flex w-full flex-col items-center gap-8"
         >
-          {tab.name}
-        </_Tabs.Tab>
+          {tab.content}
+        </_Tabs.Panel>
       ))}
-    </_Tabs.List>
-    {tabs.map((tab, index) => (
-      <_Tabs.Panel
-        key={index}
-        value={index}
-        keepMounted
-        className="flex w-full flex-col items-center gap-8"
-      >
-        {tab.content}
-      </_Tabs.Panel>
-    ))}
-  </_Tabs.Root>
-);
-
-export default Tabs;
+    </_Tabs.Root>
+  );
+}

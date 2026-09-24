@@ -3,16 +3,15 @@
     {
       "files": "*.css",
       "options": {
-        "plugins": ["prettier-plugin-tailwindcss"]
+        "plugins": ["prettier-plugin-tailwindcss"],
+        "tailwindStylesheet": "./src/styles.css"
       }
     },
     {
-      "files": "*.!(css)",
+      "files": "*",
+      "excludeFiles": "*.css",
       "options": {
-        "plugins": [
-          "@ianvs/prettier-plugin-sort-imports",
-          "prettier-plugin-jsdoc"
-        ],
+        "plugins": ["@ianvs/prettier-plugin-sort-imports"],
         "importOrder": [
           "<TYPES>^react",
           "<TYPES>^@[a-zA-Z]",
@@ -31,7 +30,6 @@
           "^../"
         ],
         "importOrderParserPlugins": ["typescript", "jsx", "importAssertions"],
-        "jsdocCapitalizeDescription": false,
         "htmlWhitespaceSensitivity": "strict"
       }
     }

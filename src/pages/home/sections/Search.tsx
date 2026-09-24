@@ -43,8 +43,9 @@ export const tooltips = {
 /** ensure only one load */
 let loaded = false;
 
-const Search = () => {
+export default function Search() {
   /** get global state */
+  const compendium = useData((state) => state.compendium);
   const projectSearch = useData((state) => state.projectSearch);
   const geoSearch = useData((state) => state.geoSearch);
   const taxonSearch = useData((state) => state.taxonSearch);
@@ -54,12 +55,14 @@ const Search = () => {
   const [tab, setTab] = useState(0);
 
   useEffect(() => {
+    const abort = new AbortController();
     /** load large data on demand */
     if (tab === 3 && !loaded) {
-      loadTags();
+      loadTags(compendium, abort);
       loaded = true;
     }
-  }, [tab]);
+    return () => abort.abort();
+  }, [tab, compendium]);
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -83,7 +86,7 @@ const Search = () => {
                 <SearchList
                   name="Geography"
                   list={geoSearch}
-                  cols={["name", "type", "samples"]}
+                  columns={["name", "type", "samples"]}
                   types={["Country", "Region"]}
                 />
               </>
@@ -102,7 +105,7 @@ const Search = () => {
                 <SearchList
                   name="Project/Sample"
                   list={projectSearch}
-                  cols={["name", "type", "samples"]}
+                  columns={["name", "type", "samples"]}
                   types={["Project", "Sample"]}
                 />
               </>
@@ -121,7 +124,7 @@ const Search = () => {
                 <SearchList
                   name="Taxa"
                   list={taxonSearch}
-                  cols={["name", "type", "samples"]}
+                  columns={["name", "type", "samples"]}
                   types={["Phylum", "Class"]}
                 />
               </>
@@ -141,7 +144,7 @@ const Search = () => {
                   <SearchList
                     name="Tags"
                     list={tagSearch}
-                    cols={["name", "projects", "samples"]}
+                    columns={["name", "projects", "samples"]}
                     onSelect={(selected) =>
                       startTransition(() => setSelectedTags(selected))
                     }
@@ -155,7 +158,7 @@ const Search = () => {
                   <SearchList
                     name="Tag Values"
                     list={tagValueSearch}
-                    cols={["name", "value", "project", "samples"]}
+                    columns={["name", "value", "project", "samples"]}
                     names={selectedTags}
                   />
                 </div>
@@ -166,6 +169,4 @@ const Search = () => {
       />
     </section>
   );
-};
-
-export default Search;
+}

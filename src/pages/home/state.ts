@@ -16,6 +16,7 @@ import type {
 } from "@/pages/home/data/tag.ts";
 import type * as TaxaAPI from "@/pages/home/data/taxa.ts";
 import type { Classes, Phyla, TaxonSearch } from "@/pages/home/data/taxa.ts";
+import type meta from "@/site";
 import { wrap } from "comlink";
 import { create } from "zustand";
 import GeoWorker from "@/pages/home/data/geo.ts?worker";
@@ -23,8 +24,12 @@ import { getLiveMeta, getMeta } from "@/pages/home/data/meta.ts";
 import ProjectWorker from "@/pages/home/data/projects.ts?worker";
 import TagWorker from "@/pages/home/data/tag.ts?worker";
 import TaxaWorker from "@/pages/home/data/taxa.ts?worker";
+import site from "@/site";
+
+export type Compendium = keyof typeof meta;
 
 export type Data = {
+  compendium: Compendium;
   meta?: Meta;
   projects?: Projects;
   reads?: Reads;
@@ -47,53 +52,113 @@ export type Data = {
 };
 
 /** home page state store */
-export const useData = create<Data>(() => ({}));
+export const useData = create<Data>(() => ({
+  compendium: "human-microbiome-compendium",
+}));
+
+/** set selected compendium */
+export const setSelectedCompendium = (compendium: Compendium) =>
+  useData.setState({ compendium });
+
+/** get selected compendium */
+export const getSelectedCompendium = () => useData.getState().compendium;
+
+/** get selected compendium meta for site/page */
+export const useSite = () => {
+  const compendium = useData((state) => state.compendium);
+  return site[compendium];
+};
 
 /** load and set metadata */
-export const loadMeta = async () => {
-  let meta = await getMeta();
+export const loadMeta = async (
+  compendium: Compendium,
+  abort: AbortController,
+) => {
+  let meta = await getMeta(compendium);
+  if (abort.signal.aborted) return;
   useData.setState({ meta });
-  meta = { ...meta, ...(await getLiveMeta()) };
+  meta = { ...meta, ...(await getLiveMeta(compendium)) };
+  if (abort.signal.aborted) return;
   useData.setState({ meta });
 };
 
 /** load and set projects */
-export const loadProjects = async () => {
-  const worker = wrap<typeof ProjectAPI>(new ProjectWorker());
-  const { projects, reads } = await worker.getProjects();
-  useData.setState({ projects, reads });
-  const { projectSearch } = await worker.getProjectSearch({ projects });
-  useData.setState({ projectSearch });
+export const loadProjects = async (
+  compendium: Compendium,
+  abort: AbortController,
+) => {
+  const worker = new ProjectWorker();
+  const wrapper = wrap<typeof ProjectAPI>(worker);
+  try {
+    const { projects, reads } = await wrapper.getProjects(compendium);
+    if (abort.signal.aborted) return;
+    useData.setState({ projects, reads });
+    const { projectSearch } = await wrapper.getProjectSearch({ projects });
+    if (abort.signal.aborted) return;
+    useData.setState({ projectSearch });
+  } finally {
+    worker.terminate();
+  }
 };
 
 /** load and set geo data */
-export const loadGeo = async () => {
-  const worker = wrap<typeof GeoAPI>(new GeoWorker());
-  const { regions, countries } = await worker.getGeo();
-  useData.setState({ regions, countries });
-  const { geoSearch } = await worker.getGeoSearch({ regions, countries });
-  useData.setState({ geoSearch });
+export const loadGeo = async (
+  compendium: Compendium,
+  abort: AbortController,
+) => {
+  const worker = new GeoWorker();
+  const wrapper = wrap<typeof GeoAPI>(worker);
+  try {
+    const { regions, countries } = await wrapper.getGeo(compendium);
+    if (abort.signal.aborted) return;
+    useData.setState({ regions, countries });
+    const { geoSearch } = await wrapper.getGeoSearch({ regions, countries });
+    if (abort.signal.aborted) return;
+    useData.setState({ geoSearch });
+  } finally {
+    worker.terminate();
+  }
 };
 
 /** load and set taxa */
-export const loadTaxa = async () => {
-  const worker = wrap<typeof TaxaAPI>(new TaxaWorker());
-  const { phyla, classes } = await worker.getTaxa();
-  useData.setState({ phyla, classes });
-  const { taxonSearch } = await worker.getTaxonSearch({ phyla, classes });
-  useData.setState({ taxonSearch });
+export const loadTaxa = async (
+  compendium: Compendium,
+  abort: AbortController,
+) => {
+  const worker = new TaxaWorker();
+  const wrapper = wrap<typeof TaxaAPI>(worker);
+  try {
+    const { phyla, classes } = await wrapper.getTaxa(compendium);
+    if (abort.signal.aborted) return;
+    useData.setState({ phyla, classes });
+    const { taxonSearch } = await wrapper.getTaxonSearch({ phyla, classes });
+    if (abort.signal.aborted) return;
+    useData.setState({ taxonSearch });
+  } finally {
+    worker.terminate();
+  }
 };
 
 /** load and set tags */
-export const loadTags = async () => {
-  const worker = wrap<typeof TagAPI>(new TagWorker());
-  const { tags, tagValues } = await worker.getTags();
-  useData.setState({ tags, tagValues });
-  const { tagSearch, tagValueSearch } = await worker.getTagSearch({
-    tags,
-    tagValues,
-  });
-  useData.setState({ tagSearch, tagValueSearch });
+export const loadTags = async (
+  compendium: Compendium,
+  abort: AbortController,
+) => {
+  const worker = new TagWorker();
+  const wrapper = wrap<typeof TagAPI>(worker);
+  try {
+    const { tags, tagValues } = await wrapper.getTags(compendium);
+    if (abort.signal.aborted) return;
+    useData.setState({ tags, tagValues });
+    const { tagSearch, tagValueSearch } = await wrapper.getTagSearch({
+      tags,
+      tagValues,
+    });
+    if (abort.signal.aborted) return;
+    useData.setState({ tagSearch, tagValueSearch });
+  } finally {
+    worker.terminate();
+  }
 };
 
 /** select feature (country or region) */

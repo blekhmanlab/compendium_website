@@ -1,8 +1,28 @@
+import type { Compendium } from "@/pages/home/state";
 import { expose } from "comlink";
+import { mapKeys } from "lodash";
 import { cleanSearch } from "@/pages/home/data/util";
 import { request } from "@/util/async";
-import tagValuesUrl from "./tag-values.json?url";
-import tagsUrl from "./tags.json?url";
+
+/** import all tag values urls */
+const tagValuesUrls = mapKeys(
+  import.meta.glob<string>("./*/tag-values.json", {
+    eager: true,
+    query: "url",
+    import: "default",
+  }),
+  (_, path) => path.match(/([^/]+)\/tag-values\.json$/)?.[1] ?? "",
+);
+
+/** import all tags urls */
+const tagsUrls = mapKeys(
+  import.meta.glob<string>("./*/tags.json", {
+    eager: true,
+    query: "url",
+    import: "default",
+  }),
+  (_, path) => path.match(/([^/]+)\/tags\.json$/)?.[1] ?? "",
+);
 
 /** tag project and sample counts */
 export type Tags = {
@@ -35,10 +55,10 @@ export type TagValueSearch = {
 }[];
 
 /** get tags and tag-values */
-export const getTags = async () => {
+export const getTags = async (compendium: Compendium) => {
   const [tags, tagValues] = await Promise.all([
-    request<Tags>(tagsUrl),
-    request<TagValues>(tagValuesUrl),
+    request<Tags>(tagsUrls[compendium] ?? ""),
+    request<TagValues>(tagValuesUrls[compendium] ?? ""),
   ]);
   return { tags, tagValues };
 };

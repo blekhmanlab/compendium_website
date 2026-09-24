@@ -1,11 +1,12 @@
 import type { Remote } from "comlink";
-import type { Col } from "@/components/Table";
+import type { Column } from "@/components/Table";
 import type { Data } from "@/pages/home/state";
 import type * as SearchAPI from "@/util/search.ts";
 import type { KeysOfType } from "@/util/types";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { capitalize } from "lodash";
+import Alert from "@/components/Alert";
 import Select from "@/components/Select";
 import Table from "@/components/Table";
 import Textbox from "@/components/Textbox";
@@ -21,7 +22,7 @@ type List = NonNullable<Data[KeysOfType<Data, `${string}Search`>]>;
 type Props = {
   name: string;
   list?: List;
-  cols: string[];
+  columns: string[];
   types?: string[];
   names?: string[];
   onSelect?: (selected: string[]) => void;
@@ -30,14 +31,14 @@ type Props = {
 /** fields to search on each list object */
 const fields = ["name", "value"];
 
-const SearchList = ({
+export default function SearchList({
   name,
   list: fullList,
-  cols,
+  columns,
   types,
   names,
   onSelect,
-}: Props) => {
+}: Props) {
   /** type filter */
   const [type, setType] = useState<TypesAll[number]>("All");
 
@@ -61,23 +62,23 @@ const SearchList = ({
   }, [fullList, types, type, names]);
 
   /** exact search results */
-  const [exactMatches = [], exactStatus, runExact] = useWorker(
+  const [exactMatches = [], exactStatus] = useWorker(
     SearchWorker,
-    (worker: Remote<typeof SearchAPI>) =>
-      worker.exactSearch(list ?? [], fields, search) as Promise<List>,
+    useCallback(
+      (worker: Remote<typeof SearchAPI>) =>
+        worker.exactSearch(list ?? [], fields, search) as Promise<List>,
+      [list, search],
+    ),
   );
   /** fuzzy search results */
-  const [fuzzyMatches = [], fuzzyStatus, runFuzzy] = useWorker(
+  const [fuzzyMatches = [], fuzzyStatus] = useWorker(
     SearchWorker,
-    (worker: Remote<typeof SearchAPI>) =>
-      worker.fuzzySearch(list ?? [], fields, search) as Promise<List>,
+    useCallback(
+      (worker: Remote<typeof SearchAPI>) =>
+        worker.fuzzySearch(list ?? [], fields, search) as Promise<List>,
+      [list, search],
+    ),
   );
-
-  /** run exact search */
-  useEffect(runExact, [list, search, runExact]);
-
-  /** run fuzzy search */
-  useEffect(runFuzzy, [list, search, runFuzzy]);
 
   /** exact match name quick lookup */
   const exactLookup = useMemo(
@@ -87,7 +88,9 @@ const SearchList = ({
 
   if (!list)
     return (
-      <div className="placeholder aspect-3/2">Loading {name.toLowerCase()}</div>
+      <Alert type="loading" className="aspect-3/1 w-full">
+        Loading {name.toLowerCase()}
+      </Alert>
     );
 
   /** full list of matches */
@@ -129,27 +132,23 @@ const SearchList = ({
       </div>
 
       <Table
-        cols={cols.map(
-          (col): Col<Datum, keyof Datum> => ({
-            key: col as keyof (typeof matches)[number],
-            name: capitalize(col),
-            style: (_, row) => ({
-              opacity: row?.fuzzy ? 0.5 : 1,
-            }),
+        columns={columns.map((column): Column<Datum, keyof Datum> => ({
+          key: column as keyof (typeof matches)[number],
+          name: capitalize(column),
+          style: (_, row) => ({
+            opacity: row?.fuzzy ? 0.5 : 1,
           }),
-        )}
+        }))}
         rows={matches}
         extraRows={
           exactStatus !== "loading" &&
           fuzzyStatus !== "loading" &&
           !matches.length
-            ? ["", "No results", ""]
+            ? ["No results"]
             : undefined
         }
         onSelect={onSelect}
       />
     </>
   );
-};
-
-export default SearchList;
+}

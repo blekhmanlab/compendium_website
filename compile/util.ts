@@ -84,11 +84,11 @@ export const write = (filename: string, data: unknown, pretty = false) => {
 };
 
 /** generate n equally spaced (in log space) intervals between a and b */
-export const logSpace = (a: number, b: number, n: number) => {
-  a = Math.log10(a);
-  b = Math.log10(b);
-  return range(a, b, (b - a) / n)
-    .concat([b])
+export const logSpace = (min: number, max: number, count: number) => {
+  min = Math.log10(min);
+  max = Math.log10(max);
+  return range(min, max, (max - min) / count)
+    .concat([max])
     .map((value) => Math.pow(10, value));
 };
 

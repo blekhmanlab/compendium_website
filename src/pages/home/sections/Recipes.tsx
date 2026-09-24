@@ -1,5 +1,6 @@
 import { LightbulbIcon, PackageIcon } from "lucide-react";
 import Button from "@/components/Button";
+import { useSite } from "@/pages/home/state";
 
 const recipes = [
   {
@@ -28,32 +29,34 @@ const recipes = [
   },
 ];
 
-const Recipes = () => (
-  <section>
-    <h2>Recipes</h2>
+export default function Recipes() {
+  const site = useSite();
 
-    <p>
-      Some of the things you can do with{" "}
-      <a href={import.meta.env.VITE_R_PACKAGE}>
-        <PackageIcon />
-        the R package
-      </a>
-      :
-    </p>
+  return (
+    <section>
+      <h2>Recipes</h2>
 
-    <div className="flex flex-col flex-wrap gap-4">
-      {recipes.map(({ link, name }, index) => (
-        <Button
-          key={index}
-          to={import.meta.env.VITE_R_PACKAGE + "articles/overview.html#" + link}
-          className="justify-start"
-        >
-          <LightbulbIcon />
-          {name}
-        </Button>
-      ))}
-    </div>
-  </section>
-);
+      <p>
+        Some of the things you can do with{" "}
+        <a href={site.rPackage}>
+          <PackageIcon />
+          the R package
+        </a>
+        :
+      </p>
 
-export default Recipes;
+      <div className="flex flex-col flex-wrap gap-4">
+        {recipes.map(({ link, name }, index) => (
+          <Button
+            key={index}
+            to={site.rPackage + "articles/overview.html#" + link}
+            className="justify-start"
+          >
+            <LightbulbIcon />
+            {name}
+          </Button>
+        ))}
+      </div>
+    </section>
+  );
+}
