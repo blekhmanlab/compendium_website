@@ -40,9 +40,6 @@ export const tooltips = {
   tag: <>Piece of metadata associated with an individual sample.</>,
 };
 
-/** ensure only one load */
-let loaded = false;
-
 export default function Search() {
   /** get global state */
   const compendium = useData((state) => state.compendium);
@@ -57,10 +54,7 @@ export default function Search() {
   useEffect(() => {
     const abort = new AbortController();
     /** load large data on demand */
-    if (tab === 3 && !loaded) {
-      loadTags(compendium, abort);
-      loaded = true;
-    }
+    if (tab === 3) loadTags(compendium, abort);
     return () => abort.abort();
   }, [tab, compendium]);
 

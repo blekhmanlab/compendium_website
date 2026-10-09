@@ -32,13 +32,16 @@ export const useWorker = <API extends APIShape, Data>(
         /** set loading state */
         setStatus("loading");
 
-        /** set message from worker */
-        if (typeof wrapper.setOnMessage === "function")
-          await wrapper.setOnMessage(
-            proxy((message) => {
-              if (latest) setMessage(message);
-            }),
-          );
+        try {
+          if (typeof wrapper.setOnMessage === "function")
+            await wrapper.setOnMessage?.(
+              proxy((message: string) => {
+                if (latest) setMessage(message);
+              }),
+            );
+        } catch {
+          /** worker doesn't implement, ignore */
+        }
 
         /** run async operation in worker thread */
         const data = await func(wrapper);
@@ -55,6 +58,7 @@ export const useWorker = <API extends APIShape, Data>(
         /** if this is still the latest run, update error status */
         if (latest) {
           latest = false;
+          console.warn(error);
           setStatus("error");
           setMessage(String((error as Error).message));
         }
