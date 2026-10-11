@@ -9,7 +9,7 @@ import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import Tooltip from "@/components/Tooltip";
 import UploadButton from "@/components/UploadButton";
-import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
+import ProjectionistWorker from "@/pages/projectionist/project?worker";
 import { useData } from "@/pages/projectionist/state";
 import { formatNumber } from "@/util/string";
 import { useWorker } from "@/util/worker";

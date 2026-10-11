@@ -1,29 +1,29 @@
-import type { Countries, GeoSearch, Regions } from "@/pages/home/data/geo.ts";
-import type * as GeoAPI from "@/pages/home/data/geo.ts";
-import type { Meta } from "@/pages/home/data/meta.ts";
+import type { Countries, GeoSearch, Regions } from "@/pages/home/data/geo";
+import type * as GeoAPI from "@/pages/home/data/geo";
+import type { Meta } from "@/pages/home/data/meta";
 import type * as ProjectAPI from "@/pages/home/data/projects";
 import type {
   Projects,
   ProjectSearch,
   Reads,
 } from "@/pages/home/data/projects";
-import type * as TagAPI from "@/pages/home/data/tag.ts";
+import type * as TagAPI from "@/pages/home/data/tags";
 import type {
   Tags,
   TagSearch,
   TagValues,
   TagValueSearch,
-} from "@/pages/home/data/tag.ts";
-import type * as TaxaAPI from "@/pages/home/data/taxa.ts";
-import type { Classes, Phyla, TaxonSearch } from "@/pages/home/data/taxa.ts";
+} from "@/pages/home/data/tags";
+import type * as TaxaAPI from "@/pages/home/data/taxa";
+import type { Classes, Phyla, TaxonSearch } from "@/pages/home/data/taxa";
 import type meta from "@/site";
 import { wrap } from "comlink";
 import { create } from "zustand";
-import GeoWorker from "@/pages/home/data/geo.ts?worker";
-import { getLiveMeta, getMeta } from "@/pages/home/data/meta.ts";
-import ProjectWorker from "@/pages/home/data/projects.ts?worker";
-import TagWorker from "@/pages/home/data/tag.ts?worker";
-import TaxaWorker from "@/pages/home/data/taxa.ts?worker";
+import GeoWorker from "@/pages/home/data/geo?worker";
+import { getLiveMeta, getMeta } from "@/pages/home/data/meta";
+import ProjectWorker from "@/pages/home/data/projects?worker";
+import TagWorker from "@/pages/home/data/tags?worker";
+import TaxaWorker from "@/pages/home/data/taxa?worker";
 import site from "@/site";
 
 export type Compendium = keyof typeof meta;

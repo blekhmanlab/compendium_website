@@ -12,10 +12,10 @@ import type {
 } from "@/pages/projectionist/project";
 import { wrap } from "comlink";
 import { create } from "zustand";
-import SamplesWorker from "@/pages/home/data/samples.ts?worker";
-import SamplePCsWorker from "@/pages/projectionist/data/sample-pcs.ts?worker";
+import SamplesWorker from "@/pages/home/data/samples?worker";
+import SamplePCsWorker from "@/pages/projectionist/data/sample-pcs?worker";
 import { getScree } from "@/pages/projectionist/data/scree";
-import TaxonPCsWorker from "@/pages/projectionist/data/taxon-pcs.ts?worker";
+import TaxonPCsWorker from "@/pages/projectionist/data/taxon-pcs?worker";
 
 export type Data = {
   userReads?: UserReads;

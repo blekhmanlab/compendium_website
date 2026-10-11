@@ -1,7 +1,7 @@
 import type { Remote } from "comlink";
 import type { Column } from "@/components/Table";
 import type { Data } from "@/pages/home/state";
-import type * as SearchAPI from "@/util/search.ts";
+import type * as SearchAPI from "@/util/search";
 import type { KeysOfType } from "@/util/types";
 import { useCallback, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
@@ -10,7 +10,7 @@ import Alert from "@/components/Alert";
 import Select from "@/components/Select";
 import Table from "@/components/Table";
 import Textbox from "@/components/Textbox";
-import SearchWorker from "@/util/search.ts?worker";
+import SearchWorker from "@/util/search?worker";
 import { formatNumber } from "@/util/string";
 import { useWorker } from "@/util/worker";
 

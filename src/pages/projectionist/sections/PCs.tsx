@@ -8,7 +8,7 @@ import Select from "@/components/Select";
 import SelectMulti from "@/components/SelectMulti";
 import Tooltip from "@/components/Tooltip";
 import { useData as useHomeData } from "@/pages/home/state";
-import ProjectionistWorker from "@/pages/projectionist/project.ts?worker";
+import ProjectionistWorker from "@/pages/projectionist/project?worker";
 import PCChart from "@/pages/projectionist/sections/PCChart";
 import {
   SelectOrdination,
