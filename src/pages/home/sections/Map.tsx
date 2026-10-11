@@ -29,22 +29,22 @@ type Feature = (Regions | Countries)["features"][number];
 const width = 770;
 const height = 400;
 
-const byOptions = ["Country", "Region"] as const;
-type By = (typeof byOptions)[number];
-
 export default function Map() {
   const ref = useRef<SVGSVGElement>(null);
   const outlineRef = useRef<SVGPathElement>(null);
   const graticulesRef = useRef<SVGPathElement>(null);
   const featuresRef = useRef<(SVGPathElement | null)[]>([]);
 
-  /** get global state */
+  /** global state */
   const countries = useData((state) => state.countries);
   const regions = useData((state) => state.regions);
   const selectedFeature = useData((state) => state.selectedFeature);
 
   /** local state */
-  const [by, setBy] = useState<By>(byOptions[0]);
+  const [level, setLevel] = useState("country");
+
+  /** data to show */
+  const data = (level === "country" ? countries : regions)?.features ?? [];
 
   /** colors */
   const primary = getCssVariable("--color-primary");
@@ -52,26 +52,8 @@ export default function Map() {
   const lightGray = getCssVariable("--color-light-gray");
   const gray = getCssVariable("--color-gray");
 
-  /** unset selected feature when clicking off map */
-  useEventListener(
-    "click",
-    () => document.activeElement === document.body && setSelectedFeature(),
-  );
-
-  /** data to show */
-  const data = by === "Country" ? countries : regions;
-
   /** get range of sample counts */
-  const [, max = 1000] = extent(
-    data?.features ?? [],
-    (datum) => datum.properties.samples,
-  );
-
-  /** check if feature/datum is selected */
-  const isSelected = (d: Feature) =>
-    selectedFeature?.country === ""
-      ? selectedFeature?.region === d.properties.region
-      : selectedFeature?.country === d.properties.country;
+  const [, max = 1000] = extent(data, (datum) => datum.properties.samples);
 
   /** color scale */
   const scale = scaleLog<string>()
@@ -104,7 +86,7 @@ export default function Map() {
     graticulesRef.current?.setAttribute("d", path(graticules) ?? "");
     featuresRef.current?.forEach((element, index) => {
       if (!element) return;
-      const feature = data?.features[index];
+      const feature = data[index];
       if (!feature) return;
       element.setAttribute("d", path(feature) ?? "");
     });
@@ -189,6 +171,18 @@ export default function Map() {
     .on("zoom", onZoom)
     .scaleExtent([baseScale, baseScale * 10]);
 
+  /** check if feature/datum is selected */
+  const isSelected = (d: Feature) =>
+    selectedFeature?.country === ""
+      ? selectedFeature?.region === d.properties.region
+      : selectedFeature?.country === d.properties.country;
+
+  /** unset selected feature when clicking off map */
+  useEventListener(
+    "click",
+    () => document.activeElement === document.body && setSelectedFeature(),
+  );
+
   if (!countries || !regions)
     return (
       <Alert type="loading" className="aspect-3/2 w-full">
@@ -198,12 +192,14 @@ export default function Map() {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <Select
-        label="Group by"
-        value={by}
-        onChange={setBy}
-        options={byOptions}
-      />
+      <div className="flex flex-col items-center gap-4">
+        <Select
+          label="Group by"
+          value={level}
+          onChange={setLevel}
+          options={["country", "region"]}
+        />
+      </div>
 
       <svg
         ref={(element) => {
@@ -237,7 +233,7 @@ export default function Map() {
           <path ref={graticulesRef} />
         </g>
         <g>
-          {data?.features.map((feature, index) => (
+          {data.map((feature, index) => (
             <Tooltip
               key={index}
               button={false}

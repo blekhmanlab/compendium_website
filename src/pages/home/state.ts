@@ -7,6 +7,8 @@ import type {
   ProjectSearch,
   Reads,
 } from "@/pages/home/data/projects";
+import type * as SamplesAPI from "@/pages/home/data/samples";
+import type { Samples } from "@/pages/home/data/samples";
 import type * as TagAPI from "@/pages/home/data/tags";
 import type {
   Tags,
@@ -22,6 +24,7 @@ import { create } from "zustand";
 import GeoWorker from "@/pages/home/data/geo?worker";
 import { getLiveMeta, getMeta } from "@/pages/home/data/meta";
 import ProjectWorker from "@/pages/home/data/projects?worker";
+import SamplesWorker from "@/pages/home/data/samples?worker";
 import TagWorker from "@/pages/home/data/tags?worker";
 import TaxaWorker from "@/pages/home/data/taxa?worker";
 import site from "@/site";
@@ -44,11 +47,14 @@ export type Data = {
   tagValues?: TagValues;
   tagSearch?: TagSearch;
   tagValueSearch?: TagValueSearch;
+  samples?: Samples;
   selectedFeature?: {
     region: string;
     country: string;
     code: string;
   };
+  selectedTags?: string[];
+  selectedTagValues?: string[];
 };
 
 /** home page state store */
@@ -185,6 +191,30 @@ export const loadTags = async (
     worker.terminate();
   }
 };
+
+/** loaded samples cache flag */
+let loadedSamples = "";
+
+/** load and set samples */
+export const loadSamples = async (
+  compendium: Compendium,
+  abort: AbortController,
+) => {
+  if (compendium === loadedSamples) return;
+  const worker = wrap<typeof SamplesAPI>(new SamplesWorker());
+  const samples = await worker.getSamples(compendium);
+  if (abort.signal.aborted) return;
+  useData.setState({ samples });
+  loadedSamples = compendium;
+};
+
+/** select tags */
+export const setSelectedTags = (selectedTags: string[]) =>
+  useData.setState({ selectedTags });
+
+/** select tag values */
+export const setSelectedTagValues = (selectedTagValues: string[]) =>
+  useData.setState({ selectedTagValues });
 
 /** select feature (country or region) */
 export const setSelectedFeature = (feature?: {

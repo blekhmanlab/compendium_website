@@ -11,7 +11,7 @@ const chartOptions = ["Phyla", "Reads"] as const;
 type Chart = (typeof chartOptions)[number];
 
 export default function Prevalence() {
-  /** get global state */
+  /** global state */
   const compendium = useData((state) => state.compendium);
   const phyla = useData((state) => state.phyla);
   const reads = useData((state) => state.reads);
@@ -31,8 +31,9 @@ export default function Prevalence() {
         </p>
       ) : (
         <p>
-          Select a <Tooltip content={tooltips["country"]}>country</Tooltip> or{" "}
-          <Tooltip content={tooltips["region"]}>region</Tooltip> to filter by.
+          Select a <Tooltip content={tooltips.country}>country</Tooltip> or{" "}
+          <Tooltip content={tooltips.region}>region</Tooltip> on map to filter
+          the charts.{" "}
         </p>
       )}
 

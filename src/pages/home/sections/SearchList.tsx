@@ -14,17 +14,12 @@ import SearchWorker from "@/util/search?worker";
 import { formatNumber } from "@/util/string";
 import { useWorker } from "@/util/worker";
 
-/** type options, including all */
-type TypesAll = ("All" | NonNullable<Props["types"]>[number])[];
-
-type List = NonNullable<Data[KeysOfType<Data, `${string}Search`>]>;
-
 type Props = {
   name: string;
-  list?: List;
+  list?: NonNullable<Data[KeysOfType<Data, `${string}Search`>]>;
   columns: string[];
   types?: string[];
-  names?: string[];
+  selectKeys?: string[];
   onSelect?: (selected: string[]) => void;
 };
 
@@ -33,14 +28,14 @@ const fields = ["name", "value"];
 
 export default function SearchList({
   name,
-  list: fullList,
+  list,
   columns,
   types,
-  names,
+  selectKeys,
   onSelect,
 }: Props) {
   /** type filter */
-  const [type, setType] = useState<TypesAll[number]>("All");
+  const [type, setType] = useState("All");
 
   /** search input */
   const [_search, setSearch] = useState("");
@@ -48,26 +43,26 @@ export default function SearchList({
   const search = useDebounce(_search, 300);
 
   /** filter full search list by type */
-  const list = useMemo(() => {
-    if (!fullList) return;
-    let list = [...fullList];
+  const filtered = useMemo(() => {
+    if (!list) return [];
+    let filtered = [...list];
     /** filter by type */
     if (types?.length && type !== "All")
-      list = list.filter((entry) =>
+      filtered = filtered.filter((entry) =>
         "type" in entry ? entry.type === type : true,
       );
-    /** filter by name */
-    if (names) list = list.filter((entry) => names.includes(entry.name));
-    return list;
-  }, [fullList, types, type, names]);
+    return filtered;
+  }, [list, types, type]);
+
+  type Filtered = NonNullable<typeof filtered>;
 
   /** exact search results */
   const [exactMatches = [], exactStatus] = useWorker(
     SearchWorker,
     useCallback(
       (worker: Remote<typeof SearchAPI>) =>
-        worker.exactSearch(list ?? [], fields, search) as Promise<List>,
-      [list, search],
+        worker.exactSearch(filtered ?? [], fields, search) as Promise<Filtered>,
+      [filtered, search],
     ),
   );
   /** fuzzy search results */
@@ -75,8 +70,8 @@ export default function SearchList({
     SearchWorker,
     useCallback(
       (worker: Remote<typeof SearchAPI>) =>
-        worker.fuzzySearch(list ?? [], fields, search) as Promise<List>,
-      [list, search],
+        worker.fuzzySearch(filtered ?? [], fields, search) as Promise<Filtered>,
+      [filtered, search],
     ),
   );
 
@@ -101,9 +96,7 @@ export default function SearchList({
           .filter((fuzzy) => !(fuzzy.name in exactLookup))
           .map((fuzzy) => ({ ...fuzzy, fuzzy: true })),
       )
-    : list;
-
-  type Datum = (typeof matches)[number];
+    : filtered;
 
   return (
     <>
@@ -132,13 +125,13 @@ export default function SearchList({
       </div>
 
       <Table
-        columns={columns.map((column): Column<Datum, keyof Datum> => ({
-          key: column as keyof (typeof matches)[number],
-          name: capitalize(column),
-          style: (_, row) => ({
-            opacity: row?.fuzzy ? 0.5 : 1,
+        columns={columns.map(
+          (column): Column<Filtered[number], keyof Filtered[number]> => ({
+            key: column as keyof Filtered[number],
+            name: capitalize(column),
+            style: (_, row) => ({ opacity: row?.fuzzy ? 0.5 : 1 }),
           }),
-        }))}
+        )}
         rows={matches}
         extraRows={
           exactStatus !== "loading" &&
@@ -147,6 +140,7 @@ export default function SearchList({
             ? ["No results"]
             : undefined
         }
+        selectKeys={selectKeys}
         onSelect={onSelect}
       />
     </>

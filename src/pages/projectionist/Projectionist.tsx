@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import Footer from "@/components/Footer";
 import Meta from "@/components/Meta";
-import { useData } from "@/pages/home/state";
+import { loadSamples, useData } from "@/pages/home/state";
 import Extremes from "./sections/Extremes";
 import Header from "./sections/Header";
 import PCs from "./sections/PCs";
 import Scree from "./sections/Scree";
 import Upload from "./sections/Upload";
-import { loadSamples, loadScree } from "./state";
+import { loadScree } from "./state";
 
 export default function Projectionist() {
   /** which compendium is selected */

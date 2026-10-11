@@ -7,7 +7,7 @@ import CheckButton from "@/components/CheckButton";
 import { preserveScroll } from "@/util/dom";
 import { formatNumber } from "@/util/string";
 
-type DatumShape = object & { name: string };
+type DatumShape = object;
 
 export type Column<Datum extends DatumShape, Key extends keyof Datum> = {
   /** key of row object to access as cell value */
@@ -37,6 +37,8 @@ type Props<Datum extends DatumShape> = {
   limit?: number;
   /** extra rows to add at end, for messages */
   extraRows?: string[];
+  /** keys for row selection identification */
+  selectKeys?: string[];
   /** when selected rows change */
   onSelect?: (selected: string[]) => void;
 };
@@ -46,11 +48,21 @@ export type SelectedRows = Parameters<OnSelect>[0];
 
 export default function Table<Datum extends DatumShape>({
   columns,
-  rows,
+  rows: _rows,
   limit = 7,
   extraRows,
+  selectKeys,
   onSelect,
 }: Props<Datum>) {
+  /** add unique key to each row */
+  const rows = _rows.map((row, index) => ({
+    ...row,
+    key:
+      selectKeys
+        ?.map((key) => key in row && row[key as keyof Datum])
+        .join("|") ?? String(index),
+  }));
+
   /** row cutoff */
   let [cutoff, setCutoff] = useState(limit);
 
@@ -69,7 +81,7 @@ export default function Table<Datum extends DatumShape>({
 
   /** are some rows selected */
   const someSelected =
-    !!rows.length && rows.some((row) => selected.has(row.name));
+    !!rows.length && rows.some((row) => selected.has(row.key));
 
   /** set selected */
   const updateSelected = (newSelected: typeof selected) => {
@@ -96,7 +108,7 @@ export default function Table<Datum extends DatumShape>({
                       updateSelected(
                         someSelected
                           ? new Set()
-                          : new Set(rows.map((row) => row.name)),
+                          : new Set(rows.map((row) => row.key)),
                       )
                     }
                   />
@@ -126,13 +138,13 @@ export default function Table<Datum extends DatumShape>({
                       <CheckButton
                         className="border border-light-gray"
                         tooltip={
-                          selected.has(row.name) ? "Deselect row" : "Select row"
+                          selected.has(row.key) ? "Deselect row" : "Select row"
                         }
-                        checked={selected.has(row.name)}
+                        checked={selected.has(row.key)}
                         onChange={(checked) => {
                           const newSelected = new Set(selected);
-                          if (checked) newSelected.add(row.name);
-                          else newSelected.delete(row.name);
+                          if (checked) newSelected.add(row.key);
+                          else newSelected.delete(row.key);
                           updateSelected(newSelected);
                         }}
                       />

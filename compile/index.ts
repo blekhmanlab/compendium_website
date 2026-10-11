@@ -62,7 +62,7 @@ const processMainData = async (
       country: string;
       code: string;
       samples: number;
-    } & Record<string, string | number>
+    } & Record<string, unknown>
   >;
 
   type WorldMapFeature = (typeof worldMap.features)[0];
@@ -156,13 +156,7 @@ const processMainData = async (
   });
 
   /** map of unique projects */
-  const projects: Record<
-    string,
-    {
-      project: string;
-      samples: string[];
-    }
-  > = {};
+  const projects: Record<string, { project: string; samples: string[] }> = {};
   /** map of unique phyla */
   const phyla: Record<
     string,
@@ -394,7 +388,7 @@ const processMainData = async (
     tags[tag].samples[sample] = sample;
 
     /** count tag values */
-    const key = [tag, value, project].join("-");
+    const key = [tag, value, project].join("|");
     tagValues[key] ??= { tag, value, project, samples: 0 };
     tagValues[key].samples++;
   }
@@ -686,6 +680,7 @@ await downloadFiles(
   site["meta-g-compendium"].record,
   "downloaded/meta-g-compendium",
 );
+
 await processMainData(
   "downloaded/human-microbiome-compendium/record.json",
   "downloaded/human-microbiome-compendium",

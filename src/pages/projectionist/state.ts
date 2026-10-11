@@ -1,8 +1,10 @@
-import type * as SamplesAPI from "@/pages/home/data/samples";
+import type { Samples } from "@/pages/home/data/samples";
 import type { Compendium } from "@/pages/home/state";
 import type * as SamplePCsAPI from "@/pages/projectionist/data/sample-pcs";
+import type { SamplePCs } from "@/pages/projectionist/data/sample-pcs";
 import type { Scree } from "@/pages/projectionist/data/scree";
 import type * as TaxonPCsAPI from "@/pages/projectionist/data/taxon-pcs";
+import type { TaxonPCs } from "@/pages/projectionist/data/taxon-pcs";
 import type {
   PC,
   UserMeta,
@@ -12,7 +14,6 @@ import type {
 } from "@/pages/projectionist/project";
 import { wrap } from "comlink";
 import { create } from "zustand";
-import SamplesWorker from "@/pages/home/data/samples?worker";
 import SamplePCsWorker from "@/pages/projectionist/data/sample-pcs?worker";
 import { getScree } from "@/pages/projectionist/data/scree";
 import TaxonPCsWorker from "@/pages/projectionist/data/taxon-pcs?worker";
@@ -22,9 +23,9 @@ export type Data = {
   userTaxa?: UserTaxa;
   userMeta?: UserMeta;
   userProjected?: UserProjected;
-  samples?: SamplesAPI.Samples;
-  samplePCs?: SamplePCsAPI.SamplePCs;
-  taxonPCs?: TaxonPCsAPI.TaxonPCs;
+  samples?: Samples;
+  samplePCs?: SamplePCs;
+  taxonPCs?: TaxonPCs;
   scree?: Scree;
   PCX?: PC;
   PCY?: PC;
@@ -64,22 +65,6 @@ export const loadTaxonPCs = async (
   const taxonPCs = await worker.getTaxonPCs(compendium, ordination);
   useData.setState({ taxonPCs });
   loadedTaxonPCs = key;
-};
-
-/** loaded samples cache flag */
-let loadedSamples = "";
-
-/** load and set samples */
-export const loadSamples = async (
-  compendium: Compendium,
-  abort: AbortController,
-) => {
-  if (compendium === loadedSamples) return;
-  const worker = wrap<typeof SamplesAPI>(new SamplesWorker());
-  const samples = await worker.getSamples(compendium);
-  if (abort.signal.aborted) return;
-  useData.setState({ samples });
-  loadedSamples = compendium;
 };
 
 /** loaded scree cache flag */

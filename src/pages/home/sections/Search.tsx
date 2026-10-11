@@ -2,7 +2,7 @@ import { startTransition, useEffect, useState } from "react";
 import clsx from "clsx";
 import Tabs from "@/components/Tabs";
 import Tooltip from "@/components/Tooltip";
-import { loadTags, useData } from "@/pages/home/state";
+import { loadTags, setSelectedTags, useData } from "@/pages/home/state";
 import SearchList from "./SearchList";
 
 export const tooltips = {
@@ -41,14 +41,16 @@ export const tooltips = {
 };
 
 export default function Search() {
-  /** get global state */
+  /** global state */
   const compendium = useData((state) => state.compendium);
   const projectSearch = useData((state) => state.projectSearch);
   const geoSearch = useData((state) => state.geoSearch);
   const taxonSearch = useData((state) => state.taxonSearch);
   const tagSearch = useData((state) => state.tagSearch);
   const tagValueSearch = useData((state) => state.tagValueSearch);
+  const selectedTags = useData((state) => state.selectedTags);
 
+  /** local state */
   const [tab, setTab] = useState(0);
 
   useEffect(() => {
@@ -57,8 +59,6 @@ export default function Search() {
     if (tab === 3) loadTags(compendium, abort);
     return () => abort.abort();
   }, [tab, compendium]);
-
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   return (
     <section className={clsx(tab === 3 && "width-lg")}>
@@ -73,9 +73,9 @@ export default function Search() {
               <>
                 <p>
                   Search for a{" "}
-                  <Tooltip content={tooltips["region"]}>region</Tooltip> or{" "}
-                  <Tooltip content={tooltips["country"]}>country</Tooltip> to
-                  see how many samples are associated with it.
+                  <Tooltip content={tooltips.region}>region</Tooltip> or{" "}
+                  <Tooltip content={tooltips.country}>country</Tooltip> to see
+                  how many samples are associated with it.
                 </p>
                 <SearchList
                   name="Geography"
@@ -92,9 +92,9 @@ export default function Search() {
               <>
                 <p>
                   Search for a{" "}
-                  <Tooltip content={tooltips["project"]}>project</Tooltip> or{" "}
-                  <Tooltip content={tooltips["sample"]}>sample</Tooltip>{" "}
-                  accession to see how many samples are associated with it.
+                  <Tooltip content={tooltips.project}>project</Tooltip> or{" "}
+                  <Tooltip content={tooltips.sample}>sample</Tooltip> accession
+                  to see how many samples are associated with it.
                 </p>
                 <SearchList
                   name="Project/Sample"
@@ -111,9 +111,9 @@ export default function Search() {
               <>
                 <p>
                   Search for a{" "}
-                  <Tooltip content={tooltips["phylum"]}>phylum</Tooltip> or{" "}
-                  <Tooltip content={tooltips["class"]}>class</Tooltip> to see
-                  how many samples it's present in.
+                  <Tooltip content={tooltips.phylum}>phylum</Tooltip> or{" "}
+                  <Tooltip content={tooltips.class}>class</Tooltip> to see how
+                  many samples it's present in.
                 </p>
                 <SearchList
                   name="Taxa"
@@ -130,15 +130,15 @@ export default function Search() {
               <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(min(400px,100%),1fr))] gap-x-14 gap-y-10 *:flex *:flex-col *:items-center *:gap-8">
                 <div>
                   <p>
-                    Search for a{" "}
-                    <Tooltip content={tooltips["tag"]}>tag</Tooltip> to see how
-                    many projects or samples have it. Select rows to filter next
-                    table.
+                    Search for a <Tooltip content={tooltips.tag}>tag</Tooltip>{" "}
+                    name to see how many projects or samples have it. Select
+                    rows filter the next table.
                   </p>
                   <SearchList
                     name="Tags"
                     list={tagSearch}
                     columns={["name", "projects", "samples"]}
+                    selectKeys={["name"]}
                     onSelect={(selected) =>
                       startTransition(() => setSelectedTags(selected))
                     }
@@ -146,14 +146,19 @@ export default function Search() {
                 </div>
                 <div>
                   <p>
-                    Search for a name or value to see which projects and how
+                    Search for a tag name or value to see which projects and how
                     many samples have it.
                   </p>
                   <SearchList
                     name="Tag Values"
-                    list={tagValueSearch}
+                    list={
+                      selectedTags?.length
+                        ? tagValueSearch?.filter((entry) =>
+                            selectedTags?.includes(entry.name),
+                          )
+                        : tagValueSearch
+                    }
                     columns={["name", "value", "project", "samples"]}
-                    names={selectedTags}
                   />
                 </div>
               </div>

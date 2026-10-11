@@ -18,7 +18,7 @@ export default function ReadsChart({ data }: Props) {
   /** colors */
   const secondary = getCssVariable("--color-secondary");
 
-  /** get global state */
+  /** global state */
   const selectedFeature = useData((state) => state.selectedFeature);
 
   /** which sample count to use */

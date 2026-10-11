@@ -15,7 +15,7 @@ type Props = {
 export default function PhylaChart({ data }: Props) {
   type Datum = (typeof data)[number];
 
-  /** get global state */
+  /** global state */
   const selectedFeature = useData((state) => state.selectedFeature);
 
   type Sample = keyof Phyla[number]["samples"];
