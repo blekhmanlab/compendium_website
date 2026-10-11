@@ -19,7 +19,7 @@ export type Samples = {
   project: string;
   run: string;
   reads: number;
-  code: string;
+  countryCode: string;
   region: string;
 }[];
 

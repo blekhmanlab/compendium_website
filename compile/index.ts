@@ -60,14 +60,14 @@ const processMainData = async (
     {
       region: string;
       country: string;
-      code: string;
+      countryCode: string;
       samples: number;
     } & Record<string, unknown>
   >;
 
   type WorldMapFeature = (typeof worldMap.features)[0];
 
-  /** make map of country code to region */
+  /** make map of countryCode to region */
   const countryToRegion: Record<string, string> = {};
   /** stream file line by line */
   const regionsStream = stream(`${inputPath}/regions.tsv`);
@@ -77,8 +77,8 @@ const processMainData = async (
   for (let row = 0; row < 1000000; row++) {
     const { value: row = [], done } = await regionsStream.next();
     if (done) break;
-    const [code = "", region = ""] = row;
-    countryToRegion[code] = region;
+    const [countryCode = "", region = ""] = row;
+    countryToRegion[countryCode] = region;
   }
 
   /** filter out null property */
@@ -91,19 +91,19 @@ const processMainData = async (
   for (const feature of worldMap.features) {
     /** natural earth country name */
     const country = startCase(clean(feature.properties.NAME));
-    /** natural earth country code */
-    const code = (
+    /** natural earth countryCode */
+    const countryCode = (
       clean(feature.properties.ISO_A2_EH) ||
       clean(feature.properties.ISO_A2) ||
       clean(feature.properties.ADM0_ISO) ||
       clean(feature.properties.ADM0_A3)
     ).toUpperCase();
-    /** our region from code */
+    /** our region from countryCode */
     const region: string =
-      countryToRegion[code as keyof typeof countryToRegion] || "";
+      countryToRegion[countryCode as keyof typeof countryToRegion] || "";
 
     /** only keep needed properties (opt-in) */
-    feature.properties = { region, country, code, samples: 0 };
+    feature.properties = { region, country, countryCode, samples: 0 };
   }
 
   /** map of unique countries */
@@ -116,10 +116,10 @@ const processMainData = async (
 
   /** add all natural earth features */
   for (const feature of worldMap.features) {
-    const { region, code } = feature.properties;
+    const { region, countryCode } = feature.properties;
 
     /** add feature as country */
-    countries[code] = cloneDeep(feature);
+    countries[countryCode] = cloneDeep(feature);
 
     if (!regions[region]) {
       /** add feature as region */
@@ -127,12 +127,12 @@ const processMainData = async (
 
       /** unset country specific info */
       regions[region].properties.country = "";
-      regions[region].properties.code = "";
+      regions[region].properties.countryCode = "";
     } else {
       /** merge features together into region */
-      if (!countryDissolved[code]) {
+      if (!countryDissolved[countryCode]) {
         regions[region].geometry = dissolve([regions[region], feature]);
-        countryDissolved[code] = true;
+        countryDissolved[countryCode] = true;
       }
     }
   }
@@ -185,7 +185,7 @@ const processMainData = async (
       project: string;
       run: string;
       reads: number;
-      code: string;
+      countryCode: string;
       region: string;
     }
   > = {};
@@ -215,12 +215,12 @@ const processMainData = async (
       ,
       ,
       ,
-      code = "",
+      countryCode = "",
       region = "",
     ] = metadataRow;
 
     /** count country */
-    if (countries[code]) countries[code].properties.samples++;
+    if (countries[countryCode]) countries[countryCode].properties.samples++;
     /** count region */
     if (regions[region]) regions[region].properties.samples++;
 
@@ -233,7 +233,7 @@ const processMainData = async (
     const classCounted: Record<string, boolean> = {};
 
     /** start counting reads for this sample */
-    samples[sample] = { sample, run, project, reads: 0, code, region };
+    samples[sample] = { sample, run, project, reads: 0, countryCode, region };
 
     /** loop through taxonomic table columns */
     for (let column = 2; column < taxonomicRow.length; column++) {
@@ -255,8 +255,8 @@ const processMainData = async (
           phyla[phylum] ??= cloneDeep(taxon);
           phyla[phylum]._class = "";
           phyla[phylum].samples.total!++;
-          phyla[phylum].samples[code] ??= 0;
-          phyla[phylum].samples[code]++;
+          phyla[phylum].samples[countryCode] ??= 0;
+          phyla[phylum].samples[countryCode]++;
           phyla[phylum].samples[region] ??= 0;
           phyla[phylum].samples[region]++;
           phylumCounted[phylum] = true;
@@ -266,8 +266,8 @@ const processMainData = async (
         if (!classCounted[_class]) {
           classes[_class] ??= cloneDeep(taxon);
           classes[_class].samples.total!++;
-          classes[_class].samples[code] ??= 0;
-          classes[_class].samples[code]++;
+          classes[_class].samples[countryCode] ??= 0;
+          classes[_class].samples[countryCode]++;
           classes[_class].samples[region] ??= 0;
           classes[_class].samples[region]++;
           classCounted[_class] = true;
@@ -280,7 +280,8 @@ const processMainData = async (
   const getReads = (key: string) =>
     Object.values(samples)
       .filter(
-        ({ code, region }) => key === "total" || key === code || key === region,
+        ({ countryCode, region }) =>
+          key === "total" || key === countryCode || key === region,
       )
       .map(({ reads }) => reads);
 
@@ -668,18 +669,18 @@ const processProjectionistData = async (
 };
 
 /** run */
-await downloadFiles(
-  site["human-microbiome-compendium"].record,
-  "downloaded/human-microbiome-compendium",
-);
-await downloadFiles(
-  site["human-microbiome-compendium"].projectionistRecord,
-  "downloaded/projectionist",
-);
-await downloadFiles(
-  site["meta-g-compendium"].record,
-  "downloaded/meta-g-compendium",
-);
+// await downloadFiles(
+//   site["human-microbiome-compendium"].record,
+//   "downloaded/human-microbiome-compendium",
+// );
+// await downloadFiles(
+//   site["human-microbiome-compendium"].projectionistRecord,
+//   "downloaded/projectionist",
+// );
+// await downloadFiles(
+//   site["meta-g-compendium"].record,
+//   "downloaded/meta-g-compendium",
+// );
 
 await processMainData(
   "downloaded/human-microbiome-compendium/record.json",

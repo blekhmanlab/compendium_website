@@ -21,7 +21,7 @@ export default function PhylaChart({ data }: Props) {
   type Sample = keyof Phyla[number]["samples"];
 
   /** which sample count to use */
-  const sampleKey = (selectedFeature?.code ||
+  const sampleKey = (selectedFeature?.countryCode ||
     selectedFeature?.region ||
     "total") as Sample;
 

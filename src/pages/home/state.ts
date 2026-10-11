@@ -51,7 +51,7 @@ export type Data = {
   selectedFeature?: {
     region: string;
     country: string;
-    code: string;
+    countryCode: string;
   };
   selectedTags?: string[];
   selectedTagValues?: string[];
@@ -220,7 +220,7 @@ export const setSelectedTagValues = (selectedTagValues: string[]) =>
 export const setSelectedFeature = (feature?: {
   region: string;
   country: string;
-  code: string;
+  countryCode: string;
 }) =>
   useData.setState({
     selectedFeature:

@@ -28,7 +28,7 @@ const countriesUrls = mapKeys(
 type Properties = {
   region: string;
   country: string;
-  code: string;
+  countryCode: string;
   samples: number;
 };
 

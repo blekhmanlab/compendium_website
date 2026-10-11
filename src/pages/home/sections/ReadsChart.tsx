@@ -22,7 +22,7 @@ export default function ReadsChart({ data }: Props) {
   const selectedFeature = useData((state) => state.selectedFeature);
 
   /** which sample count to use */
-  const sampleKey = (selectedFeature?.code ||
+  const sampleKey = (selectedFeature?.countryCode ||
     selectedFeature?.region ||
     "total") as keyof Reads["histogram"][number]["samples"];
 

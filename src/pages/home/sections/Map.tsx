@@ -241,9 +241,10 @@ export default function Map() {
                 <dl>
                   {feature.properties.country && (
                     <>
-                      <dt>County</dt>
+                      <dt>Country</dt>
                       <dd>
-                        {feature.properties.country} ({feature.properties.code})
+                        {feature.properties.country} (
+                        {feature.properties.countryCode})
                       </dd>
                     </>
                   )}
