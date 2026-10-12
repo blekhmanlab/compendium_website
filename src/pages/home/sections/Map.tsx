@@ -139,13 +139,15 @@ export default function Map() {
   const onZoom = async (fullEvent: D3ZoomEvent<SVGSVGElement, unknown>) => {
     const { sourceEvent: event, transform } = fullEvent || {};
 
+    if (!event) return;
+
     /** get current projection components */
     let [x, y] = projection.center();
     let scale = projection.scale();
     let [lambda, phi] = projection.rotate();
 
     /** update components based on event transform */
-    if (event && transform && oldTransform.current) {
+    if (transform && oldTransform.current) {
       /** calculate deltas */
       const dx = transform.x - oldTransform.current.x;
       const dy = transform.y - oldTransform.current.y;
@@ -279,6 +281,7 @@ export default function Map() {
 
           /** attach zoom behavior */
           zoomBehavior(selection);
+          zoomBehavior.transform(selection, zoomIdentity.scale(baseScale));
 
           redraw();
 

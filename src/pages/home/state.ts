@@ -108,10 +108,9 @@ export const loadProjects = async (
   try {
     const { projects, reads } = await wrapper.getProjects(compendium);
     if (abort.signal.aborted) return;
-    useData.setState({ projects, reads });
     const { projectSearch } = await wrapper.getProjectSearch({ projects });
     if (abort.signal.aborted) return;
-    useData.setState({ projectSearch });
+    useData.setState({ projects, reads, projectSearch });
     loadedProjects = compendium;
   } finally {
     worker.terminate();
@@ -132,10 +131,9 @@ export const loadGeo = async (
   try {
     const { regions, countries } = await wrapper.getGeo(compendium);
     if (abort.signal.aborted) return;
-    useData.setState({ regions, countries });
     const { geoSearch } = await wrapper.getGeoSearch({ regions, countries });
     if (abort.signal.aborted) return;
-    useData.setState({ geoSearch });
+    useData.setState({ regions, countries, geoSearch });
     loadedGeo = compendium;
   } finally {
     worker.terminate();
@@ -156,10 +154,9 @@ export const loadTaxa = async (
   try {
     const { phyla, classes } = await wrapper.getTaxa(compendium);
     if (abort.signal.aborted) return;
-    useData.setState({ phyla, classes });
     const { taxonSearch } = await wrapper.getTaxonSearch({ phyla, classes });
     if (abort.signal.aborted) return;
-    useData.setState({ taxonSearch });
+    useData.setState({ phyla, classes, taxonSearch });
     loadedTaxa = compendium;
   } finally {
     worker.terminate();
@@ -180,13 +177,12 @@ export const loadTags = async (
   try {
     const { tags, tagValues } = await wrapper.getTags(compendium);
     if (abort.signal.aborted) return;
-    useData.setState({ tags, tagValues });
     const { tagSearch, tagValueSearch } = await wrapper.getTagSearch({
       tags,
       tagValues,
     });
     if (abort.signal.aborted) return;
-    useData.setState({ tagSearch, tagValueSearch });
+    useData.setState({ tags, tagValues, tagSearch, tagValueSearch });
     loadedTags = compendium;
   } finally {
     worker.terminate();
