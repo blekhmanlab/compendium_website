@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { upperFirst } from "lodash";
 import Select from "@/components/Select";
 import Tooltip from "@/components/Tooltip";
 import { useData } from "@/pages/home/state";
@@ -46,7 +47,10 @@ export default function Prevalence() {
               label="Chart"
               value={chart}
               onChange={setChart}
-              options={chartOptions}
+              options={chartOptions.map((value) => ({
+                value,
+                label: upperFirst(value),
+              }))}
             />
           )}
           <div className="min-h-80 w-full grow">

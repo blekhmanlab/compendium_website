@@ -1,3 +1,4 @@
+import type * as SamplesAPI from "@/pages/home/data/samples";
 import type { Samples } from "@/pages/home/data/samples";
 import type { Compendium } from "@/pages/home/state";
 import type * as SamplePCsAPI from "@/pages/projectionist/data/sample-pcs";
@@ -14,6 +15,7 @@ import type {
 } from "@/pages/projectionist/project";
 import { wrap } from "comlink";
 import { create } from "zustand";
+import SamplesWorker from "@/pages/home/data/samples?worker";
 import SamplePCsWorker from "@/pages/projectionist/data/sample-pcs?worker";
 import { getScree } from "@/pages/projectionist/data/scree";
 import TaxonPCsWorker from "@/pages/projectionist/data/taxon-pcs?worker";
@@ -34,6 +36,22 @@ export type Data = {
 
 /** projectionist page state store */
 export const useData = create<Data>(() => ({}));
+
+/** loaded samples cache flag */
+let loadedSamples = "";
+
+/** load and set samples */
+export const loadSamples = async (
+  compendium: Compendium,
+  abort: AbortController,
+) => {
+  if (compendium === loadedSamples) return;
+  const worker = wrap<typeof SamplesAPI>(new SamplesWorker());
+  const samples = await worker.getSamples(compendium);
+  if (abort.signal.aborted) return;
+  useData.setState({ samples });
+  loadedSamples = compendium;
+};
 
 /** loaded sample pcs cache flag */
 let loadedSamplePCs = "";

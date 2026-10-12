@@ -67,7 +67,7 @@ const processMainData = async (
 
   type WorldMapFeature = (typeof worldMap.features)[0];
 
-  /** make map of countryCode to region */
+  /** make map of country code to region */
   const countryToRegion: Record<string, string> = {};
   /** stream file line by line */
   const regionsStream = stream(`${inputPath}/regions.tsv`);
@@ -91,14 +91,14 @@ const processMainData = async (
   for (const feature of worldMap.features) {
     /** natural earth country name */
     const country = startCase(clean(feature.properties.NAME));
-    /** natural earth countryCode */
+    /** natural earth country code */
     const countryCode = (
       clean(feature.properties.ISO_A2_EH) ||
       clean(feature.properties.ISO_A2) ||
       clean(feature.properties.ADM0_ISO) ||
       clean(feature.properties.ADM0_A3)
     ).toUpperCase();
-    /** our region from countryCode */
+    /** our region from country code */
     const region: string =
       countryToRegion[countryCode as keyof typeof countryToRegion] || "";
 
@@ -369,6 +369,18 @@ const processMainData = async (
       samples: number;
     }
   > = {};
+  /** list of tags per country */
+  const countryTags: Record<string, Record<string, number>> = {};
+  /** list of tags per region */
+  const regionTags: Record<string, Record<string, number>> = {};
+
+  /** quick lookup of sample id to country/region */
+  const sampleToGeo = Object.fromEntries(
+    Object.entries(samples).map(([sample, { countryCode, region }]) => [
+      sample,
+      { countryCode, region },
+    ]),
+  );
 
   /** process rest of rows (with hard limit) */
   for (let row = 0; row < 100000000; row++) {
@@ -389,9 +401,18 @@ const processMainData = async (
     tags[tag].samples[sample] = sample;
 
     /** count tag values */
-    const key = [tag, value, project].join("|");
+    const key = [tag, value].join("|");
     tagValues[key] ??= { tag, value, project, samples: 0 };
     tagValues[key].samples++;
+
+    /** count samples per tag per geo */
+    const { countryCode = "", region = "" } = sampleToGeo[sample] ?? {};
+    countryTags[countryCode] ??= {};
+    countryTags[countryCode][key] ??= 0;
+    countryTags[countryCode][key]++;
+    regionTags[region] ??= {};
+    regionTags[region][key] ??= 0;
+    regionTags[region][key]++;
   }
 
   /** turn maps into lists, and do final sorting and such */
@@ -445,6 +466,8 @@ const processMainData = async (
     [(datum) => datum.samples],
     ["desc"],
   );
+  const countryTagsOut = countryTags;
+  const regionTagsOut = regionTags;
 
   /** load zenodo record */
   const record = read<Zenodo>(recordPath);
@@ -485,6 +508,8 @@ const processMainData = async (
   write(`${outputPath}/reads.json`, readsOut);
   write(`${outputPath}/tags.json`, tagsOut);
   write(`${outputPath}/tag-values.json`, tagValuesOut);
+  write(`${outputPath}/country-tags.json`, countryTagsOut);
+  write(`${outputPath}/region-tags.json`, regionTagsOut);
   write(`${outputPath}/meta.json`, meta);
 
   console.info("Summary");
@@ -669,18 +694,18 @@ const processProjectionistData = async (
 };
 
 /** run */
-// await downloadFiles(
-//   site["human-microbiome-compendium"].record,
-//   "downloaded/human-microbiome-compendium",
-// );
-// await downloadFiles(
-//   site["human-microbiome-compendium"].projectionistRecord,
-//   "downloaded/projectionist",
-// );
-// await downloadFiles(
-//   site["meta-g-compendium"].record,
-//   "downloaded/meta-g-compendium",
-// );
+await downloadFiles(
+  site["human-microbiome-compendium"].record,
+  "downloaded/human-microbiome-compendium",
+);
+await downloadFiles(
+  site["human-microbiome-compendium"].projectionistRecord,
+  "downloaded/projectionist",
+);
+await downloadFiles(
+  site["meta-g-compendium"].record,
+  "downloaded/meta-g-compendium",
+);
 
 await processMainData(
   "downloaded/human-microbiome-compendium/record.json",

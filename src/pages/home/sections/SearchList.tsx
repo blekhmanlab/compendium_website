@@ -5,7 +5,7 @@ import type * as SearchAPI from "@/util/search";
 import type { KeysOfType } from "@/util/types";
 import { useCallback, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
-import { capitalize } from "lodash";
+import { capitalize, upperFirst } from "lodash";
 import Alert from "@/components/Alert";
 import Select from "@/components/Select";
 import Table from "@/components/Table";
@@ -115,7 +115,10 @@ export default function SearchList({
         {types && (
           <Select
             label="Type:"
-            options={["All", ...types] as const}
+            options={["All", ...types].map((value) => ({
+              value,
+              label: upperFirst(value),
+            }))}
             value={type}
             onChange={setType}
           />

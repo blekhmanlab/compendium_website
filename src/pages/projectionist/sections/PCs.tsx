@@ -1,7 +1,7 @@
 import type { Remote } from "comlink";
 import type * as ProjectionistAPI from "@/pages/projectionist/project";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { groupBy, isEmpty, pick, uniq } from "lodash";
+import { groupBy, isEmpty, pick, uniq, upperFirst } from "lodash";
 import { HelpCircleIcon } from "lucide-react";
 import Alert from "@/components/Alert";
 import Select from "@/components/Select";
@@ -223,7 +223,10 @@ export default function PCs() {
               </Tooltip>
             </>
           }
-          options={regionOptions}
+          options={regionOptions.map((value) => ({
+            value,
+            label: upperFirst(value),
+          }))}
           value={regions}
           onChange={setRegions}
           className="w-30"
@@ -237,7 +240,10 @@ export default function PCs() {
               </Tooltip>
             </>
           }
-          options={["", "Region", ...groupOptions]}
+          options={["", "Region", ...groupOptions].map((value) => ({
+            value,
+            label: upperFirst(value) || "-",
+          }))}
           value={group}
           onChange={setGroup}
         />

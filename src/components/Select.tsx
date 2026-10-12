@@ -1,27 +1,28 @@
 import type { ComponentProps, ReactNode } from "react";
 import { Select as BaseSelect } from "@base-ui/react";
 import clsx from "clsx";
-import { startCase } from "lodash";
 import { CheckIcon, ChevronDownIcon } from "lucide-react";
 
-type Props<Option extends string> = {
+type Props<Id extends string> = {
   label: ReactNode;
-  value: Option;
-  onChange: (value: Option) => void;
-  options: readonly Option[];
+  value: Id;
+  onChange: (value: Id) => void;
+  options: readonly { value: Id; label?: ReactNode }[];
 } & Omit<ComponentProps<"select">, "value" | "onChange">;
 
-export default function Select<Option extends string>({
+export default function Select<Id extends string>({
   label,
   value,
   onChange,
   options,
   className = "",
-}: Props<Option>) {
+}: Props<Id>) {
+  const selected = options.find((option) => option.value === value);
+
   return (
     <label className="inline-flex items-center gap-2">
       <span className="flex items-center gap-1 text-right">{label}</span>
-      <BaseSelect.Root<Option>
+      <BaseSelect.Root<Id>
         value={value}
         onValueChange={(value) => {
           if (value !== null) onChange(value);
@@ -29,17 +30,16 @@ export default function Select<Option extends string>({
       >
         <BaseSelect.Trigger
           className={clsx(
-            "flex min-w-20 cursor-pointer appearance-none items-center gap-2",
-            "rounded-md bg-gray p-2 transition",
-            "hover:bg-light-gray",
+            "flex min-w-20 cursor-pointer appearance-none items-center gap-2 rounded-md bg-gray p-2 transition hover:bg-light-gray",
             className,
           )}
         >
           <span className="grow truncate text-left">
-            {startCase(value) || "None"}
+            {selected?.label ?? value}
           </span>
           <ChevronDownIcon />
         </BaseSelect.Trigger>
+
         <BaseSelect.Portal>
           <BaseSelect.Positioner
             side="bottom"
@@ -49,22 +49,20 @@ export default function Select<Option extends string>({
             className="z-20"
             alignItemWithTrigger={false}
           >
-            <BaseSelect.Popup className="flex flex-col overflow-hidden rounded-md border border-light-gray bg-gray">
+            <BaseSelect.Popup className="flex max-h-(--available-height) flex-col overflow-y-auto rounded-md border border-light-gray bg-gray">
               <BaseSelect.List>
-                {options.map((option, index) => (
+                {options.map(({ value, label }) => (
                   <BaseSelect.Item
-                    key={index}
-                    value={option}
+                    key={value}
+                    value={value}
                     className="flex cursor-pointer items-center gap-2 p-2 hover:bg-light-gray data-highlighted:bg-light-gray"
                   >
-                    <span className="inline-flex size-5 items-center justify-center">
-                      <BaseSelect.ItemIndicator>
-                        <CheckIcon className="size-4" />
-                      </BaseSelect.ItemIndicator>
-                    </span>
-                    <BaseSelect.ItemText>
-                      {startCase(option) || "None"}
+                    <BaseSelect.ItemText className="grow">
+                      {label ?? value}
                     </BaseSelect.ItemText>
+                    <BaseSelect.ItemIndicator>
+                      <CheckIcon className="size-4" />
+                    </BaseSelect.ItemIndicator>
                   </BaseSelect.Item>
                 ))}
               </BaseSelect.List>

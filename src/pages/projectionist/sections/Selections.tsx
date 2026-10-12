@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { upperFirst } from "lodash";
 import { HelpCircleIcon } from "lucide-react";
 import Select from "@/components/Select";
 import Tooltip from "@/components/Tooltip";
@@ -33,7 +34,7 @@ export function SelectPCs() {
             </Tooltip>
           </>
         }
-        options={PCs}
+        options={PCs.map((value) => ({ value }))}
         value={PCX}
         onChange={setPCX}
       />
@@ -46,7 +47,7 @@ export function SelectPCs() {
             </Tooltip>
           </>
         }
-        options={PCs}
+        options={PCs.map((value) => ({ value }))}
         value={PCY}
         onChange={setPCY}
       />
@@ -72,7 +73,10 @@ export function SelectOrdination() {
           </Tooltip>
         </>
       }
-      options={ordinations}
+      options={ordinations.map((value) => ({
+        value,
+        label: upperFirst(value),
+      }))}
       value={ordination ?? ""}
       onChange={setOrdination}
     />

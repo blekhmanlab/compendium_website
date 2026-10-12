@@ -2,7 +2,7 @@ import { startTransition, useEffect, useState } from "react";
 import clsx from "clsx";
 import Tabs from "@/components/Tabs";
 import Tooltip from "@/components/Tooltip";
-import { loadTags, setSelectedTags, useData } from "@/pages/home/state";
+import { loadTags, useData } from "@/pages/home/state";
 import SearchList from "./SearchList";
 
 export const tooltips = {
@@ -48,10 +48,10 @@ export default function Search() {
   const taxonSearch = useData((state) => state.taxonSearch);
   const tagSearch = useData((state) => state.tagSearch);
   const tagValueSearch = useData((state) => state.tagValueSearch);
-  const selectedTags = useData((state) => state.selectedTags);
 
   /** local state */
   const [tab, setTab] = useState(0);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   useEffect(() => {
     const abort = new AbortController();

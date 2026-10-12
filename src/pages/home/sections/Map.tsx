@@ -1,7 +1,7 @@
 import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
 import type { D3ZoomEvent, GeoProjection, ZoomTransform } from "d3";
 import type { Countries, Regions } from "@/pages/home/data/geo";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEventListener } from "@reactuses/core";
 import {
   extent,
@@ -14,11 +14,18 @@ import {
   zoom,
   zoomIdentity,
 } from "d3";
-import { clamp } from "lodash";
+import { clamp, upperFirst } from "lodash";
 import Alert from "@/components/Alert";
+import Autocomplete from "@/components/Autocomplete";
+import Button from "@/components/Button";
 import Select from "@/components/Select";
 import Tooltip from "@/components/Tooltip";
-import { setSelectedFeature, useData } from "@/pages/home/state";
+import {
+  loadGeoTags,
+  loadTags,
+  setSelectedFeature,
+  useData,
+} from "@/pages/home/state";
 import { frame } from "@/util/async";
 import { getCssVariable } from "@/util/dom";
 import { formatNumber } from "@/util/string";
@@ -36,15 +43,46 @@ export default function Map() {
   const featuresRef = useRef<(SVGPathElement | null)[]>([]);
 
   /** global state */
-  const countries = useData((state) => state.countries);
+  const compendium = useData((state) => state.compendium);
   const regions = useData((state) => state.regions);
+  const countries = useData((state) => state.countries);
+  const tagValues = useData((state) => state.tagValues);
+  const regionTags = useData((state) => state.regionTags);
+  const countryTags = useData((state) => state.countryTags);
   const selectedFeature = useData((state) => state.selectedFeature);
 
   /** local state */
   const [level, setLevel] = useState("country");
+  const [filter, setFilter] = useState("");
 
-  /** data to show */
-  const data = (level === "country" ? countries : regions)?.features ?? [];
+  /** feature data to show */
+  const featureCollection = level === "country" ? countries : regions;
+  const geoTags = level === "country" ? countryTags : regionTags;
+  const geoKey = level === "country" ? "countryCode" : "region";
+  const features = (featureCollection?.features ?? []).map(
+    ({ properties, ...feature }) => ({
+      ...feature,
+      properties: {
+        ...properties,
+        ...(filter && {
+          samples: geoTags?.[properties[geoKey]]?.[filter] || 0,
+        }),
+      },
+    }),
+  );
+
+  /** user opt-in to load tags, since data is huge */
+  const [enableTags, setEnableTags] = useState(false);
+
+  /** load per-geo tag data on demand */
+  useEffect(() => {
+    const abort = new AbortController();
+    if (enableTags) {
+      loadGeoTags(compendium, abort);
+      loadTags(compendium, abort);
+    }
+    return () => abort.abort();
+  }, [compendium, enableTags]);
 
   /** colors */
   const primary = getCssVariable("--color-primary");
@@ -53,17 +91,19 @@ export default function Map() {
   const gray = getCssVariable("--color-gray");
 
   /** get range of sample counts */
-  const [, max = 1000] = extent(data, (datum) => datum.properties.samples);
+  const [, max = 1000] = extent(
+    features,
+    (feature) => feature.properties.samples,
+  );
 
   /** color scale */
   const scale = scaleLog<string>()
-    .domain([1, max])
+    .domain([1, max || 2])
     .range(selectedFeature ? [gray, lightGray] : [lightGray, primary])
     .interpolate(interpolateLab);
 
   /** create projection */
   const projection = geoNaturalEarth1();
-
   fitProjection(projection);
 
   /** get scale when projection fit to earth bbox */
@@ -86,7 +126,7 @@ export default function Map() {
     graticulesRef.current?.setAttribute("d", path(graticules) ?? "");
     featuresRef.current?.forEach((element, index) => {
       if (!element) return;
-      const feature = data[index];
+      const feature = features[index];
       if (!feature) return;
       element.setAttribute("d", path(feature) ?? "");
     });
@@ -171,7 +211,7 @@ export default function Map() {
     .on("zoom", onZoom)
     .scaleExtent([baseScale, baseScale * 10]);
 
-  /** check if feature/datum is selected */
+  /** check if feature is selected */
   const isSelected = (d: Feature) =>
     selectedFeature?.country === ""
       ? selectedFeature?.region === d.properties.region
@@ -192,13 +232,40 @@ export default function Map() {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
         <Select
           label="Level"
           value={level}
           onChange={setLevel}
-          options={["country", "region"]}
+          options={["country", "region"].map((value) => ({
+            value,
+            label: upperFirst(value),
+          }))}
         />
+        {enableTags ? (
+          <Autocomplete
+            className="w-40"
+            label="Tag"
+            value={filter}
+            onChange={setFilter}
+            options={
+              tagValues?.map(({ tag, value }) => ({
+                value: [tag, value].join("|"),
+              })) ?? []
+            }
+            renderOption={(id) => {
+              const [tag = "", tagValue = ""] = id.split("|");
+              return (
+                <div className="-my-1 flex flex-col justify-between">
+                  <span className="text-xs">{tag}</span>
+                  <span>{tagValue}</span>
+                </div>
+              );
+            }}
+          />
+        ) : (
+          <Button onClick={() => setEnableTags(true)}>Load Tags</Button>
+        )}
       </div>
 
       <svg
@@ -233,7 +300,7 @@ export default function Map() {
           <path ref={graticulesRef} />
         </g>
         <g>
-          {data.map((feature, index) => (
+          {features.map((feature, index) => (
             <Tooltip
               key={index}
               button={false}

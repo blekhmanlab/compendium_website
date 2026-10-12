@@ -1,5 +1,7 @@
 import type { Countries, GeoSearch, Regions } from "@/pages/home/data/geo";
 import type * as GeoAPI from "@/pages/home/data/geo";
+import type * as GeoTagAPI from "@/pages/home/data/geo-tags";
+import type { CountryTags, RegionTags } from "@/pages/home/data/geo-tags";
 import type { Meta } from "@/pages/home/data/meta";
 import type * as ProjectAPI from "@/pages/home/data/projects";
 import type {
@@ -7,8 +9,6 @@ import type {
   ProjectSearch,
   Reads,
 } from "@/pages/home/data/projects";
-import type * as SamplesAPI from "@/pages/home/data/samples";
-import type { Samples } from "@/pages/home/data/samples";
 import type * as TagAPI from "@/pages/home/data/tags";
 import type {
   Tags,
@@ -21,10 +21,10 @@ import type { Classes, Phyla, TaxonSearch } from "@/pages/home/data/taxa";
 import type meta from "@/site";
 import { wrap } from "comlink";
 import { create } from "zustand";
+import GeoTagWorker from "@/pages/home/data/geo-tags?worker";
 import GeoWorker from "@/pages/home/data/geo?worker";
 import { getLiveMeta, getMeta } from "@/pages/home/data/meta";
 import ProjectWorker from "@/pages/home/data/projects?worker";
-import SamplesWorker from "@/pages/home/data/samples?worker";
 import TagWorker from "@/pages/home/data/tags?worker";
 import TaxaWorker from "@/pages/home/data/taxa?worker";
 import site from "@/site";
@@ -47,7 +47,8 @@ export type Data = {
   tagValues?: TagValues;
   tagSearch?: TagSearch;
   tagValueSearch?: TagValueSearch;
-  samples?: Samples;
+  regionTags?: RegionTags;
+  countryTags?: CountryTags;
   selectedFeature?: {
     region: string;
     country: string;
@@ -192,29 +193,26 @@ export const loadTags = async (
   }
 };
 
-/** loaded samples cache flag */
-let loadedSamples = "";
+/** loaded geo tags cache flag */
+let loadedGeoTags = "";
 
-/** load and set samples */
-export const loadSamples = async (
+/** load and set geo tags */
+export const loadGeoTags = async (
   compendium: Compendium,
   abort: AbortController,
 ) => {
-  if (compendium === loadedSamples) return;
-  const worker = wrap<typeof SamplesAPI>(new SamplesWorker());
-  const samples = await worker.getSamples(compendium);
-  if (abort.signal.aborted) return;
-  useData.setState({ samples });
-  loadedSamples = compendium;
+  if (compendium === loadedGeoTags) return;
+  const worker = new GeoTagWorker();
+  const wrapper = wrap<typeof GeoTagAPI>(worker);
+  try {
+    const { regionTags, countryTags } = await wrapper.getGeoTags(compendium);
+    if (abort.signal.aborted) return;
+    useData.setState({ regionTags, countryTags });
+    loadedGeoTags = compendium;
+  } finally {
+    worker.terminate();
+  }
 };
-
-/** select tags */
-export const setSelectedTags = (selectedTags: string[]) =>
-  useData.setState({ selectedTags });
-
-/** select tag values */
-export const setSelectedTagValues = (selectedTagValues: string[]) =>
-  useData.setState({ selectedTagValues });
 
 /** select feature (country or region) */
 export const setSelectedFeature = (feature?: {
