@@ -70,10 +70,11 @@ export default function SelectMulti<Option extends string>({
             side="bottom"
             align="start"
             collisionPadding={12}
+            sideOffset={4}
             className="z-20"
             alignItemWithTrigger={false}
           >
-            <Select.Popup className="flex flex-col rounded-md border border-light-gray bg-gray">
+            <Select.Popup className="flex flex-col overflow-hidden rounded-md border border-light-gray bg-gray">
               <button
                 onClick={() => set(allSelected ? [] : [...options])}
                 className="gap-2 p-2 font-medium hover:bg-light-gray"

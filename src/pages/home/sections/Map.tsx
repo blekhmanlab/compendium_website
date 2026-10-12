@@ -194,7 +194,7 @@ export default function Map() {
     <div className="flex flex-col items-center gap-4">
       <div className="flex flex-col items-center gap-4">
         <Select
-          label="Group by"
+          label="Level"
           value={level}
           onChange={setLevel}
           options={["country", "region"]}

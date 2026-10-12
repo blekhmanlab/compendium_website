@@ -44,11 +44,12 @@ export default function Select<Option extends string>({
           <BaseSelect.Positioner
             side="bottom"
             align="start"
+            sideOffset={4}
             collisionPadding={12}
             className="z-20"
             alignItemWithTrigger={false}
           >
-            <BaseSelect.Popup className="flex flex-col rounded-md border border-light-gray bg-gray">
+            <BaseSelect.Popup className="flex flex-col overflow-hidden rounded-md border border-light-gray bg-gray">
               <BaseSelect.List>
                 {options.map((option, index) => (
                   <BaseSelect.Item
