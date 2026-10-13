@@ -37,7 +37,6 @@ export default function Tabs({ tabs, onChange }: Props) {
         <_Tabs.Panel
           key={index}
           value={index}
-          keepMounted
           className="flex w-full flex-col items-center gap-8"
         >
           {tab.content}

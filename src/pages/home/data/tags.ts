@@ -40,6 +40,7 @@ export type TagValues = {
 }[];
 
 export type TagSearch = {
+  key: string;
   name: string;
   projects: number;
   samples: number;
@@ -76,7 +77,7 @@ export const getTagSearch = ({
 
   /** tags */
   for (const { tag, samples, projects } of tags)
-    tagList.push({ name: tag, samples, projects });
+    tagList.push({ key: tag, name: tag, samples, projects });
 
   /** include tag values */
   for (const { tag, value, samples, project } of tagValues)

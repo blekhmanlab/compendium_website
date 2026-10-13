@@ -138,7 +138,6 @@ export default function Search() {
                     name="Tags"
                     list={tagSearch}
                     columns={["name", "projects", "samples"]}
-                    selectKeys={["name"]}
                     onSelect={(selected) =>
                       startTransition(() => setSelectedTags(selected))
                     }

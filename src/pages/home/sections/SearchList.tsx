@@ -19,7 +19,6 @@ type Props = {
   list?: NonNullable<Data[KeysOfType<Data, `${string}Search`>]>;
   columns: string[];
   types?: string[];
-  selectKeys?: string[];
   onSelect?: (selected: string[]) => void;
 };
 
@@ -31,7 +30,6 @@ export default function SearchList({
   list,
   columns,
   types,
-  selectKeys,
   onSelect,
 }: Props) {
   /** type filter */
@@ -143,7 +141,6 @@ export default function SearchList({
             ? ["No results"]
             : undefined
         }
-        selectKeys={selectKeys}
         onSelect={onSelect}
       />
     </>
