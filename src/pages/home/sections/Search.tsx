@@ -150,12 +150,11 @@ export default function Search() {
                   </p>
                   <SearchList
                     name="Tag Values"
-                    list={
+                    list={tagValueSearch}
+                    filter={
                       selectedTags?.length
-                        ? tagValueSearch?.filter((entry) =>
-                            selectedTags?.includes(entry.name),
-                          )
-                        : tagValueSearch
+                        ? (entry) => selectedTags?.includes(entry.name)
+                        : undefined
                     }
                     columns={["name", "value", "project", "samples"]}
                   />

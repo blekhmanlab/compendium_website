@@ -14,9 +14,12 @@ import SearchWorker from "@/util/search?worker";
 import { formatNumber } from "@/util/string";
 import { useWorker } from "@/util/worker";
 
-type Props = {
+type StateSearchList = Data[KeysOfType<Data, `${string}Search`>];
+
+type Props<Data extends StateSearchList = StateSearchList> = {
   name: string;
-  list?: NonNullable<Data[KeysOfType<Data, `${string}Search`>]>;
+  list: Data;
+  filter?: (entry: NonNullable<Data>[number]) => boolean;
   columns: string[];
   types?: string[];
   onSelect?: (selected: string[]) => void;
@@ -28,6 +31,7 @@ const fields = ["name", "value"];
 export default function SearchList({
   name,
   list,
+  filter,
   columns,
   types,
   onSelect,
@@ -49,8 +53,10 @@ export default function SearchList({
       filtered = filtered.filter((entry) =>
         "type" in entry ? entry.type === type : true,
       );
+    /** filter by func */
+    if (filter) filtered = filtered.filter(filter);
     return filtered;
-  }, [list, types, type]);
+  }, [list, types, type, filter]);
 
   type Filtered = NonNullable<typeof filtered>;
 
