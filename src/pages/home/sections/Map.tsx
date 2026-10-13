@@ -103,11 +103,14 @@ export default function Map() {
     .interpolate(interpolateLab);
 
   /** create projection */
-  const projection = geoNaturalEarth1();
-  fitProjection(projection);
+  const [projection] = useState(() => {
+    const projection = geoNaturalEarth1();
+    fitProjection(projection);
+    return projection;
+  });
 
   /** get scale when projection fit to earth bbox */
-  const baseScale = projection.scale();
+  const [baseScale] = useState(() => projection.scale());
 
   /** reset projection */
   const resetProjection = () => {
@@ -281,7 +284,11 @@ export default function Map() {
 
           /** attach zoom behavior */
           zoomBehavior(selection);
-          zoomBehavior.transform(selection, zoomIdentity.scale(baseScale));
+          /** restore previous zoom */
+          zoomBehavior.transform(
+            selection,
+            oldTransform.current ?? zoomIdentity.scale(baseScale),
+          );
 
           redraw();
 
