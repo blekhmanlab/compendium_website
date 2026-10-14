@@ -7,7 +7,9 @@ export const sleep = async (ms = 0): Promise<void> =>
  * before browser repaint)
  */
 export const frame = () =>
-  new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
+  new Promise((resolve) =>
+    globalThis.requestAnimationFrame(() => resolve(true)),
+  );
 
 /** run func until it returns truthy value, trying periodically, up to a limit */
 export const waitFor = async <T>(
@@ -30,6 +32,7 @@ export async function request<Response>(
 ): Promise<Response>;
 export async function request(url: string, type: "text"): Promise<string>;
 export async function request(url: string, type: "json" | "text" = "json") {
+  if (!url) throw Error("Request URL is empty");
   const response = await fetch(url);
   if (!response.ok) throw Error("Response not OK");
   if (type === "json") return await response.json();

@@ -1,48 +1,71 @@
 import type { Remote } from "comlink";
-import { useCallback, useState } from "react";
-import { useLatest } from "@reactuses/core";
-import { wrap } from "comlink";
+import { useEffect, useState } from "react";
+import { proxy, wrap } from "comlink";
+
+type APIShape = Record<PropertyKey, unknown> & {
+  setOnMessage?: (func: (message: string) => void) => void;
+};
 
 /** run async operation in worker, with status, error handling, de-dupe, etc. */
-export const useWorker = <API, Data>(
+export const useWorker = <API extends APIShape, Data>(
   Worker: new () => Worker,
-  func: (worker: Remote<API>) => Promise<Data>,
+
+  func: ((worker: Remote<API>) => Promise<Data>) | undefined,
 ) => {
   /** data returned from async operation */
   const [data, setData] = useState<Data>();
   /** status of async operation */
-  const [status, setStatus] = useState<
-    "loading" | "error" | "" | (string & {})
-  >("");
-
-  /** stable version of func that doesn't affect react dep arrays */
-  const _func = useLatest(func);
+  const [status, setStatus] = useState<"loading" | "error" | "">("");
+  /** status message */
+  const [message, setMessage] = useState<string>("");
 
   /** run async operation */
-  const run = useCallback(() => {
+  useEffect(() => {
+    /** skip work if no func provided */
+    if (!func) return;
+
     /** mark this run as latest */
     let latest = true;
 
     /** create new worker thread */
     const worker = new Worker();
     const wrapper = wrap<API>(worker);
+
     (async () => {
       try {
         /** set loading state */
         setStatus("loading");
 
-        /** listen for more status updates from worker */
+        try {
+          if (typeof wrapper.setOnMessage === "function")
+            await wrapper.setOnMessage?.(
+              proxy((message: string) => {
+                if (latest) setMessage(message);
+              }),
+            );
+        } catch {
+          /** worker doesn't implement, ignore */
+        }
+
         /** run async operation in worker thread */
-        const data = await _func.current(wrapper);
+        const data = await func(wrapper);
+
         /** if this is still the latest run */
         if (latest) {
+          latest = false;
           /** success */
           setData(data);
           setStatus("");
+          setMessage("");
         }
       } catch (error) {
         /** if this is still the latest run, update error status */
-        if (latest) setStatus("error");
+        if (latest) {
+          latest = false;
+          console.warn(error);
+          setStatus("error");
+          setMessage(String((error as Error).message));
+        }
       }
     })();
 
@@ -53,7 +76,10 @@ export const useWorker = <API, Data>(
       /** abort any pending work */
       worker.terminate();
     };
-  }, [Worker, _func]);
+  }, [Worker, func]);
 
-  return [data, status, run] as const;
+  /** when work skipped, ignore any state left over from a previous run */
+  if (!func) return [undefined, "", ""] as const;
+
+  return [data, status, message] as const;
 };

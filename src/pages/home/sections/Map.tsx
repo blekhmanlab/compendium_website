@@ -1,7 +1,7 @@
 import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
 import type { D3ZoomEvent, GeoProjection, ZoomTransform } from "d3";
 import type { Countries, Regions } from "@/pages/home/data/geo";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEventListener } from "@reactuses/core";
 import {
   extent,
@@ -14,10 +14,18 @@ import {
   zoom,
   zoomIdentity,
 } from "d3";
-import { clamp } from "lodash";
+import { clamp, upperFirst } from "lodash";
+import Alert from "@/components/Alert";
+import Autocomplete from "@/components/Autocomplete";
+import Button from "@/components/Button";
 import Select from "@/components/Select";
 import Tooltip from "@/components/Tooltip";
-import { setSelectedFeature, useData } from "@/pages/home/state";
+import {
+  loadGeoTags,
+  loadTags,
+  setSelectedFeature,
+  useData,
+} from "@/pages/home/state";
 import { frame } from "@/util/async";
 import { getCssVariable } from "@/util/dom";
 import { formatNumber } from "@/util/string";
@@ -28,67 +36,81 @@ type Feature = (Regions | Countries)["features"][number];
 const width = 770;
 const height = 400;
 
-const byOptions = ["Country", "Region"] as const;
-type By = (typeof byOptions)[number];
-
-const Map = () => {
+export default function Map() {
   const ref = useRef<SVGSVGElement>(null);
   const outlineRef = useRef<SVGPathElement>(null);
   const graticulesRef = useRef<SVGPathElement>(null);
   const featuresRef = useRef<(SVGPathElement | null)[]>([]);
 
-  /** get global state */
-  const countries = useData((state) => state.countries);
+  /** global state */
+  const compendium = useData((state) => state.compendium);
   const regions = useData((state) => state.regions);
+  const countries = useData((state) => state.countries);
+  const tagValues = useData((state) => state.tagValues);
+  const regionTags = useData((state) => state.regionTags);
+  const countryTags = useData((state) => state.countryTags);
   const selectedFeature = useData((state) => state.selectedFeature);
 
   /** local state */
-  const [by, setBy] = useState<By>(byOptions[0]);
+  const [level, setLevel] = useState("country");
+  const [filter, setFilter] = useState("");
+
+  /** feature data to show */
+  const featureCollection = level === "country" ? countries : regions;
+  const geoTags = level === "country" ? countryTags : regionTags;
+  const geoKey = level === "country" ? "countryCode" : "region";
+  const features = (featureCollection?.features ?? []).map(
+    ({ properties, ...feature }) => ({
+      ...feature,
+      properties: {
+        ...properties,
+        ...(filter && {
+          samples: geoTags?.[properties[geoKey]]?.[filter] || 0,
+        }),
+      },
+    }),
+  );
+
+  /** user opt-in to load tags, since data is huge */
+  const [enableTags, setEnableTags] = useState(false);
+
+  /** load per-geo tag data on demand */
+  useEffect(() => {
+    const abort = new AbortController();
+    if (enableTags) {
+      loadGeoTags(compendium, abort);
+      loadTags(compendium, abort);
+    }
+    return () => abort.abort();
+  }, [compendium, enableTags]);
 
   /** colors */
   const primary = getCssVariable("--color-primary");
   const secondary = getCssVariable("--color-secondary");
-  const gray = getCssVariable("--color-slate-500");
-  const darkGray = getCssVariable("--color-slate-700");
-
-  /** unset selected feature when clicking off map */
-  useEventListener(
-    "click",
-    () => document.activeElement === document.body && setSelectedFeature(),
-  );
-
-  /** data to show */
-  const data = by === "Country" ? countries : regions;
+  const lightGray = getCssVariable("--color-light-gray");
+  const gray = getCssVariable("--color-gray");
 
   /** get range of sample counts */
   const [, max = 1000] = extent(
-    data?.features ?? [],
-    (datum) => datum.properties.samples,
+    features,
+    (feature) => feature.properties.samples,
   );
-
-  /** check if feature/datum is selected */
-  const isSelected = (d: Feature) =>
-    selectedFeature?.country === ""
-      ? selectedFeature?.region === d.properties.region
-      : selectedFeature?.country === d.properties.country;
 
   /** color scale */
   const scale = scaleLog<string>()
-    .domain([1, max])
-    .range(selectedFeature ? [darkGray, gray] : [gray, primary])
+    .domain([1, max || 2])
+    .range(selectedFeature ? [gray, lightGray] : [lightGray, primary])
     .interpolate(interpolateLab);
 
-  const { projection, baseScale } = useMemo(() => {
-    /** create projection */
+  /** create projection */
+  const [projection] = useState(() => {
     const projection = geoNaturalEarth1();
-
     fitProjection(projection);
+    return projection;
+  });
 
-    /** get scale when projection fit to earth bbox */
-    const baseScale = projection.scale();
-
-    return { projection, baseScale };
-  }, []);
+  /** get scale when projection fit to earth bbox */
+  const [baseScale] = useState(() => projection.scale());
 
   /** reset projection */
   const resetProjection = () => {
@@ -107,7 +129,7 @@ const Map = () => {
     graticulesRef.current?.setAttribute("d", path(graticules) ?? "");
     featuresRef.current?.forEach((element, index) => {
       if (!element) return;
-      const feature = data?.features[index];
+      const feature = features[index];
       if (!feature) return;
       element.setAttribute("d", path(feature) ?? "");
     });
@@ -120,13 +142,15 @@ const Map = () => {
   const onZoom = async (fullEvent: D3ZoomEvent<SVGSVGElement, unknown>) => {
     const { sourceEvent: event, transform } = fullEvent || {};
 
+    if (!event) return;
+
     /** get current projection components */
     let [x, y] = projection.center();
     let scale = projection.scale();
     let [lambda, phi] = projection.rotate();
 
     /** update components based on event transform */
-    if (event && transform && oldTransform.current) {
+    if (transform && oldTransform.current) {
       /** calculate deltas */
       const dx = transform.x - oldTransform.current.x;
       const dy = transform.y - oldTransform.current.y;
@@ -192,17 +216,62 @@ const Map = () => {
     .on("zoom", onZoom)
     .scaleExtent([baseScale, baseScale * 10]);
 
+  /** check if feature is selected */
+  const isSelected = (d: Feature) =>
+    selectedFeature?.country === ""
+      ? selectedFeature?.region === d.properties.region
+      : selectedFeature?.country === d.properties.country;
+
+  /** unset selected feature when clicking off map */
+  useEventListener(
+    "click",
+    () => document.activeElement === document.body && setSelectedFeature(),
+  );
+
   if (!countries || !regions)
-    return <div className="placeholder aspect-3/2">Loading map</div>;
+    return (
+      <Alert type="loading" className="aspect-3/2 w-full">
+        Loading map
+      </Alert>
+    );
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <Select
-        label="Group by"
-        value={by}
-        onChange={setBy}
-        options={byOptions}
-      />
+      <div className="flex flex-wrap items-center gap-4">
+        <Select
+          label="Level"
+          value={level}
+          onChange={setLevel}
+          options={["country", "region"].map((value) => ({
+            value,
+            label: upperFirst(value),
+          }))}
+        />
+        {enableTags ? (
+          <Autocomplete
+            className="w-40"
+            label="Tag"
+            value={filter}
+            onChange={setFilter}
+            options={
+              tagValues?.map(({ tag, value }) => ({
+                value: [tag, value].join("|"),
+              })) ?? []
+            }
+            renderOption={(id) => {
+              const [tag = "", tagValue = ""] = id.split("|");
+              return (
+                <div className="-mt-1 flex flex-col leading-none">
+                  <span className="text-xs">{tag}</span>
+                  <span>{tagValue}</span>
+                </div>
+              );
+            }}
+          />
+        ) : (
+          <Button onClick={() => setEnableTags(true)}>Load Tags</Button>
+        )}
+      </div>
 
       <svg
         ref={(element) => {
@@ -215,6 +284,11 @@ const Map = () => {
 
           /** attach zoom behavior */
           zoomBehavior(selection);
+          /** restore previous zoom */
+          zoomBehavior.transform(
+            selection,
+            oldTransform.current ?? zoomIdentity.scale(baseScale),
+          );
 
           redraw();
 
@@ -229,14 +303,14 @@ const Map = () => {
             });
         }}
         viewBox={[0, 0, width, height].join(" ")}
-        className="w-full stroke-[0.5]"
+        className="w-full overflow-hidden stroke-[0.5]"
       >
-        <g className="fill-none stroke-slate-500/50">
+        <g className="fill-none stroke-light-gray">
           <path ref={outlineRef} />
           <path ref={graticulesRef} />
         </g>
         <g>
-          {data?.features.map((feature, index) => (
+          {features.map((feature, index) => (
             <Tooltip
               key={index}
               button={false}
@@ -244,16 +318,17 @@ const Map = () => {
                 <dl>
                   {feature.properties.country && (
                     <>
-                      <dt>County</dt>
+                      <dt>Country</dt>
                       <dd>
-                        {feature.properties.country} ({feature.properties.code})
+                        {feature.properties.country} (
+                        {feature.properties.countryCode})
                       </dd>
-                      <dt>Region</dt>
-                      <dd>{feature.properties.region}</dd>
-                      <dt>Samples</dt>
-                      <dd>{formatNumber(feature.properties.samples, false)}</dd>
                     </>
                   )}
+                  <dt>Region</dt>
+                  <dd>{feature.properties.region}</dd>
+                  <dt>Samples</dt>
+                  <dd>{formatNumber(feature.properties.samples, false)}</dd>
                 </dl>
               }
             >
@@ -266,7 +341,7 @@ const Map = () => {
                     ? secondary
                     : scale(feature.properties.samples || 1)
                 }
-                className="cursor-pointer stroke-black transition hover:fill-white focus:fill-white [:not(:focus-visible)]:outline-none"
+                className="cursor-pointer stroke-black transition hover:fill-white"
                 tabIndex={0}
                 onClick={(event) => selectFeature(event, feature)}
                 onKeyDown={(event) => selectFeature(event, feature)}
@@ -294,9 +369,7 @@ const Map = () => {
       </div>
     </div>
   );
-};
-
-export default Map;
+}
 
 /** fit projection to bbox of earth */
 const fitProjection = (projection: GeoProjection) =>

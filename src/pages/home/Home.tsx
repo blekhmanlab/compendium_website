@@ -1,39 +1,47 @@
 import { useEffect } from "react";
 import Footer from "@/components/Footer";
-import Overview from "@/pages/home/sections/Overview";
-import Prevalence from "@/pages/home/sections/Prevalence";
-import Recipes from "@/pages/home/sections/Recipes";
-import Search from "@/pages/home/sections/Search";
-import Title from "@/pages/home/sections/Title";
-import { loadGeo, loadMeta, loadProjects, loadTaxa } from "@/pages/home/state";
+import Meta from "@/components/Meta";
+import { useSite } from "@/pages/home/state";
+import Compare from "./sections/Compare";
+import Header from "./sections/Header";
+import Overview from "./sections/Overview";
+import Prevalence from "./sections/Prevalence";
+import Recipes from "./sections/Recipes";
+import Search from "./sections/Search";
+import { loadGeo, loadMeta, loadProjects, loadTaxa, useData } from "./state";
 
-/** ensure only one load */
-let loaded = false;
+export default function Home() {
+  /** which compendium is selected */
+  const compendium = useData((state) => state.compendium);
+  const site = useSite();
 
-const Home = () => {
   /** load (small-enough) data on page load */
   useEffect(() => {
-    if (!loaded) {
-      loadMeta();
-      loadProjects();
-      loadGeo();
-      loadTaxa();
-      loaded = true;
-    }
-  }, []);
+    const abort = new AbortController();
+    loadMeta(compendium, abort);
+    loadProjects(compendium, abort);
+    loadGeo(compendium, abort);
+    loadTaxa(compendium, abort);
+    return () => abort.abort();
+  }, [compendium]);
 
   return (
     <>
-      <Title />
+      <Meta title={site.title} description={site.description} />
+
+      <Header />
       <main>
         <Overview />
         <Search />
         <Prevalence />
-        <Recipes />
+        {compendium === "human-microbiome-compendium" && (
+          <>
+            <Compare />
+            <Recipes />
+          </>
+        )}
       </main>
       <Footer />
     </>
   );
-};
-
-export default Home;
+}

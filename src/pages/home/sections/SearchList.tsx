@@ -1,83 +1,94 @@
 import type { Remote } from "comlink";
-import type { Col } from "@/components/Table";
+import type { Column } from "@/components/Table";
 import type { Data } from "@/pages/home/state";
-import type * as SearchAPI from "@/util/search.ts";
+import type * as SearchAPI from "@/util/search";
 import type { KeysOfType } from "@/util/types";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
-import { capitalize } from "lodash";
+import { capitalize, upperFirst } from "lodash";
+import Alert from "@/components/Alert";
 import Select from "@/components/Select";
 import Table from "@/components/Table";
 import Textbox from "@/components/Textbox";
-import SearchWorker from "@/util/search.ts?worker";
+import SearchWorker from "@/util/search?worker";
 import { formatNumber } from "@/util/string";
 import { useWorker } from "@/util/worker";
 
-/** type options, including all */
-type TypesAll = ("All" | NonNullable<Props["types"]>[number])[];
+type StateSearchList = Data[KeysOfType<Data, `${string}Search`>];
 
-type List = NonNullable<Data[KeysOfType<Data, `${string}Search`>]>;
-
-type Props = {
+type Props<Data extends StateSearchList = StateSearchList> = {
   name: string;
-  list?: List;
-  cols: string[];
+  list: Data;
+  filter?: (entry: NonNullable<Data>[number]) => boolean;
+  columns: string[];
   types?: string[];
-  names?: string[];
   onSelect?: (selected: string[]) => void;
 };
 
 /** fields to search on each list object */
 const fields = ["name", "value"];
 
-const SearchList = ({
+export default function SearchList({
   name,
-  list: fullList,
-  cols,
+  list,
+  filter,
+  columns,
   types,
-  names,
   onSelect,
-}: Props) => {
+}: Props) {
   /** type filter */
-  const [type, setType] = useState<TypesAll[number]>("All");
+  const [type, setType] = useState("All");
 
   /** search input */
   const [_search, setSearch] = useState("");
   /** debounced search input */
   const search = useDebounce(_search, 300);
 
+  /** anything to search for */
+  const hasSearch = !!search.trim();
+
+  /** types specified */
+  const hasTypes = !!types?.length;
+
   /** filter full search list by type */
-  const list = useMemo(() => {
-    if (!fullList) return;
-    let list = [...fullList];
+  const filtered = useMemo(() => {
+    if (!list) return [];
+    let filtered = [...list];
     /** filter by type */
-    if (types?.length && type !== "All")
-      list = list.filter((entry) =>
+    if (hasTypes && type !== "All")
+      filtered = filtered.filter((entry) =>
         "type" in entry ? entry.type === type : true,
       );
-    /** filter by name */
-    if (names) list = list.filter((entry) => names.includes(entry.name));
-    return list;
-  }, [fullList, types, type, names]);
+    /** filter by func */
+    if (filter) filtered = filtered.filter(filter);
+    return filtered;
+  }, [list, hasTypes, type, filter]);
+
+  type Filtered = NonNullable<typeof filtered>;
+
+  const exactSearch = useCallback(
+    (worker: Remote<typeof SearchAPI>) =>
+      worker.exactSearch(filtered ?? [], fields, search) as Promise<Filtered>,
+    [filtered, search],
+  );
+  const fuzzySearch = useCallback(
+    (worker: Remote<typeof SearchAPI>) =>
+      worker.fuzzySearch(filtered ?? [], fields, search) as Promise<Filtered>,
+    [filtered, search],
+  );
 
   /** exact search results */
-  const [exactMatches = [], exactStatus, runExact] = useWorker(
+  const [exactMatches = [], exactStatus] = useWorker(
     SearchWorker,
-    (worker: Remote<typeof SearchAPI>) =>
-      worker.exactSearch(list ?? [], fields, search) as Promise<List>,
+    /** skip work when search empty */
+    hasSearch ? exactSearch : undefined,
   );
   /** fuzzy search results */
-  const [fuzzyMatches = [], fuzzyStatus, runFuzzy] = useWorker(
+  const [fuzzyMatches = [], fuzzyStatus] = useWorker(
     SearchWorker,
-    (worker: Remote<typeof SearchAPI>) =>
-      worker.fuzzySearch(list ?? [], fields, search) as Promise<List>,
+    /** skip work when search empty */
+    hasSearch ? fuzzySearch : undefined,
   );
-
-  /** run exact search */
-  useEffect(runExact, [list, search, runExact]);
-
-  /** run fuzzy search */
-  useEffect(runFuzzy, [list, search, runFuzzy]);
 
   /** exact match name quick lookup */
   const exactLookup = useMemo(
@@ -87,7 +98,9 @@ const SearchList = ({
 
   if (!list)
     return (
-      <div className="placeholder aspect-3/2">Loading {name.toLowerCase()}</div>
+      <Alert type="loading" className="aspect-3/1 w-full">
+        Loading {name.toLowerCase()}
+      </Alert>
     );
 
   /** full list of matches */
@@ -98,9 +111,7 @@ const SearchList = ({
           .filter((fuzzy) => !(fuzzy.name in exactLookup))
           .map((fuzzy) => ({ ...fuzzy, fuzzy: true })),
       )
-    : list;
-
-  type Datum = (typeof matches)[number];
+    : filtered;
 
   return (
     <>
@@ -119,7 +130,10 @@ const SearchList = ({
         {types && (
           <Select
             label="Type:"
-            options={["All", ...types] as const}
+            options={["All", ...types].map((value) => ({
+              value,
+              label: upperFirst(value),
+            }))}
             value={type}
             onChange={setType}
           />
@@ -129,13 +143,11 @@ const SearchList = ({
       </div>
 
       <Table
-        cols={cols.map(
-          (col): Col<Datum, keyof Datum> => ({
-            key: col as keyof (typeof matches)[number],
-            name: capitalize(col),
-            style: (_, row) => ({
-              opacity: row?.fuzzy ? 0.5 : 1,
-            }),
+        columns={columns.map(
+          (column): Column<Filtered[number], keyof Filtered[number]> => ({
+            key: column as keyof Filtered[number],
+            name: capitalize(column),
+            style: (_, row) => ({ opacity: row?.fuzzy ? 0.5 : 1 }),
           }),
         )}
         rows={matches}
@@ -143,13 +155,11 @@ const SearchList = ({
           exactStatus !== "loading" &&
           fuzzyStatus !== "loading" &&
           !matches.length
-            ? ["", "No results", ""]
+            ? ["No results"]
             : undefined
         }
         onSelect={onSelect}
       />
     </>
   );
-};
-
-export default SearchList;
+}

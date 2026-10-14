@@ -26,3 +26,15 @@ export const formatDate = (value?: string) =>
   new Date(value || "").toLocaleString(undefined, {
     dateStyle: "medium",
   });
+
+/** generate tooltip table from entries */
+export const tooltipTable = (entries: Record<string, unknown>) =>
+  [
+    "<dl>",
+    ...Object.entries(entries).flatMap(([key, value]) =>
+      value === null || value === undefined || value === "" || value === false
+        ? []
+        : [`<dt>${key}</dt>`, `<dd>${value}</dd>`],
+    ),
+    "</dl>",
+  ].join("\n");
