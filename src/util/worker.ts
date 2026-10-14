@@ -9,7 +9,8 @@ type APIShape = Record<PropertyKey, unknown> & {
 /** run async operation in worker, with status, error handling, de-dupe, etc. */
 export const useWorker = <API extends APIShape, Data>(
   Worker: new () => Worker,
-  func: (worker: Remote<API>) => Promise<Data>,
+
+  func: ((worker: Remote<API>) => Promise<Data>) | undefined,
 ) => {
   /** data returned from async operation */
   const [data, setData] = useState<Data>();
@@ -20,6 +21,9 @@ export const useWorker = <API extends APIShape, Data>(
 
   /** run async operation */
   useEffect(() => {
+    /** skip work if no func provided */
+    if (!func) return;
+
     /** mark this run as latest */
     let latest = true;
 
@@ -73,6 +77,9 @@ export const useWorker = <API extends APIShape, Data>(
       worker.terminate();
     };
   }, [Worker, func]);
+
+  /** when work skipped, ignore any state left over from a previous run */
+  if (!func) return [undefined, "", ""] as const;
 
   return [data, status, message] as const;
 };

@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
 import Tabs from "@/components/Tabs";
 import Tooltip from "@/components/Tooltip";
@@ -52,6 +52,15 @@ export default function Search() {
   /** local state */
   const [tab, setTab] = useState(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  /** tag value filter func (stable ref) */
+  const tagValueFilter = useMemo(
+    () =>
+      selectedTags.length
+        ? (entry: { name: string }) => selectedTags.includes(entry.name)
+        : undefined,
+    [selectedTags],
+  );
 
   useEffect(() => {
     const abort = new AbortController();
@@ -151,11 +160,7 @@ export default function Search() {
                   <SearchList
                     name="Tag Values"
                     list={tagValueSearch}
-                    filter={
-                      selectedTags?.length
-                        ? (entry) => selectedTags?.includes(entry.name)
-                        : undefined
-                    }
+                    filter={tagValueFilter}
                     columns={["name", "value", "project", "samples"]}
                   />
                 </div>

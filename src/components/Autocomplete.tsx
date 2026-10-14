@@ -10,7 +10,7 @@ import SearchWorker from "@/util/search?worker";
 import { useWorker } from "@/util/worker";
 
 /** max number of results to render */
-const limit = 10;
+const limit = 100;
 
 type Props<Id extends string> = {
   label: ReactNode;
@@ -55,6 +55,13 @@ export default function Autocomplete<Id extends string>({
     .slice(0, limit)
     .map((item) => item.value);
 
+  /** get item label */
+  const getLabel = (id: Id) =>
+    renderOption?.(id) ??
+    options.find((option) => option.value === id)?.label ??
+    id ??
+    "-";
+
   return (
     <label className="inline-flex items-center gap-2">
       <span className="flex items-center gap-1 text-right">{label}</span>
@@ -65,15 +72,19 @@ export default function Autocomplete<Id extends string>({
         onValueChange={(value) => onChange(value || "")}
         onInputValueChange={setSearch}
       >
-        <div
+        <Combobox.InputGroup
+          data-filled={value ? "" : undefined}
           className={clsx(
-            "relative flex min-w-20 rounded-md bg-gray transition hover:bg-light-gray",
+            "group relative flex min-w-20 rounded-md bg-gray transition hover:bg-light-gray",
             className,
           )}
         >
+          <div className="pointer-events-none absolute inset-2 right-10 overflow-hidden group-focus-within:opacity-0">
+            {getLabel(value as Id)}
+          </div>
           <Combobox.Input
             placeholder={placeholder}
-            className="min-w-0 p-2 pr-10"
+            className="min-w-0 p-2 pr-10 opacity-0 group-not-data-filled:opacity-100 group-focus-within:opacity-100"
           />
           {value !== "" && (
             <Combobox.Clear
@@ -83,7 +94,7 @@ export default function Autocomplete<Id extends string>({
               <XIcon className="size-4" />
             </Combobox.Clear>
           )}
-        </div>
+        </Combobox.InputGroup>
         <Combobox.Portal>
           <Combobox.Positioner
             side="bottom"
@@ -103,11 +114,7 @@ export default function Autocomplete<Id extends string>({
                     value={id}
                     className="flex cursor-pointer items-center gap-2 p-2 hover:bg-light-gray data-highlighted:bg-light-gray"
                   >
-                    <span className="grow">
-                      {renderOption?.(id) ??
-                        options.find((option) => option.value === id)?.label ??
-                        id}
-                    </span>
+                    <span className="grow">{getLabel(id)}</span>
                     <Combobox.ItemIndicator>
                       <CheckIcon className="size-4" />
                     </Combobox.ItemIndicator>

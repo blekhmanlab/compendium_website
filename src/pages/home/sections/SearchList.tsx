@@ -44,39 +44,50 @@ export default function SearchList({
   /** debounced search input */
   const search = useDebounce(_search, 300);
 
+  /** anything to search for */
+  const hasSearch = !!search.trim();
+
+  /** types specified */
+  const hasTypes = !!types?.length;
+
   /** filter full search list by type */
   const filtered = useMemo(() => {
     if (!list) return [];
     let filtered = [...list];
     /** filter by type */
-    if (types?.length && type !== "All")
+    if (hasTypes && type !== "All")
       filtered = filtered.filter((entry) =>
         "type" in entry ? entry.type === type : true,
       );
     /** filter by func */
     if (filter) filtered = filtered.filter(filter);
     return filtered;
-  }, [list, types, type, filter]);
+  }, [list, hasTypes, type, filter]);
 
   type Filtered = NonNullable<typeof filtered>;
+
+  const exactSearch = useCallback(
+    (worker: Remote<typeof SearchAPI>) =>
+      worker.exactSearch(filtered ?? [], fields, search) as Promise<Filtered>,
+    [filtered, search],
+  );
+  const fuzzySearch = useCallback(
+    (worker: Remote<typeof SearchAPI>) =>
+      worker.fuzzySearch(filtered ?? [], fields, search) as Promise<Filtered>,
+    [filtered, search],
+  );
 
   /** exact search results */
   const [exactMatches = [], exactStatus] = useWorker(
     SearchWorker,
-    useCallback(
-      (worker: Remote<typeof SearchAPI>) =>
-        worker.exactSearch(filtered ?? [], fields, search) as Promise<Filtered>,
-      [filtered, search],
-    ),
+    /** skip work when search empty */
+    hasSearch ? exactSearch : undefined,
   );
   /** fuzzy search results */
   const [fuzzyMatches = [], fuzzyStatus] = useWorker(
     SearchWorker,
-    useCallback(
-      (worker: Remote<typeof SearchAPI>) =>
-        worker.fuzzySearch(filtered ?? [], fields, search) as Promise<Filtered>,
-      [filtered, search],
-    ),
+    /** skip work when search empty */
+    hasSearch ? fuzzySearch : undefined,
   );
 
   /** exact match name quick lookup */

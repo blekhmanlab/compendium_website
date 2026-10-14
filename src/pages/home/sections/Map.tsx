@@ -261,7 +261,7 @@ export default function Map() {
             renderOption={(id) => {
               const [tag = "", tagValue = ""] = id.split("|");
               return (
-                <div className="-my-1 flex flex-col justify-between">
+                <div className="-mt-1 flex flex-col leading-none">
                   <span className="text-xs">{tag}</span>
                   <span>{tagValue}</span>
                 </div>
