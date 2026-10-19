@@ -1,5 +1,5 @@
 import type { CSSProperties, MouseEventHandler, ReactNode } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { clamp } from "lodash";
 import { ChevronDownIcon } from "lucide-react";
 import Button from "@/components/Button";
@@ -51,6 +51,8 @@ export default function Table<Datum extends DatumShape>({
   extraRows,
   onSelect,
 }: Props<Datum>) {
+  console.time("a");
+
   /** row cutoff */
   let [cutoff, setCutoff] = useState(limit);
 
@@ -68,9 +70,13 @@ export default function Table<Datum extends DatumShape>({
   const selectEnabled = !!onSelect;
 
   /** are some rows selected */
-  const someSelected =
-    !!rows.length &&
-    rows.some((row, index) => selected.has(row.key ?? String(index)));
+  const someSelected = useMemo(
+    () =>
+      !!selected.size &&
+      !!rows.length &&
+      rows.some((row, index) => selected.has(row.key ?? String(index))),
+    [rows, selected],
+  );
 
   /** set selected */
   const updateSelected = (newSelected: typeof selected) => {
@@ -78,6 +84,7 @@ export default function Table<Datum extends DatumShape>({
     setSelected(newSelected);
   };
 
+  console.timeEnd("a");
   return (
     <>
       <div className="w-full table-wrapper">

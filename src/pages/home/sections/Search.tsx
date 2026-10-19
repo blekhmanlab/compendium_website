@@ -2,7 +2,6 @@ import { startTransition, useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
 import Tabs from "@/components/Tabs";
 import Tooltip from "@/components/Tooltip";
-import LoadTags from "@/pages/home/sections/LoadTags";
 import { loadTags, useData } from "@/pages/home/state";
 import SearchList from "./SearchList";
 
@@ -49,7 +48,6 @@ export default function Search() {
   const taxonSearch = useData((state) => state.taxonSearch);
   const tagSearch = useData((state) => state.tagSearch);
   const tagValueSearch = useData((state) => state.tagValueSearch);
-  const tagsEnabled = useData((state) => state.tagsEnabled);
 
   /** local state */
   const [tab, setTab] = useState(0);
@@ -66,9 +64,10 @@ export default function Search() {
 
   useEffect(() => {
     const abort = new AbortController();
-    if (tagsEnabled) loadTags(compendium, abort);
+    /** load larger data only on demand */
+    if (tab === 3) loadTags(compendium, abort);
     return () => abort.abort();
-  }, [compendium, tagsEnabled]);
+  }, [compendium, tab]);
 
   return (
     <section className={clsx(tab === 3 && "width-lg")}>
@@ -137,37 +136,35 @@ export default function Search() {
           {
             name: "Tags",
             content: (
-              <LoadTags>
-                <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(min(400px,100%),1fr))] gap-x-14 gap-y-10 *:flex *:flex-col *:items-center *:gap-8">
-                  <div>
-                    <p>
-                      Search for a <Tooltip content={tooltips.tag}>tag</Tooltip>{" "}
-                      name to see how many projects or samples have it. Select
-                      rows filter the next table.
-                    </p>
-                    <SearchList
-                      name="Tags"
-                      list={tagSearch}
-                      columns={["name", "projects", "samples"]}
-                      onSelect={(selected) =>
-                        startTransition(() => setSelectedTags(selected))
-                      }
-                    />
-                  </div>
-                  <div>
-                    <p>
-                      Search for a tag name or value to see which projects and
-                      how many samples have it.
-                    </p>
-                    <SearchList
-                      name="Tag Values"
-                      list={tagValueSearch}
-                      filter={tagValueFilter}
-                      columns={["name", "value", "project", "samples"]}
-                    />
-                  </div>
+              <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(min(400px,100%),1fr))] gap-x-14 gap-y-10 *:flex *:flex-col *:items-center *:gap-8">
+                <div>
+                  <p>
+                    Search for a <Tooltip content={tooltips.tag}>tag</Tooltip>{" "}
+                    name to see how many projects or samples have it. Select
+                    rows filter the next table.
+                  </p>
+                  <SearchList
+                    name="Tags"
+                    list={tagSearch}
+                    columns={["name", "projects", "samples"]}
+                    onSelect={(selected) =>
+                      startTransition(() => setSelectedTags(selected))
+                    }
+                  />
                 </div>
-              </LoadTags>
+                <div>
+                  <p>
+                    Search for a tag name or value to see which projects and how
+                    many samples have it.
+                  </p>
+                  <SearchList
+                    name="Tag Values"
+                    list={tagValueSearch}
+                    filter={tagValueFilter}
+                    columns={["name", "value", "project", "samples"]}
+                  />
+                </div>
+              </div>
             ),
           },
         ]}

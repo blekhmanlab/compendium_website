@@ -19,7 +19,6 @@ import Alert from "@/components/Alert";
 import Autocomplete from "@/components/Autocomplete";
 import Select from "@/components/Select";
 import Tooltip from "@/components/Tooltip";
-import LoadTags from "@/pages/home/sections/LoadTags";
 import {
   loadGeoTags,
   loadTags,
@@ -54,6 +53,7 @@ export default function Map() {
   /** local state */
   const [level, setLevel] = useState("country");
   const [filter, setFilter] = useState("");
+  const [enableTags, setEnableTags] = useState(false);
 
   /** feature data to show */
   const featureCollection = level === "country" ? countries : regions;
@@ -74,10 +74,12 @@ export default function Map() {
   /** load per-geo tag data on demand */
   useEffect(() => {
     const abort = new AbortController();
-    loadGeoTags(compendium, abort);
-    loadTags(compendium, abort);
+    if (enableTags) {
+      loadGeoTags(compendium, abort);
+      loadTags(compendium, abort);
+    }
     return () => abort.abort();
-  }, [compendium]);
+  }, [compendium, enableTags]);
 
   /** colors */
   const primary = getCssVariable("--color-primary");
@@ -242,28 +244,31 @@ export default function Map() {
             label: upperFirst(value),
           }))}
         />
-        <LoadTags>
-          <Autocomplete
-            className="w-40"
-            label="Tag"
-            value={filter}
-            onChange={setFilter}
-            options={
-              tagValues?.map(({ tag, value }) => ({
-                value: [tag, value].join("|"),
-              })) ?? []
-            }
-            renderOption={(id) => {
-              const [tag = "", tagValue = ""] = id.split("|");
-              return (
-                <div className="-mt-1 flex flex-col leading-none">
-                  <span className="text-xs">{tag}</span>
-                  <span>{tagValue}</span>
-                </div>
-              );
-            }}
-          />
-        </LoadTags>
+        <Autocomplete
+          className="w-40"
+          label="Tag"
+          value={filter}
+          onChange={setFilter}
+          options={
+            tagValues?.map(({ tag, value }) => ({
+              value: [tag, value].join("|"),
+            })) ?? []
+          }
+          renderOption={(id) => {
+            const [tag = "", tagValue = ""] = id.split("|");
+            return (
+              <div className="-mt-1 flex flex-col leading-none">
+                <span className="text-xs">{tag}</span>
+                <span>{tagValue}</span>
+              </div>
+            );
+          }}
+          onFocus={() => setEnableTags(true)}
+          status={
+            enableTags &&
+            !tagValues?.length && <Alert type="loading">Loading tags</Alert>
+          }
+        />
       </div>
 
       <svg

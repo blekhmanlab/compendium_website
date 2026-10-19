@@ -18,6 +18,7 @@ type Props<Id extends string> = {
   onChange: (value: Id | "") => void;
   options: readonly { value: Id | ""; label?: ReactNode }[];
   renderOption?: (value: Id) => ReactNode;
+  status?: ReactNode;
 } & Omit<ComponentProps<"input">, "value" | "onChange">;
 
 export default function Autocomplete<Id extends string>({
@@ -28,6 +29,8 @@ export default function Autocomplete<Id extends string>({
   renderOption,
   placeholder = "Search",
   className = "",
+  onFocus,
+  status,
 }: Props<Id>) {
   /** search input */
   const [_search, setSearch] = useState("");
@@ -85,6 +88,7 @@ export default function Autocomplete<Id extends string>({
           <Combobox.Input
             placeholder={placeholder}
             className="min-w-0 p-2 pr-10 opacity-0 group-not-data-filled:opacity-100 group-focus-within:opacity-100"
+            onFocus={onFocus}
           />
           {value !== "" && (
             <Combobox.Clear
@@ -104,9 +108,11 @@ export default function Autocomplete<Id extends string>({
             className="z-20"
           >
             <Combobox.Popup className="flex max-h-(--available-height) flex-col overflow-y-auto rounded-md border border-light-gray bg-gray">
-              <Combobox.Empty className="p-2 empty:hidden">
-                No matches
-              </Combobox.Empty>
+              {status || (
+                <Combobox.Empty className="p-2 empty:hidden">
+                  No matches
+                </Combobox.Empty>
+              )}
               <Combobox.List>
                 {(id: Id) => (
                   <Combobox.Item

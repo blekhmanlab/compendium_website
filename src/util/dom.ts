@@ -1,5 +1,5 @@
 import { formatHex } from "culori";
-import { sleep } from "@/util/async";
+import { frame } from "@/util/async";
 
 /**
  * get transform matrix that converts point from one element coordinate system
@@ -60,7 +60,7 @@ export const downloadSvg = (
 export const preserveScroll = async (element?: Element | null) => {
   if (!element) return;
   const oldY = element.getBoundingClientRect().top;
-  await sleep(0);
+  await frame();
   const newY = element.getBoundingClientRect().top;
   if (!element.isConnected) return;
   window.scrollBy({ top: newY - oldY });

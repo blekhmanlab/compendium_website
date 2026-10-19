@@ -56,13 +56,11 @@ export type Data = {
   };
   selectedTags?: string[];
   selectedTagValues?: string[];
-  tagsEnabled: boolean;
 };
 
 /** home page state store */
 export const useData = create<Data>(() => ({
   compendium: "human-microbiome-compendium",
-  tagsEnabled: false,
 }));
 
 /** set selected compendium */
@@ -174,8 +172,6 @@ export const loadTags = async (
   abort: AbortController,
 ) => {
   if (compendium === loadedTags) return;
-
-  if (!useData.getState().tagsEnabled) return;
   const worker = new TagWorker();
   const wrapper = wrap<typeof TagAPI>(worker);
   try {
@@ -225,7 +221,3 @@ export const setSelectedFeature = (feature?: {
       /** if feature already selected, deselect */
       useData.getState().selectedFeature === feature ? undefined : feature,
   });
-
-/** enable tag data (because it's very large) */
-export const setTagsEnabled = (tagsEnabled: boolean) =>
-  useData.setState({ tagsEnabled });
