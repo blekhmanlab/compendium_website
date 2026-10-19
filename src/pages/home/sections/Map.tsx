@@ -17,9 +17,9 @@ import {
 import { clamp, upperFirst } from "lodash";
 import Alert from "@/components/Alert";
 import Autocomplete from "@/components/Autocomplete";
-import Button from "@/components/Button";
 import Select from "@/components/Select";
 import Tooltip from "@/components/Tooltip";
+import LoadTags from "@/pages/home/sections/LoadTags";
 import {
   loadGeoTags,
   loadTags,
@@ -71,18 +71,13 @@ export default function Map() {
     }),
   );
 
-  /** user opt-in to load tags, since data is huge */
-  const [enableTags, setEnableTags] = useState(false);
-
   /** load per-geo tag data on demand */
   useEffect(() => {
     const abort = new AbortController();
-    if (enableTags) {
-      loadGeoTags(compendium, abort);
-      loadTags(compendium, abort);
-    }
+    loadGeoTags(compendium, abort);
+    loadTags(compendium, abort);
     return () => abort.abort();
-  }, [compendium, enableTags]);
+  }, [compendium]);
 
   /** colors */
   const primary = getCssVariable("--color-primary");
@@ -247,7 +242,7 @@ export default function Map() {
             label: upperFirst(value),
           }))}
         />
-        {enableTags ? (
+        <LoadTags>
           <Autocomplete
             className="w-40"
             label="Tag"
@@ -268,9 +263,7 @@ export default function Map() {
               );
             }}
           />
-        ) : (
-          <Button onClick={() => setEnableTags(true)}>Load Tags</Button>
-        )}
+        </LoadTags>
       </div>
 
       <svg
