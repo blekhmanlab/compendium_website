@@ -51,8 +51,6 @@ export default function Table<Datum extends DatumShape>({
   extraRows,
   onSelect,
 }: Props<Datum>) {
-  console.time("a");
-
   /** row cutoff */
   let [cutoff, setCutoff] = useState(limit);
 
@@ -84,7 +82,6 @@ export default function Table<Datum extends DatumShape>({
     setSelected(newSelected);
   };
 
-  console.timeEnd("a");
   return (
     <>
       <div className="w-full table-wrapper">

@@ -82,7 +82,7 @@ export default function Autocomplete<Id extends string>({
             className,
           )}
         >
-          <div className="pointer-events-none absolute inset-0 right-10 overflow-hidden p-2 group-focus-within:opacity-0">
+          <div className="pointer-events-none absolute inset-0 right-10 overflow-hidden p-2 whitespace-nowrap group-focus-within:opacity-0">
             {getLabel(value as Id)}
           </div>
           <Combobox.Input
