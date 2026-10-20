@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import Footer from "@/components/Footer";
 import Meta from "@/components/Meta";
-import { useData } from "@/pages/home/state";
-import { loadSamples } from "@/pages/projectionist/state";
+import { loadSamples, useData } from "@/pages/home/state";
 import Extremes from "./sections/Extremes";
 import Header from "./sections/Header";
 import PCs from "./sections/PCs";
