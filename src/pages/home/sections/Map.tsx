@@ -53,7 +53,7 @@ export default function Map() {
   /** local state */
   const [level, setLevel] = useState("country");
   const [filter, setFilter] = useState("");
-  const [enableTags, setEnableTags] = useState(false);
+  const [tagsEnabled, setTagsEnabled] = useState(false);
 
   /** feature data to show */
   const featureCollection = level === "country" ? countries : regions;
@@ -74,12 +74,12 @@ export default function Map() {
   /** load per-geo tag data on demand */
   useEffect(() => {
     const abort = new AbortController();
-    if (enableTags) {
+    if (tagsEnabled) {
       loadGeoTags(compendium, abort);
       loadTags(compendium, abort);
     }
     return () => abort.abort();
-  }, [compendium, enableTags]);
+  }, [compendium, tagsEnabled]);
 
   /** colors */
   const primary = getCssVariable("--color-primary");
@@ -263,9 +263,9 @@ export default function Map() {
               </div>
             );
           }}
-          onFocus={() => setEnableTags(true)}
+          onFocus={() => setTagsEnabled(true)}
           status={
-            enableTags &&
+            tagsEnabled &&
             !tagValues?.length && <Alert type="loading">Loading tags</Alert>
           }
         />
