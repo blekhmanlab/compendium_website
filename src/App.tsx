@@ -1,5 +1,6 @@
 import "@fontsource-variable/mona-sans/wght.css";
 import "./styles.css";
+import type { Compendium } from "@/site";
 import {
   createBrowserRouter,
   Outlet,
@@ -8,10 +9,7 @@ import {
 } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import Home from "@/pages/home/Home";
-import {
-  getSelectedCompendium,
-  setSelectedCompendium,
-} from "@/pages/home/state";
+import { setSelectedCompendium } from "@/pages/home/state";
 import Projectionist from "@/pages/projectionist/Projectionist";
 import meta from "@/site";
 
@@ -71,24 +69,27 @@ export const router = createBrowserRouter(routes, {
 const updateCompendium = () => {
   /** get selected compendium in url */
   const url = new URL(window.location.href);
-  let compendium = url.searchParams.get("compendium");
+  const param = url.searchParams.get("compendium") || "";
 
   /** update selected compendium */
-  if (compendium && compendium in meta)
-    setSelectedCompendium(compendium as keyof typeof meta);
-  else setSelectedCompendium("human-microbiome-compendium");
-  compendium = getSelectedCompendium();
+  const compendium: Compendium =
+    param in meta ? (param as Compendium) : "human-microbiome-compendium";
+  setSelectedCompendium(compendium as keyof typeof meta);
 
   /** update theme colors based on selected compendium */
-  if (compendium === "human-microbiome-compendium") {
-    document.documentElement.style.setProperty("--primary-hue", "340");
-    document.documentElement.style.setProperty("--secondary-hue", "300");
-    document.documentElement.style.setProperty("--gray-hue", "280");
-  } else if (compendium === "meta-g-compendium") {
-    document.documentElement.style.setProperty("--primary-hue", "220");
-    document.documentElement.style.setProperty("--secondary-hue", "180");
-    document.documentElement.style.setProperty("--gray-hue", "240");
-  }
+  const theme = meta[compendium].colors;
+  document.documentElement.style.setProperty(
+    "--primary-hue",
+    String(theme["primary-hue"]),
+  );
+  document.documentElement.style.setProperty(
+    "--secondary-hue",
+    String(theme["secondary-hue"]),
+  );
+  document.documentElement.style.setProperty(
+    "--gray-hue",
+    String(theme["gray-hue"]),
+  );
 };
 
 /** update on load */

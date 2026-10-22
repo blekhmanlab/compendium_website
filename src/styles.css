@@ -13,16 +13,13 @@
 
   --color-primary: oklch(65% 0.25 var(--primary-hue));
   --color-secondary: oklch(50% 0.25 var(--secondary-hue));
-  --color-primary-light: oklch(90% 0.15 var(--primary-hue));
-  --color-secondary-light: oklch(90% 0.15 var(--secondary-hue));
-  --color-primary-dark: oklch(30% 0.1 var(--primary-hue));
-  --color-secondary-dark: oklch(30% 0.1 var(--secondary-hue));
 
   --color-black: oklch(0% 0.025 var(--gray-hue));
-  --color-dark-gray: oklch(25% 0.025 var(--gray-hue));
-  --color-gray: oklch(35% 0.025 var(--gray-hue));
-  --color-light-gray: oklch(50% 0.025 var(--gray-hue));
-  --color-white: oklch(100% 0.025 var(--gray-hue));
+  --color-dark-gray-alt: oklch(28% 0.05 var(--gray-hue));
+  --color-dark-gray: oklch(30% 0.05 var(--gray-hue));
+  --color-gray: oklch(35% 0.05 var(--gray-hue));
+  --color-light-gray: oklch(50% 0.05 var(--gray-hue));
+  --color-white: oklch(100% 0.05 var(--gray-hue));
 
   --color-success: oklch(75% 0.25 160);
   --color-info: oklch(75% 0.25 240);
@@ -36,7 +33,7 @@
 
 @layer base {
   html {
-    @apply bg-black font-sans text-[110%] leading-relaxed font-light text-white underline-offset-2;
+    @apply bg-black font-sans text-[110%] leading-normal font-light text-white underline-offset-2;
   }
 
   body {
@@ -52,11 +49,15 @@
   }
 
   section {
-    @apply flex flex-col items-center gap-12 p-(--pad) px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] [--pad:--spacing(12)] width-md last:grow odd:bg-dark-gray even:bg-dark-gray/75 max-md:[--pad:--spacing(8)];
+    @apply flex flex-col items-center gap-12 p-(--pad) px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] [--pad:--spacing(12)] width-md last:grow odd:bg-dark-gray even:bg-dark-gray-alt max-md:[--pad:--spacing(8)];
+  }
+
+  h1 {
+    @apply leading-tight font-medium;
   }
 
   h2 {
-    @apply flex items-center text-center text-2xl leading-relaxed font-light tracking-widest uppercase;
+    @apply flex items-center text-center text-2xl leading-tight font-light tracking-widest uppercase;
   }
 
   hr {
@@ -111,7 +112,7 @@
   }
 
   pre:has(> code) {
-    @apply overflow-x-auto rounded-md bg-dark-gray p-2 leading-normal whitespace-pre text-white;
+    @apply overflow-x-auto rounded-md bg-dark-gray p-2 whitespace-pre text-white;
   }
 
   .icon,

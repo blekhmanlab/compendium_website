@@ -20,7 +20,7 @@ import type {
 } from "@/pages/home/data/tags";
 import type * as TaxaAPI from "@/pages/home/data/taxa";
 import type { Classes, Phyla, TaxonSearch } from "@/pages/home/data/taxa";
-import type meta from "@/site";
+import type { Compendium } from "@/site";
 import { wrap } from "comlink";
 import { create } from "zustand";
 import GeoTagWorker from "@/pages/home/data/geo-tags?worker";
@@ -31,8 +31,6 @@ import SamplesWorker from "@/pages/home/data/samples?worker";
 import TagWorker from "@/pages/home/data/tags?worker";
 import TaxaWorker from "@/pages/home/data/taxa?worker";
 import site from "@/site";
-
-export type Compendium = keyof typeof meta;
 
 export type Data = {
   compendium: Compendium;

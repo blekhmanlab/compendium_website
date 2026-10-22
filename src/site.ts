@@ -1,5 +1,12 @@
-export default {
+export type Compendium = keyof typeof site;
+
+const site = {
   "human-microbiome-compendium": {
+    colors: {
+      "primary-hue": 340,
+      "secondary-hue": 300,
+      "gray-hue": 280,
+    },
     title: "Human Microbiome Compendium",
     description:
       "An ongoing project to build a dataset of the human microbiome at an unprecedented scale.",
@@ -34,6 +41,11 @@ export default {
     ],
   },
   "meta-g-compendium": {
+    colors: {
+      "primary-hue": 240,
+      "secondary-hue": 200,
+      "gray-hue": 240,
+    },
     title: "Meta G Compendium",
     description:
       "An ongoing initiative bringing together human gut metagenomes from around the world into the largest atlas of its kind to date.",
@@ -77,3 +89,5 @@ export default {
     ],
   },
 };
+
+export default site;

@@ -1,5 +1,5 @@
 import type { FeatureCollection, Geometry } from "geojson";
-import type { Compendium } from "@/pages/home/state";
+import type { Compendium } from "@/site";
 import { expose } from "comlink";
 import { mapKeys } from "lodash";
 import { request } from "@/util/async";

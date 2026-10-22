@@ -14,14 +14,14 @@ export default function Title({ className = "" }) {
   return (
     <Component
       className={clsx(
-        "flex flex-1 items-center justify-center gap-[1em] text-inherit no-underline",
+        "flex flex-1 items-center justify-center gap-[0.75em] text-inherit no-underline",
         className,
       )}
       {...props}
     >
       <Logo className="h-[3em]" />
       <div className="w-0.5 self-stretch bg-white" />
-      <h1 className="max-w-min leading-tight">{site.title}</h1>
+      <h1 className="-my-2 max-w-min">{site.title}</h1>
     </Component>
   );
 }

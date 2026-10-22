@@ -4,10 +4,13 @@ import { useElementSize, useEventListener } from "@reactuses/core";
 import { gsap } from "gsap";
 import { clamp, random } from "lodash";
 import PoissonDiskSampling from "poisson-disk-sampling";
-import { sleep, waitFor } from "@/util/async";
-import { getMatrix } from "@/util/dom";
+import { useData } from "@/pages/home/state";
+import { waitFor } from "@/util/async";
+import { getCssVariable, getMatrix } from "@/util/dom";
 import { cos, dist, sin } from "@/util/math";
 
+/** shape scale */
+const scale = 0.85;
 /** particle size */
 const size = 1 / 140;
 /** desired spacing of points */
@@ -16,6 +19,9 @@ const spacing = 1 / 30;
 export default function Viz() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const ctx = useRef<CanvasRenderingContext2D | null>(null);
+
+  /** which compendium is selected */
+  const compendium = useData((state) => state.compendium);
 
   /** init canvas context */
   useEffect(() => {
@@ -36,7 +42,7 @@ export default function Viz() {
     /** smaller side */
     const side = Math.min(canvas.current.width, canvas.current.height);
     /** scale to contain */
-    ctx.current?.scale(side / 2, side / 2);
+    ctx.current?.scale((scale * side) / 2, (scale * side) / 2);
   }, [width, height]);
 
   const [particles, setParticles] = useState<Particle[]>([]);
@@ -57,10 +63,10 @@ export default function Viz() {
     );
 
     /** draw particles */
-    for (const { position, size, alpha, spin, strength } of particles) {
+    for (const { position, size, color, alpha, spin, strength } of particles) {
       const radius = size * (10 * strength);
       ctx.current.globalAlpha = clamp(alpha + strength, 0, 1);
-      ctx.current.fillStyle = "white";
+      ctx.current.fillStyle = color;
       ctx.current.beginPath();
       ctx.current.arc(
         position.x + sin(t / 3 + spin) * radius,
@@ -85,21 +91,20 @@ export default function Viz() {
   /** use gsap context to efficiently clean up old animations */
   const gsapCtx = useRef<gsap.Context>(null);
 
-  const generate = useCallback((delay = 1000) => {
+  const generate = useCallback(() => {
     /** cleanup any existing animations */
     gsapCtx.current?.revert();
     /** create new animations */
     gsapCtx.current = gsap.context(async () => {
-      /** wait a bit */
-      await sleep(delay);
       /** get/set new particles */
       setParticles(await getParticles());
     });
-  }, []);
+    // eslint-disable-next-line -- compendium changes theme colors
+  }, [compendium]);
 
   /** on page load */
   useEffect(() => {
-    generate(1000);
+    generate();
     /** cleanup */
     return () => gsapCtx.current?.revert();
   }, [generate]);
@@ -123,8 +128,8 @@ export default function Viz() {
   return (
     <canvas
       ref={canvas}
-      className="absolute inset-0 -z-10 size-full mix-blend-overlay"
-      onClick={() => generate(0)}
+      className="absolute inset-0 -z-10 size-full"
+      onClick={generate}
     />
   );
 }
@@ -136,6 +141,7 @@ type Particle = {
   position: Point;
   destination: Point;
   size: number;
+  color: string;
   alpha: number;
   spin: number;
   strength: number;
@@ -156,6 +162,9 @@ const getParticles = async () => {
     transform: getMatrix(svg, path),
   }));
 
+  const primary = getCssVariable("--color-primary");
+  const secondary = getCssVariable("--color-secondary");
+
   /** get bounding box of svg */
   const [left = 0, top = 0, width = 100, height = 100] = (
     svg.getAttribute("viewBox") || ""
@@ -170,7 +179,7 @@ const getParticles = async () => {
   const points: Point[] = new PoissonDiskSampling({
     shape: [width, height],
     minDistance: side * spacing,
-    maxDistance: side * spacing * 1.02,
+    maxDistance: side * spacing * 1.01,
     tries: 10,
   })
     .fill()
@@ -198,7 +207,7 @@ const getParticles = async () => {
     }));
 
   /** hard limit number of points */
-  while (points.length > 500) points.splice(random(points.length), 1);
+  while (points.length > 1000) points.splice(random(points.length), 1);
 
   /** create particle for each point */
   const particles: Particle[] = points.map((point) => ({
@@ -206,28 +215,41 @@ const getParticles = async () => {
     position: { x: point.x * 2, y: point.y * 2 },
     destination: point,
     size,
+    color: primary,
     alpha: 0,
     spin: random(360),
     strength: 0,
   }));
 
+  /** wait a bit before starting all animation */
+  const wait = 1;
+
+  /** animation params */
+  const duration = 1;
+  gsap.defaults({ duration, ease: "power4.out" });
+
   /** animate each particle */
   for (const particle of particles) {
-    const duration = 2;
     const delay = random(duration, true);
-    const ease = "power4.out";
     /** animate position */
-    gsap.to(particle.position, {
+    gsap.timeline({ delay: wait }).to(particle.position, {
       ...particle.destination,
-      duration,
+      duration: 2 * duration,
       delay,
-      ease,
     });
     /** animate alpha */
     gsap
-      .timeline()
-      .to(particle, { alpha: 1, duration: duration, delay, ease })
-      .to(particle, { alpha: 0.5, duration: duration, ease });
+      .timeline({ delay: wait })
+      .to(particle, { alpha: 1, delay })
+      .to(particle, { alpha: 0.35 });
+    /** animate color */
+    gsap
+      .timeline({
+        repeat: -1,
+        delay: wait + 2 * duration + particle.destination.x,
+      })
+      .to(particle, { color: secondary, delay: duration })
+      .to(particle, { color: primary });
   }
 
   return particles;

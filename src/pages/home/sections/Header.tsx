@@ -34,7 +34,7 @@ export default function Header() {
 
       <Title className="text-3xl max-sm:text-xl" />
 
-      <p className="text-lg">{site.description}</p>
+      <p className="text-lg/relaxed">{site.description}</p>
 
       <div className="flex flex-wrap items-center justify-center gap-4">
         <Tooltip content="Learn more about the methods and significance behind this project.">

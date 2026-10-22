@@ -1,5 +1,4 @@
 import type { Samples } from "@/pages/home/data/samples";
-import type { Compendium } from "@/pages/home/state";
 import type * as SamplePCsAPI from "@/pages/projectionist/data/sample-pcs";
 import type { SamplePCs } from "@/pages/projectionist/data/sample-pcs";
 import type { Scree } from "@/pages/projectionist/data/scree";
@@ -12,6 +11,7 @@ import type {
   UserReads,
   UserTaxa,
 } from "@/pages/projectionist/project";
+import type { Compendium } from "@/site";
 import { wrap } from "comlink";
 import { create } from "zustand";
 import SamplePCsWorker from "@/pages/projectionist/data/sample-pcs?worker";

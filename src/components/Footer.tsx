@@ -5,7 +5,7 @@ export default function Footer() {
   const site = useSite();
 
   return (
-    <footer className="relative isolate flex flex-row items-center justify-between gap-8 bg-linear-to-r from-primary-dark to-secondary-dark p-8 max-md:flex-col">
+    <footer className="relative isolate flex flex-row items-center justify-between gap-8 bg-linear-to-r from-primary/35 to-secondary/35 p-8 max-md:flex-col">
       <p className="max-w-[unset]">
         A project of the{" "}
         {site.labs.map((lab, index, array) => (

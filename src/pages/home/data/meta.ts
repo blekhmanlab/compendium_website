@@ -1,4 +1,4 @@
-import type { Compendium } from "@/pages/home/state";
+import type { Compendium } from "@/site";
 import type { Zenodo } from "../../../../compile/types/zenodo-api";
 import { mapKeys } from "lodash";
 import site from "@/site";
