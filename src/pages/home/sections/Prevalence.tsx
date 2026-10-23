@@ -1,6 +1,5 @@
-import type { Reads } from "@/pages/home/data/projects";
-import type { Phyla } from "@/pages/home/data/taxa";
 import { useState } from "react";
+import { upperFirst } from "lodash";
 import Select from "@/components/Select";
 import Tooltip from "@/components/Tooltip";
 import { useData } from "@/pages/home/state";
@@ -12,8 +11,9 @@ import { tooltips } from "./Search";
 const chartOptions = ["Phyla", "Reads"] as const;
 type Chart = (typeof chartOptions)[number];
 
-const Prevalence = () => {
-  /** get global state */
+export default function Prevalence() {
+  /** global state */
+  const compendium = useData((state) => state.compendium);
   const phyla = useData((state) => state.phyla);
   const reads = useData((state) => state.reads);
   const selectedFeature = useData((state) => state.selectedFeature);
@@ -32,8 +32,9 @@ const Prevalence = () => {
         </p>
       ) : (
         <p>
-          Select a <Tooltip content={tooltips["country"]}>country</Tooltip> or{" "}
-          <Tooltip content={tooltips["region"]}>region</Tooltip> to filter by.
+          Select a <Tooltip content={tooltips.country}>country</Tooltip> or{" "}
+          <Tooltip content={tooltips.region}>region</Tooltip> on map to filter
+          the charts.{" "}
         </p>
       )}
 
@@ -41,20 +42,23 @@ const Prevalence = () => {
         <Map />
 
         <div className="flex flex-col items-center gap-4">
-          <Select
-            label="Chart"
-            value={chart}
-            onChange={setChart}
-            options={chartOptions}
-          />
+          {compendium !== "meta-g-compendium" && (
+            <Select
+              label="Chart"
+              value={chart}
+              onChange={setChart}
+              options={chartOptions.map((value) => ({
+                value,
+                label: upperFirst(value),
+              }))}
+            />
+          )}
           <div className="min-h-80 w-full grow">
-            {chart === "Phyla" && <PhylaChart data={phyla as Phyla} />}
-            {chart === "Reads" && <ReadsChart data={reads as Reads} />}
+            {chart === "Phyla" && phyla && <PhylaChart data={phyla} />}
+            {chart === "Reads" && reads && <ReadsChart data={reads} />}
           </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default Prevalence;
+}

@@ -1,11 +1,13 @@
+import { glob } from "fs/promises";
 import { dirname } from "path";
 import { chdir } from "process";
 import { fileURLToPath } from "url";
 import type { FeatureCollection, Geometry } from "geojson";
-import type { _Record, Zenodo } from "./types/zenodo-api";
+import type { Zenodo } from "./types/zenodo-api";
 import { bin, extent, median } from "d3";
 import dissolve from "geojson-dissolve";
 import { cloneDeep, orderBy, startCase } from "lodash";
+import naturalEarth from "./extra/natural-earth.json";
 import {
   dirSize,
   download,
@@ -16,70 +18,68 @@ import {
   throttle,
   write,
 } from "./util";
+import site from "../src/site";
 
 /**
  * pre-compile step that takes the "raw" distributed data (csv/tsv), and pares
  * it down to just what the website needs (json).
  */
 
-/** set working directory to directory of this script */
+/** set working folder to folder of this script */
 chdir(dirname(fileURLToPath(import.meta.url)));
 
-/** main data input directory */
-const mainInput = "./downloaded";
-
-/** main data output directory */
-const mainOutput = "../src/pages/home/data";
-
-/** record of downloads, version, and other info */
-export const recordUrl = process.env.VITE_RECORD ?? "";
-
-/** local record file */
-const recordFile = `${mainInput}/record.json`;
-
-/** raw natural earth data */
-const naturalEarthFile = "./extra/natural-earth.json";
-/** https://www.naturalearthdata.com/downloads/110m-cultural-vectors/ */
-/** https://github.com/nvkelso/natural-earth-vector/blob/master/geojson */
-/** https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson */
-
-/** country to region data */
-const countryToRegionFile = "./extra/country-to-region.json";
-
-/** download external input files */
-const downloadFiles = async () => {
+/** download external inputPath files */
+const downloadFiles = async (recordUrl: string, outputPath: string) => {
   console.info("DOWNLOADING FILES");
 
-  const record = (await request<Zenodo>(recordUrl)).hits.hits[0];
-  if (!record) throw Error("No hits");
-  write(recordFile, record);
+  const record = await request<Zenodo>(recordUrl);
+  write(`${outputPath}/record.json`, record);
   console.info("Downloading raw data");
   for (const { key, links } of record.files || [])
-    await download(links.self, `${mainInput}/${key}`);
+    await download(links.self, `${outputPath}/${key}`);
 };
 
 /** process main data */
-const processMainData = async () => {
+const processMainData = async (
+  recordPath: string,
+  inputPath: string,
+  outputPath: string,
+) => {
   console.info("PROCESSING MAIN DATA");
 
   /** process natural earth world map data */
   console.info("Cleaning world map data");
 
-  /** read natural earth data */
-  const worldMap = read<
-    FeatureCollection<
-      Geometry,
-      {
-        region: string;
-        country: string;
-        code: string;
-        samples: number;
-        [key: string]: string | number;
-      }
-    >
-  >(naturalEarthFile);
+  /**
+   * https://www.naturalearthdata.com/downloads/110m-cultural-vectors/
+   * https://github.com/nvkelso/natural-earth-vector/blob/master/geojson
+   * https://rawgit.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson
+   */
+  const worldMap = cloneDeep(naturalEarth) as unknown as FeatureCollection<
+    Geometry,
+    {
+      region: string;
+      country: string;
+      countryCode: string;
+      samples: number;
+    } & Record<string, unknown>
+  >;
 
   type WorldMapFeature = (typeof worldMap.features)[0];
+
+  /** make map of country code to region */
+  const countryToRegion: Record<string, string> = {};
+  /** stream file line by line */
+  const regionsStream = stream(`${inputPath}/regions.tsv`);
+  /** ignore header */
+  await regionsStream.next();
+  /** process rest of rows (with hard limit) */
+  for (let row = 0; row < 1000000; row++) {
+    const { value: row = [], done } = await regionsStream.next();
+    if (done) break;
+    const [countryCode = "", region = ""] = row;
+    countryToRegion[countryCode] = region;
+  }
 
   /** filter out null property */
   const clean = (value: unknown) => {
@@ -88,24 +88,22 @@ const processMainData = async () => {
     return value;
   };
 
-  /** map of all countries to their regions */
-  const countryToRegion = read<Record<string, string>>(countryToRegionFile);
-
   for (const feature of worldMap.features) {
     /** natural earth country name */
     const country = startCase(clean(feature.properties.NAME));
     /** natural earth country code */
-    const code = (
+    const countryCode = (
       clean(feature.properties.ISO_A2_EH) ||
       clean(feature.properties.ISO_A2) ||
       clean(feature.properties.ADM0_ISO) ||
       clean(feature.properties.ADM0_A3)
     ).toUpperCase();
-    /** our region from code */
-    const region: string = countryToRegion[code] || "";
+    /** our region from country code */
+    const region: string =
+      countryToRegion[countryCode as keyof typeof countryToRegion] || "";
 
     /** only keep needed properties (opt-in) */
-    feature.properties = { region, country, code, samples: 0 };
+    feature.properties = { region, country, countryCode, samples: 0 };
   }
 
   /** map of unique countries */
@@ -118,10 +116,10 @@ const processMainData = async () => {
 
   /** add all natural earth features */
   for (const feature of worldMap.features) {
-    const { region, code } = feature.properties;
+    const { region, countryCode } = feature.properties;
 
     /** add feature as country */
-    countries[code] = cloneDeep(feature);
+    countries[countryCode] = cloneDeep(feature);
 
     if (!regions[region]) {
       /** add feature as region */
@@ -129,19 +127,19 @@ const processMainData = async () => {
 
       /** unset country specific info */
       regions[region].properties.country = "";
-      regions[region].properties.code = "";
+      regions[region].properties.countryCode = "";
     } else {
       /** merge features together into region */
-      if (!countryDissolved[code]) {
+      if (!countryDissolved[countryCode]) {
         regions[region].geometry = dissolve([regions[region], feature]);
-        countryDissolved[code] = true;
+        countryDissolved[countryCode] = true;
       }
     }
   }
 
   /** stream files line by line */
-  const taxonomicStream = stream(`${mainInput}/taxonomic_table.csv`);
-  const metadataStream = stream(`${mainInput}/sample_metadata.tsv`);
+  const taxonomicStream = stream(`${inputPath}/taxonomic_table.csv`);
+  const metadataStream = stream(`${inputPath}/sample_metadata.tsv`);
 
   /** get first/header row of files */
   const [{ value: taxonomicHeaderRaw = [] }] = await Promise.all([
@@ -158,13 +156,7 @@ const processMainData = async () => {
   });
 
   /** map of unique projects */
-  const projects: Record<
-    string,
-    {
-      project: string;
-      samples: string[];
-    }
-  > = {};
+  const projects: Record<string, { project: string; samples: string[] }> = {};
   /** map of unique phyla */
   const phyla: Record<
     string,
@@ -193,7 +185,7 @@ const processMainData = async () => {
       project: string;
       run: string;
       reads: number;
-      code: string;
+      countryCode: string;
       region: string;
     }
   > = {};
@@ -212,7 +204,7 @@ const processMainData = async () => {
     /** if no more data, exit */
     if (taxonomicDone && metadataDone) break;
 
-    /** get sample metadata cols */
+    /** get sample metadata columns */
     const [
       sample = "",
       project = "",
@@ -223,12 +215,12 @@ const processMainData = async () => {
       ,
       ,
       ,
-      code = "",
+      countryCode = "",
       region = "",
     ] = metadataRow;
 
     /** count country */
-    if (countries[code]) countries[code].properties.samples++;
+    if (countries[countryCode]) countries[countryCode].properties.samples++;
     /** count region */
     if (regions[region]) regions[region].properties.samples++;
 
@@ -241,21 +233,21 @@ const processMainData = async () => {
     const classCounted: Record<string, boolean> = {};
 
     /** start counting reads for this sample */
-    samples[sample] = { sample, run, project, reads: 0, code, region };
+    samples[sample] = { sample, run, project, reads: 0, countryCode, region };
 
     /** loop through taxonomic table columns */
-    for (let col = 2; col < taxonomicRow.length; col++) {
+    for (let column = 2; column < taxonomicRow.length; column++) {
       /** number of sequence reads */
-      const reads = Number(taxonomicRow[col]);
+      const reads = Number(taxonomicRow[column]);
 
       /** tally reads for this sample */
       samples[sample].reads += reads;
 
       /** if taxon present in sample */
       if (reads > 0) {
-        const taxonomicCol = taxonomicHeader[col];
+        const taxonomicColumn = taxonomicHeader[column];
         /** get props from header row */
-        const taxon = { ...taxonomicCol!, samples: { total: 0 } };
+        const taxon = { ...taxonomicColumn!, samples: { total: 0 } };
         const { phylum = "", _class = "" } = taxon;
 
         /** count sample toward phylum (if not already) */
@@ -263,8 +255,8 @@ const processMainData = async () => {
           phyla[phylum] ??= cloneDeep(taxon);
           phyla[phylum]._class = "";
           phyla[phylum].samples.total!++;
-          phyla[phylum].samples[code] ??= 0;
-          phyla[phylum].samples[code]++;
+          phyla[phylum].samples[countryCode] ??= 0;
+          phyla[phylum].samples[countryCode]++;
           phyla[phylum].samples[region] ??= 0;
           phyla[phylum].samples[region]++;
           phylumCounted[phylum] = true;
@@ -274,8 +266,8 @@ const processMainData = async () => {
         if (!classCounted[_class]) {
           classes[_class] ??= cloneDeep(taxon);
           classes[_class].samples.total!++;
-          classes[_class].samples[code] ??= 0;
-          classes[_class].samples[code]++;
+          classes[_class].samples[countryCode] ??= 0;
+          classes[_class].samples[countryCode]++;
           classes[_class].samples[region] ??= 0;
           classes[_class].samples[region]++;
           classCounted[_class] = true;
@@ -288,7 +280,8 @@ const processMainData = async () => {
   const getReads = (key: string) =>
     Object.values(samples)
       .filter(
-        ({ code, region }) => key === "total" || key === code || key === region,
+        ({ countryCode, region }) =>
+          key === "total" || key === countryCode || key === region,
       )
       .map(({ reads }) => reads);
 
@@ -351,8 +344,8 @@ const processMainData = async () => {
       }
   }
 
-  /** parse tag counts */
-  const tagsStream = stream(`${mainInput}/tags.tsv`);
+  /** stream file line by line */
+  const tagsStream = stream(`${inputPath}/tags.tsv`);
 
   /** ignore header */
   await tagsStream.next();
@@ -376,6 +369,18 @@ const processMainData = async () => {
       samples: number;
     }
   > = {};
+  /** list of tags per country */
+  const countryTags: Record<string, Record<string, number>> = {};
+  /** list of tags per region */
+  const regionTags: Record<string, Record<string, number>> = {};
+
+  /** quick lookup of sample id to country/region */
+  const sampleToGeo = Object.fromEntries(
+    Object.entries(samples).map(([sample, { countryCode, region }]) => [
+      sample,
+      { countryCode, region },
+    ]),
+  );
 
   /** process rest of rows (with hard limit) */
   for (let row = 0; row < 100000000; row++) {
@@ -388,17 +393,26 @@ const processMainData = async () => {
       done,
     } = await tagsStream.next();
 
+    if (done) break;
+
     /** count tags */
     tags[tag] ??= { tag, projects: {}, samples: {} };
     tags[tag].projects[project] = project;
     tags[tag].samples[sample] = sample;
 
     /** count tag values */
-    const key = [tag, value, project].join("-");
+    const key = [tag, value].join(" | ");
     tagValues[key] ??= { tag, value, project, samples: 0 };
     tagValues[key].samples++;
 
-    if (done) break;
+    /** count samples per tag per geo */
+    const { countryCode = "", region = "" } = sampleToGeo[sample] ?? {};
+    countryTags[countryCode] ??= {};
+    countryTags[countryCode][key] ??= 0;
+    countryTags[countryCode][key]++;
+    regionTags[region] ??= {};
+    regionTags[region][key] ??= 0;
+    regionTags[region][key]++;
   }
 
   /** turn maps into lists, and do final sorting and such */
@@ -452,12 +466,14 @@ const processMainData = async () => {
     [(datum) => datum.samples],
     ["desc"],
   );
+  const countryTagsOut = countryTags;
+  const regionTagsOut = regionTags;
 
   /** load zenodo record */
-  const record = read<_Record>(recordFile);
+  const record = read<Zenodo>(recordPath);
 
   /** derive metadata about data */
-  const metadata = {
+  const meta = {
     projects: projectsOut.length,
     samples: projectsOut.reduce(
       (total, { samples }) => total + samples.length,
@@ -483,21 +499,227 @@ const processMainData = async () => {
   };
 
   /** save results */
-  write(`${mainOutput}/projects.json`, projectsOut);
-  write(`${mainOutput}/samples.json`, samplesOut);
-  write(`${mainOutput}/phyla.json`, phylaOut);
-  write(`${mainOutput}/classes.json`, classesOut);
-  write(`${mainOutput}/countries.json`, countriesOut);
-  write(`${mainOutput}/regions.json`, regionsOut);
-  write(`${mainOutput}/reads.json`, readsOut);
-  write(`${mainOutput}/tags.json`, tagsOut);
-  write(`${mainOutput}/tag-values.json`, tagValuesOut);
-  write(`${mainOutput}/metadata.json`, metadata);
+  write(`${outputPath}/projects.json`, projectsOut);
+  write(`${outputPath}/samples.json`, samplesOut);
+  write(`${outputPath}/phyla.json`, phylaOut);
+  write(`${outputPath}/classes.json`, classesOut);
+  write(`${outputPath}/countries.json`, countriesOut);
+  write(`${outputPath}/regions.json`, regionsOut);
+  write(`${outputPath}/reads.json`, readsOut);
+  write(`${outputPath}/tags.json`, tagsOut);
+  write(`${outputPath}/tag-values.json`, tagValuesOut);
+  write(`${outputPath}/country-tags.json`, countryTagsOut);
+  write(`${outputPath}/region-tags.json`, regionTagsOut);
+  write(`${outputPath}/meta.json`, meta);
 
   console.info("Summary");
-  console.info(metadata);
+  console.info(meta);
+};
+
+/** maximum number of principal components */
+const maxPC = 8;
+
+type PC = `PC${number}`;
+
+/** process projectionist data */
+const processProjectionistData = async (
+  inputPath: string,
+  outputPath: string,
+) => {
+  console.info("PROCESSING PROJECTIONIST DATA");
+
+  /** collect sample pcs */
+  const samplePCs: Record<
+    /** ordination */
+    string,
+    Record<
+      /** run */
+      string,
+      /** PCs */
+      { region: string } & Record<PC, number>
+    >
+  > = {};
+
+  /** get all sample pc files */
+  const samplePCsFiles = glob(`${inputPath}/sample-pcs-*.tsv`);
+
+  for await (const samplePCsFile of samplePCsFiles) {
+    /** ordination from filename */
+    const [, ordination = ""] =
+      samplePCsFile.match(/sample-pcs-(.*).tsv/) ?? [];
+
+    console.info(`Processing sample PCs for ${ordination}`);
+
+    /** stream file line by line */
+    const samplePCsStream = stream(samplePCsFile);
+
+    /** ignore header */
+    await samplePCsStream.next();
+
+    /** process rest of rows (with hard limit) */
+    for (let row = 0; row < 1000000; row++) {
+      /** show progress periodically */
+      if (throttle("sample pcs"))
+        console.info(`Processing sample PCs row ${row}`);
+
+      /** read row */
+      const { value: sampleRow = [], done: sampleDone } =
+        await samplePCsStream.next();
+
+      /** if no more data, exit */
+      if (sampleDone) break;
+
+      /** get columns */
+      let [run = "", region = "", ...PCs] = sampleRow;
+
+      /** split PROJECT_SRR to just SRR */
+      run = run.split("_").pop() || run;
+
+      /** set ordination */
+      samplePCs[ordination] ??= {};
+      /** set run and region */
+      samplePCs[ordination][run] ??= { region };
+      /** set PCs */
+      for (let index = 1; index <= maxPC; index++)
+        samplePCs[ordination][run]![`PC${index}`] = Number(PCs[index - 1]);
+    }
+  }
+
+  /** collect taxon pcs per ordination */
+  const taxonPCs: Record<
+    /** ordination */
+    string,
+    Record<
+      /** taxon */
+      string,
+      /** PCs */
+      Record<PC, number>
+    >
+  > = {};
+
+  /** get all taxon pc files */
+  const taxonPCsFiles = glob(`${inputPath}/taxon-pcs-*.tsv`);
+
+  for await (const taxonPCsFile of taxonPCsFiles) {
+    /** ordination from filename */
+    const [, ordination = ""] = taxonPCsFile.match(/taxon-pcs-(.*).tsv/) ?? [];
+
+    console.info(`Processing taxon PCs for ${ordination}`);
+
+    /** stream file line by line */
+    const taxonPCsStream = stream(taxonPCsFile);
+
+    /** ignore header */
+    await taxonPCsStream.next();
+
+    /** process rest of rows (with hard limit) */
+    for (let row = 0; row < 1000000; row++) {
+      /** show progress periodically */
+      if (throttle("taxon pcs"))
+        console.info(`Processing taxon PCs row ${row}`);
+
+      /** read row */
+      const { value: taxonRow = [], done: taxonDone } =
+        await taxonPCsStream.next();
+
+      /** if no more data, exit */
+      if (taxonDone) break;
+
+      /** get columns */
+      const [
+        kingdom = "",
+        phylum = "",
+        _class = "",
+        order = "",
+        family = "",
+        ...PCs
+      ] = taxonRow;
+
+      /** stringify taxon info into key */
+      const taxon = [kingdom, phylum, _class, order, family].join(" | ");
+
+      /** set ordination */
+      taxonPCs[ordination] ??= {};
+      /** set taxon */
+      taxonPCs[ordination][taxon] ??= {};
+      /** set PCs */
+      for (let index = 1; index <= maxPC; index++)
+        taxonPCs[ordination][taxon][`PC${index}`] = Number(PCs[index - 1]);
+    }
+  }
+
+  /** for each ordination, scree information */
+  const scree: Record<
+    string,
+    {
+      explained: Record<string, number>;
+      cumulative: Record<string, number>;
+    }
+  > = {};
+
+  /** stream file line by line */
+  const screeStream = stream(`${inputPath}/scree.tsv`);
+
+  /** ignore header */
+  await screeStream.next();
+
+  /** process rest of rows (with hard limit) */
+  for (let row = 0; row < 1000000; row++) {
+    /** show progress periodically */
+    if (throttle("scree")) console.info(`Processing scree row ${row}`);
+
+    /** read row */
+    const { value: screeRow = [], done: screeDone } = await screeStream.next();
+
+    /** if no more data, exit */
+    if (screeDone) break;
+
+    /** get columns */
+    const [axis = "", explained = 0, cumulative = 0, ordination = ""] =
+      screeRow;
+    const pc = `PC${axis}`;
+
+    /** set scree info */
+    scree[ordination] ??= { explained: {}, cumulative: {} };
+    scree[ordination].explained[pc] = Number(explained);
+    scree[ordination].cumulative[pc] = Number(cumulative);
+  }
+
+  /** save results */
+  for (const [ordination, data] of Object.entries(samplePCs))
+    write(`${outputPath}/sample-pcs-${ordination}.json`, data);
+  for (const [ordination, data] of Object.entries(taxonPCs))
+    write(`${outputPath}/taxon-pcs-${ordination}.json`, data);
+  write(`${outputPath}/scree.json`, scree);
 };
 
 /** run */
-await downloadFiles();
-await processMainData();
+if (process.env.DOWNLOAD !== "false") {
+  await downloadFiles(
+    site["human-microbiome-compendium"].record,
+    "downloaded/human-microbiome-compendium",
+  );
+  await downloadFiles(
+    site["human-microbiome-compendium"].projectionistRecord,
+    "downloaded/projectionist",
+  );
+  await downloadFiles(
+    site["meta-g-compendium"].record,
+    "downloaded/meta-g-compendium",
+  );
+}
+
+await processMainData(
+  "downloaded/human-microbiome-compendium/record.json",
+  "downloaded/human-microbiome-compendium",
+  "../src/pages/home/data/human-microbiome-compendium",
+);
+await processMainData(
+  "downloaded/meta-g-compendium/record.json",
+  "downloaded/meta-g-compendium",
+  "../src/pages/home/data/meta-g-compendium",
+);
+await processProjectionistData(
+  "downloaded/projectionist",
+  "../src/pages/projectionist/data/human-microbiome-compendium",
+);

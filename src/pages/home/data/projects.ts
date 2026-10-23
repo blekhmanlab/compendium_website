@@ -1,8 +1,28 @@
+import type { Compendium } from "@/site";
 import { expose } from "comlink";
+import { mapKeys } from "lodash";
 import { request } from "@/util/async";
-import projectsUrl from "./projects.json?url";
-import readsUrl from "./reads.json?url";
 import { cleanSearch } from "./util";
+
+/** get all projects urls */
+const projectsUrls = mapKeys(
+  import.meta.glob<string>("./*/projects.json", {
+    eager: true,
+    query: "url",
+    import: "default",
+  }),
+  (_, path) => path.match(/([^/]+)\/projects\.json$/)?.[1] ?? "",
+);
+
+/** get all reads urls */
+const readsUrls = mapKeys(
+  import.meta.glob<string>("./*/reads.json", {
+    eager: true,
+    query: "url",
+    import: "default",
+  }),
+  (_, path) => path.match(/([^/]+)\/reads\.json$/)?.[1] ?? "",
+);
 
 /** project and sample names */
 export type Projects = {
@@ -31,15 +51,14 @@ export type ProjectSearch = {
   name: string;
   type: "Project" | "Sample";
   samples: number;
-  fuzzy?: boolean;
 }[];
 
 /** get projects and reads */
-export const getProjects = async () => {
+export const getProjects = async (compendium: Compendium) => {
   /** load static data */
   const [projects, reads] = await Promise.all([
-    request<Projects>(projectsUrl),
-    request<Reads>(readsUrl),
+    request<Projects>(projectsUrls[compendium] ?? ""),
+    request<Reads>(readsUrls[compendium] ?? ""),
   ]);
   return { projects, reads };
 };

@@ -1,19 +1,23 @@
+import type { Theme } from "@/util/dom";
 import type { Point } from "@/util/math";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useElementSize, useEventListener } from "@reactuses/core";
 import { gsap } from "gsap";
-import { random } from "lodash";
+import { clamp, random } from "lodash";
 import PoissonDiskSampling from "poisson-disk-sampling";
-import { sleep, waitFor } from "@/util/async";
-import { getCssVariable, getMatrix } from "@/util/dom";
+import { waitFor } from "@/util/async";
+import { getMatrix } from "@/util/dom";
+import { useTheme } from "@/util/hooks";
 import { cos, dist, sin } from "@/util/math";
 
+/** shape scale */
+const scale = 0.85;
 /** particle size */
 const size = 1 / 140;
 /** desired spacing of points */
 const spacing = 1 / 30;
 
-const Viz = () => {
+export default function Viz() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const ctx = useRef<CanvasRenderingContext2D | null>(null);
 
@@ -36,10 +40,10 @@ const Viz = () => {
     /** smaller side */
     const side = Math.min(canvas.current.width, canvas.current.height);
     /** scale to contain */
-    ctx.current?.scale(side / 2, side / 2);
+    ctx.current?.scale((scale * side) / 2, (scale * side) / 2);
   }, [width, height]);
 
-  const [particles, setParticles] = useState<Particle[]>([]);
+  const particles = useRef<Particle[]>([]);
 
   /** draw frame */
   const frame = useCallback(() => {
@@ -62,15 +66,16 @@ const Viz = () => {
       size,
       color,
       alpha,
-      spinAngle,
-      spinRadius,
-    } of particles) {
-      ctx.current.globalAlpha = alpha;
+      spin,
+      strength,
+    } of particles.current) {
+      const radius = size * (10 * strength);
+      ctx.current.globalAlpha = clamp(alpha ? alpha + strength : 0, 0, 1);
       ctx.current.fillStyle = color;
       ctx.current.beginPath();
       ctx.current.arc(
-        position.x + sin(t / 3 + spinAngle) * spinRadius,
-        position.y + cos(t / 3 + spinAngle) * spinRadius,
+        position.x + sin(t / 3 + spin) * radius,
+        position.y + cos(t / 3 + spin) * radius,
         size,
         0,
         Math.PI * 2,
@@ -88,27 +93,15 @@ const Viz = () => {
     return () => gsap.ticker.remove(frame);
   }, [frame]);
 
-  /** use gsap context to efficiently clean up old animations */
-  const gsapCtx = useRef<gsap.Context>(null);
-
-  const generate = useCallback((delay = 1000) => {
-    /** cleanup any existing animations */
-    gsapCtx.current?.revert();
-    /** create new animations */
-    gsapCtx.current = gsap.context(async () => {
-      /** wait a bit */
-      await sleep(delay);
-      /** get/set new particles */
-      setParticles(await getParticles());
-    });
-  }, []);
-
-  /** on page load */
+  const theme = useTheme();
   useEffect(() => {
-    generate(1000);
+    /** generate new particles */
+    const ctx = gsap.context(
+      async () => (particles.current = await getParticles(theme)),
+    );
     /** cleanup */
-    return () => gsapCtx.current?.revert();
-  }, [generate]);
+    return () => ctx.revert();
+  }, [theme]);
 
   /** track mouse */
   useEventListener("mousemove", (event) => {
@@ -119,39 +112,31 @@ const Viz = () => {
     point.y *= oversample;
     const mouse = point.matrixTransform(ctx.current.getTransform().inverse());
     /** bulge particles */
-    for (const particle of particles) {
+    for (const particle of particles.current) {
       /** strength of effect, closer -> higher */
       const strength = 1000 ** -dist(particle.position, mouse);
-      gsap.to(particle, { spinRadius: size + size * (20 * strength) });
+      gsap.to(particle, { strength });
     }
   });
 
-  return (
-    <canvas
-      ref={canvas}
-      className="absolute inset-0 -z-10 size-full"
-      onClick={() => generate(0)}
-    />
-  );
-};
+  return <canvas ref={canvas} className="absolute inset-0 -z-10 size-full" />;
+}
 
 /** "oversampling" of canvas */
 const oversample = 2;
-
-export default Viz;
 
 type Particle = {
   position: Point;
   destination: Point;
   size: number;
-  alpha: number;
   color: string;
-  spinAngle: number;
-  spinRadius: number;
+  alpha: number;
+  spin: number;
+  strength: number;
 };
 
 /** generate particles */
-const getParticles = async () => {
+const getParticles = async (theme: Theme) => {
   /** wait for necessary elements to load */
   const svg = await waitFor(() =>
     document.querySelector<SVGSVGElement>("#logo"),
@@ -165,9 +150,9 @@ const getParticles = async () => {
     transform: getMatrix(svg, path),
   }));
 
-  const primary = getCssVariable("--color-primary");
-  const secondary = getCssVariable("--color-secondary");
-  const gray = getCssVariable("--color-slate-500");
+  /** colors */
+  const primary = theme["--color-primary"] || "";
+  const secondary = theme["--color-secondary"] || "";
 
   /** get bounding box of svg */
   const [left = 0, top = 0, width = 100, height = 100] = (
@@ -211,7 +196,7 @@ const getParticles = async () => {
     }));
 
   /** hard limit number of points */
-  while (points.length > 500) points.splice(random(points.length), 1);
+  while (points.length > 1000) points.splice(random(points.length), 1);
 
   /** create particle for each point */
   const particles: Particle[] = points.map((point) => ({
@@ -219,35 +204,41 @@ const getParticles = async () => {
     position: { x: point.x * 2, y: point.y * 2 },
     destination: point,
     size,
-    color: gray,
+    color: primary,
     alpha: 0,
-    spinAngle: random(360),
-    spinRadius: size,
+    spin: random(360),
+    strength: 0,
   }));
+
+  /** wait a bit before starting all animation */
+  const wait = 1;
+
+  /** animation params */
+  const duration = 1;
+  gsap.defaults({ duration, ease: "power4.out" });
 
   /** animate each particle */
   for (const particle of particles) {
-    const duration = 2;
     const delay = random(duration, true);
-    const ease = "power4.out";
     /** animate position */
-    gsap.to(particle.position, {
+    gsap.timeline({ delay: wait }).to(particle.position, {
       ...particle.destination,
-      duration,
+      duration: 2 * duration,
       delay,
-      ease,
     });
     /** animate alpha */
     gsap
-      .timeline()
-      .to(particle, { alpha: 1, duration: duration * 0.5, delay, ease })
-      .to(particle, { alpha: 0.35, duration: duration * 0.5, ease });
+      .timeline({ delay: wait })
+      .to(particle, { alpha: 1, delay })
+      .to(particle, { alpha: 0.35 });
     /** animate color */
     gsap
-      .timeline({ repeat: -1, yoyo: true, delay: particle.destination.x })
-      .to(particle, { color: gray, duration: duration * 0.5, ease })
-      .to(particle, { color: primary, duration: duration * 0.5, ease })
-      .to(particle, { color: secondary, duration: duration * 0.5, ease });
+      .timeline({
+        repeat: -1,
+        delay: wait + 2 * duration + particle.destination.x,
+      })
+      .to(particle, { color: secondary, delay: duration })
+      .to(particle, { color: primary });
   }
 
   return particles;

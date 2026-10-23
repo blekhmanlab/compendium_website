@@ -1,39 +1,75 @@
-import type { ComponentProps } from "react";
-import { startCase } from "lodash";
-import { ChevronDownIcon } from "lucide-react";
+import type { ComponentProps, ReactNode } from "react";
+import { Select as BaseSelect } from "@base-ui/react";
+import clsx from "clsx";
+import { CheckIcon, ChevronDownIcon } from "lucide-react";
 
-type Props<Option extends string> = {
-  label: string;
-  value: Option;
-  onChange: (value: Option) => void;
-  options: readonly Option[];
-} & Omit<ComponentProps<"select">, "onChange">;
+type Props<Id extends string> = {
+  label: ReactNode;
+  value: Id;
+  onChange: (value: Id) => void;
+  options: readonly { value: Id; label?: ReactNode }[];
+} & Omit<ComponentProps<"select">, "value" | "onChange">;
 
-const Select = <Option extends string>({
+export default function Select<Id extends string>({
   label,
   value,
   onChange,
   options,
-  ...props
-}: Props<Option>) => (
-  <label className="inline-flex items-center gap-2">
-    <span className="text-right">{label}</span>
-    <span className="relative">
-      <select
-        className="min-w-20 cursor-pointer appearance-none rounded-md bg-slate-500/25 p-2 pr-8 transition hover:bg-slate-500/50"
-        {...props}
-        value={value}
-        onChange={(event) => onChange(event.target.value as Option)}
-      >
-        {options.map((option, index) => (
-          <option key={index} value={option}>
-            {startCase(option)}
-          </option>
-        ))}
-      </select>
-      <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-1 -translate-y-1/2" />
-    </span>
-  </label>
-);
+  className = "",
+}: Props<Id>) {
+  const selected = options.find((option) => option.value === value);
 
-export default Select;
+  return (
+    <label className="flex items-center gap-2">
+      <span className="flex items-center gap-1 text-right">{label}</span>
+      <BaseSelect.Root<Id>
+        value={value}
+        onValueChange={(value) => {
+          if (value !== null) onChange(value);
+        }}
+      >
+        <BaseSelect.Trigger
+          className={clsx(
+            "flex min-w-20 cursor-pointer appearance-none items-center gap-2 rounded-md bg-gray p-2 transition hover:bg-light-gray",
+            className,
+          )}
+        >
+          <span className="grow truncate text-left">
+            {selected?.label ?? value}
+          </span>
+          <ChevronDownIcon />
+        </BaseSelect.Trigger>
+
+        <BaseSelect.Portal>
+          <BaseSelect.Positioner
+            side="bottom"
+            align="start"
+            sideOffset={4}
+            collisionPadding={12}
+            className="z-20"
+            alignItemWithTrigger={false}
+          >
+            <BaseSelect.Popup className="flex max-h-(--available-height) flex-col overflow-y-auto rounded-md border border-light-gray bg-gray">
+              <BaseSelect.List>
+                {options.map(({ value, label }) => (
+                  <BaseSelect.Item
+                    key={value}
+                    value={value}
+                    className="flex cursor-pointer items-center gap-2 p-2 hover:bg-light-gray data-highlighted:bg-light-gray"
+                  >
+                    <BaseSelect.ItemText className="grow">
+                      {label ?? value}
+                    </BaseSelect.ItemText>
+                    <BaseSelect.ItemIndicator>
+                      <CheckIcon className="size-4" />
+                    </BaseSelect.ItemIndicator>
+                  </BaseSelect.Item>
+                ))}
+              </BaseSelect.List>
+            </BaseSelect.Popup>
+          </BaseSelect.Positioner>
+        </BaseSelect.Portal>
+      </BaseSelect.Root>
+    </label>
+  );
+}

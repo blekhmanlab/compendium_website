@@ -1,5 +1,36 @@
 import { formatHex } from "culori";
-import { sleep } from "@/util/async";
+import { frame } from "@/util/async";
+
+export type Theme = Record<`--${string}`, string>;
+
+/** https://stackoverflow.com/a/78994961/2180570 */
+/** get all css variables on root */
+export const getTheme = (styles = getStyles()): Theme =>
+  Object.fromEntries(
+    Array.from(document.styleSheets)
+      .flatMap((sheet) => {
+        try {
+          return Array.from(sheet.cssRules);
+        } catch (error) {
+          return [];
+        }
+      })
+      .filter((rule) => rule instanceof CSSLayerBlockRule)
+      .filter((rule) => rule.name === "theme")
+      .flatMap((rule) => Array.from(rule.cssRules))
+      .filter((rule) => rule instanceof CSSStyleRule)
+      .flatMap((rule) => Array.from(rule.style))
+      .filter((style) => style.startsWith("--"))
+      .map((variable) => {
+        let value = styles.getPropertyValue(variable);
+        value = formatHex(value) ?? value;
+        return [variable, value];
+      }),
+  );
+
+/** get styles on target element */
+export const getStyles = (target?: Element | null) =>
+  window.getComputedStyle(target || document.documentElement);
 
 /**
  * get transform matrix that converts point from one element coordinate system
@@ -9,13 +40,6 @@ export const getMatrix = (to: SVGGraphicsElement, from: SVGGraphicsElement) =>
   (to.getScreenCTM() || new SVGMatrix())
     .inverse()
     .multiply(from.getScreenCTM() || new SVGMatrix());
-
-/** get css variable */
-export const getCssVariable = (name: string) => {
-  let value = getComputedStyle(document.body).getPropertyValue(name);
-  if (value.includes("oklch")) value = formatHex(value) ?? value;
-  return value;
-};
 
 /** download element as svg */
 export const downloadSvg = (
@@ -60,10 +84,10 @@ export const downloadSvg = (
 export const preserveScroll = async (element?: Element | null) => {
   if (!element) return;
   const oldY = element.getBoundingClientRect().top;
-  await sleep(0);
+  await frame();
   const newY = element.getBoundingClientRect().top;
   if (!element.isConnected) return;
-  window.scrollBy({ top: newY - oldY, behavior: "smooth" });
+  window.scrollBy({ top: newY - oldY });
 };
 
 /** fit svg view box to contents */

@@ -1,5 +1,6 @@
 import type { CSSProperties, MouseEventHandler, ReactNode } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import clsx from "clsx";
 import { clamp } from "lodash";
 import { ChevronDownIcon } from "lucide-react";
 import Button from "@/components/Button";
@@ -7,9 +8,9 @@ import CheckButton from "@/components/CheckButton";
 import { preserveScroll } from "@/util/dom";
 import { formatNumber } from "@/util/string";
 
-type DatumShape = object & { name: string };
+type DatumShape = object & { key?: string };
 
-export type Col<Datum extends DatumShape, Key extends keyof Datum> = {
+export type Column<Datum extends DatumShape, Key extends keyof Datum> = {
   /** key of row object to access as cell value */
   key: Key;
   /** label for header */
@@ -20,9 +21,17 @@ export type Col<Datum extends DatumShape, Key extends keyof Datum> = {
   style?: (cell?: NoInfer<Datum[Key]>, row?: Datum) => CSSProperties;
 };
 
+/**
+ * https://stackoverflow.com/questions/68274805/typescript-reference-type-of-property-by-other-property-of-same-object
+ * https://github.com/vuejs/core/discussions/8851
+ */
+type _Column<Datum extends DatumShape> = {
+  [Key in keyof Datum]: Column<Datum, Key extends keyof Datum ? Key : never>;
+}[keyof Datum];
+
 type Props<Datum extends DatumShape> = {
-  /** col definitions https://github.com/orgs/vuejs/discussions/8851 */
-  cols: { [Key in keyof Datum]: Col<Datum, Key> }[keyof Datum][];
+  /** column definitions */
+  columns: _Column<Datum>[];
   /** data */
   rows: Datum[];
   /** max rows to show at a time */
@@ -31,18 +40,21 @@ type Props<Datum extends DatumShape> = {
   extraRows?: string[];
   /** when selected rows change */
   onSelect?: (selected: string[]) => void;
+  /** class on root */
+  className?: string;
 };
 
 export type OnSelect = NonNullable<Props<DatumShape>["onSelect"]>;
 export type SelectedRows = Parameters<OnSelect>[0];
 
-const Table = <Datum extends DatumShape>({
-  cols,
+export default function Table<Datum extends DatumShape>({
+  columns,
   rows,
   limit = 7,
   extraRows,
   onSelect,
-}: Props<Datum>) => {
+  className,
+}: Props<Datum>) {
   /** row cutoff */
   let [cutoff, setCutoff] = useState(limit);
 
@@ -60,8 +72,13 @@ const Table = <Datum extends DatumShape>({
   const selectEnabled = !!onSelect;
 
   /** are some rows selected */
-  const someSelected =
-    !!rows.length && rows.some((row) => selected.has(row.name));
+  const someSelected = useMemo(
+    () =>
+      !!selected.size &&
+      !!rows.length &&
+      rows.some((row, index) => selected.has(row.key ?? String(index))),
+    [rows, selected],
+  );
 
   /** set selected */
   const updateSelected = (newSelected: typeof selected) => {
@@ -71,14 +88,14 @@ const Table = <Datum extends DatumShape>({
 
   return (
     <>
-      <div className="w-full overflow-x-auto">
+      <div className={clsx("w-full table-wrapper", className)}>
         <table>
           <thead>
             <tr>
               {selectEnabled && (
                 <th>
                   <CheckButton
-                    label={
+                    tooltip={
                       someSelected
                         ? `Deselect ${formatNumber(selected.size)} rows`
                         : `Select ${formatNumber(rows.length)} rows`
@@ -88,15 +105,19 @@ const Table = <Datum extends DatumShape>({
                       updateSelected(
                         someSelected
                           ? new Set()
-                          : new Set(rows.map((row) => row.name)),
+                          : new Set(
+                              rows.map(
+                                (row, index) => row.key ?? String(index),
+                              ),
+                            ),
                       )
                     }
                   />
                 </th>
               )}
-              {cols.map((col, index) => (
-                <th key={index} style={col.style ? col.style() : {}}>
-                  {col.name}
+              {columns.map((column, index) => (
+                <th key={index} style={column.style ? column.style() : {}}>
+                  {column.name}
                 </th>
               ))}
             </tr>
@@ -116,28 +137,32 @@ const Table = <Datum extends DatumShape>({
                   {selectEnabled && (
                     <td>
                       <CheckButton
-                        label={
-                          selected.has(row.name) ? "Deselect row" : "Select row"
+                        className="border border-light-gray"
+                        tooltip={
+                          selected.has(row.key || String(rowIndex))
+                            ? "Deselect row"
+                            : "Select row"
                         }
-                        checked={selected.has(row.name)}
+                        checked={selected.has(row.key || String(rowIndex))}
                         onChange={(checked) => {
                           const newSelected = new Set(selected);
-                          if (checked) newSelected.add(row.name);
-                          else newSelected.delete(row.name);
+                          if (checked)
+                            newSelected.add(row.key || String(rowIndex));
+                          else newSelected.delete(row.key || String(rowIndex));
                           updateSelected(newSelected);
                         }}
                       />
                     </td>
                   )}
-                  {cols.map((col, colIndex) => {
-                    const cell = row[col.key];
+                  {columns.map((column, columnIndex) => {
+                    const cell = row[column.key];
                     return (
                       <td
-                        key={colIndex}
-                        style={col.style ? col.style(cell, row) : {}}
+                        key={columnIndex}
+                        style={column.style ? column.style(cell, row) : {}}
                       >
-                        {col.render
-                          ? col.render(cell, row)
+                        {column.render
+                          ? column.render(cell, row)
                           : typeof cell === "number"
                             ? formatNumber(cell, false)
                             : String(cell)}
@@ -150,7 +175,7 @@ const Table = <Datum extends DatumShape>({
             {!!extraRows?.length &&
               extraRows.map((row, index) => (
                 <tr key={index} style={{ opacity: 0.5 }}>
-                  <td colSpan={cols.length}>{row}</td>
+                  <td colSpan={columns.length}>{row}</td>
                 </tr>
               ))}
           </tbody>
@@ -187,6 +212,4 @@ const Table = <Datum extends DatumShape>({
       </div>
     </>
   );
-};
-
-export default Table;
+}
