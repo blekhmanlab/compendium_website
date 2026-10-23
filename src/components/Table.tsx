@@ -1,5 +1,6 @@
 import type { CSSProperties, MouseEventHandler, ReactNode } from "react";
 import { useMemo, useState } from "react";
+import clsx from "clsx";
 import { clamp } from "lodash";
 import { ChevronDownIcon } from "lucide-react";
 import Button from "@/components/Button";
@@ -39,6 +40,8 @@ type Props<Datum extends DatumShape> = {
   extraRows?: string[];
   /** when selected rows change */
   onSelect?: (selected: string[]) => void;
+  /** class on root */
+  className?: string;
 };
 
 export type OnSelect = NonNullable<Props<DatumShape>["onSelect"]>;
@@ -50,6 +53,7 @@ export default function Table<Datum extends DatumShape>({
   limit = 7,
   extraRows,
   onSelect,
+  className,
 }: Props<Datum>) {
   /** row cutoff */
   let [cutoff, setCutoff] = useState(limit);
@@ -84,7 +88,7 @@ export default function Table<Datum extends DatumShape>({
 
   return (
     <>
-      <div className="w-full table-wrapper">
+      <div className={clsx("w-full table-wrapper", className)}>
         <table>
           <thead>
             <tr>

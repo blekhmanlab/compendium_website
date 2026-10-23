@@ -50,7 +50,6 @@ export type TaxonSearch = {
   name: string;
   type: "Phylum" | "Class";
   samples: number;
-  fuzzy?: boolean;
 }[];
 
 export const getTaxa = async (compendium: Compendium) => {

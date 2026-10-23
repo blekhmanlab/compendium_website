@@ -401,7 +401,7 @@ const processMainData = async (
     tags[tag].samples[sample] = sample;
 
     /** count tag values */
-    const key = [tag, value].join("|");
+    const key = [tag, value].join(" | ");
     tagValues[key] ??= { tag, value, project, samples: 0 };
     tagValues[key].samples++;
 
@@ -636,7 +636,7 @@ const processProjectionistData = async (
       ] = taxonRow;
 
       /** stringify taxon info into key */
-      const taxon = [kingdom, phylum, _class, order, family].join("|");
+      const taxon = [kingdom, phylum, _class, order, family].join(" | ");
 
       /** set ordination */
       taxonPCs[ordination] ??= {};
@@ -694,18 +694,20 @@ const processProjectionistData = async (
 };
 
 /** run */
-await downloadFiles(
-  site["human-microbiome-compendium"].record,
-  "downloaded/human-microbiome-compendium",
-);
-await downloadFiles(
-  site["human-microbiome-compendium"].projectionistRecord,
-  "downloaded/projectionist",
-);
-await downloadFiles(
-  site["meta-g-compendium"].record,
-  "downloaded/meta-g-compendium",
-);
+if (process.env.DOWNLOAD !== "false") {
+  await downloadFiles(
+    site["human-microbiome-compendium"].record,
+    "downloaded/human-microbiome-compendium",
+  );
+  await downloadFiles(
+    site["human-microbiome-compendium"].projectionistRecord,
+    "downloaded/projectionist",
+  );
+  await downloadFiles(
+    site["meta-g-compendium"].record,
+    "downloaded/meta-g-compendium",
+  );
+}
 
 await processMainData(
   "downloaded/human-microbiome-compendium/record.json",

@@ -14,7 +14,7 @@ const samplePCsUrls = mapKeys(
   (_, path) => {
     const [, compendium = "", ordination = ""] =
       path.match(/([^/]+)\/sample-pcs-(.+)\.json/) ?? [];
-    return [compendium, ordination].join("|");
+    return [compendium, ordination].join(" | ");
   },
 );
 
@@ -23,6 +23,6 @@ export type SamplePCs = Record<string, { region: string } & Record<PC, number>>;
 
 /** get sample pcs */
 export const getSamplePCs = (compendium: Compendium, ordination: string) =>
-  request<SamplePCs>(samplePCsUrls[[compendium, ordination].join("|")] ?? "");
+  request<SamplePCs>(samplePCsUrls[[compendium, ordination].join(" | ")] ?? "");
 
 expose({ getSamplePCs });

@@ -26,7 +26,7 @@ import {
   useData,
 } from "@/pages/home/state";
 import { frame } from "@/util/async";
-import { getCssVariable } from "@/util/dom";
+import { useTheme } from "@/util/hooks";
 import { formatNumber } from "@/util/string";
 
 type Feature = (Regions | Countries)["features"][number];
@@ -81,11 +81,11 @@ export default function Map() {
     return () => abort.abort();
   }, [compendium, tagsEnabled]);
 
-  /** colors */
-  const primary = getCssVariable("--color-primary");
-  const secondary = getCssVariable("--color-secondary");
-  const lightGray = getCssVariable("--color-light-gray");
-  const gray = getCssVariable("--color-gray");
+  const theme = useTheme();
+  const primary = theme["--color-primary"] || "";
+  const secondary = theme["--color-secondary"] || "";
+  const lightGray = theme["--color-light-gray"] || "";
+  const gray = theme["--color-gray"] || "";
 
   /** get range of sample counts */
   const [, max = 1000] = extent(
@@ -233,8 +233,8 @@ export default function Map() {
     );
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="flex flex-wrap items-center gap-4">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap justify-center gap-4">
         <Select
           label="Level"
           value={level}
@@ -245,26 +245,26 @@ export default function Map() {
           }))}
         />
         <Autocomplete
-          className="w-40"
+          className="max-w-80"
           label="Tag"
           value={filter}
           onChange={setFilter}
           options={
             tagValues?.map(({ tag, value }) => ({
-              value: [tag, value].join("|"),
+              value: [tag, value].join(" | "),
             })) ?? []
           }
           renderOption={(id) => {
-            const [tag = "", tagValue = ""] = id.split("|");
+            const [tag = "", tagValue = ""] = id.split(" | ");
             return (
               <div className="-mt-1 flex flex-col leading-none">
-                <span className="text-xs">{tag}</span>
-                <span>{tagValue}</span>
+                <span className="text-xs wrap-anywhere opacity-75">{tag}</span>
+                <span className="wrap-anywhere">{tagValue}</span>
               </div>
             );
           }}
           onFocus={() => setTagsEnabled(true)}
-          status={
+          content={
             tagsEnabled &&
             !tagValues?.length && <Alert type="loading">Loading tags</Alert>
           }

@@ -1,5 +1,5 @@
 import { formatHex } from "culori";
-import { getCssVariable } from "@/util/dom";
+import { useTheme } from "@/util/hooks";
 import { cos, sin } from "@/util/math";
 
 /** color options */
@@ -14,9 +14,6 @@ const colors = [
   formatHex("oklch(70% 0.25 60)"),
   formatHex("oklch(65% 0.25 20)"),
 ];
-
-/** neutral color */
-const gray = getCssVariable("--color-light-gray");
 
 export type Point = { x: number; y: number };
 
@@ -65,12 +62,15 @@ const shapes = [
 
 type Entry = { color: string; shape: string };
 type Legend = Record<string, Entry>;
-const neutral: Entry = { color: gray, shape: "circle" };
 
 export const useLegend = (keys: string[], stagger = 1) => {
   /** map of key to entry */
   const map: Legend = {};
   const used: Legend = {};
+
+  const theme = useTheme();
+  const gray = theme["--color-light-gray"] || "";
+  const neutral: Entry = { color: gray, shape: "circle" };
 
   /** next entry to reserve */
   let color = 0;

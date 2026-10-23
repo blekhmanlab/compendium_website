@@ -1,18 +1,15 @@
-import type { Remote } from "comlink";
 import type { Column } from "@/components/Table";
 import type { Data } from "@/pages/home/state";
-import type * as SearchAPI from "@/util/search";
 import type { KeysOfType } from "@/util/types";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useDebounce } from "@reactuses/core";
 import { capitalize, upperFirst } from "lodash";
 import Alert from "@/components/Alert";
 import Select from "@/components/Select";
 import Table from "@/components/Table";
 import Textbox from "@/components/Textbox";
-import SearchWorker from "@/util/search?worker";
+import { useSearch } from "@/util/hooks";
 import { formatNumber } from "@/util/string";
-import { useWorker } from "@/util/worker";
 
 type StateSearchList = Data[KeysOfType<Data, `${string}Search`>];
 
@@ -44,9 +41,6 @@ export default function SearchList({
   /** debounced search input */
   const search = useDebounce(_search, 300);
 
-  /** anything to search for */
-  const hasSearch = !!search.trim();
-
   /** types specified */
   const hasTypes = !!types?.length;
 
@@ -66,35 +60,8 @@ export default function SearchList({
 
   type Filtered = NonNullable<typeof filtered>;
 
-  const exactSearch = useCallback(
-    (worker: Remote<typeof SearchAPI>) =>
-      worker.exactSearch(filtered ?? [], fields, search) as Promise<Filtered>,
-    [filtered, search],
-  );
-  const fuzzySearch = useCallback(
-    (worker: Remote<typeof SearchAPI>) =>
-      worker.fuzzySearch(filtered ?? [], fields, search) as Promise<Filtered>,
-    [filtered, search],
-  );
-
-  /** exact search results */
-  const [exactMatches = [], exactStatus] = useWorker(
-    SearchWorker,
-    /** skip work when search empty */
-    hasSearch ? exactSearch : undefined,
-  );
-  /** fuzzy search results */
-  const [fuzzyMatches = [], fuzzyStatus] = useWorker(
-    SearchWorker,
-    /** skip work when search empty */
-    hasSearch ? fuzzySearch : undefined,
-  );
-
-  /** exact match name quick lookup */
-  const exactLookup = useMemo(
-    () => Object.fromEntries(exactMatches.map((match) => [match.name, ""])),
-    [exactMatches],
-  );
+  /** search results */
+  const [matches, status] = useSearch(filtered, fields, search);
 
   if (!list)
     return (
@@ -103,29 +70,10 @@ export default function SearchList({
       </Alert>
     );
 
-  /** full list of matches */
-  const matches = search.trim()
-    ? exactMatches.concat(
-        /** de-duplicate items already in exact */
-        fuzzyMatches
-          .filter((fuzzy) => !(fuzzy.name in exactLookup))
-          .map((fuzzy) => ({ ...fuzzy, fuzzy: true })),
-      )
-    : filtered;
-
   return (
     <>
       <div className="flex w-full min-w-0 flex-wrap items-center justify-center gap-4">
-        <Textbox
-          value={_search}
-          onChange={setSearch}
-          placeholder="Search"
-          className={
-            exactStatus === "loading" || fuzzyStatus === "loading"
-              ? "animate-pulse"
-              : ""
-          }
-        />
+        <Textbox value={_search} onChange={setSearch} placeholder="Search" />
 
         {types && (
           <Select
@@ -147,18 +95,14 @@ export default function SearchList({
           (column): Column<Filtered[number], keyof Filtered[number]> => ({
             key: column as keyof Filtered[number],
             name: capitalize(column),
-            style: (_, row) => ({ opacity: row?.fuzzy ? 0.5 : 1 }),
           }),
         )}
         rows={matches}
         extraRows={
-          exactStatus !== "loading" &&
-          fuzzyStatus !== "loading" &&
-          !matches.length
-            ? ["No results"]
-            : undefined
+          status !== "loading" && !matches.length ? ["No results"] : undefined
         }
         onSelect={onSelect}
+        className={status === "loading" ? "opacity-50" : ""}
       />
     </>
   );

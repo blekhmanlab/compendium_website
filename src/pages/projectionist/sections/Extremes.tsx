@@ -112,7 +112,7 @@ export default function Extremes() {
                 <tbody>
                   {data.map(({ taxon, PC }, rowIndex) => (
                     <tr key={rowIndex}>
-                      <td>{taxon.split("|").join(" | ")}</td>
+                      <td>{taxon.split(" | ").join(" | ")}</td>
                       <td>{PC.toFixed(3)}</td>
                     </tr>
                   ))}

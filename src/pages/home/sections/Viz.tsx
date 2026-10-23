@@ -1,12 +1,13 @@
+import type { Theme } from "@/util/dom";
 import type { Point } from "@/util/math";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useElementSize, useEventListener } from "@reactuses/core";
 import { gsap } from "gsap";
 import { clamp, random } from "lodash";
 import PoissonDiskSampling from "poisson-disk-sampling";
-import { useData } from "@/pages/home/state";
 import { waitFor } from "@/util/async";
-import { getCssVariable, getMatrix } from "@/util/dom";
+import { getMatrix } from "@/util/dom";
+import { useTheme } from "@/util/hooks";
 import { cos, dist, sin } from "@/util/math";
 
 /** shape scale */
@@ -19,9 +20,6 @@ const spacing = 1 / 30;
 export default function Viz() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const ctx = useRef<CanvasRenderingContext2D | null>(null);
-
-  /** which compendium is selected */
-  const compendium = useData((state) => state.compendium);
 
   /** init canvas context */
   useEffect(() => {
@@ -45,7 +43,7 @@ export default function Viz() {
     ctx.current?.scale((scale * side) / 2, (scale * side) / 2);
   }, [width, height]);
 
-  const [particles, setParticles] = useState<Particle[]>([]);
+  const particles = useRef<Particle[]>([]);
 
   /** draw frame */
   const frame = useCallback(() => {
@@ -63,9 +61,16 @@ export default function Viz() {
     );
 
     /** draw particles */
-    for (const { position, size, color, alpha, spin, strength } of particles) {
+    for (const {
+      position,
+      size,
+      color,
+      alpha,
+      spin,
+      strength,
+    } of particles.current) {
       const radius = size * (10 * strength);
-      ctx.current.globalAlpha = clamp(alpha + strength, 0, 1);
+      ctx.current.globalAlpha = clamp(alpha ? alpha + strength : 0, 0, 1);
       ctx.current.fillStyle = color;
       ctx.current.beginPath();
       ctx.current.arc(
@@ -88,26 +93,15 @@ export default function Viz() {
     return () => gsap.ticker.remove(frame);
   }, [frame]);
 
-  /** use gsap context to efficiently clean up old animations */
-  const gsapCtx = useRef<gsap.Context>(null);
-
-  const generate = useCallback(() => {
-    /** cleanup any existing animations */
-    gsapCtx.current?.revert();
-    /** create new animations */
-    gsapCtx.current = gsap.context(async () => {
-      /** get/set new particles */
-      setParticles(await getParticles());
-    });
-    // eslint-disable-next-line -- compendium changes theme colors
-  }, [compendium]);
-
-  /** on page load */
+  const theme = useTheme();
   useEffect(() => {
-    generate();
+    /** generate new particles */
+    const ctx = gsap.context(
+      async () => (particles.current = await getParticles(theme)),
+    );
     /** cleanup */
-    return () => gsapCtx.current?.revert();
-  }, [generate]);
+    return () => ctx.revert();
+  }, [theme]);
 
   /** track mouse */
   useEventListener("mousemove", (event) => {
@@ -118,20 +112,14 @@ export default function Viz() {
     point.y *= oversample;
     const mouse = point.matrixTransform(ctx.current.getTransform().inverse());
     /** bulge particles */
-    for (const particle of particles) {
+    for (const particle of particles.current) {
       /** strength of effect, closer -> higher */
       const strength = 1000 ** -dist(particle.position, mouse);
       gsap.to(particle, { strength });
     }
   });
 
-  return (
-    <canvas
-      ref={canvas}
-      className="absolute inset-0 -z-10 size-full"
-      onClick={generate}
-    />
-  );
+  return <canvas ref={canvas} className="absolute inset-0 -z-10 size-full" />;
 }
 
 /** "oversampling" of canvas */
@@ -148,7 +136,7 @@ type Particle = {
 };
 
 /** generate particles */
-const getParticles = async () => {
+const getParticles = async (theme: Theme) => {
   /** wait for necessary elements to load */
   const svg = await waitFor(() =>
     document.querySelector<SVGSVGElement>("#logo"),
@@ -162,8 +150,9 @@ const getParticles = async () => {
     transform: getMatrix(svg, path),
   }));
 
-  const primary = getCssVariable("--color-primary");
-  const secondary = getCssVariable("--color-secondary");
+  /** colors */
+  const primary = theme["--color-primary"] || "";
+  const secondary = theme["--color-secondary"] || "";
 
   /** get bounding box of svg */
   const [left = 0, top = 0, width = 100, height = 100] = (

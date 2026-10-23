@@ -42,7 +42,6 @@ export type GeoSearch = {
   name: string;
   type: "Region" | "Country";
   samples: number;
-  fuzzy?: boolean;
 }[];
 
 /** get regions and countries */

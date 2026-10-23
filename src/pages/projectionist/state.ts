@@ -1,3 +1,4 @@
+import type * as SamplesAPI from "@/pages/home/data/samples";
 import type { Samples } from "@/pages/home/data/samples";
 import type * as SamplePCsAPI from "@/pages/projectionist/data/sample-pcs";
 import type { SamplePCs } from "@/pages/projectionist/data/sample-pcs";
@@ -14,6 +15,7 @@ import type {
 import type { Compendium } from "@/site";
 import { wrap } from "comlink";
 import { create } from "zustand";
+import SamplesWorker from "@/pages/home/data/samples?worker";
 import SamplePCsWorker from "@/pages/projectionist/data/sample-pcs?worker";
 import { getScree } from "@/pages/projectionist/data/scree";
 import TaxonPCsWorker from "@/pages/projectionist/data/taxon-pcs?worker";
@@ -35,6 +37,22 @@ export type Data = {
 /** projectionist page state store */
 export const useData = create<Data>(() => ({}));
 
+/** loaded samples cache flag */
+let loadedSamples = "";
+
+/** load and set samples */
+export const loadSamples = async (
+  compendium: Compendium,
+  abort: AbortController,
+) => {
+  if (compendium === loadedSamples) return;
+  const worker = wrap<typeof SamplesAPI>(new SamplesWorker());
+  const samples = await worker.getSamples(compendium);
+  if (abort.signal.aborted) return;
+  useData.setState({ samples });
+  loadedSamples = compendium;
+};
+
 /** loaded sample pcs cache flag */
 let loadedSamplePCs = "";
 
@@ -42,11 +60,13 @@ let loadedSamplePCs = "";
 export const loadSamplePCs = async (
   compendium: Compendium,
   ordination: string,
+  abort: AbortController,
 ) => {
   const key = `${compendium}:${ordination}`;
   if (key === loadedSamplePCs) return;
   const worker = wrap<typeof SamplePCsAPI>(new SamplePCsWorker());
   const samplePCs = await worker.getSamplePCs(compendium, ordination);
+  if (abort.signal.aborted) return;
   useData.setState({ samplePCs });
   loadedSamplePCs = key;
 };
@@ -58,11 +78,13 @@ let loadedTaxonPCs = "";
 export const loadTaxonPCs = async (
   compendium: Compendium,
   ordination: string,
+  abort: AbortController,
 ) => {
   const key = `${compendium}:${ordination}`;
   if (key === loadedTaxonPCs) return;
   const worker = wrap<typeof TaxonPCsAPI>(new TaxonPCsWorker());
   const taxonPCs = await worker.getTaxonPCs(compendium, ordination);
+  if (abort.signal.aborted) return;
   useData.setState({ taxonPCs });
   loadedTaxonPCs = key;
 };

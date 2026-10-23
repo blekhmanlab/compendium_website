@@ -44,7 +44,6 @@ export type TagSearch = {
   name: string;
   projects: number;
   samples: number;
-  fuzzy?: boolean;
 }[];
 
 export type TagValueSearch = {
@@ -52,7 +51,6 @@ export type TagValueSearch = {
   value: string;
   project: string;
   samples: number;
-  fuzzy?: boolean;
 }[];
 
 /** get tags and tag-values */

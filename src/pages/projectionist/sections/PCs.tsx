@@ -40,8 +40,10 @@ export default function PCs() {
   /** load sample and taxon pc data based on selected ordination */
   useEffect(() => {
     if (!ordination || !compendium) return;
-    loadSamplePCs(compendium, ordination);
-    loadTaxonPCs(compendium, ordination);
+    const abort = new AbortController();
+    loadSamplePCs(compendium, ordination, abort);
+    loadTaxonPCs(compendium, ordination, abort);
+    return () => abort.abort();
   }, [compendium, ordination]);
 
   /** region options */

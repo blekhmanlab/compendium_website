@@ -51,7 +51,6 @@ export type ProjectSearch = {
   name: string;
   type: "Project" | "Sample";
   samples: number;
-  fuzzy?: boolean;
 }[];
 
 /** get projects and reads */

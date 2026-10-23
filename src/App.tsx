@@ -12,6 +12,7 @@ import Home from "@/pages/home/Home";
 import { setSelectedCompendium } from "@/pages/home/state";
 import Projectionist from "@/pages/projectionist/Projectionist";
 import meta from "@/site";
+import { updateStyles } from "@/util/hooks";
 
 /** app entrypoint */
 export default function App() {
@@ -90,6 +91,9 @@ const updateCompendium = () => {
     "--gray-hue",
     String(theme["gray-hue"]),
   );
+
+  /** mark that styles have changed */
+  updateStyles();
 };
 
 /** update on load */

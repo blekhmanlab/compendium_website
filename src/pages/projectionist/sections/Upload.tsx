@@ -99,7 +99,7 @@ export default function Upload() {
   const missingInCompendium = !isEmpty(userTaxa)
     ? Object.entries(userTaxa ?? {})
         .map(([taxon, { kingdom, phylum, _class, order, family }]) => {
-          const full = [kingdom, phylum, _class, order, family].join("|");
+          const full = [kingdom, phylum, _class, order, family].join(" | ");
           if (!taxonPCs?.[full]) return taxon;
         })
         .filter((taxon) => taxon !== undefined)

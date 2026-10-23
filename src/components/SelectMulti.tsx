@@ -52,7 +52,7 @@ export default function SelectMulti<Id extends string>({
   const allSelected = _value.length === options.length;
 
   return (
-    <label className="inline-flex items-center gap-2">
+    <label className="flex items-center gap-2">
       <span className="flex items-center gap-1 text-right">{label}</span>
       <Select.Root<Id, true>
         multiple

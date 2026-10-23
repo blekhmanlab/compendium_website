@@ -118,7 +118,7 @@ export const projectUserData = async (
       /** extract ranks, drop genus to consolidate at family level */
       const { kingdom, phylum, _class, order, family } = full;
       /** stringify taxon */
-      return [kingdom, phylum, _class, order, family].join("|");
+      return [kingdom, phylum, _class, order, family].join(" | ");
     })
     /** remove taxa not in compendium */
     .filter((taxon) => taxonPCs[taxon] !== undefined);

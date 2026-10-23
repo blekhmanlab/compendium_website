@@ -9,7 +9,6 @@ type APIShape = Record<PropertyKey, unknown> & {
 /** run async operation in worker, with status, error handling, de-dupe, etc. */
 export const useWorker = <API extends APIShape, Data>(
   Worker: new () => Worker,
-
   func: ((worker: Remote<API>) => Promise<Data>) | undefined,
 ) => {
   /** data returned from async operation */
@@ -50,22 +49,19 @@ export const useWorker = <API extends APIShape, Data>(
         /** run async operation in worker thread */
         const data = await func(wrapper);
 
-        /** if this is still the latest run */
-        if (latest) {
-          latest = false;
-          /** success */
-          setData(data);
-          setStatus("");
-          setMessage("");
-        }
+        if (!latest) return;
+        /** success */
+        latest = false;
+        setData(data);
+        setStatus("");
+        setMessage("");
       } catch (error) {
-        /** if this is still the latest run, update error status */
-        if (latest) {
-          latest = false;
-          console.warn(error);
-          setStatus("error");
-          setMessage(String((error as Error).message));
-        }
+        if (!latest) return;
+        /** error */
+        latest = false;
+        console.warn(error);
+        setStatus("error");
+        setMessage(String((error as Error).message));
       }
     })();
 

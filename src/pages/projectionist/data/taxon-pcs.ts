@@ -14,7 +14,7 @@ const taxonPCsUrls = mapKeys(
   (_, path) => {
     const [, compendium = "", ordination = ""] =
       path.match(/([^/]+)\/taxon-pcs-(.+)\.json/) ?? [];
-    return [compendium, ordination].join("|");
+    return [compendium, ordination].join(" | ");
   },
 );
 
@@ -23,6 +23,6 @@ export type TaxonPCs = Record<string, Record<PC, number>>;
 
 /** get taxon pcs */
 export const getTaxonPCs = (compendium: Compendium, ordination: string) =>
-  request<TaxonPCs>(taxonPCsUrls[[compendium, ordination].join("|")] ?? "");
+  request<TaxonPCs>(taxonPCsUrls[[compendium, ordination].join(" | ")] ?? "");
 
 expose({ getTaxonPCs });

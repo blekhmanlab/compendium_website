@@ -1,4 +1,5 @@
 import type { ECharts, EChartsInitOpts, EChartsOption } from "echarts";
+import type { Theme } from "@/util/dom";
 import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
 import { useDebounceFn, useResizeObserver } from "@reactuses/core";
 import clsx from "clsx";
@@ -7,7 +8,7 @@ import { connect, init, registerTheme } from "echarts";
 import { clamp, range } from "lodash";
 import { DownloadIcon } from "lucide-react";
 import { sleep } from "@/util/async";
-import { getCssVariable } from "@/util/dom";
+import { useTheme } from "@/util/hooks";
 
 type Props = {
   option: EChartsOption;
@@ -79,6 +80,11 @@ export default function Chart({
     if (!chart.current) return;
     chart.current.setOption(option, true, true);
   });
+
+  const theme = useTheme();
+  useEffect(() => {
+    setTheme(theme);
+  }, [theme]);
 
   return (
     <>
@@ -181,7 +187,7 @@ export default function Chart({
 }
 
 /** set default chart styles */
-const setTheme = () => {
+const setTheme = (theme: Theme) => {
   const text = {
     color: "white",
     fontSize: 16 * 1.1,
@@ -259,8 +265,8 @@ const setTheme = () => {
     },
 
     tooltip: {
-      borderColor: getCssVariable("--color-light-gray"),
-      backgroundColor: getCssVariable("--color-gray"),
+      borderColor: theme["--color-light-gray"],
+      backgroundColor: theme["--color-gray"],
       textStyle: text,
       appendTo: "body",
       // eslint-disable-next-line
@@ -276,8 +282,3 @@ const setTheme = () => {
     },
   });
 };
-
-/** update theme on events that can affect it */
-setTheme();
-window.addEventListener("load", setTheme);
-document.fonts.addEventListener("loadingdone", setTheme);

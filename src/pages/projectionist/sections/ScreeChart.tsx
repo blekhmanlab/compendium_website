@@ -1,6 +1,6 @@
 import type { EChartsOption } from "echarts";
 import Chart from "@/components/Chart";
-import { getCssVariable } from "@/util/dom";
+import { useTheme } from "@/util/hooks";
 import { formatNumber } from "@/util/string";
 
 type Props = {
@@ -13,12 +13,14 @@ const maxPcs = 8;
 
 /** scree plots of principal components */
 export default function ScreeChart({ yLabel, type, data }: Props) {
+  const theme = useTheme();
+
   const option: EChartsOption = {
     series: [
       {
         type: type,
         barWidth: "90%",
-        color: getCssVariable("--color-primary"),
+        color: theme["--color-primary"] || "",
         data: Object.entries(data).map(([key, value]) => ({
           id: key,
           value,

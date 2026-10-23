@@ -20,7 +20,7 @@ export default function Select<Id extends string>({
   const selected = options.find((option) => option.value === value);
 
   return (
-    <label className="inline-flex items-center gap-2">
+    <label className="flex items-center gap-2">
       <span className="flex items-center gap-1 text-right">{label}</span>
       <BaseSelect.Root<Id>
         value={value}

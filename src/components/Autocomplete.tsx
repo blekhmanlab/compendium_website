@@ -1,16 +1,10 @@
 import type { ComponentProps, ReactNode } from "react";
-import type { Remote } from "comlink";
-import type * as SearchAPI from "@/util/search";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Combobox } from "@base-ui/react";
-import { useDebounce } from "@reactuses/core";
+import { useDebounce, useInfiniteScroll } from "@reactuses/core";
 import clsx from "clsx";
 import { CheckIcon, XIcon } from "lucide-react";
-import SearchWorker from "@/util/search?worker";
-import { useWorker } from "@/util/worker";
-
-/** max number of results to render */
-const limit = 100;
+import { useSearch } from "@/util/hooks";
 
 type Props<Id extends string> = {
   label: ReactNode;
@@ -18,8 +12,11 @@ type Props<Id extends string> = {
   onChange: (value: Id | "") => void;
   options: readonly { value: Id | ""; label?: ReactNode }[];
   renderOption?: (value: Id) => ReactNode;
-  status?: ReactNode;
-} & Omit<ComponentProps<"input">, "value" | "onChange">;
+  content?: ReactNode;
+} & Omit<ComponentProps<"input">, "value" | "onChange" | "content">;
+
+/** chunk size of results */
+const chunk = 50;
 
 export default function Autocomplete<Id extends string>({
   label,
@@ -30,12 +27,16 @@ export default function Autocomplete<Id extends string>({
   placeholder = "Search",
   className = "",
   onFocus,
-  status,
+  content,
 }: Props<Id>) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   /** search input */
   const [_search, setSearch] = useState("");
   /** debounced search input */
   const search = useDebounce(_search, 300);
+  /** max number of results to render */
+  const [limit, setLimit] = useState(chunk);
 
   /** option search values */
   const list = useMemo(
@@ -43,20 +44,18 @@ export default function Autocomplete<Id extends string>({
     [options],
   );
 
-  /** exact search results */
-  const [exactMatches] = useWorker(
-    SearchWorker,
-    useCallback(
-      (worker: Remote<typeof SearchAPI>) =>
-        worker.exactSearch(list, ["value"], search) as Promise<typeof list>,
-      [list, search],
-    ),
+  /** load more items on scroll */
+  useInfiniteScroll(
+    () => scrollRef.current,
+    () => setLimit((prev) => prev + chunk),
+    { distance: 16 },
   );
 
+  /** search results */
+  const [matches, status] = useSearch(list, ["value"], search);
+
   /** items to show in dropdown */
-  const items = (search.trim() ? (exactMatches ?? []) : list)
-    .slice(0, limit)
-    .map((item) => item.value);
+  const items = matches.slice(0, limit).map((item) => item.value);
 
   /** get item label */
   const getLabel = (id: Id) =>
@@ -66,14 +65,18 @@ export default function Autocomplete<Id extends string>({
     "-";
 
   return (
-    <label className="inline-flex items-center gap-2">
+    <label className="flex items-center gap-2">
       <span className="flex items-center gap-1 text-right">{label}</span>
       <Combobox.Root<Id>
         items={items}
         filter={null}
         value={value || null}
         onValueChange={(value) => onChange(value || "")}
-        onInputValueChange={setSearch}
+        onInputValueChange={(value) => {
+          setSearch(value);
+          setLimit(chunk);
+        }}
+        onOpenChange={() => setLimit(chunk)}
       >
         <Combobox.InputGroup
           data-filled={value ? "" : undefined}
@@ -87,7 +90,7 @@ export default function Autocomplete<Id extends string>({
           </div>
           <Combobox.Input
             placeholder={placeholder}
-            className="min-w-0 p-2 pr-10 opacity-0 group-not-data-filled:opacity-100 group-focus-within:opacity-100"
+            className="w-full min-w-0 p-2 pr-10 opacity-0 group-not-data-filled:opacity-100 group-focus-within:opacity-100"
             onFocus={onFocus}
           />
           {value !== "" && (
@@ -107,8 +110,11 @@ export default function Autocomplete<Id extends string>({
             collisionPadding={12}
             className="z-20"
           >
-            <Combobox.Popup className="flex max-h-(--available-height) flex-col overflow-y-auto rounded-md border border-light-gray bg-gray">
-              {status || (
+            <Combobox.Popup
+              ref={scrollRef}
+              className="flex max-h-(--available-height) w-(--anchor-width) flex-col overflow-auto rounded-md border border-light-gray bg-gray"
+            >
+              {content || (
                 <Combobox.Empty className="p-2 empty:hidden">
                   No matches
                 </Combobox.Empty>
@@ -118,7 +124,10 @@ export default function Autocomplete<Id extends string>({
                   <Combobox.Item
                     key={id}
                     value={id}
-                    className="flex cursor-pointer items-center gap-2 p-2 hover:bg-light-gray data-highlighted:bg-light-gray"
+                    className={clsx(
+                      "flex cursor-pointer items-center gap-2 p-2 hover:bg-light-gray data-highlighted:bg-light-gray",
+                      status === "loading" && "opacity-50",
+                    )}
                   >
                     <span className="grow">{getLabel(id)}</span>
                     <Combobox.ItemIndicator>

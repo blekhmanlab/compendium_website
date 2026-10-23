@@ -4,7 +4,7 @@ import { max, min } from "lodash";
 import Alert from "@/components/Alert";
 import Chart from "@/components/Chart";
 import { useData } from "@/pages/home/state";
-import { getCssVariable } from "@/util/dom";
+import { useTheme } from "@/util/hooks";
 import { formatNumber, tooltipTable } from "@/util/string";
 
 type Props = {
@@ -15,8 +15,8 @@ type Props = {
 export default function ReadsChart({ data }: Props) {
   type Datum = Reads["histogram"][number];
 
-  /** colors */
-  const secondary = getCssVariable("--color-secondary");
+  const theme = useTheme();
+  const secondary = theme["--color-secondary"] || "";
 
   /** global state */
   const selectedFeature = useData((state) => state.selectedFeature);
