@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 2 2">
+  <path
+    fill="none"
+    stroke="white"
+    stroke-width="0.25"
+    d="
+      m -2 0
+      a 0.65 0.65 0 0 0 1 0
+      a 0.65 0.65 0 0 1 1 0
+      a 0.65 0.65 0 0 0 1 0
+      a 0.65 0.65 0 0 1 1 0
+    "
+  />
+</svg>
