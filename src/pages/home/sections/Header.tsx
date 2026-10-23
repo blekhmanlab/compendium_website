@@ -16,7 +16,7 @@ export default function Header() {
     <HeaderWrapper>
       <Viz />
 
-      <div className="-mt-10 flex flex-wrap items-center justify-center gap-4">
+      {/* <div className="-mt-10 flex flex-wrap items-center justify-center gap-4">
         {Object.entries(metaEntries).map(([id, { title, description }]) => (
           <Tooltip
             key={id}
@@ -30,7 +30,7 @@ export default function Header() {
             </Button>
           </Tooltip>
         ))}
-      </div>
+      </div> */}
 
       <Title className="text-3xl max-sm:text-xl" />
 

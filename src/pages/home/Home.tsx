@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import Footer from "@/components/Footer";
 import Meta from "@/components/Meta";
 import { useSite } from "@/pages/home/state";
-import Compare from "./sections/Compare";
+// import Compare from "./sections/Compare";
 import Header from "./sections/Header";
 import Overview from "./sections/Overview";
 import Prevalence from "./sections/Prevalence";
@@ -36,7 +36,7 @@ export default function Home() {
         <Prevalence />
         {compendium === "human-microbiome-compendium" && (
           <>
-            <Compare />
+            {/* <Compare /> */}
             <Recipes />
           </>
         )}
