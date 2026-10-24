@@ -191,21 +191,21 @@ const setTheme = (theme: Theme) => {
   const text = {
     color: "white",
     fontSize: 16 * 1.1,
-    fontFamily: "Mona Sans",
+    fontFamily: theme["--font-sans"],
     fontWeight: "normal",
   };
 
   const textBig = {
     color: "white",
     fontSize: 16 * 1.1,
-    fontFamily: "Mona Sans",
+    fontFamily: theme["--font-sans"],
     fontWeight: 600,
   };
 
   const textSmall = {
     color: "#fffa",
     fontSize: 12 * 1.1,
-    fontFamily: "Mona Sans",
+    fontFamily: theme["--font-sans"],
     fontWeight: "normal",
   };
 
