@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { isValidElement } from "react";
 import { Popover } from "@base-ui/react";
 import clsx from "clsx";
+import { shrinkWrap } from "@/util/dom";
 
 type Props = {
   /** tooltip content */
@@ -54,9 +55,11 @@ export default function Tooltip({
           }}
         >
           <Popover.Popup
+            ref={(element) => {
+              if (element) shrinkWrap(element);
+            }}
             className={clsx(
-              "max-h-(--available-height) w-max max-w-[min(var(--available-width),--spacing(100))] overflow-y-auto rounded-md border border-light-gray bg-gray p-4 leading-relaxed transition trim data-closed:opacity-0 data-ending-style:opacity-0 data-open:opacity-100 data-starting-style:opacity-0",
-
+              "w-max max-w-[min(var(--available-width),--spacing(100))] rounded-md border border-light-gray bg-gray p-4 leading-relaxed transition trim data-closed:opacity-0 data-ending-style:opacity-0 data-open:opacity-100 data-starting-style:opacity-0",
               className,
             )}
           >

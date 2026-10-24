@@ -106,3 +106,23 @@ export const fitViewBox = (svg: SVGSVGElement, padding = 0) => {
 
   svg.setAttribute("viewBox", viewBox);
 };
+
+/** shrink width to wrapped text https://stackoverflow.com/questions/14596213 */
+export const shrinkWrap = (
+  element: HTMLElement | null,
+  startChild = 0,
+  endChild = -1,
+) => {
+  if (!element) return;
+  const start = [...element.childNodes].at(startChild);
+  const end = [...element.childNodes].at(endChild);
+  if (!start || !end) return;
+  const range = document.createRange();
+  range.setStartBefore(start);
+  range.setEndAfter(end);
+  const style = window.getComputedStyle(element);
+  const paddingLeft = parseFloat(style.paddingLeft) || 0;
+  const paddingRight = parseFloat(style.paddingRight) || 0;
+  const { width } = range.getBoundingClientRect();
+  element.style.maxWidth = width + paddingLeft + paddingRight + "px";
+};
